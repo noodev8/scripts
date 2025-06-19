@@ -1,0 +1,221 @@
+2025-06-15 06:00:02  Starting inventory sync for 3061 products...
+2025-06-15 06:01:21  Progress: 100/3061 processed, 0 updated
+2025-06-15 06:03:02  Progress: 200/3061 processed, 0 updated
+2025-06-15 06:03:29  1019142-ARIZONA-36: Updated from 0 → 1
+2025-06-15 06:04:43  Progress: 300/3061 processed, 1 updated
+2025-06-15 06:06:22  Progress: 400/3061 processed, 1 updated
+2025-06-15 06:08:06  Progress: 500/3061 processed, 1 updated
+2025-06-15 06:08:19  0040393-MADRID-38: Updated from 0 → 1
+2025-06-15 06:09:45  Progress: 600/3061 processed, 2 updated
+2025-06-15 06:11:24  Progress: 700/3061 processed, 2 updated
+2025-06-15 06:13:02  Progress: 800/3061 processed, 2 updated
+2025-06-15 06:14:46  Progress: 900/3061 processed, 2 updated
+2025-06-15 06:16:21  Progress: 1000/3061 processed, 2 updated
+2025-06-15 06:18:04  Progress: 1100/3061 processed, 2 updated
+2025-06-15 06:19:42  Progress: 1200/3061 processed, 2 updated
+2025-06-15 06:21:25  Progress: 1300/3061 processed, 2 updated
+2025-06-15 06:23:04  Progress: 1400/3061 processed, 2 updated
+2025-06-15 06:24:41  Progress: 1500/3061 processed, 2 updated
+2025-06-15 06:26:24  Progress: 1600/3061 processed, 2 updated
+2025-06-15 06:26:56  0128183-MADRID-39: Updated from 0 → 1
+2025-06-15 06:28:03  Progress: 1700/3061 processed, 3 updated
+2025-06-15 06:29:46  Progress: 1800/3061 processed, 3 updated
+2025-06-15 06:31:24  Progress: 1900/3061 processed, 3 updated
+2025-06-15 06:33:02  Progress: 2000/3061 processed, 3 updated
+2025-06-15 06:34:10  1014932-ZERMATT-35: Updated from 2 → 0
+2025-06-15 06:34:42  Progress: 2100/3061 processed, 4 updated
+2025-06-15 06:36:25  Progress: 2200/3061 processed, 4 updated
+2025-06-15 06:37:05  1017721-BEND-37: Updated from 0 → 2
+2025-06-15 06:38:04  Progress: 2300/3061 processed, 5 updated
+2025-06-15 06:39:42  Progress: 2400/3061 processed, 5 updated
+2025-06-15 06:41:25  Progress: 2500/3061 processed, 5 updated
+2025-06-15 06:43:03  Progress: 2600/3061 processed, 5 updated
+2025-06-15 06:44:41  Progress: 2700/3061 processed, 5 updated
+2025-06-15 06:46:24  Progress: 2800/3061 processed, 5 updated
+2025-06-15 06:48:03  Progress: 2900/3061 processed, 5 updated
+2025-06-15 06:49:41  Progress: 3000/3061 processed, 5 updated
+2025-06-15 06:50:46  Inventory sync completed — items updated: 5, mode: full
+2025-06-15 07:10:23  Starting inventory sync for 0 products...
+2025-06-15 07:10:23  Inventory sync completed — items updated: 0, mode: single
+2025-06-15 07:11:43  Starting inventory sync for 1 products...
+2025-06-15 07:11:44  1014932-ZERMATT-35: Updated from 2 → 0
+2025-06-15 07:11:44  Inventory sync completed — items updated: 1, mode: single
+2025-06-15 07:24:23  Starting inventory sync for 0 products...
+2025-06-15 07:24:23  Inventory sync completed — items updated: 0, failed: 0, mode: single
+2025-06-15 07:25:11  Starting inventory sync for 1 products...
+2025-06-15 07:25:12  Inventory sync completed — items updated: 0, failed: 0, mode: single
+2025-06-15 07:26:30  Starting inventory sync for 1 products...
+2025-06-15 07:26:31  1014932-ZERMATT-35: Attempting update from 2 → 0 (inventory_item_id: 42733480804411)
+2025-06-15 07:26:32  1014932-ZERMATT-35: ✅ Updated from 2 → 0
+2025-06-15 07:26:32  Inventory sync completed — items updated: 1, failed: 0, mode: single
+2025-06-15 07:30:38  Starting inventory sync for 3061 products...
+2025-06-15 07:32:01  Progress: 100/3061 processed, 0 updated, 0 failed
+2025-06-15 07:33:24  SUINLEA-07: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:33:42  Progress: 200/3061 processed, 0 updated, 0 failed
+2025-06-15 07:33:57  SUHORNSM-0PKT: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:34:53  SUINLEA-13: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:35:21  Progress: 300/3061 processed, 0 updated, 0 failed
+2025-06-15 07:36:09  SUINLEA-12: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:37:01  Progress: 400/3061 processed, 0 updated, 0 failed
+2025-06-15 07:38:29  SUINLEA-10: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:38:39  Progress: 500/3061 processed, 0 updated, 0 failed
+2025-06-15 07:40:18  Progress: 600/3061 processed, 0 updated, 0 failed
+2025-06-15 07:41:33  SU090B-BRN-00: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:42:01  Progress: 700/3061 processed, 0 updated, 0 failed
+2025-06-15 07:42:40  B710AP-03: ⚠️  No inventory_item_id found
+2025-06-15 07:43:39  Progress: 800/3061 processed, 0 updated, 0 failed
+2025-06-15 07:44:03  SUINLEA-05: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:44:26  SUINLEA-14: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:45:17  Progress: 900/3061 processed, 0 updated, 0 failed
+2025-06-15 07:45:56  B710AP-04: ⚠️  No inventory_item_id found
+2025-06-15 07:46:59  Progress: 1000/3061 processed, 0 updated, 0 failed
+2025-06-15 07:47:13  SUINLEA-08: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:47:34  SUINLEA-09: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:48:37  Progress: 1100/3061 processed, 0 updated, 0 failed
+2025-06-15 07:49:22  SUINLEA-06: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 07:50:20  Progress: 1200/3061 processed, 0 updated, 0 failed
+2025-06-15 07:51:58  Progress: 1300/3061 processed, 0 updated, 0 failed
+2025-06-15 07:53:40  Progress: 1400/3061 processed, 0 updated, 0 failed
+2025-06-15 07:55:18  Progress: 1500/3061 processed, 0 updated, 0 failed
+2025-06-15 07:57:00  Progress: 1600/3061 processed, 0 updated, 0 failed
+2025-06-15 07:58:38  Progress: 1700/3061 processed, 0 updated, 0 failed
+2025-06-15 07:59:23  SUINLEA-04: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:00:16  Progress: 1800/3061 processed, 0 updated, 0 failed
+2025-06-15 08:00:37  B710AP-05: ⚠️  No inventory_item_id found
+2025-06-15 08:01:58  Progress: 1900/3061 processed, 0 updated, 0 failed
+2025-06-15 08:03:37  Progress: 2000/3061 processed, 0 updated, 0 failed
+2025-06-15 08:05:20  Progress: 2100/3061 processed, 0 updated, 0 failed
+2025-06-15 08:06:19  SU090A-BLK-00: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:06:58  Progress: 2200/3061 processed, 0 updated, 0 failed
+2025-06-15 08:07:34  1017721-BEND-37: Attempting update from 0 → 2 (inventory_item_id: 42733480804411)
+2025-06-15 08:07:35  1017721-BEND-37: ✅ Updated from 0 → 2
+2025-06-15 08:08:38  Progress: 2300/3061 processed, 1 updated, 0 failed
+2025-06-15 08:10:21  Progress: 2400/3061 processed, 1 updated, 0 failed
+2025-06-15 08:10:43  SUPOLA-0PKT: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:11:28  SUPOLN-0PKT: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:11:37  B710AP-02: ⚠️  No inventory_item_id found
+2025-06-15 08:11:59  Progress: 2500/3061 processed, 1 updated, 0 failed
+2025-06-15 08:12:01  B710AP-01: ⚠️  No inventory_item_id found
+2025-06-15 08:13:19  SU100A-BLK-00: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:13:37  Progress: 2600/3061 processed, 1 updated, 0 failed
+2025-06-15 08:15:19  Progress: 2700/3061 processed, 1 updated, 0 failed
+2025-06-15 08:16:58  Progress: 2800/3061 processed, 1 updated, 0 failed
+2025-06-15 08:17:24  SUINLEA-11: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 08:18:36  Progress: 2900/3061 processed, 1 updated, 0 failed
+2025-06-15 08:20:19  Progress: 3000/3061 processed, 1 updated, 0 failed
+2025-06-15 08:21:06  T764A-09: ⚠️  No inventory_item_id found
+2025-06-15 08:21:18  Inventory sync completed — items updated: 1, failed: 0, mode: full
+2025-06-15 13:00:01  Starting inventory sync for 3039 products...
+2025-06-15 13:01:21  Progress: 100/3039 processed, 0 updated, 0 failed
+2025-06-15 13:03:02  Progress: 200/3039 processed, 0 updated, 0 failed
+2025-06-15 13:03:24  1019142-ARIZONA-36: Attempting update from 1 → 0 (inventory_item_id: 53336767103362)
+2025-06-15 13:03:25  1019142-ARIZONA-36: ✅ Updated from 1 → 0
+2025-06-15 13:03:49  1005294-ARIZONA-39: Attempting update from 0 → 1 (inventory_item_id: 43778834923579)
+2025-06-15 13:03:50  1005294-ARIZONA-39: ✅ Updated from 0 → 1
+2025-06-15 13:04:45  Progress: 300/3039 processed, 2 updated, 0 failed
+2025-06-15 13:06:25  Progress: 400/3039 processed, 2 updated, 0 failed
+2025-06-15 13:08:05  Progress: 500/3039 processed, 2 updated, 0 failed
+2025-06-15 13:08:16  0040393-MADRID-38: Attempting update from 1 → 0 (inventory_item_id: 53421235208578)
+2025-06-15 13:08:17  0040393-MADRID-38: ✅ Updated from 1 → 0
+2025-06-15 13:09:45  Progress: 600/3039 processed, 3 updated, 0 failed
+2025-06-15 13:11:25  Progress: 700/3039 processed, 3 updated, 0 failed
+2025-06-15 13:11:59  B710AP-03: ⚠️  No inventory_item_id found
+2025-06-15 13:13:03  Progress: 800/3039 processed, 3 updated, 0 failed
+2025-06-15 13:14:47  Progress: 900/3039 processed, 3 updated, 0 failed
+2025-06-15 13:15:12  B710AP-04: ⚠️  No inventory_item_id found
+2025-06-15 13:16:25  Progress: 1000/3039 processed, 3 updated, 0 failed
+2025-06-15 13:18:04  Progress: 1100/3039 processed, 3 updated, 0 failed
+2025-06-15 13:19:43  Progress: 1200/3039 processed, 3 updated, 0 failed
+2025-06-15 13:21:26  Progress: 1300/3039 processed, 3 updated, 0 failed
+2025-06-15 13:23:04  Progress: 1400/3039 processed, 3 updated, 0 failed
+2025-06-15 13:23:55  1005292-ARIZONA-41: Attempting update from 1 → 0 (inventory_item_id: 43778825486395)
+2025-06-15 13:23:56  1005292-ARIZONA-41: ✅ Updated from 1 → 0
+2025-06-15 13:24:48  Progress: 1500/3039 processed, 4 updated, 0 failed
+2025-06-15 13:25:03  1019051-ARIZONA-43: Attempting update from 0 → 1 (inventory_item_id: 53536744800642)
+2025-06-15 13:25:04  1019051-ARIZONA-43: ✅ Updated from 0 → 1
+2025-06-15 13:26:27  Progress: 1600/3039 processed, 5 updated, 0 failed
+2025-06-15 13:28:05  Progress: 1700/3039 processed, 5 updated, 0 failed
+2025-06-15 13:29:48  Progress: 1800/3039 processed, 5 updated, 0 failed
+2025-06-15 13:29:51  B710AP-05: ⚠️  No inventory_item_id found
+2025-06-15 13:31:25  Progress: 1900/3039 processed, 5 updated, 0 failed
+2025-06-15 13:33:09  Progress: 2000/3039 processed, 5 updated, 0 failed
+2025-06-15 13:33:55  1014932-ZERMATT-35: Attempting update from 2 → 0 (inventory_item_id: 42733480804411)
+2025-06-15 13:33:56  1014932-ZERMATT-35: ✅ Updated from 2 → 0
+2025-06-15 13:34:48  Progress: 2100/3039 processed, 6 updated, 0 failed
+2025-06-15 13:36:26  Progress: 2200/3039 processed, 6 updated, 0 failed
+2025-06-15 13:36:47  1017721-BEND-37: Attempting update from 0 → 2 (inventory_item_id: 42733480804411)
+2025-06-15 13:36:48  1017721-BEND-37: ✅ Updated from 0 → 2
+2025-06-15 13:38:10  Progress: 2300/3039 processed, 7 updated, 0 failed
+2025-06-15 13:39:37  1005294-ARIZONA-41: Attempting update from 4 → 3 (inventory_item_id: 43778834989115)
+2025-06-15 13:39:38  1005294-ARIZONA-41: ✅ Updated from 4 → 3
+2025-06-15 13:39:49  Progress: 2400/3039 processed, 8 updated, 0 failed
+2025-06-15 13:40:45  B710AP-02: ⚠️  No inventory_item_id found
+2025-06-15 13:41:14  B710AP-01: ⚠️  No inventory_item_id found
+2025-06-15 13:41:27  Progress: 2500/3039 processed, 8 updated, 0 failed
+2025-06-15 13:42:32  SU100A-BLK-00: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 13:43:10  Progress: 2600/3039 processed, 8 updated, 0 failed
+2025-06-15 13:44:48  Progress: 2700/3039 processed, 8 updated, 0 failed
+2025-06-15 13:46:30  Progress: 2800/3039 processed, 8 updated, 0 failed
+2025-06-15 13:48:09  Progress: 2900/3039 processed, 8 updated, 0 failed
+2025-06-15 13:49:51  Progress: 3000/3039 processed, 8 updated, 0 failed
+2025-06-15 13:50:16  T764A-09: ⚠️  No inventory_item_id found
+2025-06-15 13:50:27  Inventory sync completed — items updated: 8, failed: 0, mode: full
+2025-06-15 17:00:02  Starting inventory sync for 3039 products...
+2025-06-15 17:01:21  Progress: 100/3039 processed, 0 updated, 0 failed
+2025-06-15 17:03:02  Progress: 200/3039 processed, 0 updated, 0 failed
+2025-06-15 17:03:48  1005294-ARIZONA-39: Attempting update from 1 → 0 (inventory_item_id: 43778834923579)
+2025-06-15 17:03:49  1005294-ARIZONA-39: ✅ Updated from 1 → 0
+2025-06-15 17:04:44  Progress: 300/3039 processed, 1 updated, 0 failed
+2025-06-15 17:05:26  1017723-BEND-38: Attempting update from 1 → 0 (inventory_item_id: 43747938992187)
+2025-06-15 17:05:27  1017723-BEND-38: ✅ Updated from 1 → 0
+2025-06-15 17:06:25  Progress: 400/3039 processed, 2 updated, 0 failed
+2025-06-15 17:08:05  Progress: 500/3039 processed, 2 updated, 0 failed
+2025-06-15 17:09:44  Progress: 600/3039 processed, 2 updated, 0 failed
+2025-06-15 17:11:24  Progress: 700/3039 processed, 2 updated, 0 failed
+2025-06-15 17:11:57  B710AP-03: ⚠️  No inventory_item_id found
+2025-06-15 17:13:07  Progress: 800/3039 processed, 2 updated, 0 failed
+2025-06-15 17:14:46  Progress: 900/3039 processed, 2 updated, 0 failed
+2025-06-15 17:14:48  1017724-BEND-38: Attempting update from 1 → 0 (inventory_item_id: 43766783606843)
+2025-06-15 17:14:50  1017724-BEND-38: ✅ Updated from 1 → 0
+2025-06-15 17:15:12  B710AP-04: ⚠️  No inventory_item_id found
+2025-06-15 17:16:26  Progress: 1000/3039 processed, 3 updated, 0 failed
+2025-06-15 17:18:04  Progress: 1100/3039 processed, 3 updated, 0 failed
+2025-06-15 17:19:43  Progress: 1200/3039 processed, 3 updated, 0 failed
+2025-06-15 17:21:27  Progress: 1300/3039 processed, 3 updated, 0 failed
+2025-06-15 17:23:04  Progress: 1400/3039 processed, 3 updated, 0 failed
+2025-06-15 17:24:48  Progress: 1500/3039 processed, 3 updated, 0 failed
+2025-06-15 17:25:02  1019051-ARIZONA-43: Attempting update from 1 → 0 (inventory_item_id: 53536744800642)
+2025-06-15 17:25:03  1019051-ARIZONA-43: ✅ Updated from 1 → 0
+2025-06-15 17:26:27  Progress: 1600/3039 processed, 4 updated, 0 failed
+2025-06-15 17:26:41  0128183-MADRID-39: Attempting update from 1 → 0 (inventory_item_id: 43547439431739)
+2025-06-15 17:26:47  0128183-MADRID-39: ✅ Updated from 1 → 0
+2025-06-15 17:28:06  Progress: 1700/3039 processed, 5 updated, 0 failed
+2025-06-15 17:29:49  Progress: 1800/3039 processed, 5 updated, 0 failed
+2025-06-15 17:29:53  B710AP-05: ⚠️  No inventory_item_id found
+2025-06-15 17:31:28  Progress: 1900/3039 processed, 5 updated, 0 failed
+2025-06-15 17:33:06  Progress: 2000/3039 processed, 5 updated, 0 failed
+2025-06-15 17:33:57  1014932-ZERMATT-35: Attempting update from 2 → 0 (inventory_item_id: 42733480804411)
+2025-06-15 17:33:58  1014932-ZERMATT-35: ✅ Updated from 2 → 0
+2025-06-15 17:34:22  JLH276-RENOIR-BLACK-05: Attempting update from 0 → 1 (inventory_item_id: 43391350898747)
+2025-06-15 17:34:23  JLH276-RENOIR-BLACK-05: ✅ Updated from 0 → 1
+2025-06-15 17:34:51  Progress: 2100/3039 processed, 7 updated, 0 failed
+2025-06-15 17:36:29  Progress: 2200/3039 processed, 7 updated, 0 failed
+2025-06-15 17:36:50  1017721-BEND-37: Attempting update from 0 → 2 (inventory_item_id: 42733480804411)
+2025-06-15 17:36:51  1017721-BEND-37: ✅ Updated from 0 → 2
+2025-06-15 17:36:54  1014938-ZERMATT-44: Attempting update from 0 → 1 (inventory_item_id: 43372347719739)
+2025-06-15 17:36:55  1014938-ZERMATT-44: ✅ Updated from 0 → 1
+2025-06-15 17:38:09  Progress: 2300/3039 processed, 9 updated, 0 failed
+2025-06-15 17:39:36  0143623-GIZEH-37: Attempting update from 0 → 1 (inventory_item_id: 53458940625282)
+2025-06-15 17:39:37  0143623-GIZEH-37: ✅ Updated from 0 → 1
+2025-06-15 17:39:53  Progress: 2400/3039 processed, 10 updated, 0 failed
+2025-06-15 17:40:49  B710AP-02: ⚠️  No inventory_item_id found
+2025-06-15 17:41:13  B710AP-01: ⚠️  No inventory_item_id found
+2025-06-15 17:41:31  Progress: 2500/3039 processed, 10 updated, 0 failed
+2025-06-15 17:42:36  SU100A-BLK-00: ⚠️  Could not retrieve current Shopify stock
+2025-06-15 17:43:10  Progress: 2600/3039 processed, 10 updated, 0 failed
+2025-06-15 17:44:52  Progress: 2700/3039 processed, 10 updated, 0 failed
+2025-06-15 17:46:31  Progress: 2800/3039 processed, 10 updated, 0 failed
+2025-06-15 17:48:13  Progress: 2900/3039 processed, 10 updated, 0 failed
+2025-06-15 17:49:51  Progress: 3000/3039 processed, 10 updated, 0 failed
+2025-06-15 17:50:16  T764A-09: ⚠️  No inventory_item_id found
+2025-06-15 17:50:32  Inventory sync completed — items updated: 10, failed: 0, mode: full

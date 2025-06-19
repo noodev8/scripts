@@ -1,0 +1,101 @@
+2025-06-19 06:00:02  📋 Retrieved 13 unfulfilled orders from Shopify
+2025-06-19 06:00:02     Order BC14190: 1 line items
+2025-06-19 06:00:02       - SKU: 1025046-ARIZONA-42, Qty: 1, Product: Birkenstock Arizona Two-Strap Birko-Flor Nubuck Vegan Sandals Pecan Narrow Fit
+2025-06-19 06:00:02     Order BC14189: 1 line items
+2025-06-19 06:00:02       - SKU: 0034701-MILANO-39, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Dark Brown Regular Fit
+2025-06-19 06:00:02     Order BC14188: 2 line items
+2025-06-19 06:00:02       - SKU: 1014614-ARIZONA-40, Qty: 1, Product: Birkenstock Arizona Essentials EVA Sandals Narrow Rose Reptile
+2025-06-19 06:00:02       - SKU: 0128163-MADRID-40, Qty: 1, Product: Birkenstock Madrid EVA Sandals Black Narrow Fit
+2025-06-19 06:00:02     Order BC14187: 1 line items
+2025-06-19 06:00:02       - SKU: 0034701-MILANO-43, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Dark Brown Regular Fit
+2025-06-19 06:00:02     Order BC14186: 1 line items
+2025-06-19 06:00:02       - SKU: 0128183-MADRID-41, Qty: 1, Product: Birkenstock Madrid EVA Sandals White Narrow Fit
+2025-06-19 06:00:02     Order BC14185: 1 line items
+2025-06-19 06:00:02       - SKU: 0034701-MILANO-43, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Dark Brown Regular Fit
+2025-06-19 06:00:02     Order BC14184: 1 line items
+2025-06-19 06:00:02       - SKU: 0034703-MILANO-46, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit
+2025-06-19 06:00:02     Order BC14183: 2 line items
+2025-06-19 06:00:02       - SKU: JLH321-BLAISE-SILVER-06, Qty: 1, Product: Womens Lunar Blaise Open Toe Strap Sandals Silver
+2025-06-19 06:00:02       - SKU: JLH321-BLAISE-SILVER-04, Qty: 1, Product: Womens Lunar Blaise Open Toe Strap Sandals Silver
+2025-06-19 06:00:02     Order BC14182: 1 line items
+2025-06-19 06:00:02       - SKU: 1025062-GIZEH-38, Qty: 1, Product: Birkenstock Gizeh Sandals Vegan Birko-Flor Birkibuc Pecan Brown Regular Fit
+2025-06-19 06:00:02     Order BC14181: 1 line items
+2025-06-19 06:00:02       - SKU: 0040791-MADRID-42, Qty: 1, Product: Birkenstock Madrid Birko-Flor Black Regular Fit
+2025-06-19 06:00:02     Order BC14180: 1 line items
+2025-06-19 06:00:02       - SKU: 0034791-MILANO-41, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Black Regular Fit
+2025-06-19 06:00:02     Order BC14150: 2 line items
+2025-06-19 06:00:02       - SKU: B710AP-13, Qty: 1, Product: Boys Goor Oxford Tie Leather Shoe Patent Black
+2025-06-19 06:00:02       - SKU: B710AP-01, Qty: 1, Product: Boys Goor Oxford Tie Leather Shoe Patent Black
+2025-06-19 06:00:02     Order BC13366: 2 line items
+2025-06-19 06:00:02       - SKU: L433A-08, Qty: 1, Product: Womens Rdek Fly Knit Mesh Trainers Black
+2025-06-19 06:00:02       - SKU: L944A-08, Qty: 1, Product: Womens Rdek Denim Washed Trainers Black
+2025-06-19 06:00:02  📊 Total line items processed: 17
+2025-06-19 06:00:02  🔍 Checking orderstatus table for these orders: ['BC14190', 'BC14189', 'BC14188', 'BC14187', 'BC14186', 'BC14185', 'BC14184', 'BC14183', 'BC14182', 'BC14181', 'BC14180', 'BC14150', 'BC13366']
+2025-06-19 06:00:02  📋 Found 11 orders already in orderstatus: ['BC14181', 'BC14187', 'BC14186', 'BC14182', 'BC14188', 'BC14185', 'BC14180', 'BC14184', 'BC14150', 'BC14183', 'BC13366']
+2025-06-19 06:00:02  ✅ Including order BC14190 (not in orderstatus)
+2025-06-19 06:00:02  ✅ Including order BC14189 (not in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14188 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14187 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14186 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14185 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14184 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14183 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14182 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14181 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14180 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC14150 (already in orderstatus)
+2025-06-19 06:00:02  ⏭️  Skipping order BC13366 (already in orderstatus)
+2025-06-19 06:00:02  📊 Final unique SKUs: 2 with total quantity: 2
+2025-06-19 06:00:02  ✅ Final result: 2 SKUs with unfulfilled orders not in orderstatus
+2025-06-19 06:00:02     - 1025046-ARIZONA-42: 1 items
+2025-06-19 06:00:02     - 0034701-MILANO-39: 1 items
+2025-06-19 06:00:02  ✅ Total unfulfilled items: 2
+2025-06-19 06:00:02  Fetching variant information for 3015 products...
+2025-06-19 06:00:45  Found variant information for 3009 out of 3015 products
+2025-06-19 06:00:45  Starting inventory sync for 3015 products...
+2025-06-19 06:00:45  T198A-08: Found variant 40881660035131 in product 'Mens Dek Orleans Fuller Trainers Touch Black' (inventory_item_id: 42976496615483)
+2025-06-19 06:00:45  FLE050-MIDBLUE-EVIE-07: Found variant 54913269465474 in product 'Womens Lunar Leather Pump Shoes Mid Blue' (inventory_item_id: 53368665538946)
+2025-06-19 06:00:45  M579CN-11: Found variant 41628251390011 in product 'Mens Scimitar Boat Shoes Navy' (inventory_item_id: 43723532271675)
+2025-06-19 06:00:45  L213A-05: Found variant 40881428922427 in product 'Womens Grafters Cadet Leather Parade Heeled Shoes Black' (inventory_item_id: 42976265502779)
+2025-06-19 06:00:45  1005294-ARIZONA-37: Found variant 41683661619259 in product 'Birkenstock Arizona Two-Strap Patent Sandals White Narrow Width' (inventory_item_id: 43778834858043)
+2025-06-19 06:01:17  Progress: 100/3015 processed, 0 updated, 0 failed
+2025-06-19 06:02:06  Progress: 200/3015 processed, 0 updated, 0 failed
+2025-06-19 06:02:54  Progress: 300/3015 processed, 0 updated, 0 failed
+2025-06-19 06:03:48  Progress: 400/3015 processed, 0 updated, 0 failed
+2025-06-19 06:04:37  Progress: 500/3015 processed, 0 updated, 0 failed
+2025-06-19 06:05:26  Progress: 600/3015 processed, 0 updated, 0 failed
+2025-06-19 06:06:15  Progress: 700/3015 processed, 0 updated, 0 failed
+2025-06-19 06:06:51  GLR003-CLAIRE-BLACK-07: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:07:04  Progress: 800/3015 processed, 0 updated, 0 failed
+2025-06-19 06:07:18  GLR003-CLAIRE-BLACK-04: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:07:28  GLR003-CLAIRE-BLACK-05: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:07:58  Progress: 900/3015 processed, 0 updated, 0 failed
+2025-06-19 06:08:47  Progress: 1000/3015 processed, 0 updated, 0 failed
+2025-06-19 06:09:36  Progress: 1100/3015 processed, 0 updated, 0 failed
+2025-06-19 06:10:24  Progress: 1200/3015 processed, 0 updated, 0 failed
+2025-06-19 06:11:13  Progress: 1300/3015 processed, 0 updated, 0 failed
+2025-06-19 06:11:48  0128163-MADRID-40: Attempting update from 4 → 5 (variant_id: 54965773140354, inventory_item_id: 53421246349698)
+2025-06-19 06:11:49  0128163-MADRID-40: ✅ Updated from 4 → 5 (capped from 6)
+2025-06-19 06:12:08  Progress: 1400/3015 processed, 1 updated, 0 failed
+2025-06-19 06:12:23  GLR003-CLAIRE-BLACK-08: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:12:57  Progress: 1500/3015 processed, 1 updated, 0 failed
+2025-06-19 06:13:47  Progress: 1600/3015 processed, 1 updated, 0 failed
+2025-06-19 06:14:36  Progress: 1700/3015 processed, 1 updated, 0 failed
+2025-06-19 06:15:25  Progress: 1800/3015 processed, 1 updated, 0 failed
+2025-06-19 06:15:39  GLR003-CLAIRE-BLACK-06: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:16:14  Progress: 1900/3015 processed, 1 updated, 0 failed
+2025-06-19 06:16:37  0034701-MILANO-43: Attempting update from 3 → 2 (variant_id: 41836801458235, inventory_item_id: 43932210430011)
+2025-06-19 06:16:38  0034701-MILANO-43: ✅ Updated from 3 → 2
+2025-06-19 06:16:52  GLR003-CLAIRE-BLACK-03: ⚠️  SKU not found in Shopify - skipping inventory update for safety
+2025-06-19 06:17:04  Progress: 2000/3015 processed, 2 updated, 0 failed
+2025-06-19 06:17:58  Progress: 2100/3015 processed, 2 updated, 0 failed
+2025-06-19 06:18:47  Progress: 2200/3015 processed, 2 updated, 0 failed
+2025-06-19 06:19:36  Progress: 2300/3015 processed, 2 updated, 0 failed
+2025-06-19 06:20:24  Progress: 2400/3015 processed, 2 updated, 0 failed
+2025-06-19 06:21:13  Progress: 2500/3015 processed, 2 updated, 0 failed
+2025-06-19 06:22:08  Progress: 2600/3015 processed, 2 updated, 0 failed
+2025-06-19 06:22:57  Progress: 2700/3015 processed, 2 updated, 0 failed
+2025-06-19 06:23:46  Progress: 2800/3015 processed, 2 updated, 0 failed
+2025-06-19 06:24:35  Progress: 2900/3015 processed, 2 updated, 0 failed
+2025-06-19 06:25:24  Progress: 3000/3015 processed, 2 updated, 0 failed
+2025-06-19 06:25:34  Inventory sync completed — items updated: 2, failed: 0, mode: full
