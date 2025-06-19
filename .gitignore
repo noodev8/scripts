@@ -1,0 +1,17 @@
+# Ignore virtual environments
+venv/
+.env/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+
+# Ignore OS files
+.DS_Store
+
+# Ignore logs and junk
+*.log
+
+# Ignore environment config
+.env
+
