@@ -1,0 +1,10 @@
+UPDATE amzfeed f
+SET amzprice = p.max_price::varchar
+FROM (
+    SELECT groupid, MAX(amzprice::numeric) AS max_price
+    FROM amzfeed
+    WHERE amzprice ~ '^[0-9.]+$'
+    GROUP BY groupid
+) p
+WHERE f.groupid = p.groupid
+  AND f.amzprice IS DISTINCT FROM p.max_price::varchar;
