@@ -15,3 +15,7 @@ __pycache__/
 # Ignore environment config
 .env
 
+# Google merchant api
+merchant-feed-api-462809-b3fec2813131.json
+merchant-feed-api-462809-23c712978791.json
+
