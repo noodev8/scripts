@@ -30,7 +30,7 @@ ACCESS_TOKEN = "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"
 LOG_RETENTION = 7  # days
 
 # --- GOOGLE CONFIGURATION ---
-GOOGLE_SERVICE_ACCOUNT_FILE = 'merchant-feed-api-462809-b3fec2813131.json'
+GOOGLE_SERVICE_ACCOUNT_FILE = 'merchant-feed-api-462809-23c712978791.json'
 GOOGLE_MERCHANT_ID = '124941872'
 GOOGLE_SCOPES = ['https://www.googleapis.com/auth/content']
 
