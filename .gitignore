@@ -13,6 +13,7 @@ __pycache__/
 *.log
 GOOGLE-DATA-Merchant.txt
 *.json
+AMZ-Set-Highest-Price.txt
 
 # Ignore environment config
 .env
