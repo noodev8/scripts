@@ -14,6 +14,7 @@ __pycache__/
 GOOGLE-DATA-Merchant.txt
 *.json
 AMZ-Set-Highest-Price.txt
+Brookfield_Comfort_Database_Schema.sql
 
 # Ignore environment config
 .env
