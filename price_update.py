@@ -477,7 +477,8 @@ def main():
                 # Track this variant for database update
                 variant_updates[code] = variant_id
 
-            if str(current_price) != str(shopifyprice):
+            # Compare prices as floats to avoid string formatting differences (e.g., "80.00" vs "80")
+            if float(current_price) != float(shopifyprice):
                 # Update Shopify price
                 result = update_variant_price(variant_id, shopifyprice)
                 if result is True:
@@ -538,8 +539,6 @@ def main():
     # Additional summary for price changes
     if shopify_updates > 0:
         log(f"📊 SUMMARY: {shopify_updates} price changes were made during this sync")
-        if shopify_updates > 10:
-            log(f"⚠️  WARNING: {shopify_updates} price changes detected - this is higher than usual. Please review the changes above.")
     else:
         log("📊 SUMMARY: No price changes were needed during this sync")
 
