@@ -19,7 +19,7 @@ if not ACCESS_TOKEN:
 
 # Safety settings for order deletion
 ENABLE_DELETION = False  # Set to True to enable deletion of old orders
-DELETION_DAYS_THRESHOLD = 10  # Only delete orders not seen for this many days
+DELETION_DAYS_THRESHOLD = 5  # Only delete orders not seen for this many days
 
 # Logging configuration
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
