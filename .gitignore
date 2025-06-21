@@ -51,12 +51,17 @@ android/app/*.iml
 android/key.properties
 **/android/app/.cxx/
 
-# Shopify and Google merchant api
+# Shopify and Google merchant api and passwords
 merchant-feed-api-462809-23c712978791.json
 shopify_api.env
 server.txt
+
+# Python environment
+venv/
 
 # Misc
 *.iml
 *.lock
 .idea/
+GOOGLE-DATA-Merchant.txt
+
