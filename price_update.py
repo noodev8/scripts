@@ -14,8 +14,12 @@ import os
 from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from dotenv import load_dotenv
 
 # --- SHOPIFY CONFIGURATION ---
+# Load environment variables from shopify_api.env
+load_dotenv('shopify_api.env')
+
 DB_CONFIG = {
     "host": "77.68.13.150",
     "port": 5432,
@@ -26,8 +30,12 @@ DB_CONFIG = {
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
-ACCESS_TOKEN = "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"
+ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
 LOG_RETENTION = 7  # days
+
+# Validate that the access token was loaded
+if not ACCESS_TOKEN:
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in shopify_api.env file")
 
 # --- GOOGLE CONFIGURATION ---
 GOOGLE_SERVICE_ACCOUNT_FILE = 'merchant-feed-api-462809-23c712978791.json'

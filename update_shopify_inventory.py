@@ -60,8 +60,12 @@ import sys
 import time
 import os
 from datetime import datetime
+from dotenv import load_dotenv
 
 # --- CONFIGURATION ---
+# Load environment variables from shopify_api.env
+load_dotenv('shopify_api.env')
+
 DB_CONFIG = {
     "host": "77.68.13.150",
     "port": 5432,
@@ -72,9 +76,13 @@ DB_CONFIG = {
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
-ACCESS_TOKEN = "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"
+ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
 LOCATION_ID = "64140443707"
 LOG_RETENTION = 7  # Keep last 7 logs
+
+# Validate that the access token was loaded
+if not ACCESS_TOKEN:
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in shopify_api.env file")
 
 
 def clean_old_logs(log_prefix="shopify_inventory_", keep_count=7):
