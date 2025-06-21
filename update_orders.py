@@ -157,7 +157,7 @@ try:
 
     if response.status_code == 200:
         orders = response.json().get("orders", [])
-        logger.info(f"🔍 Retrieved {len(orders)} unfulfilled orders from Shopify")
+        logger.info(f"Retrieved {len(orders)} unfulfilled orders from Shopify")
         unfulfilled_keys = set()
 
         for order in orders:
@@ -176,7 +176,7 @@ try:
             for item in order.get("line_items", []):
                 shopifysku = safe(item.get("sku"))
                 if not shopifysku:
-                    logger.warning(f"⚠️ Skipping item with missing SKU in order {order_name}")
+                    logger.warning(f"WARNING: Skipping item with missing SKU in order {order_name}")
                     continue
 
                 unfulfilled_keys.add((order_name, shopifysku))
@@ -202,16 +202,16 @@ try:
                             order_name,
                             shopifysku
                         ))
-                        logger.info(f"🔄 Updated existing order {order_name}, SKU {shopifysku} (last_seen updated)")
+                        logger.info(f"Updated existing order {order_name}, SKU {shopifysku} (last_seen updated)")
                     except psycopg2.Error as e:
-                        logger.error(f"❌ Error updating order {order_name}, SKU {shopifysku}: {e}")
+                        logger.error(f"ERROR: Error updating order {order_name}, SKU {shopifysku}: {e}")
                     continue
                 else:
                     # For new orders, also update last_seen after insertion
                     try:
                         cursor.execute(update_last_seen_sql, (order_name, shopifysku))
                     except psycopg2.Error as e:
-                        logger.warning(f"⚠️ Error updating last_seen for new order {order_name}, SKU {shopifysku}: {e}")
+                        logger.warning(f"WARNING: Error updating last_seen for new order {order_name}, SKU {shopifysku}: {e}")
 
                 # Fetch supplier, fnsku, weight
                 supplier, fnsku, weight = "", "", None
@@ -258,7 +258,7 @@ try:
                     if result:
                         groupid = result[0]
                     else:
-                        logger.warning(f"⚠️ No groupid found for SKU {shopifysku} (Order {order_name})")
+                        logger.warning(f"WARNING: No groupid found for SKU {shopifysku} (Order {order_name})")
 
                     if groupid:
                         cursor.execute("SELECT brand FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
@@ -271,17 +271,17 @@ try:
                     paytype = ",".join(order.get("payment_gateway_names", [])) or "UNKNOWN"
                     title = safe(item.get("title"))
 
-                    logger.info(f"➡️ Inserting into sales: SKU={shopifysku}, Order={order_name}, Qty={item.get('quantity')}, Price={soldprice}, PayType={paytype}")
+                    logger.info(f"Inserting into sales: SKU={shopifysku}, Order={order_name}, Qty={item.get('quantity')}, Price={soldprice}, PayType={paytype}")
 
                     cursor.execute(insert_sales_sql, (
                         shopifysku, solddate, groupid, order_name, ordertime,
                         item.get("quantity"), soldprice, "SHP",
                         paytype, None, title, brand, 0, 0
                     ))
-                    logger.info("✅ Sale inserted successfully")
+                    logger.info("Sale inserted successfully")
 
                 except psycopg2.Error as e:
-                    logger.error(f"❌ Error inserting order/sale {order_name}, SKU {shopifysku}: {e}")
+                    logger.error(f"ERROR: Error inserting order/sale {order_name}, SKU {shopifysku}: {e}")
 
         # === CLEANUP OLD ORDERS (SAFER APPROACH) ===
         if ENABLE_DELETION:
@@ -293,14 +293,14 @@ try:
             """, (DELETION_DAYS_THRESHOLD,))
 
             old_orders = cursor.fetchall()
-            logger.info(f"🔍 Found {len(old_orders)} orders older than {DELETION_DAYS_THRESHOLD} days")
+            logger.info(f"Found {len(old_orders)} orders older than {DELETION_DAYS_THRESHOLD} days")
 
             for ordernum, shopifysku, last_seen in old_orders:
                 try:
                     cursor.execute("DELETE FROM orderstatus WHERE ordernum = %s AND shopifysku = %s", (ordernum, shopifysku))
-                    logger.info(f"🗑️ Deleted old order {ordernum}, SKU {shopifysku} (last seen: {last_seen})")
+                    logger.info(f"Deleted old order {ordernum}, SKU {shopifysku} (last seen: {last_seen})")
                 except psycopg2.Error as e:
-                    logger.error(f"❌ Error deleting old order {ordernum}, SKU {shopifysku}: {e}")
+                    logger.error(f"ERROR: Error deleting old order {ordernum}, SKU {shopifysku}: {e}")
         else:
             # Show what WOULD be deleted if deletion was enabled
             cursor.execute("""
@@ -311,32 +311,32 @@ try:
 
             old_orders = cursor.fetchall()
             if old_orders:
-                logger.info(f"📊 DELETION DISABLED: Found {len(old_orders)} orders that would be deleted (older than {DELETION_DAYS_THRESHOLD} days):")
+                logger.info(f"DELETION DISABLED: Found {len(old_orders)} orders that would be deleted (older than {DELETION_DAYS_THRESHOLD} days):")
                 for ordernum, shopifysku, last_seen in old_orders[:5]:  # Show first 5 as examples
                     logger.info(f"   - {ordernum}, SKU {shopifysku} (last seen: {last_seen})")
                 if len(old_orders) > 5:
                     logger.info(f"   ... and {len(old_orders) - 5} more")
-                logger.info(f"💡 To enable deletion, set ENABLE_DELETION = True in the configuration")
+                logger.info(f"To enable deletion, set ENABLE_DELETION = True in the configuration")
             else:
-                logger.info(f"✅ No orders older than {DELETION_DAYS_THRESHOLD} days found")
+                logger.info(f"No orders older than {DELETION_DAYS_THRESHOLD} days found")
 
         conn.commit()
-        logger.info("✅ All changes committed to the database")
+        logger.info("All changes committed to the database")
         logger.info("=== Order Sync Script Completed Successfully ===")
 
     else:
-        logger.error(f"❌ Shopify API Error: {response.status_code} - {response.text}")
+        logger.error(f"Shopify API Error: {response.status_code} - {response.text}")
 
 except psycopg2.Error as e:
-    logger.error(f"❌ Database error: {e}")
+    logger.error(f"Database error: {e}")
     if conn:
         conn.rollback()
 
 except requests.exceptions.RequestException as e:
-    logger.error(f"❌ API request error: {e}")
+    logger.error(f"API request error: {e}")
 
 except Exception as e:
-    logger.error(f"❌ Unexpected error: {e}")
+    logger.error(f"Unexpected error: {e}")
 
 finally:
     if cursor:
