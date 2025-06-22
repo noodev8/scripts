@@ -15,7 +15,7 @@ from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
-from logging_utils import get_db_config
+from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- SHOPIFY CONFIGURATION ---
 # Load environment variables from .env
@@ -38,6 +38,11 @@ GOOGLE_SCOPES = ['https://www.googleapis.com/auth/content']
 # Global Google service instance
 google_service = None
 
+# Setup logging
+SCRIPT_NAME = "price_update"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
+
 
 def initialize_google_service():
     """Initialize Google Content API service"""
@@ -57,36 +62,7 @@ def initialize_google_service():
         return False
 
 
-def clean_old_logs(log_prefix="price_update_", keep_count=7):
-    log_dir = os.path.dirname(os.path.abspath(__file__))
-    if not log_dir:  # If empty, use current directory
-        log_dir = "."
 
-    try:
-        log_files = sorted(
-            [f for f in os.listdir(log_dir) if f.startswith(log_prefix) and f.endswith(".log")],
-            key=lambda f: os.path.getmtime(os.path.join(log_dir, f))
-        )
-        for old_file in log_files[:-keep_count]:
-            try:
-                os.remove(os.path.join(log_dir, old_file))
-            except Exception:
-                pass
-    except Exception:
-        pass  # If we can't clean logs, continue anyway
-
-
-def log(message):
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"price_update_{date_str}.log"
-
-    log_dir = os.path.dirname(os.path.abspath(__file__))
-    if not log_dir:  # If empty, use current directory
-        log_dir = "."
-
-    log_path = os.path.join(log_dir, log_filename)
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  {message}\n")
 
 
 def batch_search_variants_by_sku(skus, batch_size=50):
@@ -417,8 +393,6 @@ def main():
     # Record start time
     start_time = datetime.now()
 
-    clean_old_logs()
-
     # Parse command line arguments
     mode = "changed"
     google_updates_enabled = True
@@ -566,9 +540,9 @@ def main():
 
     # Additional summary for price changes
     if shopify_updates > 0:
-        log(f"📊 SUMMARY: {shopify_updates} price changes were made during this sync")
+        log(f"SUMMARY: {shopify_updates} price changes were made during this sync")
     else:
-        log("📊 SUMMARY: No price changes were needed during this sync")
+        log("SUMMARY: No price changes were needed during this sync")
 
 
 if __name__ == "__main__":
