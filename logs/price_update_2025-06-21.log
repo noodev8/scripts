@@ -1,0 +1,19 @@
+2025-06-21 03:00:02  Starting price update - mode: full, Google updates: disabled
+2025-06-21 03:00:02  Fetching variant information for 2984 SKUs across 405 product groups...
+2025-06-21 03:00:42  Found variant information for 2984 out of 2984 SKUs
+2025-06-21 03:00:42  Starting FULL price sync for 405 product groups...
+2025-06-21 03:00:59  Progress: 50/405 groups processed, 359 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:01:18  Progress: 100/405 groups processed, 736 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:01:36  Progress: 150/405 groups processed, 1080 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:01:55  Progress: 200/405 groups processed, 1468 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:02:14  Progress: 250/405 groups processed, 1847 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:02:33  Progress: 300/405 groups processed, 2220 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:02:51  Progress: 350/405 groups processed, 2586 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:03:09  Progress: 400/405 groups processed, 2949 variants checked, 0 Shopify updates, 0 Google updates
+2025-06-21 03:03:11  ✅ Sync complete — mode: full, groups: 405, total variants: 2984, Shopify price changes: 0, Google updates: disabled, Duration: 0:03:09
+2025-06-21 03:03:11  📊 SUMMARY: No price changes were needed during this sync
+2025-06-21 17:00:03  Starting price update - mode: changed, Google updates: enabled
+2025-06-21 17:00:03  Fetching variant information for 7 SKUs across 1 product groups...
+2025-06-21 17:00:03  Found variant information for 7 out of 7 SKUs
+2025-06-21 17:00:03  ✅ Sync complete — mode: changed, groups: 1, total variants: 7, Shopify price changes: 0, Google updates: 0, Google failures: 0, Duration: 0:00:00
+2025-06-21 17:00:03  📊 SUMMARY: No price changes were needed during this sync

@@ -1,0 +1,45 @@
+2025-06-20 03:00:02  Starting price update - mode: full, Google updates: disabled
+2025-06-20 03:00:02  Fetching variant information for 3009 SKUs across 409 product groups...
+2025-06-20 03:00:43  Found variant information for 3009 out of 3009 SKUs
+2025-06-20 03:00:43  Starting FULL price sync for 409 product groups...
+2025-06-20 03:00:53  💰 R6300SR-10: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328816187)
+2025-06-20 03:00:54  💰 R6300SR-06: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328685115)
+2025-06-20 03:00:54  💰 R6300SR-07: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328717883)
+2025-06-20 03:00:54  💰 R6300SR-08: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328750651)
+2025-06-20 03:00:54  💰 R6300SR-09: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328783419)
+2025-06-20 03:00:55  💰 R6300SR-11: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881328848955)
+2025-06-20 03:01:02  Progress: 50/409 groups processed, 359 variants checked, 6 Shopify updates, 0 Google updates
+2025-06-20 03:01:21  Progress: 100/409 groups processed, 736 variants checked, 6 Shopify updates, 0 Google updates
+2025-06-20 03:01:38  Progress: 150/409 groups processed, 1073 variants checked, 6 Shopify updates, 0 Google updates
+2025-06-20 03:01:38  💰 R6308SR-08: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331142715)
+2025-06-20 03:01:38  💰 R6308SR-07: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331109947)
+2025-06-20 03:01:38  💰 R6308SR-12: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331273787)
+2025-06-20 03:01:38  💰 R6308SR-13: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331306555)
+2025-06-20 03:01:39  💰 R6308SR-06: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331077179)
+2025-06-20 03:01:39  💰 R6308SR-09: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331175483)
+2025-06-20 03:01:39  💰 R6308SR-10: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331208251)
+2025-06-20 03:01:40  💰 R6308SR-11: PRICE CHANGED - 'Mens Rdek Senior Canvas Trainers Black' from £12.00 → £12 (variant_id: 40881331241019)
+2025-06-20 03:01:59  Progress: 200/409 groups processed, 1468 variants checked, 14 Shopify updates, 0 Google updates
+2025-06-20 03:02:18  Progress: 250/409 groups processed, 1847 variants checked, 14 Shopify updates, 0 Google updates
+2025-06-20 03:02:36  Progress: 300/409 groups processed, 2219 variants checked, 14 Shopify updates, 0 Google updates
+2025-06-20 03:02:44  💰 0034703-MILANO-36: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766254651)
+2025-06-20 03:02:44  💰 0034703-MILANO-37: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766287419)
+2025-06-20 03:02:44  💰 0034703-MILANO-38: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766320187)
+2025-06-20 03:02:44  💰 0034703-MILANO-39: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766352955)
+2025-06-20 03:02:46  💰 0034703-MILANO-40: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766385723)
+2025-06-20 03:02:46  💰 0034703-MILANO-41: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766418491)
+2025-06-20 03:02:46  💰 0034703-MILANO-42: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 41693766451259)
+2025-06-20 03:02:46  💰 0034703-MILANO-43: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 55012240982402)
+2025-06-20 03:02:47  💰 0034703-MILANO-44: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 55012241015170)
+2025-06-20 03:02:47  💰 0034703-MILANO-45: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 55012241047938)
+2025-06-20 03:02:47  💰 0034703-MILANO-46: PRICE CHANGED - 'Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit' from £80.00 → £80 (variant_id: 55012241080706)
+2025-06-20 03:02:58  Progress: 350/409 groups processed, 2585 variants checked, 25 Shopify updates, 0 Google updates
+2025-06-20 03:03:16  Progress: 400/409 groups processed, 2941 variants checked, 25 Shopify updates, 0 Google updates
+2025-06-20 03:03:19  ✅ Sync complete — mode: full, groups: 409, total variants: 3009, Shopify price changes: 25, Google updates: disabled, Duration: 0:03:16
+2025-06-20 03:03:19  📊 SUMMARY: 25 price changes were made during this sync
+2025-06-20 03:03:19  ⚠️  WARNING: 25 price changes detected - this is higher than usual. Please review the changes above.
+2025-06-20 17:00:02  Starting price update - mode: changed, Google updates: enabled
+2025-06-20 17:00:02  Fetching variant information for 0 SKUs across 0 product groups...
+2025-06-20 17:00:02  Found variant information for 0 out of 0 SKUs
+2025-06-20 17:00:02  ✅ Sync complete — mode: changed, groups: 0, total variants: 0, Shopify price changes: 0, Google updates: 0, Google failures: 0, Duration: 0:00:00
+2025-06-20 17:00:02  📊 SUMMARY: No price changes were needed during this sync
