@@ -195,7 +195,7 @@ def generate_feed():
     log(f"Feed file generated: {output_file}")
     log(f"Total products in feed: {len(feed_df)}")
     log(f"=== MERCHANT FEED GENERATION COMPLETED ===")
-    print(f"✅ Feed file generated: {output_file}")
+    print(f"Feed file generated: {output_file}")
 
 
 if __name__ == "__main__":
@@ -223,10 +223,10 @@ def upload_file_to_google():
 
         sftp.put(local_file, remote_file)
         log("Upload to Google Merchant SFTP successful")
-        print("✅ Upload to Google Merchant SFTP successful.")
+        print("Upload to Google Merchant SFTP successful.")
     except Exception as e:
         log(f"SFTP upload failed: {str(e)}")
-        print("❌ SFTP upload failed:", str(e))
+        print("SFTP upload failed:", str(e))
     finally:
         if 'sftp' in locals(): sftp.close()
         if 'transport' in locals(): transport.close()

@@ -165,7 +165,7 @@ def batch_search_variants_by_sku(skus, batch_size=50):
             time.sleep(0.5)
 
         except Exception as e:
-            log(f"❌ Exception in batch_search_variants_by_sku: {str(e)}")
+            log(f"Exception in batch_search_variants_by_sku: {str(e)}")
             continue
 
     return results
@@ -294,11 +294,11 @@ def update_variant_links_in_database(variant_updates, cur, conn):
             if cur.rowcount > 0:
                 updated_count += 1
         except Exception as e:
-            log(f"❌ Failed to update variantlink for {code}: {str(e)}")
+            log(f"Failed to update variantlink for {code}: {str(e)}")
 
     if updated_count > 0:
         conn.commit()
-        log(f"📝 Updated {updated_count} variant links in database")
+        log(f"Updated {updated_count} variant links in database")
 
 
 def update_variant_price(variant_id, new_price):
@@ -509,7 +509,7 @@ def main():
                 if result is True:
                     shopify_updates += 1
                     # Log detailed price change information for both modes
-                    price_change_msg = f"💰 {code}: PRICE CHANGED - '{product_title}' from £{current_price} → £{shopifyprice} (variant_id: {variant_id})"
+                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice} (variant_id: {variant_id})"
                     log(price_change_msg)
 
                     # Log price change to database for tracking
@@ -520,12 +520,12 @@ def main():
                         google_result = update_google_price(googleid, shopifyprice)
                         if google_result is True:
                             google_updates += 1
-                            log(f"🌐 {code}: Google price updated to £{shopifyprice}")
+                            log(f"{code}: Google price updated to £{shopifyprice}")
                         else:
                             google_failures += 1
-                            log(f"❌ {code}: Google update failed - {google_result}")
+                            log(f"{code}: Google update failed - {google_result}")
                 else:
-                    log(f"❌ {code}: Shopify update failed - {result}")
+                    log(f"{code}: Shopify update failed - {result}")
                     success = False
 
             total_processed += 1
@@ -554,7 +554,7 @@ def main():
     duration_str = str(duration).split('.')[0]  # Remove microseconds
 
     # Final summary log
-    summary = f"✅ Sync complete — mode: {mode}, groups: {len(group_rows)}, total variants: {total_processed}"
+    summary = f"Sync complete - mode: {mode}, groups: {len(group_rows)}, total variants: {total_processed}"
     summary += f", Shopify price changes: {shopify_updates}"
     if google_updates_enabled:
         summary += f", Google updates: {google_updates}, Google failures: {google_failures}"

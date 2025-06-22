@@ -484,26 +484,26 @@ def get_unfulfilled_shopify_orders():
         # Only include SKUs from orders that haven't been processed yet
         for order_name, skus in order_data.items():
             if order_name not in processed_orders:
-                log(f"✅ Including order {order_name} (not in orderstatus)")
+                log(f"Including order {order_name} (not in orderstatus)")
                 for sku, qty in skus.items():
                     shopify_orders[sku] = shopify_orders.get(sku, 0) + qty
             else:
-                log(f"⏭️  Skipping order {order_name} (already in orderstatus)")
+                log(f"Skipping order {order_name} (already in orderstatus)")
 
-        log(f"📊 Final unique SKUs: {len(shopify_orders)} with total quantity: {sum(shopify_orders.values())}")
+        log(f"Final unique SKUs: {len(shopify_orders)} with total quantity: {sum(shopify_orders.values())}")
 
         if shopify_orders:
-            log(f"✅ Final result: {len(shopify_orders)} SKUs with unfulfilled orders not in orderstatus")
+            log(f"Final result: {len(shopify_orders)} SKUs with unfulfilled orders not in orderstatus")
             for sku, qty in shopify_orders.items():
                 log(f"   - {sku}: {qty} items")
-            log(f"✅ Total unfulfilled items: {sum(shopify_orders.values())}")
+            log(f"Total unfulfilled items: {sum(shopify_orders.values())}")
         else:
-            log("✅ No unfulfilled orders found that aren't already in orderstatus")
+            log("No unfulfilled orders found that aren't already in orderstatus")
 
         return shopify_orders
 
     except Exception as e:
-        log(f"⚠️  Error getting unfulfilled orders: {e} - continuing without unfulfilled orders check")
+        log(f"Error getting unfulfilled orders: {e} - continuing without unfulfilled orders check")
         return {}
 
 
@@ -604,7 +604,7 @@ def main():
             if success:
                 updated_count += 1
                 # Build detailed log message
-                log_parts = [f"{code}: ✅ Updated from {current_qty} → {shopify_qty}"]
+                log_parts = [f"{code}: Updated from {current_qty} -> {shopify_qty}"]
                 if total_qty != shopify_qty:
                     log_parts.append(f"(database stock: {total_qty})")
                 if shopify_qty == 5 and total_qty > 5:
@@ -612,7 +612,7 @@ def main():
                 log(" ".join(log_parts))
             else:
                 failed_count += 1
-                log(f"{code}: ❌ Failed to update from {current_qty} → {shopify_qty}")
+                log(f"{code}: Failed to update from {current_qty} -> {shopify_qty}")
 
         # Enhanced rate limiting: pause every 20 API calls (more conservative)
         if processed_count % 20 == 0:
