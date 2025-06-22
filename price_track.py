@@ -11,7 +11,6 @@ log = create_logger(SCRIPT_NAME)
 def main():
     conn = None
     try:
-        log("=== PRICE TRACK UPDATE STARTED ===")
         db_config = get_db_config()
         conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
@@ -23,7 +22,6 @@ def main():
 
         # STEP 2: DELETE any existing entry for `today` from price_track
         cur.execute("DELETE FROM price_track WHERE date = %s", (today,))
-        log(f"Deleted existing entries for {today}")
 
         # STEP 3: INSERT NEW ROWS for `today` (localstock only '#FREE')
         insert_stock_query = """
@@ -123,9 +121,9 @@ def main():
             # print(f"↻ Backfilled sales for {target_date}")
 
         conn.commit()
-        # print("Sales backfill complete for the last 7 days.")
 
-        log("=== PRICE TRACK UPDATE COMPLETED ===")
+        # Single clear log entry
+        log(f"Price track updated for {today}")
 
     except Exception as e:
         log(f"ERROR: Price track update failed: {str(e)}")
