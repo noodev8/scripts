@@ -100,7 +100,7 @@ def generate_feed():
             sm.groupid, sm.shopifyprice, sm.imagename, sm.brand, sm.colour,
             sm.material, sm.cost, sm.rrp, sm.handle, sm.googlecampaign,
             a.gender, t.shopifytitle AS title,
-            m.code, m.variantlink, m.uksize, m.ean,
+            m.code, m.variantlink, m.uksize, m.ean, m.googleid,
             ls.qty as localstock_qty, ls.deleted as localstock_deleted,
             af.amzlive, uk.stock as ukdstock
         FROM skusummary sm
@@ -155,7 +155,7 @@ def generate_feed():
             availability = "in stock" if is_in_stock else "out of stock"
 
             feed_rows.append({
-                "id": row["code"],
+                "id": row["googleid"],
                 "title": title,
                 "description": title,
                 "link": f"https://brookfieldcomfort.com/products/{handle}?variant={variant_id}",

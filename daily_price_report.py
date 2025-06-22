@@ -16,19 +16,18 @@ from datetime import datetime, date
 from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
 ACTION_NAMES = {
-    'USE_BENCHMARK': "Market Benchmark Price (42+ days)",
-    'DROP_20_BENCH_FLOOR': "Conservative 20% (Benchmark Floor)",
+    'DROP_15_BENCH_FLOOR': "Strong 15% (Benchmark Floor)",
     'DROP_10_BENCH_FLOOR': "Moderate 10% (Benchmark Floor)",
     'DROP_5_BENCH_FLOOR': "Gentle 5% (Benchmark Floor)",
-    'DROP_20': "Conservative Reduction (20% max)",
+    'DROP_20': "Aggressive Clearance (20% reduction)",
     'DROP_15': "Strong Signal (15% reduction)",
-    'DROP_10': "Moderate Reduction (10% reduction)",
+    'DROP_10': "Conservative Reduction (10% max)",
     'DROP_5': "Gentle Reduction (5% reduction)",
     'MANUAL_REVIEW': "Manual Review Required",
     'HOLD': "Hold Current Price"
 }
 
-PRIORITY_ACTIONS = ['USE_BENCHMARK', 'DROP_20_BENCH_FLOOR', 'DROP_10_BENCH_FLOOR', 'MANUAL_REVIEW']  # High priority actions for daily attention
+PRIORITY_ACTIONS = ['DROP_15_BENCH_FLOOR', 'DROP_10_BENCH_FLOOR', 'DROP_5_BENCH_FLOOR', 'MANUAL_REVIEW']  # High priority actions for daily attention
 
 # Setup logging
 SCRIPT_NAME = "daily_price_report"
@@ -142,9 +141,8 @@ def generate_daily_report(analysis_results, summary_only=False):
 
         # Sort actions by priority (exclude HOLD from detailed view)
         action_priority = {
-            'USE_BENCHMARK': 1, 'DROP_20_BENCH_FLOOR': 2, 'DROP_10_BENCH_FLOOR': 3,
-            'DROP_5_BENCH_FLOOR': 4, 'MANUAL_REVIEW': 5, 'DROP_20': 6,
-            'DROP_15': 7, 'DROP_10': 8, 'DROP_5': 9
+            'DROP_15_BENCH_FLOOR': 1, 'DROP_10_BENCH_FLOOR': 2, 'DROP_5_BENCH_FLOOR': 3,
+            'MANUAL_REVIEW': 4, 'DROP_20': 5, 'DROP_15': 6, 'DROP_10': 7, 'DROP_5': 8
         }
 
         # Filter out HOLD actions for detailed view
@@ -199,10 +197,11 @@ def generate_daily_report(analysis_results, summary_only=False):
 
     report_content.append("PRICING LOGIC APPLIED")
     report_content.append("-" * 30)
-    report_content.append("This report uses the Brookfield Comfort Dynamic Pricing Logic v1.0")
-    report_content.append("• Maximum reduction: 20% per change (conservative approach)")
+    report_content.append("This report uses the Brookfield Comfort Dynamic Pricing Logic v1.0 (Conservative)")
+    report_content.append("• Maximum reduction: 10% per change (very conservative approach)")
+    report_content.append("• Benchmark protection: Never go below benchmark if within 90 days")
     report_content.append("• Price change lock: 10-day cooling period between changes")
-    report_content.append("• Zero Sales: Time-based reductions based on aging and stock levels")
+    report_content.append("• Zero Sales: Gentle time-based reductions (5-10% max)")
     report_content.append("• Historical Sales: Conservative reductions considering recent activity")
     report_content.append("• All prices respect cost floor (cost + £0.01 minimum)")
     report_content.append("• Manual Review: Conflicting signals require human judgment")

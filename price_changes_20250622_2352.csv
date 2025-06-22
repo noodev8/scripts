@@ -1,0 +1,4 @@
+approve,groupid,brand,current_price,suggested_price,change_amount,change_percent,change_type,action,reason,stock,days_since_last_sold,lowbench,cost,margin_impact
+1,1017724-BEND,Birkenstock,94.5,97.34,2.84,3.00%,PRICE_INCREASE,INCREASE_Raise_Price_â€“_Medium_(Strong),Sales burst: INCREASE_Raise_Price_â€“_Medium_(Strong) - 2 sales today,16,,,56.25,2.84
+,1025062-GIZEH,Birkenstock,90,90,0,0.00%,PRICE_INCREASE,INCREASE_Raise_Price_â€“_Medium_(Strong),Sales burst: INCREASE_Raise_Price_â€“_Medium_(Strong) - 2 sales today,19,,,37.5,0
+,0034703-MILANO,Birkenstock,80,81.6,1.6,2.00%,PRICE_INCREASE,INCREASE_Raise_Price_â€“_Medium,Sales burst: INCREASE_Raise_Price_â€“_Medium - 2 sales today,5,,,37.5,1.6

@@ -88,17 +88,14 @@ SELECT
     WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 28 AND 41 AND stock <= 4 AND lowbench IS NOT NULL THEN 'DROP_5_BENCH_FLOOR'
     WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 28 AND 41 AND stock <= 4 AND lowbench IS NULL THEN 'DROP_5'
 
-    -- Later stages (42-89 days): Go straight to benchmark if available
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 89 AND lowbench IS NOT NULL THEN 'USE_BENCHMARK'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock >= 15 AND lowbench IS NULL THEN 'DROP_20'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock BETWEEN 5 AND 14 AND lowbench IS NULL THEN 'DROP_20'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock <= 4 AND lowbench IS NULL THEN 'DROP_10'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock >= 15 AND lowbench IS NULL THEN 'DROP_20'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock BETWEEN 5 AND 14 AND lowbench IS NULL THEN 'DROP_20'
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock <= 4 AND lowbench IS NULL THEN 'DROP_15'
+    -- Later stages (42-89 days): Conservative 10% with benchmark floor protection
+    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND lowbench IS NOT NULL THEN 'DROP_10_BENCH_FLOOR'
+    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND lowbench IS NULL THEN 'DROP_10'
+    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND lowbench IS NOT NULL THEN 'DROP_10_BENCH_FLOOR'
+    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND lowbench IS NULL THEN 'DROP_10'
 
-    -- 90+ days: Keep going down (ignore benchmark)
-    WHEN total_sales_90d = 0 AND days_since_last_sold >= 90 THEN 'DROP_20'
+    -- 90+ days: Conservative liquidation (10% reduction, ignore benchmark)
+    WHEN total_sales_90d = 0 AND days_since_last_sold >= 90 THEN 'DROP_10'
 
     -- Historical Sales Products Logic (Section 1.2) - WITH BENCHMARK AWARENESS
     WHEN total_sales_90d > 0 AND days_since_last_sold < 30 THEN 'HOLD'
@@ -111,16 +108,21 @@ SELECT
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 30 AND 41 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_10_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 30 AND 41 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_10'
 
-    -- Later stages (42-89 days): Go straight to benchmark if available
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 89 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'USE_BENCHMARK'
+    -- Later stages (42-89 days): Conservative reductions with benchmark floor protection
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_5_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_5'
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_5_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_5'
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_10_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_10'
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_5_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_5'
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_10_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_10'
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN 'DROP_15_BENCH_FLOOR'
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN 'DROP_15'
 
-    -- 90+ days: Keep going down (ignore benchmark)
+    -- Historical sales 90+ days: aggressive clearance (ignore benchmark)
     WHEN total_sales_90d > 0 AND days_since_last_sold >= 90 AND recent_sales_30d <= 2 THEN 'DROP_20'
     WHEN total_sales_90d > 0 AND recent_sales_30d >= 3 AND days_since_last_sold < 30 THEN 'MANUAL_REVIEW'
 
@@ -183,20 +185,14 @@ SELECT
     WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 28 AND 41 AND stock <= 4 AND lowbench IS NULL THEN
       current_price * 0.95  -- DROP_5
 
-    -- Use benchmark directly (42-89 days)
+    -- Conservative reductions for 42-89 days with benchmark floor protection
     WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 89 AND lowbench IS NOT NULL THEN
-      GREATEST(lowbench, cost + 0.01)  -- USE_BENCHMARK
+      GREATEST(current_price * 0.90, lowbench)  -- DROP_10_BENCH_FLOOR
+    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 89 AND lowbench IS NULL THEN
+      current_price * 0.90  -- DROP_10
 
-    -- Standard reductions for 42+ days without benchmark
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock >= 15 AND lowbench IS NULL THEN current_price * 0.80
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock BETWEEN 5 AND 14 AND lowbench IS NULL THEN current_price * 0.80
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 42 AND 55 AND stock <= 4 AND lowbench IS NULL THEN current_price * 0.90
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock >= 15 AND lowbench IS NULL THEN current_price * 0.80
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock BETWEEN 5 AND 14 AND lowbench IS NULL THEN current_price * 0.80
-    WHEN total_sales_90d = 0 AND days_since_last_sold BETWEEN 56 AND 89 AND stock <= 4 AND lowbench IS NULL THEN current_price * 0.85
-
-    -- 90+ days: Keep going down (ignore benchmark)
-    WHEN total_sales_90d = 0 AND days_since_last_sold >= 90 THEN current_price * 0.80
+    -- 90+ days: Conservative liquidation (ignore benchmark)
+    WHEN total_sales_90d = 0 AND days_since_last_sold >= 90 THEN current_price * 0.90
 
     -- Historical sales with benchmark awareness
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 30 AND 41 AND stock <= 4 AND lowbench IS NOT NULL THEN
@@ -212,15 +208,31 @@ SELECT
     WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 30 AND 41 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
       current_price * 0.90
 
-    -- Historical sales 42-89 days: use benchmark if available
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 89 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
-      GREATEST(lowbench, cost + 0.01)
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.95
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.95
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.90
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.95
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.90
-    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN current_price * 0.85
+    -- Historical sales 42-89 days: conservative reductions with benchmark floor protection
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.95, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.95
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.95, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.95
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.90, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 42 AND 59 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.90
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.95, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock <= 4 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.95
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.90, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock BETWEEN 5 AND 14 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.90
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NOT NULL THEN
+      GREATEST(current_price * 0.85, lowbench)
+    WHEN total_sales_90d > 0 AND days_since_last_sold BETWEEN 60 AND 89 AND stock >= 15 AND recent_sales_30d <= 2 AND lowbench IS NULL THEN
+      current_price * 0.85
 
     -- Historical sales 90+ days: keep going down
     WHEN total_sales_90d > 0 AND days_since_last_sold >= 90 AND recent_sales_30d <= 2 THEN current_price * 0.80
