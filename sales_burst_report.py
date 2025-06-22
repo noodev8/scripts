@@ -182,6 +182,12 @@ def generate_report(analysis_results):
             report_content.append("")
 
         # Analysis notes
+        report_content.append("PRICING LOGIC APPLIED:")
+        report_content.append("-" * 25)
+        report_content.append("This report implements Brookfield Comfort Dynamic Pricing Logic v1.0")
+        report_content.append("Section 2: PRICE INCREASE LOGIC")
+        report_content.append("")
+
         report_content.append("ANALYSIS NOTES:")
         report_content.append("-" * 20)
         report_content.append("• Products shown have NOT had price changes in the last 7 days")
@@ -189,6 +195,7 @@ def generate_report(analysis_results):
         report_content.append("• Recent average calculated from 3 days prior to 1 day prior")
         report_content.append("• Recommended prices are capped at RRP (never exceed manufacturer price)")
         report_content.append("• Price increases range from 1% (low burst) to 5% (high burst)")
+        report_content.append("• All prerequisites checked: cooling period, burst validation, RRP ceiling")
         report_content.append("• Profit calculations account for VAT where applicable")
         report_content.append("• Total profit impact assumes all current stock sells at new price")
         report_content.append("• Sales trends based on 14-day historical average (excluding today)")

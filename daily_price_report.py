@@ -15,17 +15,20 @@ import os
 from datetime import datetime, date
 from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
-BUCKET_NAMES = {
-    1: "Dead Stock (180+ days)",
-    2: "Market Mismatch", 
-    3: "Stock Heavy",
-    4: "Low Margin",
-    5: "Slow Mover",
-    6: "Low Stock/Recent",
-    7: "Early Warning"
+ACTION_NAMES = {
+    'DROP_TO_COST': "Liquidation (Cost + £0.01)",
+    'DROP_40': "Critical Aging (40% reduction)",
+    'DROP_30': "Serious Aging (30% reduction)",
+    'DROP_20': "Aggressive Clearance (20% reduction)",
+    'DROP_15': "Strong Signal (15% reduction)",
+    'DROP_10': "Moderate Reduction (10% reduction)",
+    'DROP_5': "Gentle Reduction (5% reduction)",
+    'USE_LOWBENCH': "Market Benchmark Price",
+    'MANUAL_REVIEW': "Manual Review Required",
+    'HOLD': "Hold Current Price"
 }
 
-PRIORITY_BUCKETS = [1, 2, 3]  # High priority buckets for daily attention
+PRIORITY_ACTIONS = ['DROP_TO_COST', 'DROP_40', 'DROP_30', 'MANUAL_REVIEW']  # High priority actions for daily attention
 
 # Setup logging
 SCRIPT_NAME = "daily_price_report"
@@ -95,22 +98,21 @@ def filter_recent_changes(analysis_results):
 def generate_daily_report(analysis_results, summary_only=False):
     """Generate daily report"""
     report_content = []
-    
+
     # Filter out recent changes
     filtered_results = filter_recent_changes(analysis_results)
-    
-    # Group by bucket
-    by_bucket = {}
+
+    # Group by action
+    by_action = {}
 
     for item in filtered_results:
-        bucket = item.get('bucket')
-        if bucket:
-            if bucket not in by_bucket:
-                by_bucket[bucket] = []
-            by_bucket[bucket].append(item)
-    
-    report_content.append("DAILY PRICE DROP REPORT")
-    report_content.append("=" * 50)
+        action = item.get('action', 'UNKNOWN')
+        if action not in by_action:
+            by_action[action] = []
+        by_action[action].append(item)
+
+    report_content.append("DAILY PRICE RECOMMENDATION REPORT")
+    report_content.append("=" * 60)
     report_content.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     report_content.append(f"Total Products Analyzed: {len(analysis_results)}")
     report_content.append(f"Products Needing Action: {len(filtered_results)}")
@@ -122,58 +124,91 @@ def generate_daily_report(analysis_results, summary_only=False):
 
     priority_count = 0
 
-    for bucket in PRIORITY_BUCKETS:
-        if bucket in by_bucket:
-            items = by_bucket[bucket]
+    for action in PRIORITY_ACTIONS:
+        if action in by_action:
+            items = by_action[action]
             priority_count += len(items)
-            report_content.append(f"Bucket {bucket} ({BUCKET_NAMES[bucket]}): {len(items)} items")
+            action_name = ACTION_NAMES.get(action, action)
+            report_content.append(f"{action_name}: {len(items)} items")
 
     report_content.append(f"\nHIGH PRIORITY TOTAL: {priority_count} items")
     report_content.append("")
         
     if not summary_only:
-        # Detailed breakdown by bucket
+        # Detailed breakdown by action
         report_content.append("DETAILED BREAKDOWN")
-        report_content.append("=" * 50)
+        report_content.append("=" * 60)
         report_content.append("")
 
-        for bucket in sorted(by_bucket.keys()):
-            items = by_bucket[bucket]
-            bucket_name = BUCKET_NAMES.get(bucket, f"Bucket {bucket}")
+        # Sort actions by priority (exclude HOLD from detailed view)
+        action_priority = {
+            'DROP_TO_COST': 1, 'DROP_40': 2, 'DROP_30': 3, 'MANUAL_REVIEW': 4,
+            'DROP_20': 5, 'DROP_15': 6, 'USE_LOWBENCH': 7, 'DROP_10': 8, 'DROP_5': 9
+        }
 
-            report_content.append(f"BUCKET {bucket}: {bucket_name} ({len(items)} items)")
-            report_content.append("-" * 60)
+        # Filter out HOLD actions for detailed view
+        actionable_items = {k: v for k, v in by_action.items() if k != 'HOLD'}
+        sorted_actions = sorted(actionable_items.keys(), key=lambda x: action_priority.get(x, 99))
 
-            # Sort by stock level (descending) to prioritize high-stock items
-            items_sorted = sorted(items, key=lambda x: int(x['stock']), reverse=True)
+        for action in sorted_actions:
+            items = actionable_items[action]
+            action_name = ACTION_NAMES.get(action, action)
 
-            for item in items_sorted[:10]:  # Top 10 per bucket
+            report_content.append(f"{action_name.upper()} ({len(items)} items)")
+            report_content.append("-" * 70)
+
+            # Sort by days since last sold (descending) then by stock (descending)
+            items_sorted = sorted(items, key=lambda x: (int(x['days_since_last_sold']), int(x['stock'])), reverse=True)
+
+            for item in items_sorted[:15]:  # Top 15 per action
                 current = float(item['current_price'])
                 suggested = float(item['suggested_price'])
                 stock = int(item['stock'])
                 days_stale = item['days_since_last_sold']
                 groupid = item['groupid']
                 brand = item.get('brand', 'Unknown')
+                category = item.get('pricing_category', 'Unknown')
 
-                report_content.append(f"  {groupid}: £{current:.2f} -> £{suggested:.2f} (Stock: {stock}, Stale: {days_stale} days, {brand})")
+                # Calculate percentage change
+                pct_change = ((suggested - current) / current) * 100
 
-            if len(items) > 10:
-                report_content.append(f"  ... and {len(items) - 10} more items")
+                # Show category indicator
+                cat_indicator = "Z" if category == "ZERO_SALES" else "H"
+
+                report_content.append(f"  {groupid}: £{current:.2f} -> £{suggested:.2f} ({pct_change:+.1f}%) "
+                                    f"[{cat_indicator}] (Stock: {stock}, {days_stale}d, {brand})")
+
+            if len(items) > 15:
+                report_content.append(f"  ... and {len(items) - 15} more items")
 
             report_content.append("")
 
-    # Quick action commands
+    # Quick action commands and legend
+    report_content.append("LEGEND")
+    report_content.append("-" * 30)
+    report_content.append("[Z] = Zero Sales Product (no sales in 90+ days)")
+    report_content.append("[H] = Historical Sales Product (has sales in last 90 days)")
+    report_content.append("")
+
+    report_content.append("PRICING LOGIC APPLIED")
+    report_content.append("-" * 30)
+    report_content.append("This report uses the Brookfield Comfort Dynamic Pricing Logic v1.0")
+    report_content.append("• Zero Sales: Time-based reductions based on aging and stock levels")
+    report_content.append("• Historical Sales: Conservative reductions considering recent activity")
+    report_content.append("• All prices respect cost floor (cost + £0.01 minimum)")
+    report_content.append("• Manual Review: Conflicting signals require human judgment")
+    report_content.append("")
+
     report_content.append("QUICK ACTION COMMANDS")
     report_content.append("-" * 30)
-    report_content.append("To apply all changes for a bucket:")
-    for bucket in PRIORITY_BUCKETS:
-        if bucket in by_bucket:
-            report_content.append(f"  python apply_price_changes.py --bucket {bucket}")
-
-    report_content.append("\nTo list all pending recommendations:")
+    report_content.append("To list all pending recommendations:")
     report_content.append("  python apply_price_changes.py --list-pending")
     report_content.append("\nTo apply individual changes:")
     report_content.append("  python apply_price_changes.py GROUPID NEW_PRICE \"REASON\"")
+    report_content.append("\nTo apply specific action types (when bucket system is updated):")
+    for action in PRIORITY_ACTIONS:
+        if action in by_action:
+            report_content.append(f"  # {ACTION_NAMES[action]}: {len(by_action[action])} items")
 
     # Save report to logs directory
     report_filename = save_report_file("daily_price_report.txt", "\n".join(report_content))

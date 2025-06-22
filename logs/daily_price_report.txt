@@ -1,96 +1,84 @@
-DAILY PRICE DROP REPORT
-==================================================
-Generated: 2025-06-22 17:03
-Total Products Analyzed: 185
-Products Needing Action: 174
+DAILY PRICE RECOMMENDATION REPORT
+============================================================
+Generated: 2025-06-22 21:38
+Total Products Analyzed: 154
+Products Needing Action: 142
 
 EXECUTIVE SUMMARY
 ------------------------------
-Bucket 1 (Dead Stock (180+ days)): 11 items
-Bucket 2 (Market Mismatch): 29 items
+Liquidation (Cost + £0.01): 38 items
 
-HIGH PRIORITY TOTAL: 40 items
+HIGH PRIORITY TOTAL: 38 items
 
 DETAILED BREAKDOWN
-==================================================
+============================================================
 
-BUCKET 1: Dead Stock (180+ days) (11 items)
-------------------------------------------------------------
-  0043663-GIZEH: £90.00 -> £58.50 (Stock: 20, Stale: 9999 days, Birkenstock)
-  1016570-ZERMATT: £90.00 -> £58.50 (Stock: 19, Stale: 9999 days, Birkenstock)
-  1029777-FLORIDA: £95.00 -> £61.75 (Stock: 17, Stale: 9999 days, Birkenstock)
-  1013070-ARIZONA: £85.00 -> £55.25 (Stock: 16, Stale: 9999 days, Birkenstock)
-  1013076-GIZEH: £90.00 -> £58.50 (Stock: 14, Stale: 9999 days, Birkenstock)
-  1019717-BEND: £100.00 -> £65.00 (Stock: 12, Stale: 9999 days, Birkenstock)
-  1021381-BENDMID: £155.00 -> £100.75 (Stock: 12, Stale: 9999 days, Birkenstock)
-  JLH478-EPSOM-NAVY: £28.85 -> £18.75 (Stock: 12, Stale: 9999 days, Lunar)
-  1019723-BEND: £125.00 -> £81.25 (Stock: 11, Stale: 9999 days, Birkenstock)
-  0051101-ARIZONA: £95.00 -> £61.75 (Stock: 11, Stale: 9999 days, Birkenstock)
-  ... and 1 more items
+LIQUIDATION (COST + £0.01) (38 items)
+----------------------------------------------------------------------
+  0051791-ARIZONA: £72.00 -> £35.43 (-50.8%) [Z] (Stock: 45, 9999d, Birkenstock)
+  0043663-GIZEH: £90.00 -> £37.51 (-58.3%) [Z] (Stock: 20, 9999d, Birkenstock)
+  1016570-ZERMATT: £90.00 -> £37.51 (-58.3%) [Z] (Stock: 19, 9999d, Birkenstock)
+  1029777-FLORIDA: £95.00 -> £39.59 (-58.3%) [Z] (Stock: 17, 9999d, Birkenstock)
+  1013070-ARIZONA: £85.00 -> £37.51 (-55.9%) [Z] (Stock: 16, 9999d, Birkenstock)
+  1013076-GIZEH: £90.00 -> £37.51 (-58.3%) [Z] (Stock: 14, 9999d, Birkenstock)
+  JLH478-EPSOM-NAVY: £28.85 -> £12.00 (-58.4%) [Z] (Stock: 12, 9999d, Lunar)
+  1019717-BEND: £100.00 -> £52.09 (-47.9%) [Z] (Stock: 12, 9999d, Birkenstock)
+  XM620A: £36.00 -> £14.26 (-60.4%) [Z] (Stock: 12, 9999d, Grafters)
+  1021381-BENDMID: £155.00 -> £64.59 (-58.3%) [Z] (Stock: 12, 9999d, Birkenstock)
+  0051101-ARIZONA: £95.00 -> £39.59 (-58.3%) [Z] (Stock: 11, 9999d, Birkenstock)
+  1019723-BEND: £125.00 -> £52.09 (-58.3%) [Z] (Stock: 11, 9999d, Birkenstock)
+  JLY219-BRONWYN-BK: £33.00 -> £11.00 (-66.7%) [Z] (Stock: 11, 9999d, Lunar)
+  DLA003-JAYNE-WHITE: £35.00 -> £12.00 (-65.7%) [Z] (Stock: 10, 9999d, Lunar)
+  1029224-ARIZONA: £85.00 -> £35.43 (-58.3%) [Z] (Stock: 8, 9999d, Birkenstock)
+  ... and 23 more items
 
-BUCKET 2: Market Mismatch (29 items)
-------------------------------------------------------------
-  0051791-ARIZONA: £72.00 -> £62.72 (Stock: 45, Stale: 92 days, Birkenstock)
-  0552683-ARIZONA: £80.00 -> £62.72 (Stock: 21, Stale: 53 days, Birkenstock)
-  1025049-GIZEH: £90.00 -> £70.56 (Stock: 13, Stale: 33 days, Birkenstock)
-  XM620A: £36.00 -> £24.95 (Stock: 12, Stale: 174 days, Grafters)
-  0051191-ARIZONA: £95.00 -> £79.12 (Stock: 12, Stale: 45 days, Birkenstock)
-  FLE030-IVES-STONE: £40.50 -> £31.75 (Stock: 11, Stale: 52 days, Lunar)
-  JLH358-CLUSTER-NAVY: £34.26 -> £27.39 (Stock: 11, Stale: 30 days, Lunar)
-  DLA003-JAYNE-KHAKI: £35.00 -> £29.31 (Stock: 10, Stale: 73 days, Lunar)
-  JLY219-BRONWYN-WT: £27.72 -> £24.57 (Stock: 9, Stale: 41 days, Lunar)
-  1029224-ARIZONA: £85.00 -> £66.64 (Stock: 8, Stale: 9999 days, Birkenstock)
-  ... and 19 more items
+MODERATE REDUCTION (10% REDUCTION) (5 items)
+----------------------------------------------------------------------
+  M450A: £60.00 -> £54.00 (-10.0%) [H] (Stock: 5, 87d, Roamers)
+  DLA003-JAYNE-KHAKI: £35.00 -> £31.50 (-10.0%) [H] (Stock: 10, 73d, Lunar)
+  67463-14: £45.50 -> £40.95 (-10.0%) [H] (Stock: 5, 60d, Rieker)
+  0552683-ARIZONA: £80.00 -> £72.00 (-10.0%) [H] (Stock: 21, 53d, Birkenstock)
+  0129423-ARIZONA: £45.00 -> £40.50 (-10.0%) [H] (Stock: 24, 30d, Birkenstock)
 
-BUCKET 4: Low Margin (14 items)
-------------------------------------------------------------
-  67463-14: £45.50 -> £27.96 (Stock: 5, Stale: 60 days, Rieker)
-  M5066-30: £49.00 -> £30.06 (Stock: 5, Stale: 40 days, Rieker)
-  SOMRM02H3: £9.95 -> £2.82 (Stock: 4, Stale: 9999 days, Gentle Grip)
-  SOMRG51H3BLK: £9.95 -> £2.38 (Stock: 4, Stale: 9999 days, Gentle Grip)
-  SOLRM31G3: £9.95 -> £2.26 (Stock: 4, Stale: 9999 days, Gentle Grip)
-  SOMRJ604H3: £9.95 -> £2.39 (Stock: 4, Stale: 9999 days, Gentle Grip)
-  L174A: £32.00 -> £17.50 (Stock: 4, Stale: 117 days, Mod Comfys)
-  B1053-14: £59.50 -> £36.31 (Stock: 4, Stale: 107 days, Rieker)
-  10001-1LM: £39.52 -> £22.01 (Stock: 4, Stale: 84 days, Crocs)
-  V2860-14: £42.00 -> £25.91 (Stock: 4, Stale: 31 days, Rieker)
-  ... and 4 more items
+GENTLE REDUCTION (5% REDUCTION) (26 items)
+----------------------------------------------------------------------
+  M601A: £53.00 -> £50.35 (-5.0%) [H] (Stock: 1, 87d, Roamers)
+  T198G: £36.00 -> £34.20 (-5.0%) [H] (Stock: 2, 86d, Dek)
+  10001-1LM: £39.52 -> £37.54 (-5.0%) [H] (Stock: 4, 84d, Crocs)
+  M516B: £39.00 -> £37.05 (-5.0%) [H] (Stock: 2, 83d, Goor)
+  M409A: £60.00 -> £57.00 (-5.0%) [H] (Stock: 2, 78d, Roamers)
+  M081B: £65.00 -> £61.75 (-5.0%) [H] (Stock: 4, 74d, IMAC)
+  JLH455-CHARL-BLK: £40.00 -> £38.00 (-5.0%) [H] (Stock: 3, 74d, Lunar)
+  SOLRG67G3BLK: £9.95 -> £9.45 (-5.0%) [H] (Stock: 3, 66d, Gentle Grip)
+  FLE030-IVES-STONE: £40.50 -> £38.48 (-5.0%) [H] (Stock: 11, 52d, Lunar)
+  10001-5AJ: £50.00 -> £47.50 (-5.0%) [H] (Stock: 3, 52d, Crocs)
+  10001-0DA: £29.25 -> £27.79 (-5.0%) [H] (Stock: 1, 46d, Crocs)
+  0051191-ARIZONA: £95.00 -> £90.25 (-5.0%) [H] (Stock: 12, 45d, Birkenstock)
+  T198A: £36.00 -> £34.20 (-5.0%) [H] (Stock: 5, 42d, Dek)
+  JLY219-BRONWYN-WT: £27.72 -> £26.33 (-5.0%) [H] (Stock: 9, 41d, Lunar)
+  M5066-30: £49.00 -> £46.55 (-5.0%) [H] (Stock: 5, 40d, Rieker)
+  ... and 11 more items
 
-BUCKET 5: Slow Mover (6 items)
-------------------------------------------------------------
-  JLY219-BRONWYN-BK: £33.00 -> £28.05 (Stock: 11, Stale: 169 days, Lunar)
-  0040301-MADRID: £80.00 -> £68.00 (Stock: 7, Stale: 9999 days, Birkenstock)
-  M024B: £36.00 -> £30.60 (Stock: 7, Stale: 101 days, Roamers)
-  M551C: £48.00 -> £40.80 (Stock: 7, Stale: 98 days, Dek)
-  1009920-ARIZONA: £90.00 -> £76.50 (Stock: 6, Stale: 9999 days, Birkenstock)
-  M450A: £60.00 -> £51.00 (Stock: 5, Stale: 87 days, Roamers)
+LEGEND
+------------------------------
+[Z] = Zero Sales Product (no sales in 90+ days)
+[H] = Historical Sales Product (has sales in last 90 days)
 
-BUCKET 6: Low Stock/Recent (111 items)
-------------------------------------------------------------
-  SHAKE-II-BLACK: £47.40 -> £36.21 (Stock: 54, Stale: 4 days, Hotter)
-  0051701-ARIZONA: £72.00 -> £35.42 (Stock: 34, Stale: 2 days, Birkenstock)
-  1019094-ARIZONA: £43.77 -> £20.83 (Stock: 33, Stale: 18 days, Birkenstock)
-  0034793-MILANO: £72.00 -> £37.50 (Stock: 33, Stale: 7 days, Birkenstock)
-  1014934-ZERMATT: £52.21 -> £25.00 (Stock: 31, Stale: 5 days, Birkenstock)
-  0128221-GIZEH: £41.61 -> £18.75 (Stock: 29, Stale: 1 days, Birkenstock)
-  0128161-MADRID: £32.00 -> £16.67 (Stock: 24, Stale: 3 days, Birkenstock)
-  0051793-ARIZONA: £80.00 -> £35.42 (Stock: 21, Stale: 3 days, Birkenstock)
-  0040793-MADRID: £62.00 -> £31.25 (Stock: 21, Stale: 1 days, Birkenstock)
-  1027696-ARIZONA: £68.00 -> £35.42 (Stock: 19, Stale: 2 days, Birkenstock)
-  ... and 101 more items
-
-BUCKET 7: Early Warning (1 items)
-------------------------------------------------------------
-  0129423-ARIZONA: £45.00 -> £40.50 (Stock: 24, Stale: 30 days, Birkenstock)
+PRICING LOGIC APPLIED
+------------------------------
+This report uses the Brookfield Comfort Dynamic Pricing Logic v1.0
+• Zero Sales: Time-based reductions based on aging and stock levels
+• Historical Sales: Conservative reductions considering recent activity
+• All prices respect cost floor (cost + £0.01 minimum)
+• Manual Review: Conflicting signals require human judgment
 
 QUICK ACTION COMMANDS
 ------------------------------
-To apply all changes for a bucket:
-  python apply_price_changes.py --bucket 1
-  python apply_price_changes.py --bucket 2
-
 To list all pending recommendations:
   python apply_price_changes.py --list-pending
 
 To apply individual changes:
   python apply_price_changes.py GROUPID NEW_PRICE "REASON"
+
+To apply specific action types (when bucket system is updated):
+  # Liquidation (Cost + £0.01): 38 items

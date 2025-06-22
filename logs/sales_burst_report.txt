@@ -1,5 +1,5 @@
 SALES BURST ANALYSIS REPORT
-Generated: 2025-06-22 16:40:44
+Generated: 2025-06-22 21:38:46
 ============================================================
 
 SUMMARY BY PRIORITY:
@@ -831,6 +831,11 @@ GroupID: 0129421-ARIZONA
 ------------------------------------------------------------
 
 
+PRICING LOGIC APPLIED:
+-------------------------
+This report implements Brookfield Comfort Dynamic Pricing Logic v1.0
+Section 2: PRICE INCREASE LOGIC
+
 ANALYSIS NOTES:
 --------------------
 • Products shown have NOT had price changes in the last 7 days
@@ -838,6 +843,7 @@ ANALYSIS NOTES:
 • Recent average calculated from 3 days prior to 1 day prior
 • Recommended prices are capped at RRP (never exceed manufacturer price)
 • Price increases range from 1% (low burst) to 5% (high burst)
+• All prerequisites checked: cooling period, burst validation, RRP ceiling
 • Profit calculations account for VAT where applicable
 • Total profit impact assumes all current stock sells at new price
 • Sales trends based on 14-day historical average (excluding today)
