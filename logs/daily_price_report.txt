@@ -1,6 +1,6 @@
 DAILY PRICE DROP REPORT
 ==================================================
-Generated: 2025-06-22 15:43
+Generated: 2025-06-22 16:05
 Total Products Analyzed: 186
 Products Needing Action: 175
 
@@ -10,6 +10,79 @@ Bucket 1 (Dead Stock (180+ days)): 11 items
 Bucket 2 (Market Mismatch): 29 items
 
 HIGH PRIORITY TOTAL: 40 items
+
+DETAILED BREAKDOWN
+==================================================
+
+BUCKET 1: Dead Stock (180+ days) (11 items)
+------------------------------------------------------------
+  0043663-GIZEH: £90.00 -> £58.50 (Stock: 20, Stale: 9999 days)
+  1016570-ZERMATT: £90.00 -> £58.50 (Stock: 19, Stale: 9999 days)
+  1029777-FLORIDA: £95.00 -> £61.75 (Stock: 17, Stale: 9999 days)
+  1013070-ARIZONA: £85.00 -> £55.25 (Stock: 16, Stale: 9999 days)
+  1013076-GIZEH: £90.00 -> £58.50 (Stock: 14, Stale: 9999 days)
+  JLH478-EPSOM-NAVY: £28.85 -> £18.75 (Stock: 12, Stale: 9999 days)
+  1019717-BEND: £100.00 -> £65.00 (Stock: 12, Stale: 9999 days)
+  1021381-BENDMID: £155.00 -> £100.75 (Stock: 12, Stale: 9999 days)
+  0051101-ARIZONA: £95.00 -> £61.75 (Stock: 11, Stale: 9999 days)
+  1019723-BEND: £125.00 -> £81.25 (Stock: 11, Stale: 9999 days)
+  ... and 1 more items
+
+BUCKET 2: Market Mismatch (29 items)
+------------------------------------------------------------
+  0051791-ARIZONA: £72.00 -> £62.72 (Stock: 45, Stale: 92 days)
+  0552683-ARIZONA: £80.00 -> £62.72 (Stock: 21, Stale: 53 days)
+  1025049-GIZEH: £90.00 -> £70.56 (Stock: 13, Stale: 33 days)
+  XM620A: £36.00 -> £24.95 (Stock: 12, Stale: 174 days)
+  0051191-ARIZONA: £95.00 -> £79.12 (Stock: 12, Stale: 45 days)
+  FLE030-IVES-STONE: £40.50 -> £31.75 (Stock: 11, Stale: 52 days)
+  JLH358-CLUSTER-NAVY: £34.26 -> £27.39 (Stock: 11, Stale: 30 days)
+  DLA003-JAYNE-KHAKI: £35.00 -> £29.31 (Stock: 10, Stale: 73 days)
+  JLY219-BRONWYN-WT: £27.72 -> £24.57 (Stock: 9, Stale: 41 days)
+  1029224-ARIZONA: £85.00 -> £66.64 (Stock: 8, Stale: 9999 days)
+  ... and 19 more items
+
+BUCKET 4: Low Margin (14 items)
+------------------------------------------------------------
+  67463-14: £45.50 -> £27.96 (Stock: 5, Stale: 60 days)
+  M5066-30: £49.00 -> £30.06 (Stock: 5, Stale: 40 days)
+  SOLRM31G3: £9.95 -> £2.26 (Stock: 4, Stale: 9999 days)
+  SOMRM02H3: £9.95 -> £2.82 (Stock: 4, Stale: 9999 days)
+  SOMRJ604H3: £9.95 -> £2.39 (Stock: 4, Stale: 9999 days)
+  SOMRG51H3BLK: £9.95 -> £2.38 (Stock: 4, Stale: 9999 days)
+  L174A: £32.00 -> £17.50 (Stock: 4, Stale: 117 days)
+  B1053-14: £59.50 -> £36.31 (Stock: 4, Stale: 107 days)
+  10001-1LM: £39.52 -> £22.01 (Stock: 4, Stale: 84 days)
+  V2860-14: £42.00 -> £25.91 (Stock: 4, Stale: 31 days)
+  ... and 4 more items
+
+BUCKET 5: Slow Mover (7 items)
+------------------------------------------------------------
+  JLY219-BRONWYN-BK: £33.00 -> £28.05 (Stock: 11, Stale: 169 days)
+  0040301-MADRID: £80.00 -> £68.00 (Stock: 7, Stale: 9999 days)
+  1016571-ZERMATT: £90.00 -> £76.50 (Stock: 7, Stale: 9999 days)
+  M024B: £36.00 -> £30.60 (Stock: 7, Stale: 101 days)
+  M551C: £48.00 -> £40.80 (Stock: 7, Stale: 98 days)
+  1009920-ARIZONA: £90.00 -> £76.50 (Stock: 6, Stale: 9999 days)
+  M450A: £60.00 -> £51.00 (Stock: 5, Stale: 87 days)
+
+BUCKET 6: Low Stock/Recent (111 items)
+------------------------------------------------------------
+  SHAKE-II-BLACK: £47.40 -> £36.21 (Stock: 54, Stale: 4 days)
+  0051701-ARIZONA: £72.00 -> £35.42 (Stock: 34, Stale: 2 days)
+  1019094-ARIZONA: £43.77 -> £20.83 (Stock: 33, Stale: 18 days)
+  0034793-MILANO: £72.00 -> £37.50 (Stock: 33, Stale: 7 days)
+  1014934-ZERMATT: £52.21 -> £25.00 (Stock: 31, Stale: 5 days)
+  0128221-GIZEH: £41.61 -> £18.75 (Stock: 29, Stale: 1 days)
+  0128161-MADRID: £32.00 -> £16.67 (Stock: 24, Stale: 3 days)
+  0051793-ARIZONA: £80.00 -> £35.42 (Stock: 21, Stale: 3 days)
+  0040793-MADRID: £62.00 -> £31.25 (Stock: 21, Stale: 1 days)
+  1027696-ARIZONA: £68.00 -> £35.42 (Stock: 19, Stale: 2 days)
+  ... and 101 more items
+
+BUCKET 7: Early Warning (1 items)
+------------------------------------------------------------
+  0129423-ARIZONA: £45.00 -> £40.50 (Stock: 24, Stale: 30 days)
 
 QUICK ACTION COMMANDS
 ------------------------------

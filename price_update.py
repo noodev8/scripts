@@ -374,6 +374,29 @@ def update_google_price(google_id, new_price):
         time.sleep(0.2)
         return f"Google API error: {str(e)}"
 
+def log_price_change_to_db(groupid, old_price, new_price, reason="PRICE_UPDATE_SCRIPT"):
+    """Log price change to database for tracking"""
+    try:
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
+        cur = conn.cursor()
+
+        # Insert into price_change_log table
+        cur.execute("""
+            INSERT INTO price_change_log (groupid, old_price, new_price, reason, reviewed_by, change_date)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (groupid, old_price, new_price, reason, "PRICE_UPDATE", datetime.now().date()))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return True
+
+    except Exception as e:
+        log(f"ERROR: Failed to log price change to database for {groupid}: {str(e)}")
+        return False
+
 
 def show_usage():
     print("Usage:")
@@ -488,6 +511,9 @@ def main():
                     # Log detailed price change information for both modes
                     price_change_msg = f"💰 {code}: PRICE CHANGED - '{product_title}' from £{current_price} → £{shopifyprice} (variant_id: {variant_id})"
                     log(price_change_msg)
+
+                    # Log price change to database for tracking
+                    log_price_change_to_db(groupid, current_price, shopifyprice, f"PRICE_UPDATE_{mode.upper()}")
 
                     # Update Google price if enabled and googleid exists
                     if google_updates_enabled and googleid:

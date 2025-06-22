@@ -39,7 +39,7 @@ def get_price_analysis():
         conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
-        sql_file_path = os.path.join("performance_reports", "product_price_drop.sql")
+        sql_file_path = os.path.join("database", "product_price_drop.sql")
         with open(sql_file_path, 'r') as f:
             sql_query = f.read()
         

@@ -56,7 +56,7 @@ def get_price_drop_analysis():
         cur = conn.cursor()
         
         # Read the SQL file
-        sql_file_path = os.path.join("performance_reports", "product_price_drop.sql")
+        sql_file_path = os.path.join("database", "product_price_drop.sql")
         with open(sql_file_path, 'r') as f:
             sql_query = f.read()
         

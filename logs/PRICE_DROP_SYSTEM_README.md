@@ -32,8 +32,7 @@ This system analyzes your inventory performance and provides automated price dro
 
 ### Supporting Files
 
-- **`performance_reports/product_price_drop.sql`** - Core analysis query
-- **`performance_reports/product_price_drop_explanation.md`** - Detailed documentation
+- **`database/product_price_drop.sql`** - Core analysis query
 
 ## Quick Start
 
