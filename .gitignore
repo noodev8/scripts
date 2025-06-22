@@ -64,4 +64,4 @@ venv/
 *.lock
 .idea/
 GOOGLE-DATA-Merchant.txt
-
+DB_Schema.sql
