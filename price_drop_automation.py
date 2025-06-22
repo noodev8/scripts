@@ -219,7 +219,8 @@ def generate_report(analysis_results, mode="monitor"):
         report_content.append("-" * 50)
 
         for item in items:
-            report_content.append(f"GroupID: {item['groupid']}")
+            brand = item.get('brand', 'Unknown')
+            report_content.append(f"GroupID: {item['groupid']} ({brand})")
             report_content.append(f"  Current Price: £{item['current_price']}")
             report_content.append(f"  Suggested Price: £{item['suggested_price']}")
             report_content.append(f"  Stock: {item['stock']}")

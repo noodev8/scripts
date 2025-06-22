@@ -274,8 +274,9 @@ def list_pending_recommendations():
         for item in items:
             current = float(item['current_price'])
             suggested = float(item['suggested_price'])
-            savings = current - suggested
-            print(f"  {item['groupid']}: £{current:.2f} -> £{suggested:.2f} (save £{savings:.2f})")
+            reduction = current - suggested
+            brand = item.get('brand', 'Unknown')
+            print(f"  {item['groupid']}: £{current:.2f} -> £{suggested:.2f} (-£{reduction:.2f}) [{brand}]")
             print(f"    Stock: {item['stock']}, Days stale: {item['days_since_last_sold']}")
             print(f"    Reason: {item['bucket_reason']}")
             print()

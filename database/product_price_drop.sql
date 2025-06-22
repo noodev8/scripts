@@ -1,8 +1,4 @@
-WITH params AS (
-  SELECT 'BIRKENSTOCK'::VARCHAR AS target_brand
-),
-
-latest_sales AS (
+WITH latest_sales AS (
   SELECT 
     s.groupid,
     MAX(s.solddate) AS last_sold_date
@@ -13,6 +9,7 @@ latest_sales AS (
 inventory_view AS (
   SELECT 
     ss.groupid,
+    ss.brand,
     ss.shopifyprice::NUMERIC AS current_price,
     ss.lowbench::NUMERIC AS lowbench,
     ss.cost::NUMERIC AS cost,
@@ -36,9 +33,11 @@ inventory_view AS (
     WHERE deleted = 0
     GROUP BY groupid
   ) ls ON ss.groupid = ls.groupid
+  WHERE ss.shopify = 1
 )
 
 SELECT 
+  brand,
   groupid,
   current_price,
   lowbench,
@@ -71,7 +70,6 @@ SELECT
     ELSE NULL
   END AS bucket_reason,
 
-  -- Suggested price, always validated to be >= cost
   ROUND(GREATEST(CASE 
     WHEN (days_since_last_sold >= 180 OR days_since_last_sold = 9999) AND stock >= 10 
          THEN GREATEST(current_price * 0.65, cost + 1)

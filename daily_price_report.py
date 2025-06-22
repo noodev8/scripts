@@ -153,8 +153,9 @@ def generate_daily_report(analysis_results, summary_only=False):
                 stock = int(item['stock'])
                 days_stale = item['days_since_last_sold']
                 groupid = item['groupid']
+                brand = item.get('brand', 'Unknown')
 
-                report_content.append(f"  {groupid}: £{current:.2f} -> £{suggested:.2f} (Stock: {stock}, Stale: {days_stale} days)")
+                report_content.append(f"  {groupid}: £{current:.2f} -> £{suggested:.2f} (Stock: {stock}, Stale: {days_stale} days, {brand})")
 
             if len(items) > 10:
                 report_content.append(f"  ... and {len(items) - 10} more items")
