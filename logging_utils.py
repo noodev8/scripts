@@ -1,15 +1,40 @@
 #!/usr/bin/env python3
 """
-Shared logging utilities for all scripts
-Provides consistent log management across the codebase
+Shared logging utilities and configuration for all scripts
+Provides consistent log management and database configuration across the codebase
 """
 
 import os
 import shutil
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 # --- LOGGING CONFIGURATION ---
 LOG_ARCHIVE_DAYS = 3  # Keep 3 days of archived logs
+
+# --- DATABASE CONFIGURATION ---
+def get_db_config():
+    """Load database configuration from .env file"""
+    # Load environment variables from .env file
+    load_dotenv('.env')
+
+    # Get database configuration from environment variables
+    db_config = {
+        "host": os.getenv('DB_HOST'),
+        "port": int(os.getenv('DB_PORT', 5432)),
+        "dbname": os.getenv('DB_NAME'),
+        "user": os.getenv('DB_USER'),
+        "password": os.getenv('DB_PASSWORD')
+    }
+
+    # Validate that all required configuration is present
+    required_fields = ['host', 'dbname', 'user', 'password']
+    missing_fields = [field for field in required_fields if not db_config[field]]
+
+    if missing_fields:
+        raise ValueError(f"Missing required database configuration in .env file: {', '.join(missing_fields)}")
+
+    return db_config
 
 def setup_logging_directories():
     """Create logs and archive_logs directories if they don't exist"""

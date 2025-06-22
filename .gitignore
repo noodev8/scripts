@@ -51,8 +51,9 @@ android/app/*.iml
 android/key.properties
 **/android/app/.cxx/
 
-# Shopify and Google merchant api and passwords
+# API credentials and sensitive configuration files
 merchant-feed-api-462809-23c712978791.json
+.env
 shopify_api.env
 server.txt
 

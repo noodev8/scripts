@@ -61,19 +61,11 @@ import time
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from logging_utils import manage_log_files, create_logger
+from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- CONFIGURATION ---
-# Load environment variables from shopify_api.env
-load_dotenv('shopify_api.env')
-
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+# Load environment variables from .env
+load_dotenv('.env')
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -82,7 +74,7 @@ LOCATION_ID = "64140443707"
 
 # Validate that the access token was loaded
 if not ACCESS_TOKEN:
-    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in shopify_api.env file")
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
 
 # Setup logging
 SCRIPT_NAME = "update_shopify_inventory"
@@ -465,7 +457,8 @@ def get_unfulfilled_shopify_orders():
             return {}
 
         # Check which orders are already processed (in orderstatus table)
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
 
         order_names = list(order_data.keys())
@@ -523,7 +516,8 @@ def main():
     else:
         log("Full sync mode")
 
-    conn = psycopg2.connect(**DB_CONFIG)
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
     if single_code:

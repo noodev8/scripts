@@ -13,16 +13,7 @@ import psycopg2
 import sys
 import os
 from datetime import datetime, date
-from logging_utils import manage_log_files, create_logger, save_report_file
-
-# --- CONFIGURATION ---
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
 BUCKET_NAMES = {
     1: "Dead Stock (180+ days)",
@@ -44,7 +35,8 @@ log = create_logger(SCRIPT_NAME)
 def get_price_analysis():
     """Get price drop analysis results"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         sql_file_path = os.path.join("performance_reports", "product_price_drop.sql")
@@ -73,7 +65,8 @@ def get_price_analysis():
 def filter_recent_changes(analysis_results):
     """Filter out products with recent price changes"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         filtered_results = []

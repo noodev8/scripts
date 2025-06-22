@@ -10,16 +10,7 @@ import psycopg2
 import pandas as pd
 import paramiko
 from datetime import datetime
-from logging_utils import manage_log_files, create_logger, save_report_file
-
-# --- CONFIGURATION ---
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "merchant_feed"
@@ -100,7 +91,8 @@ def determine_stock_availability(localstock_qty, localstock_deleted, amzlive, uk
 
 
 def generate_feed():
-    conn = psycopg2.connect(**DB_CONFIG)
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
     cur.execute("""

@@ -20,18 +20,10 @@ import sys
 import os
 from datetime import datetime, date
 from dotenv import load_dotenv
-from logging_utils import manage_log_files, create_logger
+from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- CONFIGURATION ---
-load_dotenv('shopify_api.env')
-
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+load_dotenv('.env')
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -53,7 +45,8 @@ def log_and_print(message):
 def get_current_price(groupid):
     """Get current Shopify price for a product"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         cur.execute("SELECT shopifyprice FROM skusummary WHERE groupid = %s", (groupid,))
@@ -74,7 +67,8 @@ def get_current_price(groupid):
 def get_variant_by_groupid(groupid):
     """Get Shopify variant ID by groupid"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         cur.execute("""
@@ -127,7 +121,8 @@ def update_shopify_price(variant_id, new_price):
 def log_price_change(groupid, old_price, new_price, reason):
     """Log price change to database"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         cur.execute("""
@@ -183,7 +178,8 @@ def apply_single_price_change(groupid, new_price, reason):
 def get_pending_recommendations(bucket=None):
     """Get pending price change recommendations"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         # Read and execute the price drop SQL

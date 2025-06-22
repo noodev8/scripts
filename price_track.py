@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
 import psycopg2
 from datetime import date, timedelta
-from logging_utils import manage_log_files, create_logger
-
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "dbname": "brookfield_prod",
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "port": 5432
-}
+from logging_utils import manage_log_files, create_logger, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "price_track"
@@ -20,7 +12,8 @@ def main():
     conn = None
     try:
         log("=== PRICE TRACK UPDATE STARTED ===")
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
 
         # 1️⃣ SET DATES

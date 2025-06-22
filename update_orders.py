@@ -5,17 +5,18 @@ from logging.handlers import RotatingFileHandler
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from logging_utils import get_db_config
 
 # === CONFIGURATION ===
-# Load environment variables from shopify_api.env
-load_dotenv('shopify_api.env')
+# Load environment variables from .env
+load_dotenv('.env')
 
 SHOP_DOMAIN = "brookfieldcomfort2.myshopify.com"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ORDERS_ACCESS_TOKEN')
 
 # Validate that the access token was loaded
 if not ACCESS_TOKEN:
-    raise ValueError("SHOPIFY_ORDERS_ACCESS_TOKEN not found in shopify_api.env file")
+    raise ValueError("SHOPIFY_ORDERS_ACCESS_TOKEN not found in .env file")
 
 # Safety settings for order deletion
 ENABLE_DELETION = False  # Set to True to enable deletion of old orders
@@ -27,13 +28,7 @@ LOG_FILE = os.path.join(SCRIPT_DIR, "order_sync.log")
 LOG_MAX_SIZE = 5 * 1024 * 1024  # 5MB per log file
 LOG_BACKUP_COUNT = 3  # Keep 3 backup files (total ~20MB max)
 
-DB_CONFIG = {
-    "dbname": "brookfield_prod",
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "host": "77.68.13.150",
-    "port": "5432"
-}
+
 
 # === SETUP LOGGING ===
 def setup_logging():
@@ -87,7 +82,8 @@ def format_datetime(dt_str):
 conn = None
 cursor = None
 try:
-    conn = psycopg2.connect(**DB_CONFIG)
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
     cursor = conn.cursor()
 
     insert_order_sql = """

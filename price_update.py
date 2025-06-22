@@ -15,18 +15,11 @@ from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+from logging_utils import get_db_config
 
 # --- SHOPIFY CONFIGURATION ---
-# Load environment variables from shopify_api.env
-load_dotenv('shopify_api.env')
-
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+# Load environment variables from .env
+load_dotenv('.env')
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -35,7 +28,7 @@ LOG_RETENTION = 7  # days
 
 # Validate that the access token was loaded
 if not ACCESS_TOKEN:
-    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in shopify_api.env file")
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
 
 # --- GOOGLE CONFIGURATION ---
 GOOGLE_SERVICE_ACCOUNT_FILE = 'merchant-feed-api-462809-23c712978791.json'
@@ -424,7 +417,8 @@ def main():
             log("Warning: Google updates disabled due to initialization failure")
             google_updates_enabled = False
 
-    conn = psycopg2.connect(**DB_CONFIG)
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
     if mode == "full":

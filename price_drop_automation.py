@@ -19,19 +19,11 @@ import os
 import json
 from datetime import datetime, date
 from dotenv import load_dotenv
-from logging_utils import manage_log_files, create_logger, save_report_file
+from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
 # --- CONFIGURATION ---
-# Load environment variables from shopify_api.env
-load_dotenv('shopify_api.env')
-
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+# Load environment variables from .env
+load_dotenv('.env')
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -59,7 +51,8 @@ from price_drop_config import (
 def get_price_drop_analysis():
     """Execute the price drop SQL analysis and return results"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         # Read the SQL file
@@ -89,7 +82,8 @@ def get_price_drop_analysis():
 def check_recent_price_changes(groupid, days=RECENT_CHANGE_COOLDOWN):
     """Check if product had recent price changes"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         cur.execute("""
@@ -110,7 +104,8 @@ def check_recent_price_changes(groupid, days=RECENT_CHANGE_COOLDOWN):
 def get_variant_by_groupid(groupid):
     """Get Shopify variant information by groupid"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         # Get variant link from skumap table
@@ -165,7 +160,8 @@ def update_shopify_price(variant_id, new_price):
 def log_price_change(groupid, old_price, new_price, reason, applied=True):
     """Log price change to database and file"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
         
         # Insert into price_change_log table
