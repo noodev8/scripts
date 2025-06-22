@@ -145,3 +145,39 @@
 2025-06-22 21:37:45  Price analysis completed: 154 products analyzed
 2025-06-22 21:38:03  Price analysis completed: 154 products analyzed
 2025-06-22 21:38:30  Price analysis completed: 154 products analyzed
+2025-06-22 21:59:08  === DAILY PRICE REPORT STARTED ===
+2025-06-22 21:59:08  Price analysis completed: 154 products analyzed
+2025-06-22 21:59:10  Report generated: C:\scripts\logs\daily_price_report.txt
+2025-06-22 21:59:10  Total items: 142, Priority items: 43
+2025-06-22 21:59:10  Summary saved: daily_summary.txt
+2025-06-22 21:59:10  === DAILY PRICE REPORT COMPLETED ===
+2025-06-22 21:59:31  === DAILY PRICE REPORT STARTED ===
+2025-06-22 21:59:31  Price analysis completed: 154 products analyzed
+2025-06-22 21:59:33  Report generated: C:\scripts\logs\daily_price_report.txt
+2025-06-22 21:59:33  Total items: 142, Priority items: 43
+2025-06-22 21:59:33  Summary saved: daily_summary.txt
+2025-06-22 21:59:33  === DAILY PRICE REPORT COMPLETED ===
+2025-06-22 22:00:28  === DAILY PRICE REPORT STARTED ===
+2025-06-22 22:00:28  Price analysis completed: 154 products analyzed
+2025-06-22 22:00:30  Report generated: C:\scripts\logs\daily_price_report.txt
+2025-06-22 22:00:30  Total items: 142, Priority items: 43
+2025-06-22 22:00:30  Summary saved: daily_summary.txt
+2025-06-22 22:00:30  === DAILY PRICE REPORT COMPLETED ===
+2025-06-22 22:28:15  === DAILY PRICE REPORT STARTED ===
+2025-06-22 22:28:15  ERROR: Failed to get analysis: column "action" does not exist
+LINE 164:     WHEN action LIKE '%_BENCH_FLOOR' THEN
+                   ^
+
+2025-06-22 22:28:15  ERROR: No analysis results obtained
+2025-06-22 22:29:01  === DAILY PRICE REPORT STARTED ===
+2025-06-22 22:29:01  Price analysis completed: 154 products analyzed
+2025-06-22 22:29:03  Report generated: C:\scripts\logs\daily_price_report.txt
+2025-06-22 22:29:03  Total items: 142, Priority items: 12
+2025-06-22 22:29:03  Summary saved: daily_summary.txt
+2025-06-22 22:29:03  === DAILY PRICE REPORT COMPLETED ===
+2025-06-22 22:29:48  === DAILY PRICE REPORT STARTED ===
+2025-06-22 22:29:48  Price analysis completed: 154 products analyzed
+2025-06-22 22:29:50  Report generated: C:\scripts\logs\daily_price_report.txt
+2025-06-22 22:29:50  Total items: 142, Priority items: 12
+2025-06-22 22:29:50  Summary saved: daily_summary.txt
+2025-06-22 22:29:50  === DAILY PRICE REPORT COMPLETED ===

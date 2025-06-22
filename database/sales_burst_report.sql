@@ -43,7 +43,7 @@ bursts AS (
 log_filtered AS (
   SELECT DISTINCT groupid
   FROM price_change_log
-  WHERE change_date >= CURRENT_DATE - INTERVAL '7 days'
+  WHERE change_date >= CURRENT_DATE - INTERVAL '10 days'
 ),
 price_change_history AS (
   SELECT

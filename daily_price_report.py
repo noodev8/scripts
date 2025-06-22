@@ -16,19 +16,19 @@ from datetime import datetime, date
 from logging_utils import manage_log_files, create_logger, save_report_file, get_db_config
 
 ACTION_NAMES = {
-    'DROP_TO_COST': "Liquidation (Cost + £0.01)",
-    'DROP_40': "Critical Aging (40% reduction)",
-    'DROP_30': "Serious Aging (30% reduction)",
-    'DROP_20': "Aggressive Clearance (20% reduction)",
+    'USE_BENCHMARK': "Market Benchmark Price (42+ days)",
+    'DROP_20_BENCH_FLOOR': "Conservative 20% (Benchmark Floor)",
+    'DROP_10_BENCH_FLOOR': "Moderate 10% (Benchmark Floor)",
+    'DROP_5_BENCH_FLOOR': "Gentle 5% (Benchmark Floor)",
+    'DROP_20': "Conservative Reduction (20% max)",
     'DROP_15': "Strong Signal (15% reduction)",
     'DROP_10': "Moderate Reduction (10% reduction)",
     'DROP_5': "Gentle Reduction (5% reduction)",
-    'USE_LOWBENCH': "Market Benchmark Price",
     'MANUAL_REVIEW': "Manual Review Required",
     'HOLD': "Hold Current Price"
 }
 
-PRIORITY_ACTIONS = ['DROP_TO_COST', 'DROP_40', 'DROP_30', 'MANUAL_REVIEW']  # High priority actions for daily attention
+PRIORITY_ACTIONS = ['USE_BENCHMARK', 'DROP_20_BENCH_FLOOR', 'DROP_10_BENCH_FLOOR', 'MANUAL_REVIEW']  # High priority actions for daily attention
 
 # Setup logging
 SCRIPT_NAME = "daily_price_report"
@@ -76,10 +76,10 @@ def filter_recent_changes(analysis_results):
         for item in analysis_results:
             groupid = item['groupid']
             
-            # Check for recent changes
+            # Check for recent changes (10-day lock period)
             cur.execute("""
-                SELECT COUNT(*) FROM price_change_log 
-                WHERE groupid = %s AND change_date >= CURRENT_DATE - INTERVAL '7 days'
+                SELECT COUNT(*) FROM price_change_log
+                WHERE groupid = %s AND change_date >= CURRENT_DATE - INTERVAL '10 days'
             """, (groupid,))
             
             recent_changes = cur.fetchone()[0]
@@ -142,8 +142,9 @@ def generate_daily_report(analysis_results, summary_only=False):
 
         # Sort actions by priority (exclude HOLD from detailed view)
         action_priority = {
-            'DROP_TO_COST': 1, 'DROP_40': 2, 'DROP_30': 3, 'MANUAL_REVIEW': 4,
-            'DROP_20': 5, 'DROP_15': 6, 'USE_LOWBENCH': 7, 'DROP_10': 8, 'DROP_5': 9
+            'USE_BENCHMARK': 1, 'DROP_20_BENCH_FLOOR': 2, 'DROP_10_BENCH_FLOOR': 3,
+            'DROP_5_BENCH_FLOOR': 4, 'MANUAL_REVIEW': 5, 'DROP_20': 6,
+            'DROP_15': 7, 'DROP_10': 8, 'DROP_5': 9
         }
 
         # Filter out HOLD actions for detailed view
@@ -168,6 +169,7 @@ def generate_daily_report(analysis_results, summary_only=False):
                 groupid = item['groupid']
                 brand = item.get('brand', 'Unknown')
                 category = item.get('pricing_category', 'Unknown')
+                lowbench = item.get('lowbench')
 
                 # Calculate percentage change
                 pct_change = ((suggested - current) / current) * 100
@@ -175,8 +177,13 @@ def generate_daily_report(analysis_results, summary_only=False):
                 # Show category indicator
                 cat_indicator = "Z" if category == "ZERO_SALES" else "H"
 
+                # Add benchmark info if available
+                bench_info = ""
+                if lowbench and float(lowbench) > 0:
+                    bench_info = f" | Bench: £{float(lowbench):.2f}"
+
                 report_content.append(f"  {groupid}: £{current:.2f} -> £{suggested:.2f} ({pct_change:+.1f}%) "
-                                    f"[{cat_indicator}] (Stock: {stock}, {days_stale}d, {brand})")
+                                    f"[{cat_indicator}] (Stock: {stock}, {days_stale}d, {brand}){bench_info}")
 
             if len(items) > 15:
                 report_content.append(f"  ... and {len(items) - 15} more items")
@@ -193,6 +200,8 @@ def generate_daily_report(analysis_results, summary_only=False):
     report_content.append("PRICING LOGIC APPLIED")
     report_content.append("-" * 30)
     report_content.append("This report uses the Brookfield Comfort Dynamic Pricing Logic v1.0")
+    report_content.append("• Maximum reduction: 20% per change (conservative approach)")
+    report_content.append("• Price change lock: 10-day cooling period between changes")
     report_content.append("• Zero Sales: Time-based reductions based on aging and stock levels")
     report_content.append("• Historical Sales: Conservative reductions considering recent activity")
     report_content.append("• All prices respect cost floor (cost + £0.01 minimum)")
