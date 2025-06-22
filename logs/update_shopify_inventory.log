@@ -1,0 +1,116 @@
+2025-06-22 14:50:09  === SHOPIFY INVENTORY SYNC STARTED ===
+2025-06-22 14:50:09  Single item mode: --help
+2025-06-22 14:50:09  Fetching variant information for 0 products...
+2025-06-22 14:50:10  Found variant information for 0 out of 0 products
+2025-06-22 14:50:10  Starting inventory sync for 0 products (database stock only)...
+2025-06-22 14:50:10  🔄 Starting end-of-process unfulfilled orders correction...
+2025-06-22 14:50:11  📋 Retrieved 27 unfulfilled orders from Shopify
+2025-06-22 14:50:11     Order BC14237: 1 line items
+2025-06-22 14:50:11       - SKU: 1017723-BEND-43, Qty: 1, Product: Birkenstock Bend Low Natural Leather Trainer Style White Regular Fit
+2025-06-22 14:50:11     Order BC14236: 1 line items
+2025-06-22 14:50:11       - SKU: 0043661-GIZEH-39, Qty: 1, Product: Birkenstock Gizeh Sandals Black Patent Regular Fit
+2025-06-22 14:50:11     Order BC14235: 1 line items
+2025-06-22 14:50:11       - SKU: 0071793-MAYARI-40, Qty: 1, Product: Birkenstock Mayari Birko-Flor Sandals Black Narrow Fit
+2025-06-22 14:50:11     Order BC14234: 1 line items
+2025-06-22 14:50:11       - SKU: 1005299-GIZEH-43, Qty: 1, Product: Birkenstock Gizeh Sandals Patent White Regular Fit
+2025-06-22 14:50:11     Order BC14233: 1 line items
+2025-06-22 14:50:11       - SKU: JLH458-ASIAII-WHITE-05, Qty: 1, Product: Womens Lunar ASIA II Sandals White
+2025-06-22 14:50:11     Order BC14232: 1 line items
+2025-06-22 14:50:11       - SKU: JLH356-DEANNAII-PK-04, Qty: 1, Product: Womens Lunar Two Strap Sandals Pink
+2025-06-22 14:50:11     Order BC14231: 1 line items
+2025-06-22 14:50:11       - SKU: 0034701-MILANO-44, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Dark Brown Regular Fit
+2025-06-22 14:50:11     Order BC14230: 1 line items
+2025-06-22 14:50:11       - SKU: 0034791-MILANO-43, Qty: 1, Product: Birkenstock Milano Birko-Flor Sandals Black Regular Fit
+2025-06-22 14:50:11     Order BC14229: 1 line items
+2025-06-22 14:50:11       - SKU: 1013069-ARIZONA-39, Qty: 1, Product: Birkenstock Arizona Two-Strap Patent Sandals Sand Brown Regular Fit
+2025-06-22 14:50:11     Order BC14228: 1 line items
+2025-06-22 14:50:11       - SKU: 1015399-BARBADOS-38, Qty: 1, Product: Birkenstock Barbados EVA Slide On Sandals White Regular Fit
+2025-06-22 14:50:11     Order BC14227: 1 line items
+2025-06-22 14:50:11       - SKU: 0040793-MADRID-36, Qty: 1, Product: Birkenstock Madrid Birko-Flor Black Narrow Fit
+2025-06-22 14:50:11     Order BC14226: 1 line items
+2025-06-22 14:50:11       - SKU: 1013075-GIZEH-39, Qty: 1, Product: Birkenstock Gizeh Sandals Patent Sand Brown Regular Fit
+2025-06-22 14:50:11     Order BC14225: 1 line items
+2025-06-22 14:50:11       - SKU: 1017723-BEND-42, Qty: 1, Product: Birkenstock Bend Low Natural Leather Trainer Style White Regular Fit
+2025-06-22 14:50:11     Order BC14224: 1 line items
+2025-06-22 14:50:11       - SKU: 0129421-ARIZONA-43, Qty: 1, Product: Birkenstock Arizona EVA Sandals Black Regular Fit
+2025-06-22 14:50:11     Order BC14223: 1 line items
+2025-06-22 14:50:11       - SKU: JLH276-RENOIR-BLACK-06, Qty: 1, Product: Womens Lunar Renoir Sandals Black
+2025-06-22 14:50:11     Order BC14222: 1 line items
+2025-06-22 14:50:11       - SKU: 0128221-GIZEH-41, Qty: 1, Product: Birkenstock Gizeh EVA Sandals White Regular Fit
+2025-06-22 14:50:11     Order BC14221: 1 line items
+2025-06-22 14:50:11       - SKU: 0051103-ARIZONA-42, Qty: 1, Product: Birkenstock Arizona Two-Strap Natural Leather Sandals Narrow Width Brown
+2025-06-22 14:50:11     Order BC14220: 1 line items
+2025-06-22 14:50:11       - SKU: 1017724-BEND-40, Qty: 1, Product: Birkenstock Bend Low Natural Leather Trainer Style White Narrow Fit
+2025-06-22 14:50:11     Order BC14219: 1 line items
+2025-06-22 14:50:11       - SKU: 0071051-MAYARI-41, Qty: 1, Product: Birkenstock Mayari Birko-Flor Sandals White Regular Fit
+2025-06-22 14:50:11     Order BC14218: 2 line items
+2025-06-22 14:50:11       - SKU: 1017721-BEND-43, Qty: 1, Product: Birkenstock Bend Low Natural Leather Trainer Style Black Regular Fit
+2025-06-22 14:50:11       - SKU: 1017723-BEND-43, Qty: 1, Product: Birkenstock Bend Low Natural Leather Trainer Style White Regular Fit
+2025-06-22 14:50:11     Order BC14217: 1 line items
+2025-06-22 14:50:11       - SKU: 1013075-GIZEH-37, Qty: 1, Product: Birkenstock Gizeh Sandals Patent Sand Brown Regular Fit
+2025-06-22 14:50:11     Order BC14216: 1 line items
+2025-06-22 14:50:11       - SKU: 0143621-GIZEH-37, Qty: 1, Product: Birkenstock Gizeh Sandals Birko-Flor Blue Regular Fit
+2025-06-22 14:50:11     Order BC14215: 1 line items
+2025-06-22 14:50:11       - SKU: FLE030-IVES-WHITE-05, Qty: 1, Product: Womens Lunar St Ives Leather Casual Trainer White
+2025-06-22 14:50:11     Order BC14214: 1 line items
+2025-06-22 14:50:11       - SKU: FLE030-IVES-WHITE-03, Qty: 1, Product: Womens Lunar St Ives Leather Casual Trainer White
+2025-06-22 14:50:11     Order BC14213: 1 line items
+2025-06-22 14:50:11       - SKU: 0051701-ARIZONA-39, Qty: 1, Product: Birkenstock Arizona Two-Strap Birko-Flor Sandals Regular Fit Dark Brown
+2025-06-22 14:50:11     Order BC14212: 1 line items
+2025-06-22 14:50:11       - SKU: FLE030-IVES-WHITE-05, Qty: 1, Product: Womens Lunar St Ives Leather Casual Trainer White
+2025-06-22 14:50:11     Order BC13366: 2 line items
+2025-06-22 14:50:11       - SKU: L433A-08, Qty: 1, Product: Womens Rdek Fly Knit Mesh Trainers Black
+2025-06-22 14:50:11       - SKU: L944A-08, Qty: 1, Product: Womens Rdek Denim Washed Trainers Black
+2025-06-22 14:50:11  📊 Total line items processed: 29
+2025-06-22 14:50:11  🔍 Checking orderstatus table for these orders: ['BC14237', 'BC14236', 'BC14235', 'BC14234', 'BC14233', 'BC14232', 'BC14231', 'BC14230', 'BC14229', 'BC14228', 'BC14227', 'BC14226', 'BC14225', 'BC14224', 'BC14223', 'BC14222', 'BC14221', 'BC14220', 'BC14219', 'BC14218', 'BC14217', 'BC14216', 'BC14215', 'BC14214', 'BC14213', 'BC14212', 'BC13366']
+2025-06-22 14:50:11  📋 Found 20 orders already in orderstatus: ['BC14217', 'BC13366', 'BC14229', 'BC14218', 'BC14224', 'BC14223', 'BC14225', 'BC14215', 'BC14220', 'BC14213', 'BC14212', 'BC14228', 'BC14230', 'BC14221', 'BC14216', 'BC14219', 'BC14222', 'BC14226', 'BC14227', 'BC14214']
+2025-06-22 14:50:11  ✅ Including order BC14237 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14236 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14235 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14234 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14233 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14232 (not in orderstatus)
+2025-06-22 14:50:11  ✅ Including order BC14231 (not in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14230 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14229 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14228 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14227 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14226 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14225 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14224 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14223 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14222 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14221 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14220 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14219 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14218 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14217 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14216 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14215 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14214 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14213 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC14212 (already in orderstatus)
+2025-06-22 14:50:11  ⏭️  Skipping order BC13366 (already in orderstatus)
+2025-06-22 14:50:11  📊 Final unique SKUs: 7 with total quantity: 7
+2025-06-22 14:50:11  ✅ Final result: 7 SKUs with unfulfilled orders not in orderstatus
+2025-06-22 14:50:11     - 1017723-BEND-43: 1 items
+2025-06-22 14:50:11     - 0043661-GIZEH-39: 1 items
+2025-06-22 14:50:11     - 0071793-MAYARI-40: 1 items
+2025-06-22 14:50:11     - 1005299-GIZEH-43: 1 items
+2025-06-22 14:50:11     - JLH458-ASIAII-WHITE-05: 1 items
+2025-06-22 14:50:11     - JLH356-DEANNAII-PK-04: 1 items
+2025-06-22 14:50:11     - 0034701-MILANO-44: 1 items
+2025-06-22 14:50:11  ✅ Total unfulfilled items: 7
+2025-06-22 14:50:11  📋 Processing unfulfilled orders correction for 7 SKUs...
+2025-06-22 14:50:11  1017723-BEND-43: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  0043661-GIZEH-39: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  0071793-MAYARI-40: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  1005299-GIZEH-43: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  JLH458-ASIAII-WHITE-05: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  JLH356-DEANNAII-PK-04: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  0034701-MILANO-44: ⚠️  SKU has unfulfilled orders but wasn't processed in main sync
+2025-06-22 14:50:11  Main updates: 0, unfulfilled corrections: 0
+2025-06-22 14:50:11  Total updates: 0, failed: 0
+2025-06-22 14:50:11  Mode: single
+2025-06-22 14:50:11  === SHOPIFY INVENTORY SYNC COMPLETED ===
+2025-06-22 14:50:19  Test message from update_shopify_inventory

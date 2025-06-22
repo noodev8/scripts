@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import psycopg2
 from datetime import date, timedelta
+from logging_utils import manage_log_files, create_logger
 
 DB_CONFIG = {
     "host": "77.68.13.150",
@@ -10,9 +11,15 @@ DB_CONFIG = {
     "port": 5432
 }
 
+# Setup logging
+SCRIPT_NAME = "price_track"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
+
 def main():
     conn = None
     try:
+        log("=== PRICE TRACK UPDATE STARTED ===")
         conn = psycopg2.connect(**DB_CONFIG)
         cur = conn.cursor()
 
@@ -23,7 +30,7 @@ def main():
 
         # 2️⃣ DELETE any existing entry for `today` from price_track
         cur.execute("DELETE FROM price_track WHERE date = %s", (today,))
-        # print(f"🗑️  Deleted existing entries for {today}")
+        log(f"Deleted existing entries for {today}")
 
         # 3️⃣ INSERT NEW ROWS for `today` (localstock only '#FREE')
         insert_stock_query = """
@@ -125,7 +132,10 @@ def main():
         conn.commit()
         # print("✅ Sales backfill complete for the last 7 days.")
 
+        log("=== PRICE TRACK UPDATE COMPLETED ===")
+
     except Exception as e:
+        log(f"ERROR: Price track update failed: {str(e)}")
         print("❌ Error occurred:", e)
         if conn:
             conn.rollback()

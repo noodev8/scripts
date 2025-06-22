@@ -10,6 +10,7 @@ import psycopg2
 import pandas as pd
 import paramiko
 from datetime import datetime
+from logging_utils import manage_log_files, create_logger, save_report_file
 
 # --- CONFIGURATION ---
 DB_CONFIG = {
@@ -20,10 +21,10 @@ DB_CONFIG = {
     "dbname": "brookfield_prod"
 }
 
-# Get the directory where this script is located
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_FOLDER = SCRIPT_DIR  # Save feed file in the same directory as the script
-LOG_RETENTION_DAYS = 7
+# Setup logging
+SCRIPT_NAME = "merchant_feed"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
 
 
 def determine_gender_and_age(gender):
@@ -72,14 +73,7 @@ def determine_product_type(gender, titledetail):
     return ""
 
 
-def cleanup_old_files(folder, days):
-    now = datetime.now()
-    for fname in os.listdir(folder):
-        path = os.path.join(folder, fname)
-        if os.path.isfile(path) and fname.startswith("merchant_feed_"):
-            mtime = datetime.fromtimestamp(os.path.getmtime(path))
-            if (now - mtime).days > days:
-                os.remove(path)
+# Cleanup function removed - handled by shared logging system
 
 
 def determine_stock_availability(localstock_qty, localstock_deleted, amzlive, ukdstock):
@@ -197,14 +191,18 @@ def generate_feed():
             continue  # Skip malformed rows silently in final version
 
     feed_df = pd.DataFrame(feed_rows)
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-    output_file = os.path.join(OUTPUT_FOLDER, f"GOOGLE-DATA-Merchant.txt")
-    feed_df.to_csv(output_file, index=False, sep="\t")
+
+    # Save the feed to logs directory
+    feed_content = feed_df.to_csv(index=False, sep="\t")
+    output_file = save_report_file("GOOGLE-DATA-Merchant.txt", feed_content)
 
     cur.close()
     conn.close()
-    cleanup_old_files(OUTPUT_FOLDER, LOG_RETENTION_DAYS)
+
+    log(f"=== MERCHANT FEED GENERATION STARTED ===")
+    log(f"Feed file generated: {output_file}")
+    log(f"Total products in feed: {len(feed_df)}")
+    log(f"=== MERCHANT FEED GENERATION COMPLETED ===")
     print(f"✅ Feed file generated: {output_file}")
 
 
@@ -218,19 +216,24 @@ SFTP_PORT = 19321
 SFTP_USERNAME = 'mc-sftp-124941872'       # From Merchant Center
 SFTP_PASSWORD = 'V[,:Ua1#2p'       # Generate in Merchant Center
 
-# Use same folder and file name
-LOCAL_FILE = os.path.join(OUTPUT_FOLDER, "GOOGLE-DATA-Merchant.txt")
-REMOTE_FILE = "GOOGLE-DATA-Merchant.txt"
-
 def upload_file_to_google():
+    """Upload the generated feed file to Google Merchant Center via SFTP"""
+    from logging_utils import get_logs_directory
+
+    logs_dir = get_logs_directory()
+    local_file = os.path.join(logs_dir, "GOOGLE-DATA-Merchant.txt")
+    remote_file = "GOOGLE-DATA-Merchant.txt"
+
     try:
         transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
         transport.connect(username=SFTP_USERNAME, password=SFTP_PASSWORD)
         sftp = paramiko.SFTPClient.from_transport(transport)
 
-        sftp.put(LOCAL_FILE, REMOTE_FILE)
+        sftp.put(local_file, remote_file)
+        log("Upload to Google Merchant SFTP successful")
         print("✅ Upload to Google Merchant SFTP successful.")
     except Exception as e:
+        log(f"SFTP upload failed: {str(e)}")
         print("❌ SFTP upload failed:", str(e))
     finally:
         if 'sftp' in locals(): sftp.close()

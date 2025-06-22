@@ -2,10 +2,10 @@
 # General (Windows/macOS/IDEs)
 .DS_Store
 Thumbs.db
-*.log
 *.swp
 *.swo
 *.tmp
+
 
 # VS Code
 .vscode/
@@ -58,6 +58,9 @@ server.txt
 
 # Python environment
 venv/
+__pycache__/
+*.pyc
+*.pyo
 
 # Misc
 *.iml

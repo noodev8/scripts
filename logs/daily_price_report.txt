@@ -1,0 +1,24 @@
+DAILY PRICE DROP REPORT
+==================================================
+Generated: 2025-06-22 14:36
+Total Products Analyzed: 186
+Products Needing Action: 175
+
+EXECUTIVE SUMMARY
+------------------------------
+Bucket 1 (Dead Stock (180+ days)): 11 items
+Bucket 2 (Market Mismatch): 29 items
+
+HIGH PRIORITY TOTAL: 40 items
+
+QUICK ACTION COMMANDS
+------------------------------
+To apply all changes for a bucket:
+  python apply_price_changes.py --bucket 1
+  python apply_price_changes.py --bucket 2
+
+To list all pending recommendations:
+  python apply_price_changes.py --list-pending
+
+To apply individual changes:
+  python apply_price_changes.py GROUPID NEW_PRICE "REASON"

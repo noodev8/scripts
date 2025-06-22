@@ -61,6 +61,7 @@ import time
 import os
 from datetime import datetime
 from dotenv import load_dotenv
+from logging_utils import manage_log_files, create_logger
 
 # --- CONFIGURATION ---
 # Load environment variables from shopify_api.env
@@ -78,32 +79,18 @@ SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
 LOCATION_ID = "64140443707"
-LOG_RETENTION = 7  # Keep last 7 logs
 
 # Validate that the access token was loaded
 if not ACCESS_TOKEN:
     raise ValueError("SHOPIFY_ACCESS_TOKEN not found in shopify_api.env file")
 
-
-def clean_old_logs(log_prefix="shopify_inventory_", keep_count=7):
-    log_dir = os.path.dirname(__file__)
-    log_files = sorted(
-        [f for f in os.listdir(log_dir) if f.startswith(log_prefix) and f.endswith(".log")],
-        key=lambda f: os.path.getmtime(os.path.join(log_dir, f))
-    )
-    for old_file in log_files[:-keep_count]:
-        try:
-            os.remove(os.path.join(log_dir, old_file))
-        except Exception as e:
-            pass  # Silent fail to keep cron clean
+# Setup logging
+SCRIPT_NAME = "update_shopify_inventory"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
 
 
-def log(message):
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"shopify_inventory_{date_str}.log"
-    log_path = os.path.join(os.path.dirname(__file__), log_filename)
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  {message}\n")
+# Old logging functions removed - handled by shared logging system
 
 
 def batch_search_variants_by_sku(skus, batch_size=50):
@@ -528,9 +515,13 @@ def get_unfulfilled_shopify_orders():
 
 
 def main():
-    clean_old_logs()
-
     single_code = sys.argv[1] if len(sys.argv) > 1 else None
+
+    log("=== SHOPIFY INVENTORY SYNC STARTED ===")
+    if single_code:
+        log(f"Single item mode: {single_code}")
+    else:
+        log("Full sync mode")
 
     conn = psycopg2.connect(**DB_CONFIG)
     cur = conn.cursor()
@@ -682,7 +673,10 @@ def main():
     total_updates = updated_count + unfulfilled_corrections
     total_failures = failed_count + unfulfilled_failed
 
-    log(f"Inventory sync completed — main updates: {updated_count}, unfulfilled corrections: {unfulfilled_corrections}, total updates: {total_updates}, failed: {total_failures}, mode: {'single' if single_code else 'full'}")
+    log(f"Main updates: {updated_count}, unfulfilled corrections: {unfulfilled_corrections}")
+    log(f"Total updates: {total_updates}, failed: {total_failures}")
+    log(f"Mode: {'single' if single_code else 'full'}")
+    log("=== SHOPIFY INVENTORY SYNC COMPLETED ===")
 
 
 if __name__ == "__main__":

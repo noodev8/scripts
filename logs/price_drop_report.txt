@@ -1,0 +1,1321 @@
+PRICE DROP ANALYSIS REPORT
+Generated: 2025-06-22 14:37:18
+Mode: REPORT-ONLY
+============================================================
+
+SUMMARY BY BUCKET:
+------------------------------
+Bucket 1 (Dead Stock): 11 products
+Bucket 2 (Market Mismatch): 29 products
+Bucket 4 (Low Margin): 14 products
+Bucket 5 (Slow Mover): 7 products
+Bucket 6 (Low Stock/Recent): 122 products
+Bucket 7 (Early Warning): 1 products
+
+============================================================
+
+BUCKET 1: Dead Stock (11 products)
+--------------------------------------------------
+GroupID: JLH478-EPSOM-NAVY
+  Current Price: £28.85
+  Suggested Price: £18.75
+  Stock: 12
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1029777-FLORIDA
+  Current Price: £95.00
+  Suggested Price: £61.75
+  Stock: 17
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 0043663-GIZEH
+  Current Price: £90.00
+  Suggested Price: £58.50
+  Stock: 20
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1019717-BEND
+  Current Price: £100.00
+  Suggested Price: £65.00
+  Stock: 12
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1021381-BENDMID
+  Current Price: £155.00
+  Suggested Price: £100.75
+  Stock: 12
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 0051101-ARIZONA
+  Current Price: £95.00
+  Suggested Price: £61.75
+  Stock: 11
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1019723-BEND
+  Current Price: £125.00
+  Suggested Price: £81.25
+  Stock: 11
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: DLA003-JAYNE-WHITE
+  Current Price: £35.00
+  Suggested Price: £22.75
+  Stock: 10
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1016570-ZERMATT
+  Current Price: £90.00
+  Suggested Price: £58.50
+  Stock: 19
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1013070-ARIZONA
+  Current Price: £85.00
+  Suggested Price: £55.25
+  Stock: 16
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+GroupID: 1013076-GIZEH
+  Current Price: £90.00
+  Suggested Price: £58.50
+  Stock: 14
+  Days Since Last Sold: 9999
+  Reason: Dead-stock: no sales in 6+ months, stock â‰¥ 10
+
+
+BUCKET 2: Market Mismatch (29 products)
+--------------------------------------------------
+GroupID: 1019635-ARIZONA
+  Current Price: £90.00
+  Suggested Price: £70.56
+  Stock: 7
+  Days Since Last Sold: 9999
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1029224-ARIZONA
+  Current Price: £85.00
+  Suggested Price: £66.64
+  Stock: 8
+  Days Since Last Sold: 9999
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: FLE044-IVES-SILVER
+  Current Price: £43.20
+  Suggested Price: £35.93
+  Stock: 7
+  Days Since Last Sold: 9999
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1005310-MADRID
+  Current Price: £80.00
+  Suggested Price: £62.72
+  Stock: 7
+  Days Since Last Sold: 9999
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1019115-ARIZONA
+  Current Price: £90.00
+  Suggested Price: £75.83
+  Stock: 1
+  Days Since Last Sold: 361
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1015086-ZERMATT
+  Current Price: £90.00
+  Suggested Price: £70.56
+  Stock: 1
+  Days Since Last Sold: 319
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: XM620A
+  Current Price: £36.00
+  Suggested Price: £24.95
+  Stock: 12
+  Days Since Last Sold: 174
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M365AP
+  Current Price: £39.00
+  Suggested Price: £30.58
+  Stock: 3
+  Days Since Last Sold: 141
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: L173A
+  Current Price: £34.00
+  Suggested Price: £27.99
+  Stock: 2
+  Days Since Last Sold: 136
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M9556B
+  Current Price: £40.00
+  Suggested Price: £30.79
+  Stock: 1
+  Days Since Last Sold: 103
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 0051791-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £62.72
+  Stock: 45
+  Days Since Last Sold: 92
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M516B
+  Current Price: £39.00
+  Suggested Price: £30.58
+  Stock: 2
+  Days Since Last Sold: 83
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M409A
+  Current Price: £60.00
+  Suggested Price: £42.60
+  Stock: 2
+  Days Since Last Sold: 78
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: JLH455-CHARL-BLK
+  Current Price: £40.00
+  Suggested Price: £32.14
+  Stock: 3
+  Days Since Last Sold: 74
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: DLA003-JAYNE-KHAKI
+  Current Price: £35.00
+  Suggested Price: £29.31
+  Stock: 10
+  Days Since Last Sold: 73
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 0552683-ARIZONA
+  Current Price: £80.00
+  Suggested Price: £62.72
+  Stock: 21
+  Days Since Last Sold: 53
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: FLE030-IVES-STONE
+  Current Price: £40.50
+  Suggested Price: £31.75
+  Stock: 11
+  Days Since Last Sold: 52
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 10001-5AJ
+  Current Price: £50.00
+  Suggested Price: £36.74
+  Stock: 3
+  Days Since Last Sold: 52
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 10001-0DA
+  Current Price: £29.25
+  Suggested Price: £23.52
+  Stock: 1
+  Days Since Last Sold: 46
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 0051191-ARIZONA
+  Current Price: £95.00
+  Suggested Price: £79.12
+  Stock: 12
+  Days Since Last Sold: 45
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M404A
+  Current Price: £59.97
+  Suggested Price: £31.53
+  Stock: 7
+  Days Since Last Sold: 45
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: T198A
+  Current Price: £36.00
+  Suggested Price: £29.64
+  Stock: 5
+  Days Since Last Sold: 42
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: JLY219-BRONWYN-WT
+  Current Price: £27.72
+  Suggested Price: £24.57
+  Stock: 9
+  Days Since Last Sold: 41
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M410A
+  Current Price: £40.00
+  Suggested Price: £31.36
+  Stock: 3
+  Days Since Last Sold: 38
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1022433-ARIZONA
+  Current Price: £40.00
+  Suggested Price: £25.97
+  Stock: 3
+  Days Since Last Sold: 37
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 43753-14
+  Current Price: £45.50
+  Suggested Price: £37.58
+  Stock: 3
+  Days Since Last Sold: 36
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: 1025049-GIZEH
+  Current Price: £90.00
+  Suggested Price: £70.56
+  Stock: 13
+  Days Since Last Sold: 33
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: M196A
+  Current Price: £58.00
+  Suggested Price: £45.47
+  Stock: 6
+  Days Since Last Sold: 32
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+GroupID: JLH358-CLUSTER-NAVY
+  Current Price: £34.26
+  Suggested Price: £27.39
+  Stock: 11
+  Days Since Last Sold: 30
+  Reason: Market mismatch: overpriced vs lowbench and stale
+
+
+BUCKET 4: Low Margin (14 products)
+--------------------------------------------------
+GroupID: SOLRM31G3
+  Current Price: £9.95
+  Suggested Price: £2.26
+  Stock: 4
+  Days Since Last Sold: 9999
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: SOMRM02H3
+  Current Price: £9.95
+  Suggested Price: £2.82
+  Stock: 4
+  Days Since Last Sold: 9999
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: SOMRJ604H3
+  Current Price: £9.95
+  Suggested Price: £2.39
+  Stock: 4
+  Days Since Last Sold: 9999
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: SOMRG51H3BLK
+  Current Price: £9.95
+  Suggested Price: £2.38
+  Stock: 4
+  Days Since Last Sold: 9999
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: L172A
+  Current Price: £34.00
+  Suggested Price: £17.36
+  Stock: 1
+  Days Since Last Sold: 370
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: L174A
+  Current Price: £32.00
+  Suggested Price: £17.50
+  Stock: 4
+  Days Since Last Sold: 117
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: B1053-14
+  Current Price: £59.50
+  Suggested Price: £36.31
+  Stock: 4
+  Days Since Last Sold: 107
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: 10001-1LM
+  Current Price: £39.52
+  Suggested Price: £22.01
+  Stock: 4
+  Days Since Last Sold: 84
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: SOLRG67G3BLK
+  Current Price: £9.95
+  Suggested Price: £2.26
+  Stock: 3
+  Days Since Last Sold: 66
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: 67463-14
+  Current Price: £45.50
+  Suggested Price: £27.96
+  Stock: 5
+  Days Since Last Sold: 60
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: M5066-30
+  Current Price: £49.00
+  Suggested Price: £30.06
+  Stock: 5
+  Days Since Last Sold: 40
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: SOLRH247G3
+  Current Price: £9.95
+  Suggested Price: £2.26
+  Stock: 3
+  Days Since Last Sold: 37
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: 10001-1FT
+  Current Price: £34.33
+  Suggested Price: £22.01
+  Stock: 3
+  Days Since Last Sold: 32
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+GroupID: V2860-14
+  Current Price: £42.00
+  Suggested Price: £25.91
+  Stock: 4
+  Days Since Last Sold: 31
+  Reason: Low-margin risk: under Â£15 per unit profit
+
+
+BUCKET 5: Slow Mover (7 products)
+--------------------------------------------------
+GroupID: 0040301-MADRID
+  Current Price: £80.00
+  Suggested Price: £68.00
+  Stock: 7
+  Days Since Last Sold: 9999
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: 1016571-ZERMATT
+  Current Price: £90.00
+  Suggested Price: £76.50
+  Stock: 7
+  Days Since Last Sold: 9999
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: 1009920-ARIZONA
+  Current Price: £90.00
+  Suggested Price: £76.50
+  Stock: 6
+  Days Since Last Sold: 9999
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: JLY219-BRONWYN-BK
+  Current Price: £33.00
+  Suggested Price: £28.05
+  Stock: 11
+  Days Since Last Sold: 169
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: M024B
+  Current Price: £36.00
+  Suggested Price: £30.60
+  Stock: 7
+  Days Since Last Sold: 101
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: M551C
+  Current Price: £48.00
+  Suggested Price: £40.80
+  Stock: 7
+  Days Since Last Sold: 98
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+GroupID: M450A
+  Current Price: £60.00
+  Suggested Price: £51.00
+  Stock: 5
+  Days Since Last Sold: 87
+  Reason: Slow-mover: moderate stock, stale, okay margin
+
+
+BUCKET 6: Low Stock/Recent (122 products)
+--------------------------------------------------
+GroupID: M028B
+  Current Price: £65.00
+  Suggested Price: £25.98
+  Stock: 1
+  Days Since Last Sold: 276
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M186WB
+  Current Price: £58.00
+  Suggested Price: £24.98
+  Stock: 4
+  Days Since Last Sold: 132
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M227B
+  Current Price: £70.00
+  Suggested Price: £29.98
+  Stock: 1
+  Days Since Last Sold: 123
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M202A
+  Current Price: £53.00
+  Suggested Price: £21.95
+  Stock: 2
+  Days Since Last Sold: 101
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M601A
+  Current Price: £53.00
+  Suggested Price: £21.98
+  Stock: 1
+  Days Since Last Sold: 87
+  Reason: Low-stock or recent: do nothing
+
+GroupID: T198G
+  Current Price: £36.00
+  Suggested Price: £14.98
+  Stock: 2
+  Days Since Last Sold: 86
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M081B
+  Current Price: £65.00
+  Suggested Price: £27.95
+  Stock: 4
+  Days Since Last Sold: 74
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1014932-ZERMATT
+  Current Price: £48.00
+  Suggested Price: £25.00
+  Stock: 9
+  Days Since Last Sold: 26
+  Reason: Low-stock or recent: do nothing
+
+GroupID: W2950-00
+  Current Price: £50.40
+  Suggested Price: £30.85
+  Stock: 4
+  Days Since Last Sold: 25
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019180-BEND
+  Current Price: £125.00
+  Suggested Price: £52.08
+  Stock: 15
+  Days Since Last Sold: 25
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 64870-31
+  Current Price: £45.50
+  Suggested Price: £27.95
+  Stock: 5
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 10001-309
+  Current Price: £31.65
+  Suggested Price: £22.00
+  Stock: 1
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1009921-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 1
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1029737-FLORIDA
+  Current Price: £57.60
+  Suggested Price: £37.50
+  Stock: 2
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH320-UNA-WT
+  Current Price: £21.70
+  Suggested Price: £11.99
+  Stock: 1
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: L213A
+  Current Price: £36.00
+  Suggested Price: £13.98
+  Stock: 6
+  Days Since Last Sold: 24
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1005309-MADRID
+  Current Price: £60.50
+  Suggested Price: £33.33
+  Stock: 1
+  Days Since Last Sold: 22
+  Reason: Low-stock or recent: do nothing
+
+GroupID: W2605-80
+  Current Price: £56.00
+  Suggested Price: £34.20
+  Stock: 5
+  Days Since Last Sold: 21
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M478A
+  Current Price: £41.00
+  Suggested Price: £16.98
+  Stock: 1
+  Days Since Last Sold: 20
+  Reason: Low-stock or recent: do nothing
+
+GroupID: N4263-40
+  Current Price: £50.40
+  Suggested Price: £30.85
+  Stock: 6
+  Days Since Last Sold: 18
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019094-ARIZONA
+  Current Price: £43.77
+  Suggested Price: £20.83
+  Stock: 33
+  Days Since Last Sold: 18
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051703-ARIZONA
+  Current Price: £60.59
+  Suggested Price: £35.42
+  Stock: 1
+  Days Since Last Sold: 18
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1028566-BARBADOS
+  Current Price: £34.00
+  Suggested Price: £16.67
+  Stock: 2
+  Days Since Last Sold: 18
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1022465-ARIZONA
+  Current Price: £40.00
+  Suggested Price: £20.83
+  Stock: 3
+  Days Since Last Sold: 17
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128181-MADRID
+  Current Price: £34.00
+  Suggested Price: £16.67
+  Stock: 7
+  Days Since Last Sold: 15
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0071791-MAYARI
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 2
+  Days Since Last Sold: 14
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 10001-001
+  Current Price: £36.03
+  Suggested Price: £22.00
+  Stock: 8
+  Days Since Last Sold: 14
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1005293-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 10
+  Days Since Last Sold: 14
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0040303-MADRID
+  Current Price: £80.00
+  Suggested Price: £33.33
+  Stock: 17
+  Days Since Last Sold: 13
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051193-ARIZONA
+  Current Price: £95.00
+  Suggested Price: £39.58
+  Stock: 12
+  Days Since Last Sold: 13
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019163-BEND
+  Current Price: £100.00
+  Suggested Price: £52.08
+  Stock: 7
+  Days Since Last Sold: 13
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1005291-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 1
+  Days Since Last Sold: 13
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M1655-54
+  Current Price: £46.90
+  Suggested Price: £28.80
+  Stock: 1
+  Days Since Last Sold: 12
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0129443-ARIZONA
+  Current Price: £38.25
+  Suggested Price: £20.83
+  Stock: 2
+  Days Since Last Sold: 12
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH320-UNA-BL
+  Current Price: £20.31
+  Suggested Price: £11.99
+  Stock: 2
+  Days Since Last Sold: 12
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M620A
+  Current Price: £36.00
+  Suggested Price: £14.95
+  Stock: 8
+  Days Since Last Sold: 12
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH320-UNA-GN
+  Current Price: £23.18
+  Suggested Price: £11.99
+  Stock: 1
+  Days Since Last Sold: 12
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1026202-ARIZONA
+  Current Price: £36.00
+  Suggested Price: £20.83
+  Stock: 5
+  Days Since Last Sold: 11
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE051-WHITE-IVA
+  Current Price: £50.00
+  Suggested Price: £16.99
+  Stock: 7
+  Days Since Last Sold: 11
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH356-DEANNAII-PK
+  Current Price: £25.20
+  Suggested Price: £14.99
+  Stock: 1
+  Days Since Last Sold: 11
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019662-ARIZONA
+  Current Price: £90.00
+  Suggested Price: £37.50
+  Stock: 9
+  Days Since Last Sold: 10
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 10001-78R
+  Current Price: £35.48
+  Suggested Price: £22.00
+  Stock: 3
+  Days Since Last Sold: 10
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1029751-FLORIDA
+  Current Price: £56.70
+  Suggested Price: £37.50
+  Stock: 1
+  Days Since Last Sold: 9
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH458-ASIAII-BLACK
+  Current Price: £27.94
+  Suggested Price: £12.99
+  Stock: 1
+  Days Since Last Sold: 9
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 62950-00
+  Current Price: £35.10
+  Suggested Price: £27.95
+  Stock: 1
+  Days Since Last Sold: 8
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH276-RENOIR-WHITE
+  Current Price: £40.00
+  Suggested Price: £13.99
+  Stock: 11
+  Days Since Last Sold: 8
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M710AP
+  Current Price: £30.60
+  Suggested Price: £15.98
+  Stock: 9
+  Days Since Last Sold: 8
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH458-ASIAII-WHITE
+  Current Price: £22.40
+  Suggested Price: £12.99
+  Stock: 5
+  Days Since Last Sold: 7
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051751-ARIZONA
+  Current Price: £64.00
+  Suggested Price: £35.42
+  Stock: 1
+  Days Since Last Sold: 7
+  Reason: Low-stock or recent: do nothing
+
+GroupID: L402C
+  Current Price: £32.00
+  Suggested Price: £12.95
+  Stock: 2
+  Days Since Last Sold: 7
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0034793-MILANO
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 33
+  Days Since Last Sold: 7
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0043661-GIZEH
+  Current Price: £68.00
+  Suggested Price: £37.50
+  Stock: 12
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH321-BLAISE-BLACK
+  Current Price: £25.27
+  Suggested Price: £11.99
+  Stock: 3
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0129441-ARIZONA
+  Current Price: £40.00
+  Suggested Price: £20.83
+  Stock: 9
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128201-GIZEH
+  Current Price: £38.25
+  Suggested Price: £18.75
+  Stock: 1
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1027720-ARIZONA
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 11
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH950-BLAZE-BLACK
+  Current Price: £24.18
+  Suggested Price: £12.99
+  Stock: 1
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: L32F1-80
+  Current Price: £52.50
+  Suggested Price: £32.10
+  Stock: 11
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: N42T0-14
+  Current Price: £50.40
+  Suggested Price: £30.85
+  Stock: 9
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH331-MARIELLA-BEIGE
+  Current Price: £27.43
+  Suggested Price: £11.99
+  Stock: 12
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019152-ARIZONA
+  Current Price: £36.72
+  Suggested Price: £20.83
+  Stock: 1
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: L59L1-83
+  Current Price: £50.40
+  Suggested Price: £30.85
+  Stock: 1
+  Days Since Last Sold: 6
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1014934-ZERMATT
+  Current Price: £52.21
+  Suggested Price: £25.00
+  Stock: 31
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1017722-BEND
+  Current Price: £108.00
+  Suggested Price: £56.25
+  Stock: 18
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 659C7-24
+  Current Price: £45.50
+  Suggested Price: £27.95
+  Stock: 1
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M410B
+  Current Price: £40.00
+  Suggested Price: £15.98
+  Stock: 4
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-BLACK
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 5
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0143623-GIZEH
+  Current Price: £54.40
+  Suggested Price: £35.42
+  Stock: 2
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051753-ARIZONA
+  Current Price: £61.56
+  Suggested Price: £35.42
+  Stock: 2
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M291AP
+  Current Price: £30.40
+  Suggested Price: £15.98
+  Stock: 12
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-RED
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 1
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1027721-ARIZONA
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 4
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0040393-MADRID
+  Current Price: £48.96
+  Suggested Price: £31.25
+  Stock: 1
+  Days Since Last Sold: 5
+  Reason: Low-stock or recent: do nothing
+
+GroupID: M968BC
+  Current Price: £36.00
+  Suggested Price: £15.45
+  Stock: 10
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 67476-10
+  Current Price: £45.50
+  Suggested Price: £27.95
+  Stock: 4
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH321-BLAISE-SILVER
+  Current Price: £35.00
+  Suggested Price: £11.99
+  Stock: 1
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0034701-MILANO
+  Current Price: £75.60
+  Suggested Price: £37.50
+  Stock: 23
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1025046-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 4
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: SHAKE-II-BLACK
+  Current Price: £47.40
+  Suggested Price: £36.21
+  Stock: 54
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128163-MADRID
+  Current Price: £32.80
+  Suggested Price: £16.67
+  Stock: 18
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128183-MADRID
+  Current Price: £34.00
+  Suggested Price: £16.67
+  Stock: 2
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1025062-GIZEH
+  Current Price: £90.00
+  Suggested Price: £37.50
+  Stock: 18
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0034703-MILANO
+  Current Price: £80
+  Suggested Price: £37.50
+  Stock: 3
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 08866-15
+  Current Price: £46.90
+  Suggested Price: £28.80
+  Stock: 1
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: B710AP
+  Current Price: £27.30
+  Suggested Price: £13.98
+  Stock: 14
+  Days Since Last Sold: 4
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0040791-MADRID
+  Current Price: £60.00
+  Suggested Price: £31.25
+  Stock: 7
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1005294-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 8
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1005299-GIZEH
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 10
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0071793-MAYARI
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 3
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0043693-GIZEH
+  Current Price: £55.49
+  Suggested Price: £35.42
+  Stock: 1
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-GREY
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 1
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051793-ARIZONA
+  Current Price: £80.00
+  Suggested Price: £35.42
+  Stock: 21
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1019051-ARIZONA
+  Current Price: £36.00
+  Suggested Price: £20.83
+  Stock: 1
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-BLACKSOLE
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 2
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0043691-GIZEH
+  Current Price: £67.40
+  Suggested Price: £35.42
+  Stock: 11
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1022466-ARIZONA
+  Current Price: £40.00
+  Suggested Price: £20.83
+  Stock: 5
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH950-BLAZE-NUDE
+  Current Price: £26.91
+  Suggested Price: £12.99
+  Stock: 1
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128161-MADRID
+  Current Price: £32.00
+  Suggested Price: £16.67
+  Stock: 24
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-MIDBLUE
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 4
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-NAVY-BLUE
+  Current Price: £40.50
+  Suggested Price: £15.99
+  Stock: 4
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1015080-ZERMATT
+  Current Price: £48.00
+  Suggested Price: £25.00
+  Stock: 5
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH950-BLAZE-NAVY
+  Current Price: £24.96
+  Suggested Price: £12.99
+  Stock: 3
+  Days Since Last Sold: 3
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1027696-ARIZONA
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 19
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: FLE030-IVES-WHITE
+  Current Price: £29.38
+  Suggested Price: £15.99
+  Stock: 16
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0143621-GIZEH
+  Current Price: £69.36
+  Suggested Price: £35.42
+  Stock: 2
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0071051-MAYARI
+  Current Price: £68.00
+  Suggested Price: £35.42
+  Stock: 3
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0040733-MADRID
+  Current Price: £60.00
+  Suggested Price: £31.25
+  Stock: 10
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051701-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £35.42
+  Stock: 34
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1017721-BEND
+  Current Price: £89.50
+  Suggested Price: £56.25
+  Stock: 15
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1017724-BEND
+  Current Price: £94.50
+  Suggested Price: £56.25
+  Stock: 13
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1014938-ZERMATT
+  Current Price: £60.00
+  Suggested Price: £25.00
+  Stock: 7
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1015398-BARBADOS
+  Current Price: £39.92
+  Suggested Price: £16.67
+  Stock: 7
+  Days Since Last Sold: 2
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0051103-ARIZONA
+  Current Price: £76.00
+  Suggested Price: £39.58
+  Stock: 4
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1013075-GIZEH
+  Current Price: £90.00
+  Suggested Price: £37.50
+  Stock: 18
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0040793-MADRID
+  Current Price: £62.00
+  Suggested Price: £31.25
+  Stock: 21
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0128221-GIZEH
+  Current Price: £41.61
+  Suggested Price: £18.75
+  Stock: 29
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0129421-ARIZONA
+  Current Price: £40.50
+  Suggested Price: £20.83
+  Stock: 10
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1017723-BEND
+  Current Price: £108.00
+  Suggested Price: £56.25
+  Stock: 13
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: JLH276-RENOIR-BLACK
+  Current Price: £20.00
+  Suggested Price: £12.99
+  Stock: 1
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1013069-ARIZONA
+  Current Price: £72.00
+  Suggested Price: £37.50
+  Stock: 18
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 1015399-BARBADOS
+  Current Price: £32.00
+  Suggested Price: £16.67
+  Stock: 6
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+GroupID: 0034791-MILANO
+  Current Price: £73.44
+  Suggested Price: £37.50
+  Stock: 12
+  Days Since Last Sold: 1
+  Reason: Low-stock or recent: do nothing
+
+
+BUCKET 7: Early Warning (1 products)
+--------------------------------------------------
+GroupID: 0129423-ARIZONA
+  Current Price: £45.00
+  Suggested Price: £40.50
+  Stock: 24
+  Days Since Last Sold: 30
+  Reason: Early warning: heavy stock, sales slowing
+
