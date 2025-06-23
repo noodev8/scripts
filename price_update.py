@@ -454,6 +454,8 @@ def main():
         variants = cur.fetchall()
 
         success = True
+        group_price_changed = False  # Track if any variant in this group had a price change
+        first_price_change = None   # Store details of first price change for logging
 
         for code, variantlink, googleid in variants:
             # Check if we have variant data from the batch lookup
@@ -486,8 +488,10 @@ def main():
                     price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice} (variant_id: {variant_id})"
                     log(price_change_msg)
 
-                    # Log price change to database for tracking
-                    log_price_change_to_db(groupid, current_price, shopifyprice, f"PRICE_UPDATE_{mode.upper()}")
+                    # Track that this group had a price change (for database logging)
+                    if not group_price_changed:
+                        group_price_changed = True
+                        first_price_change = (current_price, shopifyprice)
 
                     # Update Google price if enabled and googleid exists
                     if google_updates_enabled and googleid:
@@ -507,6 +511,11 @@ def main():
             # Enhanced rate limiting: pause every 20 API calls (more conservative)
             if total_processed % 20 == 0:
                 time.sleep(1)
+
+        # Log price change to database once per group (not per variant)
+        if group_price_changed and first_price_change:
+            old_price, new_price = first_price_change
+            log_price_change_to_db(groupid, old_price, new_price, f"PRICE_UPDATE_{mode.upper()}")
 
         # Progress logging for full mode every 50 groups
         if mode == "full" and processed_groups % 50 == 0:

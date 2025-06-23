@@ -41,23 +41,35 @@ python generate_price_change.py
 ```
 This creates `price_changes.csv` with all price change recommendations.
 
+**Note**: Items marked with `ignore_auto_price = 1` in the database will be automatically excluded from recommendations.
+
 ### Step 2: Review and Approve
 1. Open `price_changes.csv` in Excel or spreadsheet application
 2. Review each recommendation:
    - Check current vs suggested price
    - Review the reason/logic
    - Consider stock levels and benchmark prices
-3. Enter '1' in the 'approve' column for items you want to change
+3. Choose your action for each item:
+   - Enter `1` in the 'approve' column to approve the price change
+   - Enter `x` or `X` in the 'approve' column to mark item to ignore future auto pricing
+   - Leave blank to skip (no action taken)
 4. Save the file
+
+**Ignore Auto Pricing**: When you mark an item with 'x' or 'X', it will:
+- Set `ignore_auto_price = 1` in the database for that product
+- Exclude the item from all future price change recommendations
+- Allow manual price management without automated interference
 
 ### Step 3: Apply Changes
 ```bash
 python apply_price_change.py
 ```
 This will:
-- Read only approved items (approve = '1')
+- Process approved price changes (approve = '1')
+- Process ignore flags (approve = 'x' or 'X')
 - Update prices in Shopify and Google (via price_update.py)
 - Update prices in local database
+- Set ignore_auto_price flags in database
 - Log all changes to price_change_log table
 - Generate results file
 
@@ -65,7 +77,7 @@ This will:
 
 | Column | Description |
 |--------|-------------|
-| approve | **Enter '1' to approve** |
+| approve | **Enter '1' to approve, 'x' or 'X' to ignore auto pricing** |
 | groupid | Product group ID |
 | brand | Product brand |
 | current_price | Current selling price |

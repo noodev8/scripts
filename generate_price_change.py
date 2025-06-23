@@ -123,32 +123,50 @@ def get_sales_burst_analysis():
         return []
 
 def filter_recent_changes(analysis_results):
-    """Filter out products with recent price changes (10-day lock)"""
+    """Filter out products with recent price changes (10-day lock) and ignored items"""
     try:
         db_config = get_db_config()
         conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
-        
+
         filtered_results = []
+        ignored_count = 0
+        recent_changes_count = 0
+
         for item in analysis_results:
             groupid = item['groupid']
-            
+
+            # Check if item is marked to ignore auto price changes
+            cur.execute("""
+                SELECT COALESCE(ignore_auto_price, 0) FROM skusummary
+                WHERE groupid = %s
+            """, (groupid,))
+
+            ignore_result = cur.fetchone()
+            if ignore_result and ignore_result[0] == 1:
+                ignored_count += 1
+                continue
+
             # Check for recent changes (10-day lock period)
             cur.execute("""
-                SELECT COUNT(*) FROM price_change_log 
+                SELECT COUNT(*) FROM price_change_log
                 WHERE groupid = %s AND change_date >= CURRENT_DATE - INTERVAL '10 days'
             """, (groupid,))
-            
+
             recent_changes = cur.fetchone()[0]
             if recent_changes == 0:
                 filtered_results.append(item)
-        
+            else:
+                recent_changes_count += 1
+
         cur.close()
         conn.close()
-        
-        log(f"Filtered out {len(analysis_results) - len(filtered_results)} items with recent changes")
+
+        log(f"Filtered out {ignored_count} items marked to ignore auto price changes")
+        log(f"Filtered out {recent_changes_count} items with recent changes")
+        log(f"Total filtered: {len(analysis_results) - len(filtered_results)} items")
         return filtered_results
-        
+
     except Exception as e:
         log(f"ERROR: Failed to filter recent changes: {str(e)}")
         return analysis_results
