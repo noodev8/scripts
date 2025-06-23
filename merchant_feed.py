@@ -118,6 +118,7 @@ def generate_feed():
     df = pd.DataFrame(rows, columns=colnames)
 
     feed_rows = []
+
     for _, row in df.iterrows():
         try:
             variant_id = str(row["variantlink"]).rstrip("V")
@@ -127,9 +128,12 @@ def generate_feed():
             gender = row["gender"]
             product_type = determine_product_type(gender, title)
 
-            # 1. GTIN from skumap.ean, remove "B" at end
+            # 1. GTIN from skumap.ean, remove "B" at end, validate length
             raw_gtin = str(row["ean"]) if row["ean"] else ""
             gtin = raw_gtin.rstrip("B")
+            # Only process rows with valid GTIN (exactly 13 characters)
+            if not (gtin and len(gtin) == 13 and gtin.isdigit()):
+                continue  # Skip this row entirely
 
             # 2. Gender and age_group logic
             google_gender, age_group = determine_gender_and_age(gender)
@@ -161,7 +165,7 @@ def generate_feed():
                 "link": f"https://brookfieldcomfort.com/products/{handle}?variant={variant_id}",
                 "image_link": f"https://images.brookfieldcomfort.com/{image_name}",
                 "availability": availability,
-                "cost_of_goods_sold": f"{float(row['cost']):.2f}" if pd.notnull(row["cost"]) else "",
+                "cost_of_goods_sold": f"{float(row['cost']):.2f} GBP" if pd.notnull(row["cost"]) else "",
                 "price": price,
                 "sale_price": sale_price,
                 "google_product_category": 187,
@@ -232,4 +236,4 @@ def upload_file_to_google():
         if 'transport' in locals(): transport.close()
 
 # Call this after your file is ready
-# upload_file_to_google()
+upload_file_to_google()
