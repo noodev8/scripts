@@ -1,6 +1,0 @@
-Bulk Price Update Results - 2025-06-23 00:14
-Source file: price_changes.csv
-Successful updates: 0
-Failed updates: 1
-
-Details:

@@ -1,7 +1,0 @@
-Bulk Price Update Results - 2025-06-23 00:18
-Source file: price_changes.csv
-Successful updates: 1
-Failed updates: 0
-
-Details:
-SUCCESS 1017724-BEND: £94.50 -> £97.34

@@ -1,7 +1,0 @@
-Bulk Price Update Results - 2025-06-23 00:47
-Source file: test_gizeh.csv
-Successful updates: 1
-Failed updates: 0
-
-Details:
-SUCCESS 0043661-GIZEH: £68.00 -> £70.04

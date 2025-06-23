@@ -27,6 +27,8 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 logs/
+*.txt
+*.csv
 
 # =========================================
 # Flutter (splitdine_flutter)
@@ -71,5 +73,4 @@ __pycache__/
 .idea/
 GOOGLE-DATA-Merchant.txt
 DB_Schema.sql
-Process.txt
 price_change_logic.md
