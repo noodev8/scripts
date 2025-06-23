@@ -107,14 +107,21 @@ def batch_search_variants_by_sku(skus, batch_size=50):
         payload = {"query": query, "variables": variables}
 
         try:
+            batch_call_start = datetime.now()
             r = requests.post(url, json=payload, headers=headers)
             if r.status_code == 429:  # Rate limited
+                log(f"Rate limited on batch {batch_num}, waiting 5 seconds...")
                 time.sleep(5)
                 r = requests.post(url, json=payload, headers=headers)
 
+            batch_call_end = datetime.now()
+            call_duration = (batch_call_end - batch_call_start).total_seconds()
+
             if r.status_code != 200:
-                log(f"❌ Batch GraphQL request failed with status {r.status_code}")
+                log(f"Batch {batch_num} GraphQL request failed with status {r.status_code} (took {call_duration:.2f}s)")
                 continue
+            else:
+                log(f"Batch {batch_num} completed successfully (took {call_duration:.2f}s)")
 
             data = r.json()
 
@@ -441,12 +448,19 @@ def main():
 
     # Get all variant data in batches to minimize API calls
     log(f"Fetching variant information for {len(all_codes)} SKUs across {total_groups} product groups...")
+    batch_start_time = datetime.now()
     variant_data = batch_search_variants_by_sku(all_codes)
-    log(f"Found variant information for {len(variant_data)} out of {len(all_codes)} SKUs")
+    batch_end_time = datetime.now()
+    batch_duration = (batch_end_time - batch_start_time).total_seconds()
+    log(f"Found variant information for {len(variant_data)} out of {len(all_codes)} SKUs in {batch_duration:.1f} seconds")
 
     # Log start details for full mode
     if mode == "full":
         log(f"Starting FULL price sync for {total_groups} product groups...")
+
+    # Start timing the price update phase
+    price_update_start = datetime.now()
+    log(f"Starting price update phase at {price_update_start.strftime('%H:%M:%S')}")
 
     for groupid, shopifyprice in group_rows:
         processed_groups += 1
@@ -481,11 +495,15 @@ def main():
             # Compare prices as floats to avoid string formatting differences (e.g., "80.00" vs "80")
             if float(current_price) != float(shopifyprice):
                 # Update Shopify price
+                shopify_start = datetime.now()
                 result = update_variant_price(variant_id, shopifyprice)
+                shopify_end = datetime.now()
+                shopify_duration = (shopify_end - shopify_start).total_seconds()
+
                 if result is True:
                     shopify_updates += 1
                     # Log detailed price change information for both modes
-                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice} (variant_id: {variant_id})"
+                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice} (variant_id: {variant_id}) [Shopify: {shopify_duration:.2f}s]"
                     log(price_change_msg)
 
                     # Track that this group had a price change (for database logging)
@@ -495,22 +513,27 @@ def main():
 
                     # Update Google price if enabled and googleid exists
                     if google_updates_enabled and googleid:
+                        google_start = datetime.now()
                         google_result = update_google_price(googleid, shopifyprice)
+                        google_end = datetime.now()
+                        google_duration = (google_end - google_start).total_seconds()
+
                         if google_result is True:
                             google_updates += 1
-                            log(f"{code}: Google price updated to £{shopifyprice}")
+                            log(f"{code}: Google price updated to £{shopifyprice} [Google: {google_duration:.2f}s]")
                         else:
                             google_failures += 1
-                            log(f"{code}: Google update failed - {google_result}")
+                            log(f"{code}: Google update failed - {google_result} [Google: {google_duration:.2f}s]")
                 else:
-                    log(f"{code}: Shopify update failed - {result}")
+                    log(f"{code}: Shopify update failed - {result} [Shopify: {shopify_duration:.2f}s]")
                     success = False
 
             total_processed += 1
 
-            # Enhanced rate limiting: pause every 20 API calls (more conservative)
-            if total_processed % 20 == 0:
-                time.sleep(1)
+            # Rate limiting: 2 second pause every 30 API calls to stay under 40/second limit
+            if total_processed % 30 == 0:
+                log(f"Rate limiting pause after {total_processed} API calls...")
+                time.sleep(2)
 
         # Log price change to database once per group (not per variant)
         if group_price_changed and first_price_change:
@@ -531,21 +554,28 @@ def main():
     cur.close()
     conn.close()
 
-    # Calculate duration
+    # Calculate duration and timing breakdown
     end_time = datetime.now()
-    duration = end_time - start_time
-    duration_str = str(duration).split('.')[0]  # Remove microseconds
+    total_duration = end_time - start_time
+    batch_duration_total = batch_duration if 'batch_duration' in locals() else 0
+    price_update_duration = (end_time - price_update_start).total_seconds() if 'price_update_start' in locals() else 0
 
-    # Final summary log
+    duration_str = str(total_duration).split('.')[0]  # Remove microseconds
+
+    # Final summary log with timing breakdown
     summary = f"Sync complete - mode: {mode}, groups: {len(group_rows)}, total variants: {total_processed}"
     summary += f", Shopify price changes: {shopify_updates}"
     if google_updates_enabled:
         summary += f", Google updates: {google_updates}, Google failures: {google_failures}"
     else:
         summary += ", Google updates: disabled"
-    summary += f", Duration: {duration_str}"
+    summary += f", Total duration: {duration_str}"
 
     log(summary)
+    log(f"TIMING BREAKDOWN:")
+    log(f"  - Batch variant lookup: {batch_duration_total:.1f}s")
+    log(f"  - Price update phase: {price_update_duration:.1f}s")
+    log(f"  - Total time: {total_duration.total_seconds():.1f}s")
 
     # Additional summary for price changes
     if shopify_updates > 0:

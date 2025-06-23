@@ -1,87 +1,81 @@
-approve,groupid,brand,current_price,suggested_price,change_amount,change_percent,change_type,action,reason,stock,days_since_last_sold,lowbench,cost,margin_impact
-1,1017723-BEND,Birkenstock,108,111.28,3.24,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,11,,,56.25,3.24
-,1025046-ARIZONA,Birkenstock,72,74.16,2.16,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,6,,,37.5,2.16
-,0071793-MAYARI,Birkenstock,68,70.04,2.04,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,4,,,35.42,2.04
-,0043691-GIZEH,Birkenstock,67.4,69.42,2.02,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,12,,,35.42,2.02
-,1027720-ARIZONA,Birkenstock,68,69.36,1.36,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,14,,,35.42,1.36
-,0552681-ARIZONA,Birkenstock,64,65.92,1.92,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1,,,35.42,1.92
-,0040733-MADRID,Birkenstock,60,61.8,1.8,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,11,,,31.25,1.8
-,0040791-MADRID,Birkenstock,60,61.8,1.8,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,9,,,31.25,1.8
-,1005292-ARIZONA,Birkenstock,56.7,58.4,1.7,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1,,,37.5,1.7
-,1005292-ARIZONA,Birkenstock,56.7,58.4,1.7,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,4,,,37.5,1.7
-,1015080-ZERMATT,Birkenstock,48,49.44,1.44,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,6,,,25,1.44
-,1015080-ZERMATT,Birkenstock,48,48.96,0.96,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,8,,,25,0.96
-,0128221-GIZEH,Birkenstock,41.61,42.86,1.25,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,31,,,18.75,1.25
-,0129421-ARIZONA,Birkenstock,40.5,41.31,0.81,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,10,,,20.83,0.81
-,0129441-ARIZONA,Birkenstock,40,41.2,1.2,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,11,,,20.83,1.2
-,1022466-ARIZONA,Birkenstock,40,41.2,1.2,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,7,,,20.83,1.2
-,1014614-ARIZONA,Birkenstock,40,41.2,1.2,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1,,,20.83,1.2
-,1019051-ARIZONA,Birkenstock,36,37.08,1.08,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,3,,,20.83,1.08
-,1019051-ARIZONA,Birkenstock,36,36.72,0.72,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,5,,,20.83,0.72
-,0128183-MADRID,Birkenstock,34,34.68,0.68,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,3,,,16.67,0.68
-,0128163-MADRID,Birkenstock,32.8,33.78,0.98,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,20,,,16.67,0.98
-,0128161-MADRID,Birkenstock,32,32.64,0.64,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,26,,,16.67,0.64
-,JLH331-MARIELLA-BEIGE,Lunar,27.43,28.25,0.82,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,11,,,11.99,0.82
-,JLH321-BLAISE-BLACK,Lunar,25.27,26.03,0.76,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,3,,,11.99,0.76
-,V2860-14,Rieker,42,49.99,7.99,19.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,Historical sales - Low stock cushion,4,32,49.99,25.9,7.99
-,67463-14,Rieker,45.5,53.83,8.33,18.30%,PRICE_DROP,DROP_10_BENCH_FLOOR,"Historical sales - Medium stock, moderate push",5,61,53.83,27.95,8.33
-,B1053-14,Rieker,59.5,53.55,-5.95,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),4,9999,,36.3,-5.95
-,0051791-ARIZONA,Birkenstock,72,64.8,-7.2,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),45,9999,57.6,35.42,-7.2
-,XM620A,Grafters,36,32.4,-3.6,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),12,9999,,14.25,-3.6
-,M024B,Roamers,36,32.4,-3.6,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,27.54,14.98,-3.6
-,JLY219-BRONWYN-BK,Lunar,33,29.7,-3.3,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),11,9999,27.72,10.99,-3.3
-,0043663-GIZEH,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),20,9999,72,37.5,-9
-,1016570-ZERMATT,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),19,9999,72,37.5,-9
-,1029777-FLORIDA,Birkenstock,95,85.5,-9.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),17,9999,,39.58,-9.5
-,1013070-ARIZONA,Birkenstock,85,76.5,-8.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),16,9999,,37.5,-8.5
-,1013076-GIZEH,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),14,9999,72,37.5,-9
-,1019717-BEND,Birkenstock,100,90,-10,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),12,9999,80,52.08,-10
-,1021381-BENDMID,Birkenstock,155,139.5,-15.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),12,9999,,64.58,-15.5
-,0051101-ARIZONA,Birkenstock,95,85.5,-9.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),11,9999,61.07,39.58,-9.5
-,1019723-BEND,Birkenstock,125,112.5,-12.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),11,9999,100,52.08,-12.5
-,DLA003-JAYNE-WHITE,Lunar,35,31.5,-3.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),10,9999,,11.99,-3.5
-,1029224-ARIZONA,Birkenstock,85,76.5,-8.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),8,9999,65,35.42,-8.5
-,FLE044-IVES-SILVER,Lunar,43.2,38.88,-4.32,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,,21.59,-4.32
-,0040301-MADRID,Birkenstock,80,72,-8,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,64,33.33,-8
-,1019635-ARIZONA,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,60.05,37.5,-9
-,1005310-MADRID,Birkenstock,80,72,-8,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,,33.33,-8
-,1009920-ARIZONA,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),6,9999,72,37.5,-9
-,M028B,Roamers,65,58.5,-6.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,51.51,25.98,-6.5
-,M227B,IMAC,70,63,-7,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,,29.98,-7
-,M9556B,Goor,40,36,-4,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,30.97,15.98,-4
-,1015086-ZERMATT,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,,37.5,-9
-,1019115-ARIZONA,Birkenstock,90,81,-9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,72,37.5,-9
-,M450A,Roamers,60,54,-6,-10.00%,PRICE_DROP,DROP_10_BENCH_FLOOR,"Historical sales - Medium stock, moderate push",5,88,47.63,22.95,-6
-,DLA003-JAYNE-KHAKI,Lunar,35,31.5,-3.5,-10.00%,PRICE_DROP,DROP_10,"Historical sales - Medium stock, moderate push",10,74,,11.99,-3.5
-,0552683-ARIZONA,Birkenstock,80,72,-8,-10.00%,PRICE_DROP,DROP_10,"Historical sales - High stock, clear signal",21,54,,35.42,-8
-,0129423-ARIZONA,Birkenstock,45,40.5,-4.5,-10.00%,PRICE_DROP,DROP_10,"Historical sales - High stock, clear signal",24,31,,20.83,-4.5
-,L174A,Mod Comfys,32,28.8,-3.2,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),4,9999,26.22,17.49,-3.2
-,M365AP,Goor,39,35.1,-3.9,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),3,9999,,15.98,-3.9
-,L173A,Mod Comfys,34,30.6,-3.4,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),2,9999,,17.35,-3.4
-,L172A,Mod Comfys,34,30.6,-3.4,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),1,9999,32.51,17.35,-3.4
-,M186WB,Grafters,58,52.2,-5.8,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),4,9999,39.87,24.98,-5.8
-,M202A,Roamers,53,47.7,-5.3,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),2,9999,42.78,21.95,-5.3
-,M551C,Dek,48,43.2,-4.8,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),7,9999,38.4,18.98,-4.8
-,JLH478-EPSOM-NAVY,Lunar,28.85,25.97,-2.88,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),12,9999,,11.99,-2.88
-,JLY219-BRONWYN-WT,Lunar,27.72,26.33,-1.39,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",9,42,22.77,10.99,-1.39
-,10001-1FT,Crocs,34.33,32.61,-1.72,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,Historical sales - Low stock cushion,3,33,28,22,-1.72
-,10001-1LM,Crocs,39.52,37.54,-1.98,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",4,85,32,22,-1.98
-,M516B,Goor,39,37.05,-1.95,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Low stock, minimal reduction",2,84,,15.98,-1.95
-,M5066-30,Rieker,49,46.55,-2.45,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",5,41,,30.05,-2.45
-,M409A,Roamers,60,57,-3,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",2,79,42.78,22.95,-3
-,M081B,IMAC,65,61.75,-3.25,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",4,75,51.82,27.95,-3.25
-,JLH455-CHARL-BLK,Lunar,40,38,-2,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Low stock, minimal reduction",3,75,,12.99,-2
-,10001-5AJ,Crocs,50,47.5,-2.5,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,3,53,,22,-2.5
-,0051191-ARIZONA,Birkenstock,95,90.25,-4.75,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",12,46,75.63,39.58,-4.75
-,M410A,Goor,40,38,-2,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,3,39,,15.98,-2
-,1022433-ARIZONA,Birkenstock,40,38,-2,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,3,38,,20.83,-2
-,1025049-GIZEH,Birkenstock,90,85.5,-4.5,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",13,34,,37.5,-4.5
-,M404B,Roamers,60,57,-3,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",9,34,40.81,22.95,-3
-,M601A,Roamers,53,50.35,-2.65,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",1,88,43.82,21.98,-2.65
-,M196A,Roamers,58,55.1,-2.9,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",6,33,,22.95,-2.9
-,T198G,Dek,36,34.2,-1.8,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",2,87,29.96,14.98,-1.8
-,T198A,Dek,36,34.2,-1.8,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",5,43,29.52,14.98,-1.8
-,10001-0DA,Crocs,29.25,27.79,-1.46,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,Historical sales - Low stock cushion,1,47,23.5,22,-1.46
-,JLH358-CLUSTER-NAVY,Lunar,34.26,32.55,-1.71,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",11,31,,13.99,-1.71
-,43753-14,Rieker,45.5,43.23,-2.27,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,3,37,,27.95,-2.27
-,FLE030-IVES-STONE,Lunar,40.5,38.48,-2.02,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",11,53,,15.99,-2.02
+approve,groupid,brand,current_price,suggested_price,change_amount,stock,days_since_last_sold,lowbench,cost,change_percent,change_type,action,reason,margin_impact
+1,1025046-ARIZONA,Birkenstock,72,74.17,2.16,6,,,37.5,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,2.16
+1,0071793-MAYARI,Birkenstock,68,70.05,2.04,4,,,35.42,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,2.04
+1,0043691-GIZEH,Birkenstock,67.4,69.43,2.02,12,,,35.42,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,2.02
+1,0552681-ARIZONA,Birkenstock,64,65.93,1.92,1,,,35.42,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.92
+1,0040733-MADRID,Birkenstock,60,61.81,1.8,11,,,31.25,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.8
+1,0040791-MADRID,Birkenstock,60,61.81,1.8,9,,,31.25,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.8
+1,1005292-ARIZONA,Birkenstock,56.7,58.41,1.7,1,,,37.5,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.7
+1,1005292-ARIZONA,Birkenstock,56.7,58.41,1.7,4,,,37.5,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.7
+1,1015080-ZERMATT,Birkenstock,48,49.45,1.44,6,,,25,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.44
+1,1027720-ARIZONA,Birkenstock,68,69.37,1.36,14,,,35.42,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,1.36
+1,0128221-GIZEH,Birkenstock,41.61,42.87,1.25,31,,,18.75,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.25
+1,0129441-ARIZONA,Birkenstock,40,41.21,1.2,11,,,20.83,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.2
+1,1022466-ARIZONA,Birkenstock,40,41.21,1.2,7,,,20.83,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.2
+1,1014614-ARIZONA,Birkenstock,40,41.21,1.2,1,,,20.83,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.2
+1,1019051-ARIZONA,Birkenstock,36,37.09,1.08,3,,,20.83,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,1.08
+1,0128163-MADRID,Birkenstock,32.8,33.79,0.98,20,,,16.67,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,0.98
+1,1015080-ZERMATT,Birkenstock,48,48.97,0.96,8,,,25,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,0.96
+1,JLH331-MARIELLA-BEIGE,Lunar,27.43,28.26,0.82,11,,,11.99,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,0.82
+1,0129421-ARIZONA,Birkenstock,40.5,41.32,0.81,10,,,20.83,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,0.81
+1,JLH321-BLAISE-BLACK,Lunar,25.27,26.04,0.76,3,,,11.99,3.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium_(Strong),Sales burst: Raise_Price__Medium_(Strong) - 2 sales today,0.76
+1,1019051-ARIZONA,Birkenstock,36,36.73,0.72,5,,,20.83,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,0.72
+1,0128183-MADRID,Birkenstock,34,34.69,0.68,3,,,16.67,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,0.68
+1,0128161-MADRID,Birkenstock,32,32.65,0.64,26,,,16.67,2.00%,PRICE_INCREASE,INCREASE_Raise_Price__Medium,Sales burst: Raise_Price__Medium - 2 sales today,0.64
+1,JLY219-BRONWYN-WT,Lunar,27.72,26.34,-1.39,9,42,22.77,10.99,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",-1.39
+1,10001-0DA,Crocs,29.25,27.8,-1.46,1,47,23.5,22,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,Historical sales - Low stock cushion,-1.46
+1,JLH358-CLUSTER-NAVY,Lunar,34.26,32.56,-1.71,11,31,,13.99,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",-1.71
+1,10001-1FT,Crocs,34.33,32.62,-1.72,3,33,28,22,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,Historical sales - Low stock cushion,-1.72
+1,10001-1LM,Crocs,39.52,37.55,-1.98,4,85,32,22,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",-1.98
+1,JLH455-CHARL-BLK,Lunar,40,38.01,-2,3,75,,12.99,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Low stock, minimal reduction",-2
+,M410A,Goor,40,38.01,-2,3,39,,15.98,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,-2
+1,1022433-ARIZONA,Birkenstock,40,38.01,-2,3,38,,20.83,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,-2
+1,FLE030-IVES-STONE,Lunar,40.5,38.49,-2.02,11,53,,15.99,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",-2.02
+1,43753-14,Rieker,45.5,43.24,-2.27,3,37,,27.95,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,-2.27
+1,M5066-30,Rieker,49,46.56,-2.45,5,41,,30.05,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",-2.45
+1,10001-5AJ,Crocs,50,47.51,-2.5,3,53,,22,-5.00%,PRICE_DROP,DROP_5,Historical sales - Low stock cushion,-2.5
+,M601A,Roamers,53,50.36,-2.65,1,88,43.82,21.98,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",-2.65
+1,JLH478-EPSOM-NAVY,Lunar,28.85,25.98,-2.88,12,9999,,11.99,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-2.88
+,M196A,Roamers,58,55.11,-2.9,6,33,,22.95,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",-2.9
+,M409A,Roamers,60,57.01,-3,2,79,42.78,22.95,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",-3
+,M404B,Roamers,60,57.01,-3,9,34,40.81,22.95,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",-3
+,L174A,Mod Comfys,32,28.81,-3.2,4,9999,26.22,17.49,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.2
+,M081B,IMAC,65,61.76,-3.25,4,75,51.82,27.95,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Low stock, minimal reduction",-3.25
+1,JLY219-BRONWYN-BK,Lunar,33,29.71,-3.3,11,9999,27.72,10.99,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.3
+,L173A,Mod Comfys,34,30.61,-3.4,2,9999,,17.35,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.4
+,L172A,Mod Comfys,34,30.61,-3.4,1,9999,32.51,17.35,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.4
+1,DLA003-JAYNE-WHITE,Lunar,35,31.51,-3.5,10,9999,,11.99,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.5
+1,DLA003-JAYNE-KHAKI,Lunar,35,31.51,-3.5,10,74,,11.99,-10.00%,PRICE_DROP,DROP_10,"Historical sales - Medium stock, moderate push",-3.5
+,XM620A,Grafters,36,32.41,-3.6,12,9999,,14.25,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.6
+,M024B,Roamers,36,32.41,-3.6,7,9999,27.54,14.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.6
+,M365AP,Goor,39,35.11,-3.9,3,9999,,15.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-3.9
+,M9556B,Goor,40,36.01,-4,1,9999,30.97,15.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-4
+1,FLE044-IVES-SILVER,Lunar,43.2,38.89,-4.32,7,9999,,21.59,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-4.32
+1,0129423-ARIZONA,Birkenstock,45,40.51,-4.5,24,31,,20.83,-10.00%,PRICE_DROP,DROP_10,"Historical sales - High stock, clear signal",-4.5
+1,1025049-GIZEH,Birkenstock,90,85.51,-4.5,13,34,,37.5,-5.00%,PRICE_DROP,DROP_5,"Historical sales - Medium stock, gentle push",-4.5
+1,0051191-ARIZONA,Birkenstock,95,90.26,-4.75,12,46,75.63,39.58,-5.00%,PRICE_DROP,DROP_5_BENCH_FLOOR,"Historical sales - Medium stock, gentle push",-4.75
+,M551C,Dek,48,43.21,-4.8,7,9999,38.4,18.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-4.8
+,M202A,Roamers,53,47.71,-5.3,2,9999,42.78,21.95,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-5.3
+,M186WB,Grafters,58,52.21,-5.8,4,9999,39.87,24.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-5.8
+,B1053-14,Rieker,59.5,53.56,-5.95,4,9999,,36.3,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-5.95
+,M450A,Roamers,60,54.01,-6,5,88,47.63,22.95,-10.00%,PRICE_DROP,DROP_10_BENCH_FLOOR,"Historical sales - Medium stock, moderate push",-6
+,M028B,Roamers,65,58.51,-6.5,1,9999,51.51,25.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-6.5
+,M227B,IMAC,70,63.01,-7,1,9999,,29.98,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-7
+1,0051791-ARIZONA,Birkenstock,72,64.81,-7.2,45,9999,57.6,35.42,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-7.2
+1,0040301-MADRID,Birkenstock,80,72.01,-8,7,9999,64,33.33,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-8
+1,1005310-MADRID,Birkenstock,80,72.01,-8,7,9999,,33.33,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-8
+1,0552683-ARIZONA,Birkenstock,80,72.01,-8,21,54,,35.42,-10.00%,PRICE_DROP,DROP_10,"Historical sales - High stock, clear signal",-8
+1,1013070-ARIZONA,Birkenstock,85,76.51,-8.5,16,9999,,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-8.5
+1,1029224-ARIZONA,Birkenstock,85,76.51,-8.5,8,9999,65,35.42,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-8.5
+1,0043663-GIZEH,Birkenstock,90,81.01,-9,20,9999,72,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1016570-ZERMATT,Birkenstock,90,81.01,-9,19,9999,72,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1013076-GIZEH,Birkenstock,90,81.01,-9,14,9999,72,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1019635-ARIZONA,Birkenstock,90,81.01,-9,7,9999,60.05,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1009920-ARIZONA,Birkenstock,90,81.01,-9,6,9999,72,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1015086-ZERMATT,Birkenstock,90,81.01,-9,1,9999,,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1019115-ARIZONA,Birkenstock,90,81.01,-9,1,9999,72,37.5,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9
+1,1029777-FLORIDA,Birkenstock,95,85.51,-9.5,17,9999,,39.58,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9.5
+1,0051101-ARIZONA,Birkenstock,95,85.51,-9.5,11,9999,61.07,39.58,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-9.5
+1,1019717-BEND,Birkenstock,100,90.01,-10,12,9999,80,52.08,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-10
+1,1019723-BEND,Birkenstock,125,112.51,-12.5,11,9999,100,52.08,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-12.5
+1,1021381-BENDMID,Birkenstock,155,139.51,-15.5,12,9999,,64.58,-10.00%,PRICE_DROP,DROP_10,Zero sales - Conservative liquidation (20% max),-15.5

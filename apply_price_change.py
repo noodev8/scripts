@@ -236,15 +236,19 @@ def main():
         # If we have successful database updates, run price_update.py to sync to Shopify/Google
         if price_results['success'] > 0:
             print(f"\nSyncing {price_results['success']} price changes to Shopify and Google...")
+            print("Running without timeout - will complete when finished...")
+
             sync_result = subprocess.run([
                 'python', 'price_update.py'
-            ], capture_output=True, text=True, timeout=120)
+            ], capture_output=True, text=True)
 
             if sync_result.returncode == 0:
                 print("Shopify and Google sync completed successfully")
                 log("SUCCESS: Shopify and Google sync completed")
             else:
-                print(f"WARNING: Shopify/Google sync had issues: {sync_result.stderr}")
+                print(f"WARNING: Shopify/Google sync had issues:")
+                print(f"STDOUT: {sync_result.stdout}")
+                print(f"STDERR: {sync_result.stderr}")
                 log(f"WARNING: Shopify/Google sync issues: {sync_result.stderr}")
 
     # Combined summary
