@@ -60,42 +60,29 @@ import sys
 import time
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- CONFIGURATION ---
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "port": 5432,
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "dbname": "brookfield_prod"
-}
+# Load environment variables from .env
+load_dotenv('.env')
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
-ACCESS_TOKEN = "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"
+ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
 LOCATION_ID = "64140443707"
-LOG_RETENTION = 7  # Keep last 7 logs
+
+# Validate that the access token was loaded
+if not ACCESS_TOKEN:
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
+
+# Setup logging
+SCRIPT_NAME = "update_shopify_inventory"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
 
 
-def clean_old_logs(log_prefix="shopify_inventory_", keep_count=7):
-    log_dir = os.path.dirname(__file__)
-    log_files = sorted(
-        [f for f in os.listdir(log_dir) if f.startswith(log_prefix) and f.endswith(".log")],
-        key=lambda f: os.path.getmtime(os.path.join(log_dir, f))
-    )
-    for old_file in log_files[:-keep_count]:
-        try:
-            os.remove(os.path.join(log_dir, old_file))
-        except Exception as e:
-            pass  # Silent fail to keep cron clean
-
-
-def log(message):
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"shopify_inventory_{date_str}.log"
-    log_path = os.path.join(os.path.dirname(__file__), log_filename)
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  {message}\n")
+# Old logging functions removed - handled by shared logging system
 
 
 def batch_search_variants_by_sku(skus, batch_size=50):
@@ -470,7 +457,8 @@ def get_unfulfilled_shopify_orders():
             return {}
 
         # Check which orders are already processed (in orderstatus table)
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
 
         order_names = list(order_data.keys())
@@ -496,35 +484,40 @@ def get_unfulfilled_shopify_orders():
         # Only include SKUs from orders that haven't been processed yet
         for order_name, skus in order_data.items():
             if order_name not in processed_orders:
-                log(f"✅ Including order {order_name} (not in orderstatus)")
+                log(f"Including order {order_name} (not in orderstatus)")
                 for sku, qty in skus.items():
                     shopify_orders[sku] = shopify_orders.get(sku, 0) + qty
             else:
-                log(f"⏭️  Skipping order {order_name} (already in orderstatus)")
+                log(f"Skipping order {order_name} (already in orderstatus)")
 
-        log(f"📊 Final unique SKUs: {len(shopify_orders)} with total quantity: {sum(shopify_orders.values())}")
+        log(f"Final unique SKUs: {len(shopify_orders)} with total quantity: {sum(shopify_orders.values())}")
 
         if shopify_orders:
-            log(f"✅ Final result: {len(shopify_orders)} SKUs with unfulfilled orders not in orderstatus")
+            log(f"Final result: {len(shopify_orders)} SKUs with unfulfilled orders not in orderstatus")
             for sku, qty in shopify_orders.items():
                 log(f"   - {sku}: {qty} items")
-            log(f"✅ Total unfulfilled items: {sum(shopify_orders.values())}")
+            log(f"Total unfulfilled items: {sum(shopify_orders.values())}")
         else:
-            log("✅ No unfulfilled orders found that aren't already in orderstatus")
+            log("No unfulfilled orders found that aren't already in orderstatus")
 
         return shopify_orders
 
     except Exception as e:
-        log(f"⚠️  Error getting unfulfilled orders: {e} - continuing without unfulfilled orders check")
+        log(f"Error getting unfulfilled orders: {e} - continuing without unfulfilled orders check")
         return {}
 
 
 def main():
-    clean_old_logs()
-
     single_code = sys.argv[1] if len(sys.argv) > 1 else None
 
-    conn = psycopg2.connect(**DB_CONFIG)
+    log("=== SHOPIFY INVENTORY SYNC STARTED ===")
+    if single_code:
+        log(f"Single item mode: {single_code}")
+    else:
+        log("Full sync mode")
+
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
     if single_code:
@@ -611,7 +604,7 @@ def main():
             if success:
                 updated_count += 1
                 # Build detailed log message
-                log_parts = [f"{code}: ✅ Updated from {current_qty} → {shopify_qty}"]
+                log_parts = [f"{code}: Updated from {current_qty} -> {shopify_qty}"]
                 if total_qty != shopify_qty:
                     log_parts.append(f"(database stock: {total_qty})")
                 if shopify_qty == 5 and total_qty > 5:
@@ -619,7 +612,7 @@ def main():
                 log(" ".join(log_parts))
             else:
                 failed_count += 1
-                log(f"{code}: ❌ Failed to update from {current_qty} → {shopify_qty}")
+                log(f"{code}: Failed to update from {current_qty} -> {shopify_qty}")
 
         # Enhanced rate limiting: pause every 20 API calls (more conservative)
         if processed_count % 20 == 0:
@@ -674,7 +667,10 @@ def main():
     total_updates = updated_count + unfulfilled_corrections
     total_failures = failed_count + unfulfilled_failed
 
-    log(f"Inventory sync completed — main updates: {updated_count}, unfulfilled corrections: {unfulfilled_corrections}, total updates: {total_updates}, failed: {total_failures}, mode: {'single' if single_code else 'full'}")
+    log(f"Main updates: {updated_count}, unfulfilled corrections: {unfulfilled_corrections}")
+    log(f"Total updates: {total_updates}, failed: {total_failures}")
+    log(f"Mode: {'single' if single_code else 'full'}")
+    log("=== SHOPIFY INVENTORY SYNC COMPLETED ===")
 
 
 if __name__ == "__main__":

@@ -1,21 +1,82 @@
-# Ignore virtual environments
-venv/
-.env/
-
-# Byte-compiled / cache files
-__pycache__/
-*.py[cod]
-
-# Ignore OS files
+# =========================================
+# General (Windows/macOS/IDEs)
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
 
-# Ignore logs and junk
-*.log
 
-# Ignore environment config
+# VS Code
+.vscode/
+
+# =========================================
+# Node.js & Next.js (splitdine_server + Next frontend)
+node_modules/
 .env
+.env.local
+dist/
+.cache/
+.next/
+out/
+
 
 # Google merchant api
-merchant-feed-api-462809-b3fec2813131.json
 merchant-feed-api-462809-23c712978791.json
 
+=======
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+logs/
+*.txt
+*.csv
+
+# =========================================
+# Flutter (splitdine_flutter)
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+pubspec.lock
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/
+
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/*.iml
+android/key.properties
+**/android/app/.cxx/
+
+# API credentials and sensitive configuration files
+merchant-feed-api-462809-23c712978791.json
+.env
+shopify_api.env
+server.txt
+
+# Python environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Misc
+*.iml
+*.lock
+.idea/
+GOOGLE-DATA-Merchant.txt
+DB_Schema.sql
+price_change_logic.md
+>>>>>>> b1236d98a0dfb9aa944e558b23875a9b3558bc78

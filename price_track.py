@@ -1,31 +1,29 @@
 #!/usr/bin/env python3
 import psycopg2
 from datetime import date, timedelta
+from logging_utils import manage_log_files, create_logger, get_db_config
 
-DB_CONFIG = {
-    "host": "77.68.13.150",
-    "dbname": "brookfield_prod",
-    "user": "brookfield_prod_user",
-    "password": "prodpw",
-    "port": 5432
-}
+# Setup logging
+SCRIPT_NAME = "price_track"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
 
 def main():
     conn = None
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
 
-        # 1️⃣ SET DATES
+        # STEP 1: SET DATES
         today = date.today()
         # We'll backfill the 7 days prior: 1 = yesterday, 7 = 7 days ago
         days_to_backfill = range(1, 8)
 
-        # 2️⃣ DELETE any existing entry for `today` from price_track
+        # STEP 2: DELETE any existing entry for `today` from price_track
         cur.execute("DELETE FROM price_track WHERE date = %s", (today,))
-        # print(f"🗑️  Deleted existing entries for {today}")
 
-        # 3️⃣ INSERT NEW ROWS for `today` (localstock only '#FREE')
+        # STEP 3: INSERT NEW ROWS for `today` (localstock only '#FREE')
         insert_stock_query = """
             INSERT INTO price_track (
                 groupid,
@@ -71,7 +69,7 @@ def main():
         """
         cur.execute(insert_stock_query, (today,))
         conn.commit()
-        print(f"✅ Inserted stock snapshot for {today} into price_track.")
+        print(f"Inserted stock snapshot for {today} into price_track.")
 
         # Prepare the two update statements once:
         update_amazon_sales = """
@@ -115,7 +113,7 @@ def main():
         ;
         """
 
-        # 4️⃣–5️⃣ Backfill sales for the last 7 days
+        # STEP 4-5: Backfill sales for the last 7 days
         for delta in days_to_backfill:
             target_date = today - timedelta(days=delta)
             cur.execute(update_amazon_sales, (target_date, target_date))
@@ -123,10 +121,13 @@ def main():
             # print(f"↻ Backfilled sales for {target_date}")
 
         conn.commit()
-        # print("✅ Sales backfill complete for the last 7 days.")
+
+        # Single clear log entry
+        log(f"Price track updated for {today}")
 
     except Exception as e:
-        print("❌ Error occurred:", e)
+        log(f"ERROR: Price track update failed: {str(e)}")
+        print("ERROR occurred:", e)
         if conn:
             conn.rollback()
     finally:

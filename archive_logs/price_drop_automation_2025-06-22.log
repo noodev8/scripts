@@ -1,0 +1,16 @@
+2025-06-22 14:37:17  === PRICE DROP AUTOMATION STARTED ===
+2025-06-22 14:37:17  Mode: report-only
+2025-06-22 14:37:17  Master switch (ENABLE_PRICE_DROPS): False
+2025-06-22 14:37:17  Max daily changes: 50
+2025-06-22 14:37:18  Price drop analysis completed: 186 products analyzed
+2025-06-22 14:37:18  Report generated: C:\scripts\logs\price_drop_report.txt
+2025-06-22 14:37:18  Report-only mode complete. Report: C:\scripts\logs\price_drop_report.txt
+2025-06-22 14:37:18  WARNING: Failed to cleanup old logs: name 'LOG_RETENTION' is not defined
+2025-06-22 17:04:01  === PRICE DROP AUTOMATION STARTED ===
+2025-06-22 17:04:01  Mode: report-only
+2025-06-22 17:04:01  Master switch (ENABLE_PRICE_DROPS): False
+2025-06-22 17:04:01  Max daily changes: 50
+2025-06-22 17:04:01  Price drop analysis completed: 185 products analyzed
+2025-06-22 17:04:01  Report generated: C:\scripts\logs\price_drop_report.txt
+2025-06-22 17:04:01  Report-only mode complete. Report: C:\scripts\logs\price_drop_report.txt
+2025-06-22 17:04:01  WARNING: Failed to cleanup old logs: name 'LOG_RETENTION' is not defined
