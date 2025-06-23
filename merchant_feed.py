@@ -142,8 +142,8 @@ def generate_feed():
             size = uksize.replace(" UK", "") if uksize else ""
 
             # 5. Price should be rrp from skusummary, sale_price should be shopifyprice
-            price = f"{float(row['rrp']):.2f}" if pd.notnull(row["rrp"]) else ""
-            sale_price = f"{float(row['shopifyprice']):.2f}" if pd.notnull(row["shopifyprice"]) else ""
+            price = f"{float(row['rrp']):.2f} GBP" if pd.notnull(row["rrp"]) else ""
+            sale_price = f"{float(row['shopifyprice']):.2f} GBP" if pd.notnull(row["shopifyprice"]) else ""
 
             # 6. Check stock availability across multiple tables in priority order
             is_in_stock = determine_stock_availability(
@@ -232,4 +232,4 @@ def upload_file_to_google():
         if 'transport' in locals(): transport.close()
 
 # Call this after your file is ready
-upload_file_to_google()
+# upload_file_to_google()
