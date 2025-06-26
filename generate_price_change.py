@@ -75,40 +75,59 @@ def get_sales_burst_analysis():
             item['current_price'] = item.get('shopify_price', 0)
             item['suggested_price'] = item.get('recommended_price', 0)
 
-            # Clean up action name - remove special characters and emojis
+            # Simple action name cleanup - replace spaces with underscores and convert to ASCII
             raw_action = item.get('action', 'UNKNOWN')
+            # First normalize common dash characters, then convert to ASCII
             clean_action = (raw_action.replace(' ', '_')
-                                    .replace('–', '-')
-                                    .replace('—', '-')
-                                    .replace('â€"', '-')
-                                    .replace('Ã¢â‚¬â€œ', '-')
+                                    .replace('–', '-')  # em dash
+                                    .replace('—', '-')  # en dash
                                     .encode('ascii', 'ignore')
                                     .decode('ascii'))
 
             item['action'] = f"INCREASE_{clean_action}"
             item['reason'] = f"Sales burst: {clean_action} - {item.get('shopify_sales', 0)} sales today"
             item['stock'] = item.get('shopify_stock', 0)
-            item['days_since_last_sold'] = ''  # Not applicable for sales bursts
-            item['lowbench'] = ''  # Not applicable for sales bursts
 
-            # Get cost and brand from database
+            # Get cost, brand, days_since_last_sold, and lowbench from database
             try:
                 db_config = get_db_config()
                 conn = psycopg2.connect(**db_config)
                 cur = conn.cursor()
-                cur.execute("SELECT cost, brand FROM skusummary WHERE groupid = %s", (item['groupid'],))
+
+                # Get additional fields including days_since_last_sold and lowbench
+                cur.execute("""
+                    SELECT
+                        cost,
+                        brand,
+                        lowbench,
+                        COALESCE((CURRENT_DATE - (
+                            SELECT MAX(solddate)
+                            FROM sales
+                            WHERE groupid = %s AND solddate >= CURRENT_DATE - INTERVAL '90 days'
+                        )), 9999) AS days_since_last_sold
+                    FROM skusummary
+                    WHERE groupid = %s
+                """, (item['groupid'], item['groupid']))
+
                 result = cur.fetchone()
                 if result:
-                    item['cost'] = result[0]
-                    item['brand'] = result[1]
+                    item['cost'] = result[0] or 0
+                    item['brand'] = result[1] or 'Unknown'
+                    item['lowbench'] = result[2] or ''
+                    item['days_since_last_sold'] = result[3] if result[3] != 9999 else ''
                 else:
                     item['cost'] = 0
                     item['brand'] = 'Unknown'
+                    item['lowbench'] = ''
+                    item['days_since_last_sold'] = ''
                 cur.close()
                 conn.close()
-            except:
+            except Exception as e:
+                log(f"WARNING: Failed to get additional data for {item['groupid']}: {str(e)}")
                 item['cost'] = 0
                 item['brand'] = 'Unknown'
+                item['lowbench'] = ''
+                item['days_since_last_sold'] = ''
 
             sales_bursts.append(item)
         
@@ -147,10 +166,10 @@ def filter_recent_changes(analysis_results):
                 ignored_count += 1
                 continue
 
-            # Check for recent changes (10-day lock period)
+            # Check for recent changes (3-day lock period)
             cur.execute("""
                 SELECT COUNT(*) FROM price_change_log
-                WHERE groupid = %s AND change_date >= CURRENT_DATE - INTERVAL '10 days'
+                WHERE groupid = %s AND change_date >= CURRENT_DATE - INTERVAL '3 days'
             """, (groupid,))
 
             recent_changes = cur.fetchone()[0]
