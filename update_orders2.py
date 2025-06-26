@@ -1,13 +1,11 @@
 
 import psycopg2
 import requests
-import logging
-from logging.handlers import RotatingFileHandler
 from datetime import datetime
 import os
 import random
 from dotenv import load_dotenv
-from logging_utils import get_db_config
+from logging_utils import get_db_config, manage_log_files, create_logger
 import sys
 
 # === CONFIGURATION ===
@@ -20,28 +18,12 @@ if not ACCESS_TOKEN:
 
 ENABLE_DELETION = False
 DELETION_DAYS_THRESHOLD = 5
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE = os.path.join(SCRIPT_DIR, "order_sync.log")
-LOG_MAX_SIZE = 5 * 1024 * 1024
-LOG_BACKUP_COUNT = 3
 
-def setup_logging():
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
-
-    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=LOG_MAX_SIZE, backupCount=LOG_BACKUP_COUNT)
-    console_handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-    return logger
-
-logger = setup_logging()
-logger.info("=== Order Sync Script Started ===")
+# Setup logging using the standardized logging_utils
+SCRIPT_NAME = "update_orders2"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
+log("=== Order Sync Script Started ===")
 
 def safe(value):
     return value.strip() if value and isinstance(value, str) else ""
@@ -52,8 +34,86 @@ def format_datetime(dt_str):
     except (ValueError, TypeError):
         return ""
 
+def get_current_datetime():
+    """Get current datetime in YYYYMMDD HH:MM:SS format"""
+    return datetime.now().strftime("%Y%m%d %H:%M:%S")
+
+def get_supplier_for_sku(cursor, shopifysku):
+    """Get supplier from skusummary table for a given SKU"""
+    try:
+        # First get groupid from skumap using the code (SKU)
+        cursor.execute("SELECT groupid FROM skumap WHERE code = %s LIMIT 1", (shopifysku,))
+        result = cursor.fetchone()
+
+        if not result:
+            log(f"WARNING: No groupid found in skumap for SKU {shopifysku}")
+            return ""
+
+        groupid = result[0]
+
+        # Then get supplier from skusummary using the groupid
+        cursor.execute("""
+            SELECT supplier FROM skusummary
+            WHERE groupid = %s AND supplier IS NOT NULL AND TRIM(supplier) != ''
+            LIMIT 1
+        """, (groupid,))
+        result = cursor.fetchone()
+        return result[0] if result else ""
+
+    except Exception as e:
+        log(f"WARNING: Could not get supplier for SKU {shopifysku}: {e}")
+        return ""
+
+def insert_into_sales(cursor, order, item, shopifysku, order_name):
+    """Insert order into sales table"""
+    try:
+        # Get groupid from skumap
+        cursor.execute("SELECT groupid FROM skumap WHERE code = %s LIMIT 1", (shopifysku,))
+        result = cursor.fetchone()
+        groupid = result[0] if result else None
+
+        if not groupid:
+            log(f"WARNING: No groupid found for SKU {shopifysku} (Order {order_name}) - skipping sales insert")
+            return
+
+        # Get brand from skusummary
+        cursor.execute("SELECT brand FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
+        result = cursor.fetchone()
+        brand = result[0] if result else None
+
+        # Extract sales data
+        soldprice = float(item.get("price", 0))
+        solddate = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date()
+        ordertime = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).strftime("%H:%M:%S")
+        paytype = ",".join(order.get("payment_gateway_names", [])) or "UNKNOWN"
+        title = safe(item.get("title"))
+
+        log(f"Inserting into sales: SKU={shopifysku}, Order={order_name}, Qty={item.get('quantity')}, Price={soldprice}, PayType={paytype}")
+
+        # Insert into sales table
+        cursor.execute("""
+            INSERT INTO sales (
+                code, solddate, groupid, ordernum, ordertime, qty,
+                soldprice, channel, paytype, collectedvat,
+                productname, brand, profit, discount
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s
+            )
+        """, (
+            shopifysku, solddate, groupid, order_name, ordertime,
+            item.get("quantity"), soldprice, "SHP",
+            paytype, None, title, brand, 0, 0
+        ))
+
+        log("Sale inserted successfully")
+
+    except Exception as e:
+        log(f"ERROR: Failed to insert sale for {order_name}, SKU {shopifysku}: {e}")
+
 def run_pick_allocation(cursor):
-    logger.info("Running pick allocation...")
+    log("Running pick allocation...")
     cursor.execute("""
         SELECT ordernum, shopifysku, qty FROM orderstatus
         WHERE ordertype NOT IN (3, 5)
@@ -67,10 +127,10 @@ def run_pick_allocation(cursor):
     for order_name, shopifysku, order_qty in orders:
         # Skip if order_qty is None or invalid
         if not order_qty or order_qty <= 0:
-            logger.warning(f"Skipping {order_name}, SKU {shopifysku} - invalid quantity: {order_qty}")
+            log(f"WARNING: Skipping {order_name}, SKU {shopifysku} - invalid quantity: {order_qty}")
             continue
 
-        logger.info(f"Processing {order_name}, SKU {shopifysku} - need {order_qty} picks")
+        log(f"Processing {order_name}, SKU {shopifysku} - need {order_qty} picks")
 
         # First check how many picks are already allocated to this order
         cursor.execute("""
@@ -80,16 +140,16 @@ def run_pick_allocation(cursor):
         already_allocated = cursor.fetchone()[0]
 
         if already_allocated >= order_qty:
-            logger.info(f"Order {order_name}, SKU {shopifysku} already fully allocated: {already_allocated}/{order_qty} picks")
+            log(f"Order {order_name}, SKU {shopifysku} already fully allocated: {already_allocated}/{order_qty} picks")
             # Set orderdate to mark as picked and localstock to the number of picks allocated
             cursor.execute("""
-                UPDATE orderstatus SET orderdate = CURRENT_DATE, localstock = %s
+                UPDATE orderstatus SET orderdate = %s, localstock = %s
                 WHERE ordernum = %s AND shopifysku = %s
-            """, (already_allocated, order_name, shopifysku))
+            """, (get_current_datetime(), already_allocated, order_name, shopifysku))
             continue
 
         picks_needed = order_qty - already_allocated
-        logger.info(f"Order {order_name}, SKU {shopifysku} needs {picks_needed} more picks (already have {already_allocated}/{order_qty})")
+        log(f"Order {order_name}, SKU {shopifysku} needs {picks_needed} more picks (already have {already_allocated}/{order_qty})")
 
         # Get all available stock for this SKU
         query = """
@@ -97,17 +157,17 @@ def run_pick_allocation(cursor):
             WHERE code = %s AND ordernum = '#FREE' AND (deleted = 0 OR deleted IS NULL) AND allocated = 'unallocated'
             ORDER BY location, id
         """
-        logger.info(f"Executing query: {query} with SKU: {shopifysku}")
+        log(f"Executing query: {query} with SKU: {shopifysku}")
         cursor.execute(query, (shopifysku,))
         available_picks = cursor.fetchall()
-        logger.info(f"Raw query result: {available_picks}")
+        log(f"Raw query result: {available_picks}")
 
-        logger.info(f"Found {len(available_picks)} available #FREE stock rows for {shopifysku}")
+        log(f"Found {len(available_picks)} available #FREE stock rows for {shopifysku}")
         for i, pick in enumerate(available_picks):
-            logger.info(f"  Stock {i+1}: id={pick[0]}, qty={pick[1]}, location={pick[2]}")
+            log(f"  Stock {i+1}: id={pick[0]}, qty={pick[1]}, location={pick[2]}")
 
         if not available_picks:
-            logger.warning(f"No available localstock for {order_name}, SKU {shopifysku}")
+            log(f"WARNING: No available localstock for {order_name}, SKU {shopifysku}")
 
             # Check amzfeed table for amzlive stock
             cursor.execute("""
@@ -120,7 +180,7 @@ def run_pick_allocation(cursor):
             if amz_available > 0:
                 # Calculate how much AMZ stock to allocate (min of what's needed vs what's available)
                 amz_to_allocate = min(picks_needed, amz_available)
-                logger.info(f"Found {amz_available} AMZ stock for {order_name}, SKU {shopifysku} - allocating {amz_to_allocate}")
+                log(f"Found {amz_available} AMZ stock for {order_name}, SKU {shopifysku} - allocating {amz_to_allocate}")
 
                 # Set amz column with the amount allocated (no orderdate for AMZ)
                 cursor.execute("""
@@ -128,16 +188,22 @@ def run_pick_allocation(cursor):
                     WHERE ordernum = %s AND shopifysku = %s
                 """, (amz_to_allocate, order_name, shopifysku))
 
-                logger.info(f"Order {order_name}, SKU {shopifysku} allocated from AMZ: {amz_to_allocate}/{picks_needed}")
+                log(f"Order {order_name}, SKU {shopifysku} allocated from AMZ: {amz_to_allocate}/{picks_needed}")
                 continue
 
-            # Check supplier using skumap table (shopifysku in orderstatus = code in skumap)
-            cursor.execute("""
-                SELECT supplier FROM skumap
-                WHERE code = %s AND supplier IS NOT NULL AND TRIM(supplier) != ''
-                LIMIT 1
-            """, (shopifysku,))
-            supplier_result = cursor.fetchone()
+            # Check supplier using skumap -> skusummary lookup
+            cursor.execute("SELECT groupid FROM skumap WHERE code = %s LIMIT 1", (shopifysku,))
+            groupid_result = cursor.fetchone()
+            supplier_result = None
+
+            if groupid_result:
+                groupid = groupid_result[0]
+                cursor.execute("""
+                    SELECT supplier FROM skusummary
+                    WHERE groupid = %s AND supplier IS NOT NULL AND TRIM(supplier) != ''
+                    LIMIT 1
+                """, (groupid,))
+                supplier_result = cursor.fetchone()
 
             if supplier_result:
                 supplier = supplier_result[0]
@@ -154,26 +220,26 @@ def run_pick_allocation(cursor):
                     if ukd_available > 0:
                         # Calculate how much UKD stock to allocate (min of what's needed vs what's available)
                         ukd_to_allocate = min(picks_needed, ukd_available)
-                        logger.info(f"Found {ukd_available} UKD stock for {order_name}, SKU {shopifysku} - marking UKD with {ukd_to_allocate}")
+                        log(f"Found {ukd_available} UKD stock for {order_name}, SKU {shopifysku} - marking UKD with {ukd_to_allocate}")
                         cursor.execute("""
-                            UPDATE orderstatus SET ukd = %s 
+                            UPDATE orderstatus SET ukd = %s
                             WHERE ordernum = %s AND shopifysku = %s
                         """, (ukd_to_allocate, order_name, shopifysku))
                     else:
                         # No UKD stock available, mark the amount needed for ordering
-                        logger.info(f"No UKD stock available for {order_name}, SKU {shopifysku} - marking UKD with {picks_needed} for ordering")
+                        log(f"No UKD stock available for {order_name}, SKU {shopifysku} - marking UKD with {picks_needed} for ordering")
                         cursor.execute("""
                             UPDATE orderstatus SET ukd = %s
                             WHERE ordernum = %s AND shopifysku = %s
                         """, (picks_needed, order_name, shopifysku))
                 else:
-                    logger.info(f"No stock found anywhere for {order_name}, SKU {shopifysku} - marking othersupplier with {picks_needed} (supplier: {supplier})")
+                    log(f"No stock found anywhere for {order_name}, SKU {shopifysku} - marking othersupplier with {picks_needed} (supplier: {supplier})")
                     cursor.execute("""
                         UPDATE orderstatus SET othersupplier = %s
                         WHERE ordernum = %s AND shopifysku = %s
                     """, (picks_needed, order_name, shopifysku))
             else:
-                logger.info(f"No stock found anywhere for {order_name}, SKU {shopifysku} - marking othersupplier with {picks_needed} (no supplier info)")
+                log(f"No stock found anywhere for {order_name}, SKU {shopifysku} - marking othersupplier with {picks_needed} (no supplier info)")
                 cursor.execute("""
                     UPDATE orderstatus SET othersupplier = %s
                     WHERE ordernum = %s AND shopifysku = %s
@@ -194,12 +260,12 @@ def run_pick_allocation(cursor):
             available_picks = cursor.fetchall()
 
             if not available_picks:
-                logger.warning(f"No more available stock for {order_name}, SKU {shopifysku} - allocated {picks_allocated}/{picks_needed}")
+                log(f"WARNING: No more available stock for {order_name}, SKU {shopifysku} - allocated {picks_allocated}/{picks_needed}")
                 break
 
             # Take the first available pick
             pick_id, pick_qty, location, groupid, supplier, brand = available_picks[0]
-            logger.info(f"Allocating pick {picks_allocated + 1}/{picks_needed}: row {pick_id}, qty={pick_qty}, location={location}")
+            log(f"Allocating pick {picks_allocated + 1}/{picks_needed}: row {pick_id}, qty={pick_qty}, location={location}")
 
             if pick_qty > 1:
                 # Use 1 from this pick and create a new row with the remainder
@@ -213,11 +279,11 @@ def run_pick_allocation(cursor):
                     INSERT INTO localstock (id, updated, ordernum, location, groupid, code, supplier, qty, brand, allocated)
                     VALUES (%s, CURRENT_TIMESTAMP, '#FREE', %s, %s, %s, %s, %s, %s, 'unallocated')
                 """, (fallback_id, location, groupid, shopifysku, supplier, remaining_qty, brand))
-                logger.info(f"Pick split for {order_name}, SKU {shopifysku}, row {pick_id} (location: {location}) -> 1 pick + new row {fallback_id} with {remaining_qty}")
+                log(f"Pick split for {order_name}, SKU {shopifysku}, row {pick_id} (location: {location}) -> 1 pick + new row {fallback_id} with {remaining_qty}")
             else:
                 # Use the entire pick (qty = 1)
                 cursor.execute("UPDATE localstock SET ordernum = %s WHERE id = %s", (order_name, pick_id))
-                logger.info(f"Pick assigned for {order_name}, SKU {shopifysku} -> row {pick_id} (location: {location})")
+                log(f"Pick assigned for {order_name}, SKU {shopifysku} -> row {pick_id} (location: {location})")
 
             picks_allocated += 1
 
@@ -228,16 +294,16 @@ def run_pick_allocation(cursor):
         # Set orderdate and localstock for ANY picks found to prevent double picking
         if picks_allocated > 0:
             cursor.execute("""
-                UPDATE orderstatus SET orderdate = CURRENT_DATE, localstock = %s
+                UPDATE orderstatus SET orderdate = %s, localstock = %s
                 WHERE ordernum = %s AND shopifysku = %s
-            """, (total_allocated, order_name, shopifysku))
+            """, (get_current_datetime(), total_allocated, order_name, shopifysku))
 
             if total_allocated == order_qty:
-                logger.info(f"Order {order_name}, SKU {shopifysku} fully allocated: {total_allocated}/{order_qty} picks")
+                log(f"Order {order_name}, SKU {shopifysku} fully allocated: {total_allocated}/{order_qty} picks")
             else:
-                logger.warning(f"Order {order_name}, SKU {shopifysku} partially allocated: {total_allocated}/{order_qty} picks")
+                log(f"WARNING: Order {order_name}, SKU {shopifysku} partially allocated: {total_allocated}/{order_qty} picks")
         else:
-            logger.warning(f"Order {order_name}, SKU {shopifysku} - no new picks allocated")
+            log(f"WARNING: Order {order_name}, SKU {shopifysku} - no new picks allocated")
 
 def run_order_sync(cursor):
     url = f"https://{SHOP_DOMAIN}/admin/api/2024-01/orders.json"
@@ -252,11 +318,11 @@ def run_order_sync(cursor):
     response = requests.get(url, headers=headers, params=params)
 
     if response.status_code != 200:
-        logger.error(f"Shopify API Error: {response.status_code} - {response.text}")
+        log(f"ERROR: Shopify API Error: {response.status_code} - {response.text}")
         return
 
     orders = response.json().get("orders", [])
-    logger.info(f"Retrieved {len(orders)} unfulfilled orders from Shopify")
+    log(f"Retrieved {len(orders)} unfulfilled orders from Shopify")
 
     # Track current orders from Shopify to identify orders to archive
     current_shopify_orders = set()
@@ -276,11 +342,14 @@ def run_order_sync(cursor):
         for item in order.get("line_items", []):
             shopifysku = safe(item.get("sku"))
             if not shopifysku:
-                logger.warning(f"WARNING: Skipping item with missing SKU in order {order_name}")
+                log(f"WARNING: Skipping item with missing SKU in order {order_name}")
                 continue
 
             # Track this order+SKU combination as current
             current_shopify_orders.add((order_name, shopifysku))
+
+            # Get supplier for this SKU
+            supplier = get_supplier_for_sku(cursor, shopifysku)
 
             cursor.execute("SELECT 1 FROM orderstatus WHERE ordernum = %s AND shopifysku = %s", (order_name, shopifysku))
             exists = cursor.fetchone() is not None
@@ -316,7 +385,7 @@ def run_order_sync(cursor):
                     order_name,
                     shopifysku
                 ))
-                logger.info(f"Updated existing order {order_name}, SKU {shopifysku}")
+                log(f"Updated existing order {order_name}, SKU {shopifysku}")
             else:
                 cursor.execute("""
                     INSERT INTO orderstatus (
@@ -337,7 +406,7 @@ def run_order_sync(cursor):
                     order_name, shopifysku, item.get("quantity"),
                     format_datetime(order["updated_at"]),
                     format_datetime(order["created_at"]),
-                    "0", "", safe(item.get("title")), "Summer",
+                    "0", supplier, safe(item.get("title")), safe(shipping.get("name")),
                     safe(shipping.get("zip")), safe(shipping.get("address1")),
                     safe(shipping.get("address2")), safe(shipping.get("company")),
                     safe(shipping.get("city")), safe(shipping.get("province_code")),
@@ -347,7 +416,10 @@ def run_order_sync(cursor):
                     "", "SHOPIFY", None, None, None, 0, shipping_cost, 1, None,
                     datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date(), 0, None
                 ))
-                logger.info(f"Inserted new order {order_name}, SKU {shopifysku}")
+                log(f"Inserted new order {order_name}, SKU {shopifysku} (supplier: {supplier})")
+
+                # Insert into sales table
+                insert_into_sales(cursor, order, item, shopifysku, order_name)
 
     # Archive orders that are no longer in Shopify
     archive_old_orders(cursor, current_shopify_orders)
@@ -357,7 +429,7 @@ def archive_old_orders(cursor, current_shopify_orders):
     Archive orders from orderstatus that are no longer in the current Shopify data.
     This helps keep the UI clean by removing old and fulfilled orders.
     """
-    logger.info("Checking for orders to archive...")
+    log("Checking for orders to archive...")
 
     # Get all orders currently in orderstatus
     cursor.execute("""
@@ -372,7 +444,7 @@ def archive_old_orders(cursor, current_shopify_orders):
             orders_to_archive.append((order_name, shopifysku))
 
     if orders_to_archive:
-        logger.info(f"Found {len(orders_to_archive)} orders to archive")
+        log(f"Found {len(orders_to_archive)} orders to archive")
 
         for order_name, shopifysku in orders_to_archive:
             # Copy the order to archive table
@@ -388,9 +460,9 @@ def archive_old_orders(cursor, current_shopify_orders):
                 WHERE ordernum = %s AND shopifysku = %s
             """, (order_name, shopifysku))
 
-            logger.info(f"Archived order {order_name}, SKU {shopifysku}")
+            log(f"Archived order {order_name}, SKU {shopifysku}")
     else:
-        logger.info("No orders need to be archived")
+        log("No orders need to be archived")
 
 def main():
     pick_only = '--picks' in sys.argv
@@ -406,14 +478,14 @@ def main():
             run_pick_allocation(cursor)
         else:
             # Run both order sync and pick allocation in sequence
-            logger.info("Running full order sync and pick allocation...")
+            log("Running full order sync and pick allocation...")
             run_order_sync(cursor)
-            logger.info("Order sync completed, now running pick allocation...")
+            log("Order sync completed, now running pick allocation...")
             run_pick_allocation(cursor)
 
         conn.commit()
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        log(f"ERROR: Unexpected error: {e}")
         if conn:
             conn.rollback()
     finally:
@@ -421,7 +493,7 @@ def main():
             cursor.close()
         if conn:
             conn.close()
-        logger.info("=== Script Finished ===")
+        log("=== Script Finished ===")
 
 if __name__ == '__main__':
     main()
