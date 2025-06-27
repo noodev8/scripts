@@ -13,7 +13,6 @@ Thumbs.db
 # =========================================
 # Node.js & Next.js (splitdine_server + Next frontend)
 node_modules/
-.env
 .env.local
 dist/
 .cache/
