@@ -174,7 +174,7 @@ try:
     if 'page_number' not in st.session_state:
         st.session_state.page_number = 1
 
-    rows_per_page = 25
+    rows_per_page = 15
     total_rows = len(st.session_state.filtered_df)
     total_pages = max(1, (total_rows + rows_per_page - 1) // rows_per_page)
 
@@ -233,75 +233,71 @@ try:
             "sold_qty"
         ]
 
-        # Create clean HTML table without checkboxes
-        def create_clean_table(df, columns):
-            html = """
-            <style>
-            .custom-table {
-                width: auto;
-                min-width: 1400px;
-                border-collapse: collapse;
-                font-family: 'Source Sans Pro', sans-serif;
-                font-size: 14px;
-            }
-            .custom-table th, .custom-table td {
-                border: 1px solid #e0e0e0;
-                padding: 8px 12px;
-                text-align: left;
-                white-space: nowrap;
-                min-width: 120px;
-            }
-            .custom-table th {
-                background-color: #f0f2f6;
-                font-weight: 600;
-                position: sticky;
-                top: 0;
-                z-index: 1;
-            }
-            .custom-table tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            .custom-table tr:hover {
-                background-color: #e8f4f8;
-            }
-            .custom-table th:first-child, .custom-table td:first-child {
-                min-width: 100px;
-            }
-            .custom-table th:nth-child(2), .custom-table td:nth-child(2) {
-                min-width: 140px;
-            }
-            .custom-table th:nth-child(6), .custom-table td:nth-child(6) {
-                min-width: 100px;
-            }
-            .custom-table th:nth-child(16), .custom-table td:nth-child(16) {
-                min-width: 150px;
-            }
-            </style>
-            <table class="custom-table">
-            <thead><tr>
-            """
+        # Format the data for better display
+        display_data = page_data[columns_to_show].copy()
 
-            # Add headers
-            for col in columns:
-                html += f"<th>{col}</th>"
-            html += "</tr></thead><tbody>"
+        # Format currency columns for better readability
+        if 'annual_profit' in display_data.columns:
+            display_data['annual_profit'] = display_data['annual_profit'].apply(
+                lambda x: f"£{x:,.0f}" if pd.notna(x) else "£0"
+            )
+        if 'profit_per_unit' in display_data.columns:
+            display_data['profit_per_unit'] = display_data['profit_per_unit'].apply(
+                lambda x: f"£{x:.2f}" if pd.notna(x) else "£0.00"
+            )
+        if 'shopifyprice_current' in display_data.columns:
+            display_data['shopifyprice_current'] = display_data['shopifyprice_current'].apply(
+                lambda x: f"£{x}" if pd.notna(x) and str(x).strip() != '' else ""
+            )
+        if 'rrp' in display_data.columns:
+            display_data['rrp'] = display_data['rrp'].apply(
+                lambda x: f"£{x}" if pd.notna(x) and str(x).strip() != '' else ""
+            )
+        if 'sales_velocity_per_day' in display_data.columns:
+            display_data['sales_velocity_per_day'] = display_data['sales_velocity_per_day'].apply(
+                lambda x: f"{x:.2f}" if pd.notna(x) else "0.00"
+            )
+        if 'days_of_stock_left' in display_data.columns:
+            display_data['days_of_stock_left'] = display_data['days_of_stock_left'].apply(
+                lambda x: f"{x:.1f}" if pd.notna(x) else "0.0"
+            )
 
-            # Add data rows
-            for _, row in df.iterrows():
-                html += "<tr>"
-                for col in columns:
-                    value = row[col]
-                    if pd.isna(value):
-                        value = ""
-                    html += f"<td>{value}</td>"
-                html += "</tr>"
+        # Add some spacing before the table
+        st.markdown("<br>", unsafe_allow_html=True)
 
-            html += "</tbody></table>"
-            return html
+        # Dynamically calculate height based on number of rows
+        approx_row_height = 36
+        header_height = 40
+        calculated_height = len(display_data) * approx_row_height + header_height
 
-        # Display the clean table
-        table_html = create_clean_table(page_data, columns_to_show)
-        st.markdown(table_html, unsafe_allow_html=True)
+        # Display with Streamlit dataframe
+        st.dataframe(
+            display_data,
+            use_container_width=True,
+            hide_index=True,
+            height=calculated_height,
+            column_config={
+                "code": st.column_config.TextColumn("Code", width="medium"),
+                "brand": st.column_config.TextColumn("Brand", width="medium"),
+                "owner": st.column_config.TextColumn("Owner", width="small"),
+                "status": st.column_config.TextColumn("Status", width="small"),
+                "segment": st.column_config.TextColumn("Segment", width="small"),
+                "annual_profit": st.column_config.TextColumn("Annual Profit", width="small"),
+                "profit_per_unit": st.column_config.TextColumn("Profit/Unit", width="small"),
+                "local_stock": st.column_config.NumberColumn("Local Stock", width="small"),
+                "total_stock": st.column_config.NumberColumn("Total Stock", width="small"),
+                "shopifyprice_current": st.column_config.TextColumn("Shopify Price", width="small"),
+                "rrp": st.column_config.TextColumn("RRP", width="small"),
+                "sales_30d": st.column_config.NumberColumn("Sales 30d", width="small"),
+                "sales_90d": st.column_config.NumberColumn("Sales 90d", width="small"),
+                "sales_velocity_per_day": st.column_config.TextColumn("Daily Velocity", width="small"),
+                "days_of_stock_left": st.column_config.TextColumn("Days Stock Left", width="small"),
+                "recommended_action": st.column_config.TextColumn("Recommended Action", width="medium"),
+                "last_reviewed": st.column_config.DateColumn("Last Reviewed", width="small"),
+                "notes": st.column_config.TextColumn("Notes", width="large"),
+                "sold_qty": st.column_config.NumberColumn("Sold Qty", width="small")
+            }
+        )
 
         # Reset page number when filters change
         if st.session_state.filter_applied and st.session_state.page_number > total_pages:
