@@ -15,7 +15,7 @@ st.subheader("Code Level Stock and Price Management")
 def filter_dataframe(df, include_text, exclude_text):
     if df.empty:
         return df
-    search_columns = ['code', 'brand', 'owner', 'status', 'segment']
+    search_columns = ['code', 'brand', 'owner', 'status', 'segment', 'recommended_action']
     if 'title' in df.columns:
         search_columns.append('title')
     filtered_df = df.copy()
@@ -56,25 +56,50 @@ def calculate_filter_stats(df):
     }
     return stats
 
+def apply_price_change(current_price_str, change_type):
+    """Apply percentage change to price string"""
+    try:
+        current_price = float(str(current_price_str).replace('£', '').replace(',', ''))
+        multipliers = {
+            'increase_2': 1.02,
+            'increase_5': 1.05,
+            'increase_10': 1.10,
+            'decrease_2': 0.98,
+            'decrease_5': 0.95,
+            'decrease_10': 0.90
+        }
+        new_price = current_price * multipliers.get(change_type, 1.0)
+        return round(new_price, 2)
+    except:
+        return None
+
 try:
     df = query_health_check()
 
+    # Initialize session state
     if 'filtered_df' not in st.session_state:
         st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
     if 'filter_applied' not in st.session_state:
         st.session_state.filter_applied = False
     if 'selected_rows' not in st.session_state:
         st.session_state.selected_rows = set()
-    if 'last_filter_state' not in st.session_state:
-        st.session_state.last_filter_state = ""
+    if 'price_changes' not in st.session_state:
+        st.session_state.price_changes = {}
+    if 'page_number' not in st.session_state:
+        st.session_state.page_number = 1
+    if 'include_text' not in st.session_state:
+        st.session_state.include_text = ""
+    if 'exclude_text' not in st.session_state:
+        st.session_state.exclude_text = ""
 
+    # Filter form
     with st.container():
-        with st.form(key="filter_form", clear_on_submit=True):
+        with st.form(key="filter_form"):
             col1, col2, col3, col4 = st.columns([3, 3, 1.5, 1.5])
             with col1:
-                include_text = st.text_input("Include:", help="Search in code, brand, owner, status, segment, title")
+                include_text = st.text_input("Include:", value=st.session_state.include_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col2:
-                exclude_text = st.text_input("Exclude:", help="Search in code, brand, owner, status, segment, title")
+                exclude_text = st.text_input("Exclude:", value=st.session_state.exclude_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col3:
                 st.markdown("<br>", unsafe_allow_html=True)
                 filter_clicked = st.form_submit_button("🔍 Filter", use_container_width=True)
@@ -82,22 +107,38 @@ try:
                 st.markdown("<br>", unsafe_allow_html=True)
                 reset_clicked = st.form_submit_button("🔄 Reset", use_container_width=True)
 
-    current_filter_state = f"{include_text}|{exclude_text}"
-    if current_filter_state != st.session_state.last_filter_state:
-        st.session_state.selected_rows = set()
-        st.session_state.last_filter_state = current_filter_state
-
-    if filter_clicked or (include_text.strip() or exclude_text.strip()):
+    # Handle filtering
+    if filter_clicked:
         current_df = st.session_state.filtered_df if st.session_state.filter_applied else df
         filtered_result = filter_dataframe(current_df, include_text, exclude_text)
         st.session_state.filtered_df = filtered_result.sort_values('annual_profit', ascending=False) if 'annual_profit' in filtered_result.columns else filtered_result
         st.session_state.filter_applied = True
+        st.session_state.selected_rows = set()  # Clear selections on new filter
+        st.session_state.page_number = 1
+        # Clear the text fields for next use
+        st.session_state.include_text = ""
+        st.session_state.exclude_text = ""
+        # Show success message with filter details
+        filter_terms = []
+        if include_text.strip():
+            filter_terms.append(f"including '{include_text}'")
+        if exclude_text.strip():
+            filter_terms.append(f"excluding '{exclude_text}'")
+        if filter_terms:
+            st.success(f"✅ Filtered data {' and '.join(filter_terms)} - found {len(filtered_result)} items")
+        st.rerun()
 
     if reset_clicked:
         st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
         st.session_state.filter_applied = False
         st.session_state.selected_rows = set()
+        st.session_state.price_changes = {}
+        st.session_state.page_number = 1
+        # Clear the text fields
+        st.session_state.include_text = ""
+        st.session_state.exclude_text = ""
 
+    # Display stats
     current_stats = calculate_filter_stats(st.session_state.filtered_df)
     if current_stats:
         col1, col2, col3, col4 = st.columns(4)
@@ -116,17 +157,9 @@ try:
             avg_profit_formatted = f"£{current_stats['avg_annual_profit']:,.0f}"
             st.metric("Avg Profit", avg_profit_formatted)
 
-    # This will be updated after the grid selection is processed
-    if st.session_state.filter_applied:
-        st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {len(st.session_state.selected_rows) if st.session_state.selected_rows else 0} rows")
-    else:
-        st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {len(st.session_state.selected_rows) if st.session_state.selected_rows else 0} rows")
-
     st.markdown("---")
 
-    if 'page_number' not in st.session_state:
-        st.session_state.page_number = 1
-
+    # Pagination
     rows_per_page = 15
     total_rows = len(st.session_state.filtered_df)
     total_pages = max(1, (total_rows + rows_per_page - 1) // rows_per_page)
@@ -152,6 +185,7 @@ try:
                 st.session_state.page_number = total_pages
                 st.rerun()
 
+        # Prepare page data
         start_idx = (st.session_state.page_number - 1) * rows_per_page
         end_idx = start_idx + rows_per_page
         page_data = st.session_state.filtered_df.iloc[start_idx:end_idx].copy()
@@ -165,7 +199,7 @@ try:
         ]
         display_data = page_data[columns_to_show].copy()
 
-        # Format currency columns for better display
+        # Format currency columns
         if 'annual_profit' in display_data.columns:
             display_data['annual_profit'] = display_data['annual_profit'].apply(
                 lambda x: f"£{x:,.0f}" if pd.notna(x) else "£0"
@@ -185,19 +219,12 @@ try:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Configure AgGrid options
+        # Configure AgGrid
         gb = GridOptionsBuilder.from_dataframe(display_data)
-
-        # Enable checkbox selection with simpler configuration
-        gb.configure_selection(
-            selection_mode='multiple',
-            use_checkbox=True
-        )
-
-        # Enable row selection
+        gb.configure_selection(selection_mode='multiple', use_checkbox=True)
         gb.configure_grid_options(rowSelection='multiple')
 
-        # Configure columns for better display with alignment
+        # Configure columns
         gb.configure_column("code", headerName="Code", width=120, pinned="left")
         gb.configure_column("brand", headerName="Brand", width=140)
         gb.configure_column("owner", headerName="Owner", width=100, cellStyle={'textAlign': 'center'})
@@ -215,18 +242,18 @@ try:
         gb.configure_column("days_of_stock_left", headerName="Days Stock Left", width=120, cellStyle={'textAlign': 'center'})
         gb.configure_column("recommended_action", headerName="Recommended Action", width=150, cellStyle={'textAlign': 'center'})
         gb.configure_column("last_reviewed", headerName="Last Reviewed", width=120, cellStyle={'textAlign': 'center'})
-        gb.configure_column("notes", headerName="Notes", width=200)  # Left aligned as requested
+        gb.configure_column("notes", headerName="Notes", width=200)
         gb.configure_column("sold_qty", headerName="Sold Qty", width=100, cellStyle={'textAlign': 'center'})
 
-        # Build grid options
         grid_options = gb.build()
 
-        # Calculate height for all rows
+        # Calculate height
         approx_row_height = 36
         header_height = 40
         calculated_height = len(display_data) * approx_row_height + header_height
 
-        # Display AgGrid
+        # Display grid with dynamic key to force refresh after removals
+        grid_key = f'main_grid_{st.session_state.page_number}_{len(st.session_state.filtered_df)}'
         grid_response = AgGrid(
             display_data,
             gridOptions=grid_options,
@@ -236,199 +263,192 @@ try:
             enable_enterprise_modules=False,
             height=calculated_height,
             width='100%',
-            reload_data=False,
-            key='main_grid'  # Add unique key
+            reload_data=True,  # Force reload after data changes
+            key=grid_key
         )
 
-        # Handle selection safely
+        # Handle grid selection - only update if we actually have valid selections
         try:
             selected_rows = grid_response.get('selected_rows', pd.DataFrame())
-
-            # Check if we have selections
-            if isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
-                st.write(f"DEBUG: selected_df columns: {list(selected_rows.columns)}")
-                if 'code' in selected_rows.columns:
-                    selected_codes = selected_rows['code'].tolist()
-                    st.write(f"DEBUG: selected_codes: {selected_codes}")
-                    # Store the codes in session state
-                    st.session_state.selected_rows = set(selected_codes)
-                else:
-                    st.session_state.selected_rows = set()
+            if isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty and 'code' in selected_rows.columns:
+                # Verify the selected codes actually exist in our current filtered data
+                valid_codes = set(selected_rows['code'].tolist())
+                current_codes = set(st.session_state.filtered_df['code'].tolist())
+                st.session_state.selected_rows = valid_codes.intersection(current_codes)
             else:
-                # Clear selections if nothing selected
-                st.session_state.selected_rows = set()
-
-        except Exception as e:
-            # Handle any selection errors gracefully
-            st.warning(f"Selection error: {e}")
+                # No valid selection, ensure we clear it
+                if not hasattr(st.session_state, '_clearing_selection'):
+                    st.session_state.selected_rows = set()
+        except Exception:
             st.session_state.selected_rows = set()
 
-        if st.session_state.selected_rows:
-            st.subheader("✅ Selected Items & Price Management")
+        # Status info - now shows accurate selection count
+        if st.session_state.filter_applied:
+            st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {len(st.session_state.selected_rows)} rows")
+        else:
+            st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {len(st.session_state.selected_rows)} rows")
+
+        # Selection Management Section - only show if there are actual selections
+        if st.session_state.selected_rows and len(st.session_state.selected_rows) > 0:
+            st.markdown("---")
+            st.subheader("✅ Selected Items Management")
+            
             selected_df = df[df['code'].isin(st.session_state.selected_rows)]
-
-            # Price management controls
-            col_actions1, col_actions2, col_actions3 = st.columns([2, 2, 2])
-
-            with col_actions1:
-                st.markdown("**Bulk Actions:**")
-                if st.button("❌ Remove Selected from Display", key="remove_selected"):
-                    # Remove selected items from current filtered view
+            
+            # Action buttons in a cleaner layout
+            col1, col2, col3 = st.columns([2, 3, 3])
+            
+            with col1:
+                st.markdown("**Remove Items:**")
+                if st.button("❌ Remove Selected", key="remove_selected", use_container_width=True):
                     codes_to_remove = st.session_state.selected_rows.copy()
                     st.session_state.filtered_df = st.session_state.filtered_df[
                         ~st.session_state.filtered_df['code'].isin(codes_to_remove)
                     ]
-                    st.session_state.selected_rows = set()  # Clear selections
-                    st.session_state.price_changes = {}  # Clear any price changes
-                    # Reset to page 1 if current page would be empty
+                    # Clear all selection-related state
+                    st.session_state.selected_rows = set()
+                    st.session_state.price_changes = {}
+                    # Clean up temp price values
+                    for key in list(st.session_state.keys()):
+                        if key.startswith('temp_price_'):
+                            del st.session_state[key]
                     st.session_state.page_number = 1
+                    st.success(f"✅ Removed {len(codes_to_remove)} items from display")
                     st.rerun()
-
-            with col_actions2:
+            
+            with col2:
                 st.markdown("**Price Increases:**")
                 col_inc1, col_inc2, col_inc3 = st.columns(3)
                 with col_inc1:
-                    if st.button("+2%", key="inc_2"):
-                        st.session_state.price_action = "increase_2"
+                    if st.button("+2%", key="inc_2", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'increase_2')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
                 with col_inc2:
-                    if st.button("+5%", key="inc_5"):
-                        st.session_state.price_action = "increase_5"
+                    if st.button("+5%", key="inc_5", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'increase_5')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
                 with col_inc3:
-                    if st.button("+10%", key="inc_10"):
-                        st.session_state.price_action = "increase_10"
+                    if st.button("+10%", key="inc_10", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'increase_10')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
-
-            with col_actions3:
+            
+            with col3:
                 st.markdown("**Price Decreases:**")
                 col_dec1, col_dec2, col_dec3 = st.columns(3)
                 with col_dec1:
-                    if st.button("-2%", key="dec_2"):
-                        st.session_state.price_action = "decrease_2"
+                    if st.button("-2%", key="dec_2", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'decrease_2')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
                 with col_dec2:
-                    if st.button("-5%", key="dec_5"):
-                        st.session_state.price_action = "decrease_5"
+                    if st.button("-5%", key="dec_5", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'decrease_5')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
                 with col_dec3:
-                    if st.button("-10%", key="dec_10"):
-                        st.session_state.price_action = "decrease_10"
+                    if st.button("-10%", key="dec_10", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                new_price = apply_price_change(item.iloc[0]['shopifyprice_current'], 'decrease_10')
+                                if new_price:
+                                    st.session_state.price_changes[code] = new_price
                         st.rerun()
 
-            # Display selected items with editable prices
+            # Manual price editing section
             st.markdown("---")
-            st.markdown("**Selected Items (click prices to edit manually):**")
-
-            # Initialize price changes session state
-            if 'price_changes' not in st.session_state:
-                st.session_state.price_changes = {}
-
-            # Create editable dataframe for selected items
-            selected_display = selected_df[columns_to_show].copy()
-
-            # Add current price and new price columns
-            selected_display['current_price'] = selected_display['shopifyprice_current']
-            selected_display['new_price'] = selected_display['shopifyprice_current']
-
-            # Apply any bulk price changes
-            if hasattr(st.session_state, 'price_action'):
-                action = st.session_state.price_action
-                for idx in selected_display.index:
-                    code = selected_display.loc[idx, 'code']
-                    current_price_str = str(selected_display.loc[idx, 'current_price'])
-
-                    # Extract numeric value from price string (remove £ and commas)
-                    try:
-                        current_price = float(current_price_str.replace('£', '').replace(',', ''))
-
-                        if action == "increase_2":
-                            new_price = current_price * 1.02
-                        elif action == "increase_5":
-                            new_price = current_price * 1.05
-                        elif action == "increase_10":
-                            new_price = current_price * 1.10
-                        elif action == "decrease_2":
-                            new_price = current_price * 0.98
-                        elif action == "decrease_5":
-                            new_price = current_price * 0.95
-                        elif action == "decrease_10":
-                            new_price = current_price * 0.90
-                        else:
-                            new_price = current_price
-
-                        # Store the price change
-                        st.session_state.price_changes[code] = round(new_price, 2)
-                        selected_display.loc[idx, 'new_price'] = f"£{new_price:.2f}"
-                    except:
-                        pass
-
-                # Clear the action after applying
-                del st.session_state.price_action
-
-            # Apply any stored price changes
-            for code, new_price in st.session_state.price_changes.items():
-                if code in selected_display['code'].values:
-                    idx = selected_display[selected_display['code'] == code].index[0]
-                    selected_display.loc[idx, 'new_price'] = f"£{new_price:.2f}"
-
-            # Show manual price editing section
             st.markdown("**Manual Price Editing:**")
+            
+            # Create a form for manual price inputs to avoid constant reruns
+            with st.form("price_editing_form"):
+                for idx, row in selected_df.iterrows():
+                    code = row['code']
+                    current_price_str = str(row['shopifyprice_current']).replace('£', '').replace(',', '')
+                    
+                    col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
+                    with col1:
+                        st.text(f"Code: {code}")
+                    with col2:
+                        st.text(f"Brand: {row['brand']}")
+                    with col3:
+                        st.text(f"Current: £{current_price_str}")
+                    with col4:
+                        # Get current new price or default to current price
+                        current_new_price = st.session_state.price_changes.get(code, None)
+                        if current_new_price is None:
+                            try:
+                                current_new_price = float(current_price_str)
+                            except:
+                                current_new_price = 0.0
+                        
+                        new_price = st.number_input(
+                            "New Price",
+                            value=current_new_price,
+                            min_value=0.01,
+                            step=0.01,
+                            format="%.2f",
+                            key=f"price_input_{code}",
+                            label_visibility="collapsed"
+                        )
+                        
+                        # Store the price for processing when form is submitted
+                        st.session_state[f"temp_price_{code}"] = new_price
+                
+                # Submit button for manual changes
+                if st.form_submit_button("💾 Update Manual Prices", use_container_width=True):
+                    for code in st.session_state.selected_rows:
+                        temp_price_key = f"temp_price_{code}"
+                        if temp_price_key in st.session_state:
+                            new_price = st.session_state[temp_price_key]
+                            # Get original price
+                            item = df[df['code'] == code]
+                            if not item.empty:
+                                current_price_str = str(item.iloc[0]['shopifyprice_current']).replace('£', '').replace(',', '')
+                                try:
+                                    original_price = float(current_price_str)
+                                    if abs(new_price - original_price) > 0.01:
+                                        st.session_state.price_changes[code] = new_price
+                                    elif code in st.session_state.price_changes:
+                                        del st.session_state.price_changes[code]
+                                except:
+                                    pass
+                    st.rerun()
 
-            # Create individual price inputs for each selected item
-            for idx, row in selected_display.iterrows():
-                code = row['code']
-                current_price_str = str(row['current_price']).replace('£', '').replace(',', '')
-
-                col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
-                with col1:
-                    st.text(f"Code: {code}")
-                with col2:
-                    st.text(f"Brand: {row['brand']}")
-                with col3:
-                    st.text(f"Current: {row['current_price']}")
-                with col4:
-                    # Get current new price or default to current price
-                    current_new_price = st.session_state.price_changes.get(code, None)
-                    if current_new_price is None:
-                        try:
-                            current_new_price = float(current_price_str)
-                        except:
-                            current_new_price = 0.0
-
-                    new_price = st.number_input(
-                        "New Price",
-                        value=current_new_price,
-                        min_value=0.01,
-                        step=0.01,
-                        format="%.2f",
-                        key=f"price_input_{code}",
-                        label_visibility="collapsed"
-                    )
-
-                    # Store the price change if different from current
-                    try:
-                        original_price = float(current_price_str)
-                        if abs(new_price - original_price) > 0.01:  # Only store if changed
-                            st.session_state.price_changes[code] = new_price
-                        elif code in st.session_state.price_changes and abs(new_price - original_price) <= 0.01:
-                            # Remove from changes if set back to original
-                            del st.session_state.price_changes[code]
-                    except:
-                        pass
-
-            # Price change confirmation section
+            # Price changes summary and confirmation
             if st.session_state.price_changes:
                 st.markdown("---")
                 st.markdown("**📋 Price Changes Summary:**")
-
+                
                 changes_summary = []
                 for code, new_price in st.session_state.price_changes.items():
-                    item_row = selected_df[selected_df['code'] == code]
+                    item_row = df[df['code'] == code]
                     if not item_row.empty:
-                        current_price_str = str(item_row.iloc[0]['shopifyprice_current'])
+                        current_price_str = str(item_row.iloc[0]['shopifyprice_current']).replace('£', '').replace(',', '')
                         try:
-                            current_price = float(current_price_str.replace('£', '').replace(',', ''))
+                            current_price = float(current_price_str)
                             change_pct = ((new_price - current_price) / current_price) * 100
                             changes_summary.append({
                                 'Code': code,
@@ -439,25 +459,27 @@ try:
                             })
                         except:
                             pass
-
+                
                 if changes_summary:
                     changes_df = pd.DataFrame(changes_summary)
                     st.dataframe(changes_df, use_container_width=True, hide_index=True)
-
+                    
                     # Confirmation buttons
-                    col_confirm1, col_confirm2, col_confirm3 = st.columns([2, 2, 6])
+                    col_confirm1, col_confirm2 = st.columns([1, 1])
                     with col_confirm1:
-                        if st.button("✅ Confirm Price Changes", key="confirm_changes", type="primary"):
-                            st.success(f"Price changes confirmed for {len(changes_summary)} items!")
-                            st.info("Implementation: This will update prices in your system")
+                        if st.button("✅ Confirm All Price Changes", key="confirm_changes", type="primary", use_container_width=True):
+                            st.success(f"✅ Price changes confirmed for {len(changes_summary)} items!")
+                            st.info("💡 Ready for implementation - these changes will be applied to your system")
                             # TODO: Implement actual price update logic here
-
+                    
                     with col_confirm2:
-                        if st.button("🔄 Clear All Changes", key="clear_changes"):
+                        if st.button("🔄 Clear All Changes", key="clear_changes", use_container_width=True):
                             st.session_state.price_changes = {}
+                            # Clean up temp price values
+                            for key in list(st.session_state.keys()):
+                                if key.startswith('temp_price_'):
+                                    del st.session_state[key]
                             st.rerun()
-
-
 
     else:
         st.warning("No data matches your current filters.")
