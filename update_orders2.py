@@ -424,6 +424,35 @@ def run_order_sync(cursor):
     # Archive orders that are no longer in Shopify
     archive_old_orders(cursor, current_shopify_orders)
 
+def remove_done_picks_from_localstock(cursor):
+    """
+    Remove done picks from localstock for orders that have been fulfilled/archived.
+    This prevents completed picks from showing up on the picklist.
+    """
+    log("Removing done picks from localstock...")
+
+    try:
+        # Delete picks from localstock where:
+        # - ordernum is not null and starts with 'BC%' (Brookfield Comfort orders)
+        # - ordernum is not in orderstatus (meaning the order has been fulfilled/archived)
+        cursor.execute("""
+            DELETE FROM localstock
+            WHERE ordernum IS NOT NULL
+              AND ordernum LIKE 'BC%'
+              AND ordernum NOT IN (
+                SELECT DISTINCT ordernum FROM orderstatus
+              )
+        """)
+
+        deleted_count = cursor.rowcount
+        if deleted_count > 0:
+            log(f"Removed {deleted_count} completed picks from localstock")
+        else:
+            log("No done picks found to remove from localstock")
+
+    except Exception as e:
+        log(f"ERROR: Failed to remove completed picks from localstock: {e}")
+
 def archive_old_orders(cursor, current_shopify_orders):
     """
     Archive orders from orderstatus that are no longer in the current Shopify data.
@@ -461,6 +490,9 @@ def archive_old_orders(cursor, current_shopify_orders):
             """, (order_name, shopifysku))
 
             log(f"Archived order {order_name}, SKU {shopifysku}")
+
+        # After archiving orders, remove done picks from localstock
+        remove_done_picks_from_localstock(cursor)
     else:
         log("No orders need to be archived")
 
