@@ -91,6 +91,8 @@ try:
         st.session_state.include_text = ""
     if 'exclude_text' not in st.session_state:
         st.session_state.exclude_text = ""
+    if 'status_changes' not in st.session_state:
+        st.session_state.status_changes = {}
 
     # Filter form
     with st.container():
@@ -158,6 +160,32 @@ try:
             st.metric("Avg Profit", avg_profit_formatted)
 
     st.markdown("---")
+    
+    # Select All / Clear All section - always visible
+    if not st.session_state.filtered_df.empty:
+        selection_info_col1, selection_info_col2 = st.columns([3, 1])
+        with selection_info_col1:
+            if st.session_state.filter_applied:
+                st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {len(st.session_state.selected_rows)} rows")
+            else:
+                st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {len(st.session_state.selected_rows)} rows")
+        
+        with selection_info_col2:
+            # Select All / Clear All buttons
+            current_filtered_codes = set(st.session_state.filtered_df['code'].tolist())
+            
+            if len(st.session_state.selected_rows) == 0:
+                # No items selected - show Select All
+                if st.button("✅ Select All", key="select_all", use_container_width=True):
+                    st.session_state.selected_rows = current_filtered_codes.copy()
+                    st.success(f"✅ Selected all {len(current_filtered_codes)} items")
+                    st.rerun()
+            else:
+                # Items are selected - show Clear Selection
+                if st.button("❌ Clear Selection", key="clear_selection", use_container_width=True):
+                    st.session_state.selected_rows = set()
+                    st.success("✅ Cleared all selections")
+                    st.rerun()
 
     # Pagination
     rows_per_page = 15
@@ -253,7 +281,8 @@ try:
         calculated_height = len(display_data) * approx_row_height + header_height
 
         # Display grid with dynamic key to force refresh after removals
-        grid_key = f'main_grid_{st.session_state.page_number}_{len(st.session_state.filtered_df)}'
+        grid_key = f'main_grid_{st.session_state.page_number}_{len(st.session_state.filtered_df)}_{len(st.session_state.selected_rows)}'
+        
         grid_response = AgGrid(
             display_data,
             gridOptions=grid_options,
@@ -282,11 +311,25 @@ try:
         except Exception:
             st.session_state.selected_rows = set()
 
-        # Status info - now shows accurate selection count
-        if st.session_state.filter_applied:
-            st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {len(st.session_state.selected_rows)} rows")
-        else:
-            st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {len(st.session_state.selected_rows)} rows")
+        # Status info with download options
+        col_info, col_download = st.columns([3, 1])
+
+        with col_info:
+            if st.session_state.filter_applied:
+                st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {len(st.session_state.selected_rows)} rows")
+            else:
+                st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {len(st.session_state.selected_rows)} rows")
+
+        with col_download:
+            # CSV download for current filtered data
+            csv_data = st.session_state.filtered_df.to_csv(index=False)
+            st.download_button(
+                label="📄 Download CSV",
+                data=csv_data,
+                file_name=f"shopify_health_check_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
+                mime="text/csv",
+                help="Download current filtered data as CSV"
+            )
 
         # Selection Management Section - only show if there are actual selections
         if st.session_state.selected_rows and len(st.session_state.selected_rows) > 0:
@@ -296,7 +339,7 @@ try:
             selected_df = df[df['code'].isin(st.session_state.selected_rows)]
             
             # Action buttons in a cleaner layout
-            col1, col2, col3 = st.columns([2, 3, 3])
+            col1, col2, col3, col4 = st.columns([1.5, 2.5, 2.5, 2.5])
             
             with col1:
                 st.markdown("**Remove Items:**")
@@ -308,6 +351,7 @@ try:
                     # Clear all selection-related state
                     st.session_state.selected_rows = set()
                     st.session_state.price_changes = {}
+                    st.session_state.status_changes = {}
                     # Clean up temp price values
                     for key in list(st.session_state.keys()):
                         if key.startswith('temp_price_'):
@@ -315,6 +359,20 @@ try:
                     st.session_state.page_number = 1
                     st.success(f"✅ Removed {len(codes_to_remove)} items from display")
                     st.rerun()
+            
+            with col4:
+                st.markdown("**Status Management:**")
+                col_status1, col_status2 = st.columns(2)
+                with col_status1:
+                    if st.button("📝 Set NEW", key="status_new", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            st.session_state.status_changes[code] = {"status": "NEW", "owner": ""}
+                        st.rerun()
+                with col_status2:
+                    if st.button("👤 Set ASSIGNED", key="status_assigned", use_container_width=True):
+                        # Show assignment form
+                        st.session_state.show_assignment_form = True
+                        st.rerun()
             
             with col2:
                 st.markdown("**Price Increases:**")
@@ -378,6 +436,41 @@ try:
                                     st.session_state.price_changes[code] = new_price
                         st.rerun()
 
+            # Assignment form for ASSIGNED status
+            if hasattr(st.session_state, 'show_assignment_form') and st.session_state.show_assignment_form:
+                st.markdown("---")
+                st.markdown("**👤 Assign to User:**")
+                col_assign1, col_assign2, col_assign3, col_assign4 = st.columns([2, 2, 2, 2])
+                
+                with col_assign1:
+                    if st.button("Andreas", key="assign_andreas", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            st.session_state.status_changes[code] = {"status": "ASSIGNED", "owner": "Andreas"}
+                        st.session_state.show_assignment_form = False
+                        st.success(f"✅ Assigned {len(st.session_state.selected_rows)} items to Andreas")
+                        st.rerun()
+                
+                with col_assign2:
+                    if st.button("Summer", key="assign_summer", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            st.session_state.status_changes[code] = {"status": "ASSIGNED", "owner": "Summer"}
+                        st.session_state.show_assignment_form = False
+                        st.success(f"✅ Assigned {len(st.session_state.selected_rows)} items to Summer")
+                        st.rerun()
+                
+                with col_assign3:
+                    if st.button("Karen", key="assign_karen", use_container_width=True):
+                        for code in st.session_state.selected_rows:
+                            st.session_state.status_changes[code] = {"status": "ASSIGNED", "owner": "Karen"}
+                        st.session_state.show_assignment_form = False
+                        st.success(f"✅ Assigned {len(st.session_state.selected_rows)} items to Karen")
+                        st.rerun()
+                
+                with col_assign4:
+                    if st.button("❌ Cancel", key="cancel_assign", use_container_width=True):
+                        st.session_state.show_assignment_form = False
+                        st.rerun()
+
             # Manual price editing section
             st.markdown("---")
             st.markdown("**Manual Price Editing:**")
@@ -438,48 +531,85 @@ try:
                     st.rerun()
 
             # Price changes summary and confirmation
-            if st.session_state.price_changes:
+            if st.session_state.price_changes or st.session_state.status_changes:
                 st.markdown("---")
-                st.markdown("**📋 Price Changes Summary:**")
                 
-                changes_summary = []
-                for code, new_price in st.session_state.price_changes.items():
-                    item_row = df[df['code'] == code]
-                    if not item_row.empty:
-                        current_price_str = str(item_row.iloc[0]['shopifyprice_current']).replace('£', '').replace(',', '')
-                        try:
-                            current_price = float(current_price_str)
-                            change_pct = ((new_price - current_price) / current_price) * 100
-                            changes_summary.append({
+                # Show price changes if any
+                if st.session_state.price_changes:
+                    st.markdown("**💰 Price Changes Summary:**")
+                    price_changes_summary = []
+                    for code, new_price in st.session_state.price_changes.items():
+                        item_row = df[df['code'] == code]
+                        if not item_row.empty:
+                            current_price_str = str(item_row.iloc[0]['shopifyprice_current']).replace('£', '').replace(',', '')
+                            try:
+                                current_price = float(current_price_str)
+                                change_pct = ((new_price - current_price) / current_price) * 100
+                                price_changes_summary.append({
+                                    'Code': code,
+                                    'Brand': item_row.iloc[0]['brand'],
+                                    'Current Price': f"£{current_price:.2f}",
+                                    'New Price': f"£{new_price:.2f}",
+                                    'Change': f"{change_pct:+.1f}%"
+                                })
+                            except:
+                                pass
+                    
+                    if price_changes_summary:
+                        price_changes_df = pd.DataFrame(price_changes_summary)
+                        st.dataframe(price_changes_df, use_container_width=True, hide_index=True)
+                
+                # Show status changes if any
+                if st.session_state.status_changes:
+                    st.markdown("**📝 Status Changes Summary:**")
+                    status_changes_summary = []
+                    for code, changes in st.session_state.status_changes.items():
+                        item_row = df[df['code'] == code]
+                        if not item_row.empty:
+                            current_status = item_row.iloc[0]['status']
+                            current_owner = item_row.iloc[0]['owner']
+                            new_status = changes['status']
+                            new_owner = changes['owner']
+                            
+                            status_changes_summary.append({
                                 'Code': code,
                                 'Brand': item_row.iloc[0]['brand'],
-                                'Current Price': f"£{current_price:.2f}",
-                                'New Price': f"£{new_price:.2f}",
-                                'Change': f"{change_pct:+.1f}%"
+                                'Current Status': current_status,
+                                'Current Owner': current_owner,
+                                'New Status': new_status,
+                                'New Owner': new_owner if new_owner else '-'
                             })
-                        except:
-                            pass
+                    
+                    if status_changes_summary:
+                        status_changes_df = pd.DataFrame(status_changes_summary)
+                        st.dataframe(status_changes_df, use_container_width=True, hide_index=True)
                 
-                if changes_summary:
-                    changes_df = pd.DataFrame(changes_summary)
-                    st.dataframe(changes_df, use_container_width=True, hide_index=True)
-                    
-                    # Confirmation buttons
-                    col_confirm1, col_confirm2 = st.columns([1, 1])
-                    with col_confirm1:
-                        if st.button("✅ Confirm All Price Changes", key="confirm_changes", type="primary", use_container_width=True):
-                            st.success(f"✅ Price changes confirmed for {len(changes_summary)} items!")
-                            st.info("💡 Ready for implementation - these changes will be applied to your system")
-                            # TODO: Implement actual price update logic here
-                    
-                    with col_confirm2:
-                        if st.button("🔄 Clear All Changes", key="clear_changes", use_container_width=True):
-                            st.session_state.price_changes = {}
-                            # Clean up temp price values
-                            for key in list(st.session_state.keys()):
-                                if key.startswith('temp_price_'):
-                                    del st.session_state[key]
-                            st.rerun()
+                # Combined confirmation buttons
+                total_changes = len(st.session_state.price_changes) + len(st.session_state.status_changes)
+                col_confirm1, col_confirm2 = st.columns([1, 1])
+                with col_confirm1:
+                    if st.button("✅ Confirm All Changes", key="confirm_all_changes", type="primary", use_container_width=True):
+                        change_details = []
+                        if st.session_state.price_changes:
+                            change_details.append(f"{len(st.session_state.price_changes)} price changes")
+                        if st.session_state.status_changes:
+                            change_details.append(f"{len(st.session_state.status_changes)} status changes")
+                        
+                        st.success(f"✅ Confirmed {' and '.join(change_details)}!")
+                        st.info("💡 Ready for implementation - these changes will be applied to your system")
+                        # TODO: Implement actual price and status update logic here
+                
+                with col_confirm2:
+                    if st.button("🔄 Clear All Changes", key="clear_all_changes", use_container_width=True):
+                        st.session_state.price_changes = {}
+                        st.session_state.status_changes = {}
+                        # Clean up temp price values
+                        for key in list(st.session_state.keys()):
+                            if key.startswith('temp_price_'):
+                                del st.session_state[key]
+                        if hasattr(st.session_state, 'show_assignment_form'):
+                            st.session_state.show_assignment_form = False
+                        st.rerun()
 
     else:
         st.warning("No data matches your current filters.")
