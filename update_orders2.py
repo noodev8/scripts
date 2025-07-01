@@ -308,8 +308,9 @@ def run_pick_allocation(cursor):
 def run_order_sync(cursor):
     url = f"https://{SHOP_DOMAIN}/admin/api/2024-01/orders.json"
     headers = {"X-Shopify-Access-Token": ACCESS_TOKEN}
+    # Note: We'll fetch all open unfulfilled orders and filter by financial_status in code
+    # to include both "paid" and "partially_refunded" orders
     params = {
-        "financial_status": "paid",
         "fulfillment_status": "unfulfilled",
         "limit": 250,
         "status": "open"
@@ -327,7 +328,10 @@ def run_order_sync(cursor):
     # Track current orders from Shopify to identify orders to archive
     current_shopify_orders = set()
     for order in orders:
-        if order.get("financial_status") != "paid" or \
+        # Allow both "paid" and "partially_refunded" orders (e.g., when shipping is refunded)
+        # but exclude cancelled or fulfilled orders
+        financial_status = order.get("financial_status")
+        if financial_status not in ["paid", "partially_refunded"] or \
            order.get("fulfillment_status") not in ["unfulfilled", None] or \
            order.get("cancel_reason") is not None:
             continue
