@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from db_utils import query_health_check
 
 st.set_page_config(
@@ -75,13 +76,18 @@ try:
     # Load all data
     df = query_health_check()
 
-    # Initialize session state for filters
+    # Initialize session state for filters and selections
     if 'filtered_df' not in st.session_state:
-        st.session_state.filtered_df = df
+        # Sort by annual_profit DESC initially
+        st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
     if 'filter_applied' not in st.session_state:
         st.session_state.filter_applied = False
     if 'clear_inputs' not in st.session_state:
         st.session_state.clear_inputs = False
+    if 'selected_rows' not in st.session_state:
+        st.session_state.selected_rows = set()
+    if 'last_filter_state' not in st.session_state:
+        st.session_state.last_filter_state = ""
 
     # Filter controls in a clean container
     with st.container():
@@ -109,11 +115,19 @@ try:
                 st.markdown("<br>", unsafe_allow_html=True)  # Add some spacing
                 reset_clicked = st.form_submit_button("🔄 Reset", help="Clear all filters and reload data", use_container_width=True)
 
+    # Check if filters have changed (to reset selections)
+    current_filter_state = f"{include_text}|{exclude_text}"
+    if current_filter_state != st.session_state.last_filter_state:
+        st.session_state.selected_rows = set()  # Reset selections when filters change
+        st.session_state.last_filter_state = current_filter_state
+
     # Handle filter button or form submission (Enter/Tab)
     if filter_clicked or (include_text.strip() or exclude_text.strip()):
         # Apply filters to current filtered dataset (progressive filtering)
         current_df = st.session_state.filtered_df if st.session_state.filter_applied else df
-        st.session_state.filtered_df = filter_dataframe(current_df, include_text, exclude_text)
+        filtered_result = filter_dataframe(current_df, include_text, exclude_text)
+        # Sort by annual_profit DESC after filtering
+        st.session_state.filtered_df = filtered_result.sort_values('annual_profit', ascending=False) if 'annual_profit' in filtered_result.columns else filtered_result
         st.session_state.filter_applied = True
 
     # Handle reset button
@@ -121,6 +135,7 @@ try:
         # Sort by annual_profit DESC when resetting
         st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
         st.session_state.filter_applied = False
+        st.session_state.selected_rows = set()  # Clear selections on reset
 
     # Calculate and show statistics
     current_stats = calculate_filter_stats(st.session_state.filtered_df)
@@ -146,38 +161,153 @@ try:
             avg_profit_formatted = f"£{current_stats['avg_annual_profit']:,.0f}"
             st.metric("Avg Profit", avg_profit_formatted)
 
-    # Show filter results
+    # Show filter results and selection count
+    selection_count = len(st.session_state.selected_rows)
     if st.session_state.filter_applied:
-        st.info(f"Showing {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering")
+        st.info(f"Found {len(st.session_state.filtered_df):,} of {len(df):,} rows after filtering | Selected: {selection_count} rows")
     else:
-        st.info(f"Showing all {len(df):,} rows (sorted by annual profit)")
+        st.info(f"Showing all {len(df):,} rows (sorted by annual profit) | Selected: {selection_count} rows")
 
     st.markdown("---")
 
-    # Use filtered data
-    columns_to_show = [
-        "code",
-        "brand",
-        "owner",
-        "status",
-        "last_reviewed",
-        "notes",
-        "sold_qty",
-        "annual_profit",
-        "profit_per_unit",
-        "segment",
-        "local_stock",
-        "shopifyprice_current",
-        "rrp",
-        "sales_30d",
-        "sales_90d",
-        "sales_velocity_per_day",
-        "days_of_stock_left",
-        "recommended_restock_qty"
-    ]
+    # Pagination setup
+    if 'page_number' not in st.session_state:
+        st.session_state.page_number = 1
+
+    rows_per_page = 25
+    total_rows = len(st.session_state.filtered_df)
+    total_pages = max(1, (total_rows + rows_per_page - 1) // rows_per_page)
 
     if not st.session_state.filtered_df.empty:
-        st.dataframe(st.session_state.filtered_df[columns_to_show], use_container_width=True)
+        # Pagination controls
+        col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+
+        with col1:
+            if st.button("⏮️ First", disabled=(st.session_state.page_number == 1)):
+                st.session_state.page_number = 1
+                st.rerun()
+
+        with col2:
+            if st.button("◀️ Prev", disabled=(st.session_state.page_number == 1)):
+                st.session_state.page_number -= 1
+                st.rerun()
+
+        with col3:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'><strong>Page {st.session_state.page_number} of {total_pages}</strong><br><small>Showing rows {(st.session_state.page_number-1)*rows_per_page + 1} to {min(st.session_state.page_number*rows_per_page, total_rows)} of {total_rows}</small></div>", unsafe_allow_html=True)
+
+        with col4:
+            if st.button("▶️ Next", disabled=(st.session_state.page_number == total_pages)):
+                st.session_state.page_number += 1
+                st.rerun()
+
+        with col5:
+            if st.button("⏭️ Last", disabled=(st.session_state.page_number == total_pages)):
+                st.session_state.page_number = total_pages
+                st.rerun()
+
+        # Calculate page slice
+        start_idx = (st.session_state.page_number - 1) * rows_per_page
+        end_idx = start_idx + rows_per_page
+        page_data = st.session_state.filtered_df.iloc[start_idx:end_idx]
+
+        # Display data for current page
+        columns_to_show = [
+            "code",
+            "brand",
+            "owner",
+            "status",
+            "segment",
+            "annual_profit",
+            "profit_per_unit",
+            "local_stock",
+            "total_stock",
+            "shopifyprice_current",
+            "rrp",
+            "sales_30d",
+            "sales_90d",
+            "sales_velocity_per_day",
+            "days_of_stock_left",
+            "recommended_action",
+            "last_reviewed",
+            "notes",
+            "sold_qty"
+        ]
+
+        # Create clean HTML table without checkboxes
+        def create_clean_table(df, columns):
+            html = """
+            <style>
+            .custom-table {
+                width: auto;
+                min-width: 1400px;
+                border-collapse: collapse;
+                font-family: 'Source Sans Pro', sans-serif;
+                font-size: 14px;
+            }
+            .custom-table th, .custom-table td {
+                border: 1px solid #e0e0e0;
+                padding: 8px 12px;
+                text-align: left;
+                white-space: nowrap;
+                min-width: 120px;
+            }
+            .custom-table th {
+                background-color: #f0f2f6;
+                font-weight: 600;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+            .custom-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            .custom-table tr:hover {
+                background-color: #e8f4f8;
+            }
+            .custom-table th:first-child, .custom-table td:first-child {
+                min-width: 100px;
+            }
+            .custom-table th:nth-child(2), .custom-table td:nth-child(2) {
+                min-width: 140px;
+            }
+            .custom-table th:nth-child(6), .custom-table td:nth-child(6) {
+                min-width: 100px;
+            }
+            .custom-table th:nth-child(16), .custom-table td:nth-child(16) {
+                min-width: 150px;
+            }
+            </style>
+            <table class="custom-table">
+            <thead><tr>
+            """
+
+            # Add headers
+            for col in columns:
+                html += f"<th>{col}</th>"
+            html += "</tr></thead><tbody>"
+
+            # Add data rows
+            for _, row in df.iterrows():
+                html += "<tr>"
+                for col in columns:
+                    value = row[col]
+                    if pd.isna(value):
+                        value = ""
+                    html += f"<td>{value}</td>"
+                html += "</tr>"
+
+            html += "</tbody></table>"
+            return html
+
+        # Display the clean table
+        table_html = create_clean_table(page_data, columns_to_show)
+        st.markdown(table_html, unsafe_allow_html=True)
+
+        # Reset page number when filters change
+        if st.session_state.filter_applied and st.session_state.page_number > total_pages:
+            st.session_state.page_number = 1
+            st.rerun()
+
     else:
         st.warning("No data matches your current filters.")
 

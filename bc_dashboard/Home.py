@@ -20,39 +20,9 @@ try:
 
     st.markdown("---")
 
-    # Two column layout for detailed tables
-    col_left, col_right = st.columns(2)
-
-    with col_left:
-        st.markdown("## Top Performers (Annual Profit)")
-        if not top_performers.empty:
-            # Format the dataframe for display
-            display_df = top_performers.copy()
-            display_df['annual_profit'] = display_df['annual_profit'].apply(lambda x: f"£{x:,.0f}" if x else "£0")
-            display_df['sales_velocity_per_day'] = display_df['sales_velocity_per_day'].apply(lambda x: f"{x:.2f}" if x else "0.00")
-
-            st.dataframe(
-                display_df[['code', 'brand', 'segment', 'annual_profit', 'sales_30d', 'local_stock']],
-                use_container_width=True,
-                hide_index=True
-            )
-        else:
-            st.info("No data available")
-
-    with col_right:
-        st.markdown("## Items Needing Attention")
-        if not attention_items.empty:
-            # Format the dataframe for display
-            display_df = attention_items.copy()
-            display_df['annual_profit'] = display_df['annual_profit'].apply(lambda x: f"£{x:,.0f}" if x else "£0")
-
-            st.dataframe(
-                display_df[['code', 'brand', 'recommended_action', 'annual_profit', 'total_stock', 'sales_30d']],
-                use_container_width=True,
-                hide_index=True
-            )
-        else:
-            st.info("All items are OK")
+    # Placeholder for future charts and analytics
+    st.markdown("## Analytics Dashboard")
+    st.info("📊 Charts and analytics coming soon - will include multi-platform insights when Amazon integration is added")
 
 except Exception as e:
     st.error(f"Error loading dashboard data: {e}")
