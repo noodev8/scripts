@@ -13,7 +13,7 @@ SELECT
         WHEN l.channel = 'AMZ' THEN COALESCE(af.amztotal, 0)
         ELSE 0
     END AS stock_level
-FROM losers l
+FROM perfromance l
 LEFT JOIN localstock ls
   ON l.code = ls.code
 LEFT JOIN amzfeed af
@@ -34,7 +34,7 @@ SELECT
         WHEN l.channel = 'AMZ' THEN COALESCE(af.amztotal, 0)
         ELSE 0
     END AS stock_level
-FROM losers l
+FROM performance l
 LEFT JOIN localstock ls
   ON l.code = ls.code
 LEFT JOIN amzfeed af
@@ -56,7 +56,7 @@ SELECT
         WHEN l.channel = 'AMZ' THEN COALESCE(af.amztotal, 0)
         ELSE 0
     END AS stock_level
-FROM losers l
+FROM performance l
 LEFT JOIN localstock ls
   ON l.code = ls.code
 LEFT JOIN amzfeed af

@@ -1,35 +1,26 @@
--- First, clear old losers data
-DELETE FROM losers;
+-- performance table:
+--   segment: 'Winner' or 'Loser', based on profit threshold
+--   fail_reason: reason for failing (if loser)
+--   status: workflow tag (e.g. New, Fix planned, Active, Ignored, Waiting, Dropped, Promote)
+--   notes: free text field for collaboration and explanation
 
--- Now insert fresh diagnostic data
 WITH sales_summary AS (
-
     SELECT
         s.code,
         s.channel,
         ss.groupid,
         ss.brand,
-
-        -- Net quantity sold
         SUM(s.qty) AS net_qty,
-
-        -- Net revenue excluding VAT
         ROUND(
             SUM(
-                CASE 
-                    WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
-                    ELSE s.soldprice * s.qty
-                END
+                CASE WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
+                     ELSE s.soldprice * s.qty END
             ), 2
         ) AS net_revenue,
-
-        -- Net profit
         ROUND(
             SUM(
-                CASE 
-                    WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
-                    ELSE s.soldprice * s.qty
-                END
+                CASE WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
+                     ELSE s.soldprice * s.qty END
             )
             - SUM(COALESCE(ss.cost::NUMERIC, 0) * s.qty)
             - SUM(
@@ -43,27 +34,21 @@ WITH sales_summary AS (
                         + 1
                         + 0.5
                     ) * ABS(s.qty)
-
                     WHEN s.channel = 'SHP' THEN (
                         0.3
                         + 0.029 * s.soldprice
                         + 0.5
                         + 3.44
                     ) * ABS(s.qty)
-
                     ELSE 0
                 END
             ), 2
         ) AS net_profit,
-
-        -- Profit per unit
         ROUND(
             (
                 SUM(
-                    CASE 
-                        WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
-                        ELSE s.soldprice * s.qty
-                    END
+                    CASE WHEN ss.tax = 1 THEN (s.soldprice / 1.2) * s.qty
+                         ELSE s.soldprice * s.qty END
                 )
                 - SUM(COALESCE(ss.cost::NUMERIC, 0) * s.qty)
                 - SUM(
@@ -77,37 +62,27 @@ WITH sales_summary AS (
                             + 1
                             + 0.5
                         ) * ABS(s.qty)
-
                         WHEN s.channel = 'SHP' THEN (
                             0.3
                             + 0.029 * s.soldprice
                             + 0.5
                             + 3.44
                         ) * ABS(s.qty)
-
                         ELSE 0
                     END
                 )
-            ) / NULLIF(SUM(s.qty), 0)
-        , 2) AS profit_per_unit
-
+            ) / NULLIF(SUM(s.qty), 0), 2
+        ) AS profit_per_unit
     FROM sales s
     JOIN skusummary ss ON s.groupid = ss.groupid
     WHERE s.solddate >= CURRENT_DATE - INTERVAL '365 days'
       AND s.soldprice > 0
     GROUP BY s.code, s.channel, ss.groupid, ss.brand
 )
-
-INSERT INTO losers (
-    code,
-    channel,
-    groupid,
-    brand,
-    sold_qty,
-    revenue,
-    annual_profit,
-    profit_per_unit,
-    fail_reason
+INSERT INTO performance (
+    code, channel, groupid, brand,
+    sold_qty, revenue, annual_profit, profit_per_unit,
+    segment, fail_reason
 )
 SELECT
     code,
@@ -119,11 +94,23 @@ SELECT
     net_profit,
     profit_per_unit,
     CASE
+        WHEN net_profit >= 100 THEN 'Winner'
+        ELSE 'Loser'
+    END AS segment,
+    CASE
         WHEN net_profit < 0 THEN 'Negative profit'
         WHEN net_profit < 100 THEN 'Low profit'
         WHEN net_qty <= 0 THEN 'No sales'
-        ELSE 'Unknown'
+        ELSE NULL
     END AS fail_reason
 FROM sales_summary
-WHERE net_profit < 100
-ORDER BY net_profit ASC;
+ON CONFLICT (code, channel) DO UPDATE
+SET
+    groupid = EXCLUDED.groupid,
+    brand = EXCLUDED.brand,
+    sold_qty = EXCLUDED.sold_qty,
+    revenue = EXCLUDED.revenue,
+    annual_profit = EXCLUDED.annual_profit,
+    profit_per_unit = EXCLUDED.profit_per_unit,
+    segment = EXCLUDED.segment,
+    fail_reason = EXCLUDED.fail_reason;
