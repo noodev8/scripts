@@ -84,7 +84,7 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
         # Extract sales data
         soldprice = float(item.get("price", 0))
         solddate = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date()
-        ordertime = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).strftime("%H:%M:%S")
+        ordertime = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).strftime("%H:%M")
         paytype = ",".join(order.get("payment_gateway_names", [])) or "UNKNOWN"
         title = safe(item.get("title"))
 
