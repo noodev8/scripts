@@ -67,7 +67,7 @@ def determine_product_type(gender, titledetail):
 # Cleanup function removed - handled by shared logging system
 
 
-def determine_stock_availability(localstock_qty, localstock_deleted, amzlive, ukdstock):
+def determine_stock_availability(localstock_qty, localstock_deleted, amzlive, ukdstock, code=None):
     """
     Determine stock availability based on priority:
     1. localstock (qty > 0 and deleted = 0)
@@ -101,7 +101,8 @@ def generate_feed():
             sm.material, sm.cost, sm.rrp, sm.handle, sm.googlecampaign,
             a.gender, t.shopifytitle AS title,
             m.code, m.variantlink, m.uksize, m.ean, m.googleid,
-            ls.qty as localstock_qty, ls.deleted as localstock_deleted,
+            COALESCE(SUM(CASE WHEN ls.deleted = 0 THEN ls.qty ELSE 0 END), 0) as localstock_qty,
+            CASE WHEN COUNT(CASE WHEN ls.deleted = 0 THEN 1 END) > 0 THEN 0 ELSE 1 END as localstock_deleted,
             af.amzlive, uk.stock as ukdstock
         FROM skusummary sm
         JOIN skumap m ON sm.groupid = m.groupid
@@ -111,6 +112,10 @@ def generate_feed():
         LEFT JOIN amzfeed af ON af.code = m.code
         LEFT JOIN ukdstock uk ON uk.code = m.code
         WHERE sm.googlestatus = 1 AND sm.shopify = 1 AND m.googlestatus = 1
+        GROUP BY sm.groupid, sm.shopifyprice, sm.imagename, sm.brand, sm.colour,
+                 sm.material, sm.cost, sm.rrp, sm.handle, sm.googlecampaign,
+                 a.gender, t.shopifytitle, m.code, m.variantlink, m.uksize, m.ean, m.googleid,
+                 af.amzlive, uk.stock
     """)
 
     rows = cur.fetchall()

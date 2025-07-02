@@ -66,68 +66,33 @@ try:
         st.session_state.include_text = ""
     if 'exclude_text' not in st.session_state:
         st.session_state.exclude_text = ""
-    if 'review_filter' not in st.session_state:
-        st.session_state.review_filter = "All"
+
 
     # Filter form
     with st.container():
         with st.form(key="filter_form"):
-            col1, col2, col3, col4, col5 = st.columns([2.5, 2.5, 2, 1.5, 1.5])
+            col1, col2, col3, col4 = st.columns([3, 3, 1.5, 1.5])
             with col1:
                 include_text = st.text_input("Include:", value=st.session_state.include_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col2:
                 exclude_text = st.text_input("Exclude:", value=st.session_state.exclude_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col3:
-                review_filter = st.selectbox(
-                    "Review Status:",
-                    options=["All", "Pending (10+ days)", "Current (≤10 days)"],
-                    index=["All", "Pending (10+ days)", "Current (≤10 days)"].index(st.session_state.review_filter),
-                    help="Filter by review age"
-                )
-            with col4:
                 st.markdown("<br>", unsafe_allow_html=True)
                 filter_clicked = st.form_submit_button("🔍 Filter", use_container_width=True)
-            with col5:
+            with col4:
                 st.markdown("<br>", unsafe_allow_html=True)
                 reset_clicked = st.form_submit_button("🔄 Reset", use_container_width=True)
 
     # Handle filtering
     if filter_clicked:
-        current_df = df.copy()  # Always start from full dataset
-
-        # Apply review filter
-        if review_filter != "All" and 'last_reviewed' in current_df.columns:
-            # Convert last_reviewed to datetime, handling various formats
-            current_df['last_reviewed_dt'] = pd.to_datetime(current_df['last_reviewed'], errors='coerce')
-            # Create timezone-naive comparison date
-            ten_days_ago = pd.Timestamp.now().tz_localize(None) - pd.Timedelta(days=10)
-
-            # Make sure both sides are timezone-naive for comparison
-            current_df['last_reviewed_dt'] = current_df['last_reviewed_dt'].dt.tz_localize(None)
-
-            if review_filter == "Pending (10+ days)":
-                # Show items reviewed more than 10 days ago OR never reviewed (null)
-                current_df = current_df[
-                    (current_df['last_reviewed_dt'] < ten_days_ago) |
-                    (current_df['last_reviewed_dt'].isna())
-                ]
-            elif review_filter == "Current (≤10 days)":
-                # Show items reviewed within the last 10 days
-                current_df = current_df[
-                    (current_df['last_reviewed_dt'] >= ten_days_ago) &
-                    (current_df['last_reviewed_dt'].notna())
-                ]
+        # Start from current filtered data if filters are already applied, otherwise start from full dataset
+        current_df = st.session_state.filtered_df.copy() if st.session_state.filter_applied else df.copy()
 
         # Apply text filters
         filtered_result = filter_dataframe(current_df, include_text, exclude_text)
 
-        # Clean up temporary datetime column if it exists
-        if 'last_reviewed_dt' in filtered_result.columns:
-            filtered_result = filtered_result.drop('last_reviewed_dt', axis=1)
-
         st.session_state.filtered_df = filtered_result.sort_values('annual_profit', ascending=False) if 'annual_profit' in filtered_result.columns else filtered_result
         st.session_state.filter_applied = True
-        st.session_state.review_filter = review_filter
         st.session_state.page_number = 1
         # Clear the text fields for next use
         st.session_state.include_text = ""
@@ -137,7 +102,6 @@ try:
     if reset_clicked:
         st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
         st.session_state.filter_applied = False
-        st.session_state.review_filter = "All"
         st.session_state.page_number = 1
         # Clear the text fields
         st.session_state.include_text = ""
@@ -186,11 +150,11 @@ try:
         page_data = st.session_state.filtered_df.iloc[start_idx:end_idx].copy()
 
         columns_to_show = [
-            "code", "brand", "owner", "status", "segment",
+            "code", "groupid", "brand", "owner", "status", "segment",
             "annual_profit", "profit_per_unit", "local_stock", "total_stock",
             "shopifyprice_current", "rrp", "sales_30d", "sales_90d",
             "sales_velocity_per_day", "days_of_stock_left", "recommended_action",
-            "last_reviewed", "notes", "sold_qty"
+            "notes", "sold_qty"
         ]
         display_data = page_data[columns_to_show].copy()
 
@@ -212,13 +176,16 @@ try:
                 lambda x: f"£{x}" if pd.notna(x) and str(x).strip() != '' else ""
             )
 
+
+
         st.markdown("<br>", unsafe_allow_html=True)
 
         # Configure AgGrid
         gb = GridOptionsBuilder.from_dataframe(display_data)
 
         # Configure columns
-        gb.configure_column("code", headerName="Code", width=120, pinned="left")
+        gb.configure_column("code", headerName="Code", width=120, pinned="left", cellStyle={'textAlign': 'center'})
+        gb.configure_column("groupid", headerName="Group ID", width=120, cellStyle={'textAlign': 'center'})
         gb.configure_column("brand", headerName="Brand", width=140)
         gb.configure_column("owner", headerName="Owner", width=100, cellStyle={'textAlign': 'center'})
         gb.configure_column("status", headerName="Status", width=100, cellStyle={'textAlign': 'center'})
@@ -234,7 +201,6 @@ try:
         gb.configure_column("sales_velocity_per_day", headerName="Daily Velocity", width=110, cellStyle={'textAlign': 'center'})
         gb.configure_column("days_of_stock_left", headerName="Days Stock Left", width=120, cellStyle={'textAlign': 'center'})
         gb.configure_column("recommended_action", headerName="Recommended Action", width=150, cellStyle={'textAlign': 'center'})
-        gb.configure_column("last_reviewed", headerName="Last Reviewed", width=120, cellStyle={'textAlign': 'center'})
         gb.configure_column("notes", headerName="Notes", width=200)
         gb.configure_column("sold_qty", headerName="Sold Qty", width=100, cellStyle={'textAlign': 'center'})
 
@@ -261,6 +227,8 @@ try:
             key=grid_key
         )
 
+
+
         # Download options
         col_download1, col_download2 = st.columns(2)
 
@@ -276,15 +244,15 @@ try:
             )
 
         with col_download2:
-            # GroupID export - only code and groupid columns
+            # GroupID export - only code and groupid columns from filtered data
             if 'code' in st.session_state.filtered_df.columns and 'groupid' in st.session_state.filtered_df.columns:
                 groupid_data = st.session_state.filtered_df[['code', 'groupid']].to_csv(index=False)
                 st.download_button(
-                    label="🏷️ GroupID Export",
+                    label=f"🏷️ GroupID Export ({len(st.session_state.filtered_df)} rows)",
                     data=groupid_data,
                     file_name=f"groupid_export_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
-                    help="Download code and groupid only"
+                    help="Download code and groupid from current filtered data"
                 )
 
     else:
