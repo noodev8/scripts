@@ -42,9 +42,13 @@ def filter_dataframe(df, include_text, exclude_text):
 def calculate_filter_stats(df):
     if df.empty:
         return {}
+    total_items = len(df)
+    winners = len(df[df['segment'] == 'Winner']) if 'segment' in df.columns else 0
+    winners_percentage = (winners / total_items * 100) if total_items > 0 else 0
     stats = {
-        'total_items': len(df),
-        'winners': len(df[df['segment'] == 'Winner']) if 'segment' in df.columns else 0
+        'total_items': total_items,
+        'winners': winners,
+        'winners_percentage': winners_percentage
     }
     return stats
 
@@ -62,28 +66,68 @@ try:
         st.session_state.include_text = ""
     if 'exclude_text' not in st.session_state:
         st.session_state.exclude_text = ""
+    if 'review_filter' not in st.session_state:
+        st.session_state.review_filter = "All"
 
     # Filter form
     with st.container():
         with st.form(key="filter_form"):
-            col1, col2, col3, col4 = st.columns([3, 3, 1.5, 1.5])
+            col1, col2, col3, col4, col5 = st.columns([2.5, 2.5, 2, 1.5, 1.5])
             with col1:
                 include_text = st.text_input("Include:", value=st.session_state.include_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col2:
                 exclude_text = st.text_input("Exclude:", value=st.session_state.exclude_text, help="Search in code, brand, owner, status, segment, recommended_action, title")
             with col3:
+                review_filter = st.selectbox(
+                    "Review Status:",
+                    options=["All", "Pending (10+ days)", "Current (≤10 days)"],
+                    index=["All", "Pending (10+ days)", "Current (≤10 days)"].index(st.session_state.review_filter),
+                    help="Filter by review age"
+                )
+            with col4:
                 st.markdown("<br>", unsafe_allow_html=True)
                 filter_clicked = st.form_submit_button("🔍 Filter", use_container_width=True)
-            with col4:
+            with col5:
                 st.markdown("<br>", unsafe_allow_html=True)
                 reset_clicked = st.form_submit_button("🔄 Reset", use_container_width=True)
 
     # Handle filtering
     if filter_clicked:
-        current_df = st.session_state.filtered_df if st.session_state.filter_applied else df
+        current_df = df.copy()  # Always start from full dataset
+
+        # Apply review filter
+        if review_filter != "All" and 'last_reviewed' in current_df.columns:
+            # Convert last_reviewed to datetime, handling various formats
+            current_df['last_reviewed_dt'] = pd.to_datetime(current_df['last_reviewed'], errors='coerce')
+            # Create timezone-naive comparison date
+            ten_days_ago = pd.Timestamp.now().tz_localize(None) - pd.Timedelta(days=10)
+
+            # Make sure both sides are timezone-naive for comparison
+            current_df['last_reviewed_dt'] = current_df['last_reviewed_dt'].dt.tz_localize(None)
+
+            if review_filter == "Pending (10+ days)":
+                # Show items reviewed more than 10 days ago OR never reviewed (null)
+                current_df = current_df[
+                    (current_df['last_reviewed_dt'] < ten_days_ago) |
+                    (current_df['last_reviewed_dt'].isna())
+                ]
+            elif review_filter == "Current (≤10 days)":
+                # Show items reviewed within the last 10 days
+                current_df = current_df[
+                    (current_df['last_reviewed_dt'] >= ten_days_ago) &
+                    (current_df['last_reviewed_dt'].notna())
+                ]
+
+        # Apply text filters
         filtered_result = filter_dataframe(current_df, include_text, exclude_text)
+
+        # Clean up temporary datetime column if it exists
+        if 'last_reviewed_dt' in filtered_result.columns:
+            filtered_result = filtered_result.drop('last_reviewed_dt', axis=1)
+
         st.session_state.filtered_df = filtered_result.sort_values('annual_profit', ascending=False) if 'annual_profit' in filtered_result.columns else filtered_result
         st.session_state.filter_applied = True
+        st.session_state.review_filter = review_filter
         st.session_state.page_number = 1
         # Clear the text fields for next use
         st.session_state.include_text = ""
@@ -93,6 +137,7 @@ try:
     if reset_clicked:
         st.session_state.filtered_df = df.sort_values('annual_profit', ascending=False) if 'annual_profit' in df.columns else df
         st.session_state.filter_applied = False
+        st.session_state.review_filter = "All"
         st.session_state.page_number = 1
         # Clear the text fields
         st.session_state.include_text = ""
@@ -105,7 +150,7 @@ try:
         with col1:
             st.metric("Total Items", f"{current_stats['total_items']}")
         with col2:
-            st.metric("Winners", f"{current_stats['winners']}")
+            st.metric("Winners", f"{current_stats['winners']} ({current_stats['winners_percentage']:.1f}%)")
 
     st.markdown("---")
 
@@ -217,18 +262,30 @@ try:
         )
 
         # Download options
-        col_download = st.columns([1])[0]
+        col_download1, col_download2 = st.columns(2)
 
-        with col_download:
-            # CSV download for current filtered data
+        with col_download1:
+            # Full CSV download for current filtered data
             csv_data = st.session_state.filtered_df.to_csv(index=False)
             st.download_button(
-                label="📄 Download CSV",
+                label="📄 Full Export",
                 data=csv_data,
                 file_name=f"shopify_health_check_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
                 mime="text/csv",
                 help="Download current filtered data as CSV"
             )
+
+        with col_download2:
+            # GroupID export - only code and groupid columns
+            if 'code' in st.session_state.filtered_df.columns and 'groupid' in st.session_state.filtered_df.columns:
+                groupid_data = st.session_state.filtered_df[['code', 'groupid']].to_csv(index=False)
+                st.download_button(
+                    label="🏷️ GroupID Export",
+                    data=groupid_data,
+                    file_name=f"groupid_export_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
+                    mime="text/csv",
+                    help="Download code and groupid only"
+                )
 
     else:
         st.warning("No data matches your current filters.")
