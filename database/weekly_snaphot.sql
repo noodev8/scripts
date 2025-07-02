@@ -1,8 +1,11 @@
 WITH this_week AS (
-    SELECT TO_CHAR(CURRENT_DATE, 'IYYY-"W"IW') AS year_week
+    SELECT
+        TO_CHAR(CURRENT_DATE, 'IYYY-"W"IW') AS year_week,
+        CURRENT_DATE AS snapshot_date
 ), source AS (
     SELECT
         this_week.year_week,
+        this_week.snapshot_date,
         gp.*
     FROM groupid_performance gp, this_week
 ), to_insert AS (
@@ -16,6 +19,7 @@ WITH this_week AS (
 )
 INSERT INTO groupid_performance_week (
     year_week,
+    snapshot_date,
     groupid,
     channel,
     annual_profit,
@@ -28,6 +32,7 @@ INSERT INTO groupid_performance_week (
 )
 SELECT
     year_week,
+    snapshot_date,
     groupid,
     channel,
     annual_profit,
