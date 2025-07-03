@@ -16,7 +16,8 @@ LOG_ARCHIVE_DAYS = 3  # Keep 3 days of archived logs
 def get_db_config():
     """Load database configuration from .env file"""
     # Load environment variables from .env file
-    load_dotenv('.env')
+    #load_dotenv('.env')
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
     # Get database configuration from environment variables
     db_config = {

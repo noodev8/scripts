@@ -19,7 +19,7 @@ from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- SHOPIFY CONFIGURATION ---
 # Load environment variables from .env
-load_dotenv('.env')
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -31,7 +31,7 @@ if not ACCESS_TOKEN:
     raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
 
 # --- GOOGLE CONFIGURATION ---
-GOOGLE_SERVICE_ACCOUNT_FILE = 'merchant-feed-api-462809-23c712978791.json'
+GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'merchant-feed-api-462809-23c712978791.json')
 GOOGLE_MERCHANT_ID = '124941872'
 GOOGLE_SCOPES = ['https://www.googleapis.com/auth/content']
 

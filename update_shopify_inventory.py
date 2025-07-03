@@ -65,7 +65,7 @@ from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- CONFIGURATION ---
 # Load environment variables from .env
-load_dotenv('.env')
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"

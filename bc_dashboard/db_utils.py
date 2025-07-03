@@ -5,7 +5,7 @@ import streamlit as st
 from sqlalchemy import create_engine
 
 # Load .env variables
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Build SQLAlchemy connection string
 def get_sqlalchemy_engine():

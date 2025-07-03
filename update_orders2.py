@@ -9,7 +9,7 @@ from logging_utils import get_db_config, manage_log_files, create_logger
 import sys
 
 # === CONFIGURATION ===
-load_dotenv('.env')
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 SHOP_DOMAIN = "brookfieldcomfort2.myshopify.com"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ORDERS_ACCESS_TOKEN')
 
