@@ -370,9 +370,9 @@ def log_price_change_to_db(groupid, old_price, new_price, reason="PRICE_UPDATE_S
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (groupid, old_price, new_price, reason, "PRICE_UPDATE", datetime.now().date()))
 
-        conn.commit()
-        cur.close()
-        conn.close()
+        # conn.commit()
+        # cur.close()
+        # conn.close()
 
         return True
 
