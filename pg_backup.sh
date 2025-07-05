@@ -18,3 +18,7 @@ gzip -f $BACKUP_DIR/*.dump
 
 # Delete backups older than 3 days
 find "$BACKUP_DIR" -type f -mtime +3 -delete
+
+# Upload to Google Drive
+rclone copy "$BACKUP_DIR" bcgoogle:ServerBackups
+
