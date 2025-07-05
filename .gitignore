@@ -78,3 +78,8 @@ __pycache__/
 GOOGLE-DATA-Merchant.txt
 DB_Schema.sql
 price_change_logic.md
+
+# Database backup
+*.dump
+*.gz
+
