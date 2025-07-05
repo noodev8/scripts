@@ -117,7 +117,6 @@ INSERT INTO groupid_performance (
     annual_profit,
     sold_qty,
     avg_profit_per_unit,
-    status,
     owner
 )
 SELECT
@@ -126,7 +125,6 @@ SELECT
     total_profit,
     total_sold_qty,
     avg_profit_per_unit,
-    'NEW' AS status,
     NULL AS owner
 FROM groupid_sales
 ON CONFLICT (groupid, channel) DO UPDATE

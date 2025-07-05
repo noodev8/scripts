@@ -26,7 +26,6 @@ INSERT INTO groupid_performance_week (
     annual_profit,
     sold_qty,
     avg_profit_per_unit,
-    status,
     segment,
     notes,
     owner
@@ -40,7 +39,6 @@ SELECT
     annual_profit,
     sold_qty,
     avg_profit_per_unit,
-    status,
     segment,
     notes,
     owner

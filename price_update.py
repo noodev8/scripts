@@ -24,7 +24,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
-LOG_RETENTION = 7  # days
+LOG_RETENTION = 3  # days
 
 # Validate that the access token was loaded
 if not ACCESS_TOKEN:
