@@ -16,5 +16,5 @@ done
 # Compress all .dump files
 gzip -f $BACKUP_DIR/*.dump
 
-# Delete backups older than 7 days
-find "$BACKUP_DIR" -type f -mtime +7 -delete
+# Delete backups older than 3 days
+find "$BACKUP_DIR" -type f -mtime +3 -delete
