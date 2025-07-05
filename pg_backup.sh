@@ -1,25 +1,26 @@
 #!/bin/bash
 
 BACKUP_DIR="/apps/scripts/database"
-DATE=$(date +%Y-%m-%d)
 
-# Make sure backup folder exists
+# Make sure the backup directory exists
 mkdir -p "$BACKUP_DIR"
 
-# Remove any old local backups so only today's will remain
-rm -f "$BACKUP_DIR"/*
+echo "Starting backup..."
 
-# List your production databases
-DBS=("brookfield_prod" "splitleague_prod")
+# Backup brookfield_prod
+echo "Backing up brookfield_prod..."
+sudo -u postgres pg_dump -Fc brookfield_prod > "$BACKUP_DIR/brookfield_backup.dump"
+gzip -f "$BACKUP_DIR/brookfield_backup.dump"
 
-# Create fresh backups
-for DB in "${DBS[@]}"; do
-    echo "Backing up database: $DB"
-    sudo -u postgres pg_dump -Fc "$DB" > "$BACKUP_DIR/${DB}_$DATE.dump"
-done
+# Backup splitleague_prod
+echo "Backing up splitleague_prod..."
+sudo -u postgres pg_dump -Fc splitleague_prod > "$BACKUP_DIR/splitleague_backup.dump"
+gzip -f "$BACKUP_DIR/splitleague_backup.dump"
 
-# Compress all .dump files
-gzip -f "$BACKUP_DIR"/*.dump
+echo "Uploading to Google Drive..."
 
-# Upload ONLY today's backups, replacing old Google Drive copies
-rclone sync "$BACKUP_DIR/" bcgoogle:ServerBackups
+# Upload only these two backup files to Google Drive
+rclone copy "$BACKUP_DIR/brookfield_backup.dump.gz" bcgoogle:ServerBackups
+rclone copy "$BACKUP_DIR/splitleague_backup.dump.gz" bcgoogle:ServerBackups
+
+echo "Backup complete."
