@@ -15,7 +15,7 @@ from datetime import datetime
 from logging_utils import manage_log_files, create_logger, get_db_config
 
 # Setup logging
-SCRIPT_NAME = "database_maintenance"
+SCRIPT_NAME = "refresh_groupid_perfromance"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
