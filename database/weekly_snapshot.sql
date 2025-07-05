@@ -2,13 +2,15 @@ WITH this_week AS (
     SELECT
         TO_CHAR(CURRENT_DATE, 'IYYY-"W"IW') AS year_week,
         CURRENT_DATE AS snapshot_date
-), source AS (
+),
+source AS (
     SELECT
         this_week.year_week,
         this_week.snapshot_date,
         gp.*
     FROM groupid_performance gp, this_week
-), to_insert AS (
+),
+to_insert AS (
     SELECT s.*
     FROM source s
     LEFT JOIN groupid_performance_week existing
@@ -26,6 +28,7 @@ INSERT INTO groupid_performance_week (
     annual_profit,
     sold_qty,
     avg_profit_per_unit,
+    avg_gross_margin,
     segment,
     notes,
     owner
@@ -39,6 +42,7 @@ SELECT
     annual_profit,
     sold_qty,
     avg_profit_per_unit,
+    avg_gross_margin,
     segment,
     notes,
     owner
