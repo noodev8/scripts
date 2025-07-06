@@ -4,7 +4,7 @@ WITH daily AS (
     SUM(pt.shopify_sales)   AS units_sold,
     COUNT(DISTINCT pt.date) AS days_recorded
   FROM price_track pt
-  WHERE pt.groupid = '1017723-BEND'
+  WHERE pt.groupid = '0043691-GIZEH'
     AND pt.shopify_sales IS NOT NULL
   GROUP BY pt.shopify_price
 ),
