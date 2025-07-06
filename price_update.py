@@ -357,28 +357,7 @@ def update_google_price(google_id, new_price):
         time.sleep(0.2)
         return f"Google API error: {str(e)}"
 
-def log_price_change_to_db(groupid, old_price, new_price, reason="PRICE_UPDATE_SCRIPT"):
-    """Log price change to database for tracking"""
-    try:
-        db_config = get_db_config()
-        conn = psycopg2.connect(**db_config)
-        cur = conn.cursor()
 
-        # Insert into price_change_log table
-        cur.execute("""
-            INSERT INTO price_change_log (groupid, old_price, new_price, reason, reviewed_by, change_date)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (groupid, old_price, new_price, reason, "PRICE_UPDATE", datetime.now().date()))
-
-        # conn.commit()
-        # cur.close()
-        # conn.close()
-
-        return True
-
-    except Exception as e:
-        log(f"ERROR: Failed to log price change to database for {groupid}: {str(e)}")
-        return False
 
 
 def show_usage():
@@ -535,10 +514,7 @@ def main():
                 log(f"Rate limiting pause after {total_processed} API calls...")
                 time.sleep(2)
 
-        # Log price change to database once per group (not per variant)
-        if group_price_changed and first_price_change:
-            old_price, new_price = first_price_change
-            log_price_change_to_db(groupid, old_price, new_price, f"PRICE_UPDATE_{mode.upper()}")
+
 
         # Progress logging for full mode every 50 groups
         if mode == "full" and processed_groups % 50 == 0:
