@@ -7,10 +7,18 @@ Provides consistent log management and database configuration across the codebas
 import os
 import shutil
 from datetime import datetime, timedelta
+import pytz
 from dotenv import load_dotenv
 
 # --- LOGGING CONFIGURATION ---
 LOG_ARCHIVE_DAYS = 3  # Keep 3 days of archived logs
+
+# --- TIMEZONE CONFIGURATION ---
+UK_TIMEZONE = pytz.timezone('Europe/London')
+
+def get_uk_time():
+    """Get current time in UK timezone (automatically handles BST/GMT)"""
+    return datetime.now(UK_TIMEZONE)
 
 # --- DATABASE CONFIGURATION ---
 def get_db_config():
@@ -51,16 +59,16 @@ def setup_logging_directories():
 def manage_log_files(script_name):
     """Manage log files: archive current log and cleanup old archives"""
     logs_dir, archive_dir = setup_logging_directories()
-    
+
     current_log = os.path.join(logs_dir, f"{script_name}.log")
-    date_str = datetime.now().strftime("%Y-%m-%d")
+    date_str = get_uk_time().strftime("%Y-%m-%d")
     archived_log = os.path.join(archive_dir, f"{script_name}_{date_str}.log")
     
     # Archive current log if it exists and is from a previous day
     if os.path.exists(current_log):
         # Check if log is from today by looking at modification time
         log_mtime = datetime.fromtimestamp(os.path.getmtime(current_log))
-        if log_mtime.date() < datetime.now().date():
+        if log_mtime.date() < get_uk_time().date():
             # Archive the previous day's log
             prev_date = log_mtime.strftime("%Y-%m-%d")
             prev_archived_log = os.path.join(archive_dir, f"{script_name}_{prev_date}.log")
@@ -70,7 +78,7 @@ def manage_log_files(script_name):
             open(current_log, 'w').close()
     
     # Cleanup old archived logs (keep only LOG_ARCHIVE_DAYS)
-    cutoff_date = datetime.now().date() - timedelta(days=LOG_ARCHIVE_DAYS)
+    cutoff_date = get_uk_time().date() - timedelta(days=LOG_ARCHIVE_DAYS)
     
     for filename in os.listdir(archive_dir):
         if filename.startswith(f"{script_name}_") and filename.endswith(".log"):
@@ -92,8 +100,11 @@ def create_logger(script_name):
     def log(message):
         """Log message to current log file and archive copy"""
         logs_dir, archive_dir = setup_logging_directories()
-        
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        uk_time = get_uk_time()
+        # Include timezone info to show whether it's GMT or BST
+        timezone_name = uk_time.strftime('%Z')  # Will show 'GMT' or 'BST'
+        timestamp = uk_time.strftime(f'%Y-%m-%d %H:%M:%S {timezone_name}')
         log_entry = f"{timestamp}  {message}\n"
         
         # Write to current log
@@ -102,7 +113,7 @@ def create_logger(script_name):
             f.write(log_entry)
         
         # Also write to today's archive (allows for duplicate during the day)
-        date_str = datetime.now().strftime("%Y-%m-%d")
+        date_str = get_uk_time().strftime("%Y-%m-%d")
         archived_log = os.path.join(archive_dir, f"{script_name}_{date_str}.log")
         with open(archived_log, "a", encoding="utf-8") as f:
             f.write(log_entry)
