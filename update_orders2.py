@@ -1,9 +1,10 @@
 
 import psycopg2
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import random
+import pytz
 from dotenv import load_dotenv
 from logging_utils import get_db_config, manage_log_files, create_logger
 import sys
@@ -12,6 +13,7 @@ import sys
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 SHOP_DOMAIN = "brookfieldcomfort2.myshopify.com"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ORDERS_ACCESS_TOKEN')
+SYSTEM_TIMEZONE = os.getenv('SYSTEM_TIMEZONE', 'LOCAL')
 
 if not ACCESS_TOKEN:
     raise ValueError("SHOPIFY_ORDERS_ACCESS_TOKEN not found in .env file")
@@ -24,6 +26,11 @@ SCRIPT_NAME = "update_orders2"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 log("=== Order Sync Script Started ===")
+if SYSTEM_TIMEZONE.upper() == 'UTC':
+    bst_status = "BST active" if is_bst_active() else "GMT active"
+    log(f"Timezone mode: {SYSTEM_TIMEZONE} ({bst_status}, will adjust accordingly)")
+else:
+    log(f"Timezone mode: {SYSTEM_TIMEZONE} (using local time)")
 
 def safe(value):
     return value.strip() if value and isinstance(value, str) else ""
@@ -34,9 +41,27 @@ def format_datetime(dt_str):
     except (ValueError, TypeError):
         return ""
 
+def is_bst_active():
+    """Check if British Summer Time (BST) is currently active"""
+    uk_tz = pytz.timezone('Europe/London')
+    uk_time = datetime.now(uk_tz)
+    # BST is active when timezone shows 'BST', GMT when it shows 'GMT'
+    return uk_time.strftime('%Z') == 'BST'
+
 def get_current_datetime():
-    """Get current datetime in YYYYMMDD HH:MM:SS format"""
-    return datetime.now().strftime("%Y%m%d %H:%M:%S")
+    """Get current datetime in YYYYMMDD HH:MM:SS format, adjusted for UK timezone"""
+    current_time = datetime.now()
+
+    # If system timezone is UTC, check if BST is active and add 1 hour if needed
+    if SYSTEM_TIMEZONE.upper() == 'UTC':
+        bst_active = is_bst_active()
+        if bst_active:
+            current_time = current_time + timedelta(hours=1)
+            log(f"Timezone adjustment: UTC + 1 hour (BST active) = {current_time.strftime('%Y-%m-%d %H:%M:%S')} UK time")
+        else:
+            log(f"No timezone adjustment needed: GMT active, using UTC time = {current_time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+    return current_time.strftime("%Y%m%d %H:%M:%S")
 
 def get_supplier_for_sku(cursor, shopifysku):
     """Get supplier from skusummary table for a given SKU"""
