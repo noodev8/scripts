@@ -26,11 +26,6 @@ SCRIPT_NAME = "update_orders2"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 log("=== Order Sync Script Started ===")
-if SYSTEM_TIMEZONE.upper() == 'UTC':
-    bst_status = "BST active" if is_bst_active() else "GMT active"
-    log(f"Timezone mode: {SYSTEM_TIMEZONE} ({bst_status}, will adjust accordingly)")
-else:
-    log(f"Timezone mode: {SYSTEM_TIMEZONE} (using local time)")
 
 def safe(value):
     return value.strip() if value and isinstance(value, str) else ""
@@ -47,6 +42,13 @@ def is_bst_active():
     uk_time = datetime.now(uk_tz)
     # BST is active when timezone shows 'BST', GMT when it shows 'GMT'
     return uk_time.strftime('%Z') == 'BST'
+
+# Log timezone information after function definitions
+if SYSTEM_TIMEZONE.upper() == 'UTC':
+    bst_status = "BST active" if is_bst_active() else "GMT active"
+    log(f"Timezone mode: {SYSTEM_TIMEZONE} ({bst_status}, will adjust accordingly)")
+else:
+    log(f"Timezone mode: {SYSTEM_TIMEZONE} (using local time)")
 
 def get_current_datetime():
     """Get current datetime in YYYYMMDD HH:MM:SS format, adjusted for UK timezone"""
