@@ -111,6 +111,7 @@ WITH sales_summary AS (
     JOIN skusummary ss ON s.groupid = ss.groupid
     WHERE s.solddate >= CURRENT_DATE - INTERVAL '365 days'
       AND s.soldprice > 0
+	  AND s.channel = 'SHP'
     GROUP BY s.code, s.channel, ss.groupid, ss.brand
 )
 
