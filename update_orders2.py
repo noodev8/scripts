@@ -27,8 +27,12 @@ manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 log("=== Order Sync Script Started ===")
 
-def safe(value):
-    return value.strip() if value and isinstance(value, str) else ""
+def safe(value, max_length=None):
+    """Convert value to string, strip whitespace, and optionally truncate for database insertion"""
+    result = value.strip() if value and isinstance(value, str) else ""
+    if max_length and len(result) > max_length:
+        result = result[:max_length]
+    return result
 
 def format_datetime(dt_str):
     try:
@@ -113,7 +117,9 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
         solddate = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date()
         ordertime = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).strftime("%H:%M")
         paytype = ",".join(order.get("payment_gateway_names", [])) or "UNKNOWN"
-        title = safe(item.get("title"))
+        # Truncate fields to fit database limits
+        paytype = paytype[:20]  # varchar(20)
+        title = safe(item.get("title"), 200)  # varchar(200)
 
         log(f"Inserting into sales: SKU={shopifysku}, Order={order_name}, Qty={item.get('quantity')}, Price={soldprice}, PayType={paytype}")
 
@@ -129,9 +135,9 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
                 %s, %s, %s, %s
             )
         """, (
-            shopifysku, solddate, groupid, order_name, ordertime,
+            safe(shopifysku, 50), solddate, safe(groupid, 50), safe(order_name, 50), ordertime[:20],
             item.get("quantity"), soldprice, "SHP",
-            paytype, None, title, brand, 0, 0
+            paytype, None, title, safe(brand, 50), 0, 0
         ))
 
         log("Sale inserted successfully")
@@ -434,17 +440,17 @@ def run_order_sync(cursor):
                         %s, %s, %s, %s, %s, %s, %s, %s
                     )
                 """, (
-                    order_name, shopifysku, item.get("quantity"),
-                    format_datetime(order["updated_at"]),
-                    format_datetime(order["created_at"]),
-                    "0", supplier, safe(item.get("title")), safe(shipping.get("name")),
-                    safe(shipping.get("zip")), safe(shipping.get("address1")),
-                    safe(shipping.get("address2")), safe(shipping.get("company")),
-                    safe(shipping.get("city")), safe(shipping.get("province_code")),
-                    safe(shipping.get("country_code")), safe(shipping.get("phone")),
-                    shipping_notes, "", 0, 0, 0, 0,
-                    "", None, 0, safe(order.get("email")), courier, 0, 0, None, None,
-                    "", "SHOPIFY", None, None, None, 0, shipping_cost, 1, None,
+                    safe(order_name, 100), safe(shopifysku, 50), item.get("quantity"),
+                    safe(format_datetime(order["updated_at"]), 50),
+                    safe(format_datetime(order["created_at"]), 50),
+                    "0", safe(supplier, 50), safe(item.get("title"), 200), safe(shipping.get("name"), 100),
+                    safe(shipping.get("zip"), 20), safe(shipping.get("address1"), 200),
+                    safe(shipping.get("address2"), 200), safe(shipping.get("company"), 100),
+                    safe(shipping.get("city"), 100), safe(shipping.get("province_code"), 100),
+                    safe(shipping.get("country_code"), 100), safe(shipping.get("phone"), 50),
+                    safe(shipping_notes, 200), "", 0, 0, 0, 0,
+                    "", safe(None, 10), 0, safe(order.get("email"), 100), safe(courier, 100), 0, 0, None, None,
+                    safe("", 50), "SHOPIFY", None, None, safe(None, 255), 0, safe(shipping_cost, 20), 1, safe(None, 50),
                     datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date(), 0, None
                 ))
                 log(f"Inserted new order {order_name}, SKU {shopifysku} (supplier: {supplier})")
