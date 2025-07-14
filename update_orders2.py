@@ -432,7 +432,7 @@ def run_order_sync(cursor):
         shipping_cost_str = order.get("total_shipping_price_set", {}).get("shop_money", {}).get("amount")
         shipping_cost = float(shipping_cost_str) if shipping_cost_str else None
         shipping_notes = safe(order.get("note"))
-        courier = 4 if shipping_cost == 5.95 else 5
+        courier = str(4 if shipping_cost == 5.95 else 5)
 
         for item in order.get("line_items", []):
             shopifysku = safe(item.get("sku"))
