@@ -31,7 +31,8 @@ INSERT INTO groupid_performance_week (
     avg_gross_margin,
     segment,
     notes,
-    owner
+    owner,
+    recommended_price
 )
 SELECT
     year_week,
@@ -45,5 +46,6 @@ SELECT
     avg_gross_margin,
     segment,
     notes,
-    owner
+    owner,
+    recommended_price
 FROM to_insert;
