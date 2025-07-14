@@ -8,6 +8,7 @@ import pytz
 from dotenv import load_dotenv
 from logging_utils import get_db_config, manage_log_files, create_logger
 import sys
+import csv
 
 # === CONFIGURATION ===
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
@@ -338,6 +339,60 @@ def run_pick_allocation(cursor):
         else:
             log(f"WARNING: Order {order_name}, SKU {shopifysku} - no new picks allocated")
 
+def log_shopify_orders_to_csv(orders):
+    """Log Shopify orders to CSV for debugging courier issues"""
+    try:
+        csv_path = os.path.join("logs", "shopify_orders_debug.csv")
+
+        with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+            fieldnames = [
+                'order_name', 'created_at', 'updated_at', 'financial_status', 'fulfillment_status',
+                'cancel_reason', 'total_shipping_price_set_raw', 'shipping_cost_str',
+                'shipping_cost_float', 'courier_calculated', 'email', 'shipping_name',
+                'line_items_count', 'note', 'shipping_lines_raw', 'payment_gateway_names'
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for order in orders:
+                # Extract shipping cost information step by step for debugging
+                total_shipping_price_set = order.get("total_shipping_price_set", {})
+                shop_money = total_shipping_price_set.get("shop_money", {}) if total_shipping_price_set else {}
+                shipping_cost_str = shop_money.get("amount") if shop_money else None
+
+                try:
+                    shipping_cost_float = float(shipping_cost_str) if shipping_cost_str else None
+                except (ValueError, TypeError):
+                    shipping_cost_float = None
+
+                courier_calculated = 4 if shipping_cost_float == 5.95 else 5
+
+                shipping = order.get("shipping_address", {}) or {}
+
+                writer.writerow({
+                    'order_name': order.get("name", ""),
+                    'created_at': order.get("created_at", ""),
+                    'updated_at': order.get("updated_at", ""),
+                    'financial_status': order.get("financial_status", ""),
+                    'fulfillment_status': order.get("fulfillment_status", ""),
+                    'cancel_reason': order.get("cancel_reason", ""),
+                    'total_shipping_price_set_raw': str(total_shipping_price_set),
+                    'shipping_cost_str': str(shipping_cost_str),
+                    'shipping_cost_float': str(shipping_cost_float),
+                    'courier_calculated': courier_calculated,
+                    'email': order.get("email", ""),
+                    'shipping_name': shipping.get("name", ""),
+                    'line_items_count': len(order.get("line_items", [])),
+                    'note': order.get("note", ""),
+                    'shipping_lines_raw': str(order.get("shipping_lines", [])),
+                    'payment_gateway_names': str(order.get("payment_gateway_names", []))
+                })
+
+        log(f"Shopify orders debug data written to {csv_path}")
+
+    except Exception as e:
+        log(f"ERROR: Failed to write Shopify orders debug CSV: {e}")
+
 def run_order_sync(cursor):
     url = f"https://{SHOP_DOMAIN}/admin/api/2024-01/orders.json"
     headers = {"X-Shopify-Access-Token": ACCESS_TOKEN}
@@ -357,6 +412,9 @@ def run_order_sync(cursor):
 
     orders = response.json().get("orders", [])
     log(f"Retrieved {len(orders)} unfulfilled orders from Shopify")
+
+    # Log all orders to CSV for debugging
+    log_shopify_orders_to_csv(orders)
 
     # Track current orders from Shopify to identify orders to archive
     current_shopify_orders = set()
