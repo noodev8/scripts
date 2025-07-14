@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 Database Maintenance Script
-Runs 3 SQL scripts in order:
+Runs 3 SQL scripts in order, then updates price recommendations:
 1. clean_sales.sql - Remove deleted/expired products and fix return prices
 2. refresh_perfomance.sql - Refresh performance and groupid_performance tables
 3. weekly_snapshot.sql - Create weekly snapshot in groupid_performance_week
+4. Update recommended prices for all SHP channel items
 
 This script is designed to run via cron on the server.
 """
@@ -13,6 +14,7 @@ import psycopg2
 import os
 from datetime import datetime
 from logging_utils import manage_log_files, create_logger, get_db_config
+from price_recommendation import update_all_recommended_prices
 
 # Setup logging
 SCRIPT_NAME = "refresh_groupid_perfromance"
@@ -113,6 +115,22 @@ def main():
                 all_successful = False
                 break
         
+        # Step 4: Update recommended prices for all SHP channel items
+        if all_successful:
+            log("--- Starting: Price Recommendations Update ---")
+            try:
+                stats = update_all_recommended_prices(mode="Steady", db_config=db_config)
+                log(f"Price recommendations completed - Processed: {stats['total_processed']}, "
+                    f"Calculated: {stats['recommendations_generated']}, "
+                    f"Current prices used: {stats['current_price_used']}, "
+                    f"No price set: {stats['no_price_set']}, "
+                    f"Errors: {stats['errors']}")
+                log("--- Completed: Price Recommendations Update ---")
+            except Exception as e:
+                log(f"WARNING: Price recommendations update failed: {str(e)}")
+                # Don't fail the entire process for price recommendation errors
+                log("Continuing despite price recommendation errors...")
+
         # Final status
         if all_successful:
             end_time = datetime.now()

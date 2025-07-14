@@ -37,12 +37,12 @@ PROFIT_MODE_UPLIFT = 0.02  # 2% uplift for Profit mode
 CLEARANCE_REDUCTION = 0.05  # 5% reduction for Clearance mode when no sales history
 MINIMUM_MARGIN_MULTIPLIER = 1.10  # Cost * 1.10 minimum price floor
 
-def get_price_recommendation(groupid, mode=None, db_config=None):
+def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_date_check=False):
     """
     Generate optimal price recommendation for a SKU based on historical sales data and pricing strategy.
 
     NEW LOGIC:
-    1. IF next review date is available and not yet arrived → do nothing (return None)
+    1. IF next review date is available and not yet arrived → do nothing (return None) [unless skip_review_date_check=True]
     2. IF no stock available in localstock table → do nothing (return None)
     3. IF not sold in over 3 weeks → Drop by 5% as long as new price is more than 110% of cost price
        - SEASONAL LOGIC: For out-of-season items, be more conservative with price drops (2% reduction)
@@ -53,10 +53,12 @@ def get_price_recommendation(groupid, mode=None, db_config=None):
         mode (str, optional): One of "Ignore", "Steady", "Profit", "Clearance" (case-sensitive)
                              Defaults to "Steady" if not provided
         db_config (dict, optional): Database connection parameters (if None, load from .env file)
+        skip_review_date_check (bool, optional): If True, skip the next review date check
+                                               Used for bulk updates to always calculate prices
 
     Returns:
         float: Recommended price rounded to 2 decimal places
-        None: If mode is "Ignore", if groupid not found, or if next review date not yet arrived
+        None: If mode is "Ignore", if groupid not found, or if next review date not yet arrived (when skip_review_date_check=False)
 
     Raises:
         ValueError: If mode is invalid
@@ -89,20 +91,21 @@ def get_price_recommendation(groupid, mode=None, db_config=None):
         conn = psycopg2.connect(**db_config)
         cur = conn.cursor()
 
-        # STEP 1: Check if next review date exists and hasn't arrived yet
-        cur.execute("""
-            SELECT next_review_date
-            FROM groupid_performance
-            WHERE groupid = %s
-        """, (groupid,))
+        # STEP 1: Check if next review date exists and hasn't arrived yet (unless skipping this check)
+        if not skip_review_date_check:
+            cur.execute("""
+                SELECT next_review_date
+                FROM groupid_performance
+                WHERE groupid = %s
+            """, (groupid,))
 
-        review_data = cur.fetchone()
-        if review_data and review_data[0] is not None:
-            next_review_date = review_data[0]
-            from datetime import date
-            if next_review_date > date.today():
-                log(f"Next review date ({next_review_date}) not yet arrived for {groupid} - no action needed")
-                return None
+            review_data = cur.fetchone()
+            if review_data and review_data[0] is not None:
+                next_review_date = review_data[0]
+                from datetime import date
+                if next_review_date > date.today():
+                    log(f"Next review date ({next_review_date}) not yet arrived for {groupid} - no action needed")
+                    return None
 
         # Get SKU basic data (cost, current price, and season)
         cur.execute("""
@@ -236,9 +239,9 @@ def get_price_recommendation(groupid, mode=None, db_config=None):
         elif mode == "Clearance":
             recommendation = _calculate_clearance_price(df, current_price, minimum_price, cost)
 
-        # Round final recommendation
+        # Round final recommendation and ensure it's a plain Python float
         if recommendation is not None:
-            recommendation = round(recommendation, 2)
+            recommendation = float(round(recommendation, 2))
             log(f"Final recommendation for {groupid}: £{recommendation:.2f}")
         else:
             log(f"No recommendation generated for {groupid}")
@@ -300,12 +303,12 @@ def _calculate_steady_price(profitable_df, current_price, minimum_price, cost):
     
     # Find price with highest average daily gross profit
     best_row = profitable_df.loc[profitable_df['avg_daily_gross_profit'].idxmax()]
-    recommendation = best_row['price']
-    
+    recommendation = float(best_row['price'])
+
     log(f"Steady mode: Best price £{recommendation:.2f} (avg daily profit: £{best_row['avg_daily_gross_profit']:.2f}, "
         f"avg units/day: {best_row['avg_units_per_day']:.2f})")
-    
-    return max(recommendation, minimum_price)
+
+    return float(max(recommendation, minimum_price))
 
 def _calculate_clearance_price(df, current_price, minimum_price, cost):
     """Calculate Clearance mode price - highest average units/day with floor constraints"""
@@ -318,22 +321,260 @@ def _calculate_clearance_price(df, current_price, minimum_price, cost):
     
     # Find price with highest average units per day
     best_row = df.loc[df['avg_units_per_day'].idxmax()]
-    recommendation = best_row['price']
-    
+    recommendation = float(best_row['price'])
+
     # Always enforce minimum price floor for clearance
-    recommendation = max(recommendation, minimum_price)
-    
+    recommendation = float(max(recommendation, minimum_price))
+
     log(f"Clearance mode: Best velocity price £{recommendation:.2f} (avg units/day: {best_row['avg_units_per_day']:.2f}, "
         f"total units: {best_row['total_units_sold']:.0f})")
-    
+
     return recommendation
+
+def update_all_recommended_prices(mode=None, db_config=None, limit=None):
+    """
+    Calculate and update recommended prices for all SHP channel items in groupid_performance table.
+
+    Args:
+        mode (str, optional): One of "Ignore", "Steady", "Profit", "Clearance" (case-sensitive)
+                             Defaults to "Steady" if not provided
+        db_config (dict, optional): Database connection parameters (if None, load from .env file)
+        limit (int, optional): Limit the number of items to process (for testing)
+
+    Returns:
+        dict: Summary statistics of the update operation
+
+    Note:
+        Only processes items with channel = 'SHP' (Shopify). Amazon items are excluded.
+        If no recommendation is generated, uses current shopifyprice from skusummary table.
+    """
+
+    # Default to Steady mode if not provided
+    if mode is None:
+        mode = "Steady"
+        log(f"No mode provided for bulk update, defaulting to 'Steady' mode")
+
+    # Validate mode
+    valid_modes = ["Ignore", "Steady", "Profit", "Clearance"]
+    if mode not in valid_modes:
+        raise ValueError(f"Invalid mode '{mode}'. Valid options: {', '.join(valid_modes)}")
+
+    log(f"Starting bulk price recommendation update - Mode: {mode}")
+
+    conn = None
+    try:
+        # Get database connection
+        if db_config is None:
+            db_config = get_db_config()
+
+        conn = psycopg2.connect(**db_config)
+        cur = conn.cursor()
+
+        # Get all groupids from groupid_performance table (SHP channel only) that exist in skusummary
+        if limit:
+            cur.execute("""
+                SELECT DISTINCT gp.groupid
+                FROM groupid_performance gp
+                INNER JOIN skusummary ss ON gp.groupid = ss.groupid
+                WHERE gp.channel = 'SHP'
+                ORDER BY gp.groupid
+                LIMIT %s
+            """, (limit,))
+        else:
+            cur.execute("""
+                SELECT DISTINCT gp.groupid
+                FROM groupid_performance gp
+                INNER JOIN skusummary ss ON gp.groupid = ss.groupid
+                WHERE gp.channel = 'SHP'
+                ORDER BY gp.groupid
+            """)
+
+        all_groupids = [row[0] for row in cur.fetchall()]
+        total_items = len(all_groupids)
+
+        log(f"Found {total_items} unique SHP groupids (existing in skusummary) to process")
+
+        # Track statistics
+        stats = {
+            'total_processed': 0,
+            'recommendations_generated': 0,
+            'current_price_used': 0,
+            'no_price_set': 0,
+            'errors': 0,
+            'mode_used': mode
+        }
+
+        # Process each groupid with individual transaction handling
+        for i, groupid in enumerate(all_groupids, 1):
+            try:
+                # Calculate recommended price (skip review date check for bulk updates)
+                calculated_recommendation = get_price_recommendation(groupid, mode, db_config, skip_review_date_check=True)
+                recommended_price = calculated_recommendation
+                price_source = "calculated"
+
+                # If no recommendation, try to use current shopifyprice
+                if recommended_price is None:
+                    try:
+                        cur.execute("""
+                            SELECT shopifyprice::NUMERIC
+                            FROM skusummary
+                            WHERE groupid = %s
+                              AND shopifyprice IS NOT NULL
+                              AND shopifyprice != ''
+                              AND shopifyprice::NUMERIC > 0
+                        """, (groupid,))
+
+                        price_data = cur.fetchone()
+                        if price_data:
+                            current_price = float(price_data[0])
+                            recommended_price = current_price
+                            price_source = "current_price"
+                            log(f"No recommendation for {groupid}, using current shopifyprice: £{current_price:.2f}")
+                    except Exception as price_error:
+                        log(f"Could not get current price for {groupid}: {str(price_error)} - skipping")
+                        stats['errors'] += 1
+                        continue
+
+                # Update the groupid_performance table (SHP channel only)
+                if recommended_price is not None:
+                    cur.execute("""
+                        UPDATE groupid_performance
+                        SET recommended_price = %s
+                        WHERE groupid = %s AND channel = 'SHP'
+                    """, (recommended_price, groupid))
+
+                    # Track statistics based on price source
+                    if price_source == "calculated":
+                        stats['recommendations_generated'] += 1
+                        if i % 50 == 0:  # Log progress every 50 items
+                            log(f"Progress: {i}/{total_items} - {groupid}: £{recommended_price:.2f} (calculated)")
+                    else:
+                        stats['current_price_used'] += 1
+                        if i % 50 == 0:  # Log progress every 50 items
+                            log(f"Progress: {i}/{total_items} - {groupid}: £{recommended_price:.2f} (current price)")
+                else:
+                    # Set recommended_price to NULL if no recommendation and no current price
+                    cur.execute("""
+                        UPDATE groupid_performance
+                        SET recommended_price = NULL
+                        WHERE groupid = %s AND channel = 'SHP'
+                    """, (groupid,))
+                    stats['no_price_set'] += 1
+
+                    if i % 50 == 0:  # Log progress every 50 items
+                        log(f"Progress: {i}/{total_items} - {groupid}: No price available")
+
+                # Commit after each successful update to avoid transaction rollback issues
+                conn.commit()
+                stats['total_processed'] += 1
+
+            except Exception as e:
+                log(f"ERROR processing {groupid}: {str(e)}")
+                # Rollback the failed transaction and continue with next item
+                conn.rollback()
+                stats['errors'] += 1
+                continue
+
+        log(f"Bulk update completed - Processed: {stats['total_processed']}, "
+            f"Calculated recommendations: {stats['recommendations_generated']}, "
+            f"Current prices used: {stats['current_price_used']}, "
+            f"No price set: {stats['no_price_set']}, "
+            f"Errors: {stats['errors']}")
+
+        return stats
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        log(f"ERROR: Bulk price recommendation update failed: {str(e)}")
+        raise
+
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
 
 # Command line usage
 if __name__ == "__main__":
     import sys
 
     # Check if command line arguments provided
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 2 and (sys.argv[1] == "--help" or sys.argv[1] == "-h"):
+        print("Price Recommendation Engine")
+        print("=" * 50)
+        print("Usage:")
+        print("  python price_recommendation.py <GROUPID> [MODE]")
+        print("  python price_recommendation.py --bulk [MODE] [--auto]")
+        print("  python price_recommendation.py  (for interactive mode)")
+        print("")
+        print("Examples:")
+        print("  python price_recommendation.py 0043691-GIZEH          # Uses default Steady mode")
+        print("  python price_recommendation.py 0043691-GIZEH Steady")
+        print("  python price_recommendation.py 1017723-BEND Profit")
+        print("  python price_recommendation.py --bulk Steady          # Bulk update all groupids")
+        print("  python price_recommendation.py --bulk --auto          # Auto mode for cron/scripts")
+        print("")
+        print("Modes: Ignore, Steady, Profit, Clearance (default: Steady)")
+        print("")
+        print("Bulk Mode:")
+        print("  --bulk [MODE] [--auto]  Update recommended_price column for all SHP channel items")
+        print("  --auto or --silent      Skip confirmation prompt (for automated execution)")
+        sys.exit(0)
+    elif len(sys.argv) >= 2 and sys.argv[1] == "--bulk":
+        # Bulk update mode
+        auto_mode = False
+        mode = None
+
+        # Parse arguments for bulk mode
+        for arg in sys.argv[2:]:
+            if arg == "--auto" or arg == "--silent":
+                auto_mode = True
+            elif arg in ["Ignore", "Steady", "Profit", "Clearance"]:
+                mode = arg
+            else:
+                print(f"Error: Invalid argument '{arg}' for bulk mode.")
+                print("Usage for bulk update:")
+                print("  python price_recommendation.py --bulk [MODE] [--auto]")
+                print("")
+                print("Examples:")
+                print("  python price_recommendation.py --bulk          # Uses default Steady mode")
+                print("  python price_recommendation.py --bulk Steady")
+                print("  python price_recommendation.py --bulk Profit --auto")
+                print("  python price_recommendation.py --bulk --auto   # Auto mode with default Steady")
+                print("")
+                print("Modes: Ignore, Steady, Profit, Clearance (default: Steady)")
+                print("Flags: --auto or --silent (skip confirmation prompt)")
+                sys.exit(1)
+
+        try:
+            display_mode = mode if mode is not None else "Steady (default)"
+            print(f"\nStarting bulk price recommendation update in {display_mode} mode...")
+            print("This will update the recommended_price column for all SHP channel items in groupid_performance table.")
+
+            # Confirm before proceeding (unless auto mode)
+            if not auto_mode:
+                confirm = input("\nProceed with bulk update? (y/N): ").strip().lower()
+                if confirm != 'y':
+                    print("Bulk update cancelled.")
+                    sys.exit(0)
+            else:
+                print("Running in auto mode - proceeding without confirmation...")
+
+            stats = update_all_recommended_prices(mode)
+
+            print(f"\n✓ Bulk update completed successfully!")
+            print(f"  Total processed: {stats['total_processed']}")
+            print(f"  Calculated recommendations: {stats['recommendations_generated']}")
+            print(f"  Current prices used: {stats['current_price_used']}")
+            print(f"  No price set: {stats['no_price_set']}")
+            print(f"  Errors: {stats['errors']}")
+            print(f"  Mode used: {stats['mode_used']}")
+
+        except Exception as e:
+            print(f"\n✗ Bulk update failed: {str(e)}")
+            sys.exit(1)
+
+    elif len(sys.argv) == 3:
         groupid = sys.argv[1]
         mode = sys.argv[2]
     elif len(sys.argv) == 2:
@@ -344,48 +585,107 @@ if __name__ == "__main__":
         # Interactive mode - ask for parameters
         print("Price Recommendation Engine")
         print("=" * 50)
-        groupid = input("Enter GroupID: ").strip()
-        if not groupid:
-            print("Error: GroupID is required")
-            sys.exit(1)
+        print("Choose operation:")
+        print("1. Single GroupID recommendation")
+        print("2. Bulk update all groupids in groupid_performance table")
 
-        print("\nAvailable modes:")
-        print("1. Ignore   - Return None immediately")
-        print("2. Steady   - Find price with highest average daily gross profit")
-        print("3. Profit   - Apply 2% uplift to Steady mode price")
-        print("4. Clearance - Find price with highest average units/day")
+        operation = input("\nEnter choice (1 or 2): ").strip()
 
-        mode_input = input("\nEnter mode (Ignore/Steady/Profit/Clearance) [default: Steady]: ").strip()
-        if mode_input == "":
-            mode = None  # Will default to Steady
-        elif mode_input not in ["Ignore", "Steady", "Profit", "Clearance"]:
-            print(f"Error: Invalid mode '{mode_input}'. Valid options: Ignore, Steady, Profit, Clearance")
-            sys.exit(1)
+        if operation == "2":
+            # Bulk update mode
+            print("\nAvailable modes:")
+            print("1. Ignore   - Return None immediately")
+            print("2. Steady   - Find price with highest average daily gross profit")
+            print("3. Profit   - Apply 2% uplift to Steady mode price")
+            print("4. Clearance - Find price with highest average units/day")
+
+            mode_input = input("\nEnter mode (Ignore/Steady/Profit/Clearance) [default: Steady]: ").strip()
+            if mode_input == "":
+                mode = None  # Will default to Steady
+            elif mode_input not in ["Ignore", "Steady", "Profit", "Clearance"]:
+                print(f"Error: Invalid mode '{mode_input}'. Valid options: Ignore, Steady, Profit, Clearance")
+                sys.exit(1)
+            else:
+                mode = mode_input
+
+            try:
+                display_mode = mode if mode is not None else "Steady (default)"
+                print(f"\nStarting bulk price recommendation update in {display_mode} mode...")
+                print("This will update the recommended_price column for all SHP channel items in groupid_performance table.")
+
+                # Confirm before proceeding
+                confirm = input("\nProceed with bulk update? (y/N): ").strip().lower()
+                if confirm != 'y':
+                    print("Bulk update cancelled.")
+                    sys.exit(0)
+
+                stats = update_all_recommended_prices(mode)
+
+                print(f"\n✓ Bulk update completed successfully!")
+                print(f"  Total processed: {stats['total_processed']}")
+                print(f"  Calculated recommendations: {stats['recommendations_generated']}")
+                print(f"  Current prices used: {stats['current_price_used']}")
+                print(f"  No price set: {stats['no_price_set']}")
+                print(f"  Errors: {stats['errors']}")
+                print(f"  Mode used: {stats['mode_used']}")
+
+            except Exception as e:
+                print(f"\n✗ Bulk update failed: {str(e)}")
+                sys.exit(1)
+
+        elif operation == "1":
+            # Single GroupID mode
+            groupid = input("Enter GroupID: ").strip()
+            if not groupid:
+                print("Error: GroupID is required")
+                sys.exit(1)
+
+            print("\nAvailable modes:")
+            print("1. Ignore   - Return None immediately")
+            print("2. Steady   - Find price with highest average daily gross profit")
+            print("3. Profit   - Apply 2% uplift to Steady mode price")
+            print("4. Clearance - Find price with highest average units/day")
+
+            mode_input = input("\nEnter mode (Ignore/Steady/Profit/Clearance) [default: Steady]: ").strip()
+            if mode_input == "":
+                mode = None  # Will default to Steady
+            elif mode_input not in ["Ignore", "Steady", "Profit", "Clearance"]:
+                print(f"Error: Invalid mode '{mode_input}'. Valid options: Ignore, Steady, Profit, Clearance")
+                sys.exit(1)
+            else:
+                mode = mode_input
         else:
-            mode = mode_input
+            print("Error: Invalid choice. Please enter 1 or 2.")
+            sys.exit(1)
     else:
         print("Usage:")
         print("  python price_recommendation.py <GROUPID> [MODE]")
+        print("  python price_recommendation.py --bulk [MODE] [--auto]")
         print("  python price_recommendation.py  (for interactive mode)")
         print("")
         print("Examples:")
         print("  python price_recommendation.py 0043691-GIZEH          # Uses default Steady mode")
         print("  python price_recommendation.py 0043691-GIZEH Steady")
         print("  python price_recommendation.py 1017723-BEND Profit")
+        print("  python price_recommendation.py --bulk Steady          # Bulk update all groupids")
+        print("  python price_recommendation.py --bulk --auto          # Auto mode for cron/scripts")
         print("")
         print("Modes: Ignore, Steady, Profit, Clearance (default: Steady)")
+        print("Flags: --auto or --silent (skip confirmation for automated execution)")
         sys.exit(1)
 
-    try:
-        display_mode = mode if mode is not None else "Steady (default)"
-        print(f"\nProcessing: {groupid} in {display_mode} mode...")
-        price = get_price_recommendation(groupid, mode)
+    # Single GroupID processing (if not bulk mode)
+    if 'groupid' in locals():
+        try:
+            display_mode = mode if mode is not None else "Steady (default)"
+            print(f"\nProcessing: {groupid} in {display_mode} mode...")
+            price = get_price_recommendation(groupid, mode)
 
-        if price is not None:
-            print(f"\n✓ Recommendation for {groupid} ({display_mode} mode): £{price:.2f}")
-        else:
-            print(f"\n• No recommendation for {groupid} ({display_mode} mode)")
+            if price is not None:
+                print(f"\n✓ Recommendation for {groupid} ({display_mode} mode): £{price:.2f}")
+            else:
+                print(f"\n• No recommendation for {groupid} ({display_mode} mode)")
 
-    except Exception as e:
-        print(f"\n✗ Error: {str(e)}")
-        sys.exit(1)
+        except Exception as e:
+            print(f"\n✗ Error: {str(e)}")
+            sys.exit(1)

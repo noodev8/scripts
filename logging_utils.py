@@ -11,7 +11,7 @@ import pytz
 from dotenv import load_dotenv
 
 # --- LOGGING CONFIGURATION ---
-LOG_ARCHIVE_DAYS = 3  # Keep 3 days of archived logs
+LOG_ARCHIVE_DAYS = 1  # Keep 1 day of archived logs
 
 # --- TIMEZONE CONFIGURATION ---
 UK_TIMEZONE = pytz.timezone('Europe/London')
