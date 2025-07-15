@@ -97,6 +97,7 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
                 SELECT next_review_date
                 FROM groupid_performance
                 WHERE groupid = %s
+                AND channel = 'SHP'
             """, (groupid,))
 
             review_data = cur.fetchone()
@@ -104,7 +105,7 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
                 next_review_date = review_data[0]
                 from datetime import date
                 if next_review_date > date.today():
-                    log(f"Next review date ({next_review_date}) not yet arrived for {groupid} - no action needed")
+                    log(f"Next review date ({next_review_date}) not yet arrived for {groupid} (SHP) - no action needed")
                     return None
 
         # Get SKU basic data (cost, current price, and season)
@@ -135,7 +136,7 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
 
         log(f"SKU data - Cost: £{cost:.2f}, Current Price: £{current_price:.2f}, Min Price: £{minimum_price:.2f}, Season: {season} ({season_status})")
 
-        # STEP 2: Check stock levels - only adjust price if we have stock
+        # STEP 2: Check stock levels - only adjust price if we have stock (except for out-of-season items)
         cur.execute("""
             SELECT COALESCE(SUM(qty), 0) as total_stock
             FROM localstock
@@ -147,10 +148,13 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
         total_stock = stock_data[0] if stock_data else 0
 
         if total_stock <= 0:
-            log(f"No stock available for {groupid} (total stock: {total_stock}) - no price adjustment needed")
-            return None
-
-        log(f"Stock check passed - {total_stock} units in stock for {groupid}")
+            if is_out_of_season:
+                log(f"No stock available for {groupid} (total stock: {total_stock}) but out-of-season item - proceeding with seasonal pricing")
+            else:
+                log(f"No stock available for {groupid} (total stock: {total_stock}) - no price adjustment needed")
+                return None
+        else:
+            log(f"Stock check passed - {total_stock} units in stock for {groupid}")
 
         # STEP 3: Check if no sales in over 3 weeks (21 days)
         cur.execute("""
@@ -164,18 +168,10 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
         recent_sales_count = cur.fetchone()[0]
 
         if recent_sales_count == 0:
-            # No sales in 3 weeks - apply seasonal logic for price reduction
+            # No sales in 3 weeks - different logic for in-season vs out-of-season
             if is_out_of_season:
-                # For out-of-season items, be more conservative - only reduce if significantly above minimum
-                conservative_threshold = minimum_price * 1.25  # 25% above minimum
-                if current_price > conservative_threshold:
-                    reduced_price = current_price * 0.98  # Smaller 2% reduction for out-of-season
-                    reduced_price = max(reduced_price, minimum_price)
-                    log(f"No sales in 3+ weeks for {groupid} (out-of-season {season}) - conservative 2% reduction from £{current_price:.2f} to £{reduced_price:.2f}")
-                    return round(reduced_price, 2)
-                else:
-                    log(f"No sales in 3+ weeks for {groupid} (out-of-season {season}) but price £{current_price:.2f} not significantly above minimum £{minimum_price:.2f} - holding price")
-                    return None
+                # For out-of-season items, skip automatic reduction and let Steady mode handle pricing
+                log(f"No sales in 3+ weeks for {groupid} (out-of-season {season}) - deferring to Steady mode logic for seasonal pricing")
             else:
                 # For in-season items, apply standard 5% reduction
                 reduced_price = current_price * 0.95  # 5% reduction
@@ -225,10 +221,10 @@ def get_price_recommendation(groupid, mode=None, db_config=None, skip_review_dat
 
         # Calculate recommendation based on mode
         if mode == "Steady":
-            recommendation = _calculate_steady_price(profitable_df, current_price, minimum_price, cost)
+            recommendation = _calculate_steady_price(profitable_df, current_price, minimum_price, cost, groupid, cur)
 
         elif mode == "Profit":
-            steady_price = _calculate_steady_price(profitable_df, current_price, minimum_price, cost)
+            steady_price = _calculate_steady_price(profitable_df, current_price, minimum_price, cost, groupid, cur)
             if steady_price is not None:
                 recommendation = steady_price * (1 + PROFIT_MODE_UPLIFT)
                 recommendation = max(recommendation, minimum_price)  # Enforce minimum
@@ -292,23 +288,145 @@ def _is_out_of_season(season):
     # Default to in-season for unknown seasons
     return False
 
-def _calculate_steady_price(profitable_df, current_price, minimum_price, cost):
-    """Calculate Steady mode price - highest average daily gross profit"""
-    if profitable_df.empty:
-        # No sales history - drop price slightly to try and generate a sale
-        reduction_price = current_price * 0.98  # 2% reduction
-        recommendation = max(reduction_price, minimum_price)
-        log(f"Steady mode: No profitable sales history, reducing current price by 2% to £{recommendation:.2f}")
-        return recommendation
-    
-    # Find price with highest average daily gross profit
-    best_row = profitable_df.loc[profitable_df['avg_daily_gross_profit'].idxmax()]
-    recommendation = float(best_row['price'])
+def _calculate_steady_price(profitable_df, current_price, minimum_price, cost, groupid, cur):
+    """Calculate Steady mode price - highest average daily gross profit with experimental price increases"""
 
-    log(f"Steady mode: Best price £{recommendation:.2f} (avg daily profit: £{best_row['avg_daily_gross_profit']:.2f}, "
+    # Get season information for out-of-season logic
+    cur.execute("""
+        SELECT season
+        FROM skusummary
+        WHERE groupid = %s
+    """, (groupid,))
+
+    season_data = cur.fetchone()
+    season = season_data[0] if season_data else None
+    is_out_of_season = _is_out_of_season(season)
+
+    if profitable_df.empty:
+        # No sales history - different logic for out-of-season vs in-season
+        if is_out_of_season:
+            # For out-of-season items, don't reduce - maintain or increase price for next season
+            log(f"Steady mode: No profitable sales history for out-of-season item ({season}) - maintaining current price £{current_price:.2f}")
+            return current_price
+        else:
+            # For in-season items, drop price slightly to try and generate a sale
+            reduction_price = current_price * 0.98  # 2% reduction
+            recommendation = max(reduction_price, minimum_price)
+            log(f"Steady mode: No profitable sales history for in-season item, reducing current price by 2% to £{recommendation:.2f}")
+            return recommendation
+
+    # Find price with highest average daily gross profit from historical data
+    best_row = profitable_df.loc[profitable_df['avg_daily_gross_profit'].idxmax()]
+    historical_best_price = float(best_row['price'])
+
+    log(f"Steady mode: Historical best price £{historical_best_price:.2f} (avg daily profit: £{best_row['avg_daily_gross_profit']:.2f}, "
         f"avg units/day: {best_row['avg_units_per_day']:.2f})")
 
-    return float(max(recommendation, minimum_price))
+    # Check for steady sales (2+ sales in last 30 days) to experiment with price increase
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM sales
+        WHERE groupid = %s
+            AND solddate >= CURRENT_DATE - INTERVAL '30 days'
+            AND qty > 0
+    """, (groupid,))
+
+    recent_sales_30d = cur.fetchone()[0]
+
+    # Special logic for out-of-season items with no recent sales
+    if is_out_of_season and recent_sales_30d == 0:
+        # Get RRP for out-of-season pricing
+        cur.execute("""
+            SELECT rrp
+            FROM skusummary
+            WHERE groupid = %s
+        """, (groupid,))
+
+        rrp_data = cur.fetchone()
+        rrp_limit = None
+        if rrp_data and rrp_data[0] and rrp_data[0].strip():
+            try:
+                rrp_limit = float(rrp_data[0])
+            except (ValueError, TypeError):
+                log(f"Warning: Invalid RRP value '{rrp_data[0]}' for {groupid}, ignoring RRP limit")
+
+        # Check if this item has no stock (special case for out-of-season items)
+        cur.execute("""
+            SELECT COALESCE(SUM(qty), 0) as total_stock
+            FROM localstock
+            WHERE groupid = %s
+                AND deleted IS DISTINCT FROM 1
+        """, (groupid,))
+
+        stock_check = cur.fetchone()
+        has_stock = stock_check[0] > 0 if stock_check else False
+
+        if not has_stock and rrp_limit:
+            # For out-of-season items with no stock, set price to 90% of RRP
+            no_stock_seasonal_price = rrp_limit * 0.90
+            no_stock_seasonal_price = max(no_stock_seasonal_price, minimum_price)  # Respect minimum margin
+
+            log(f"Steady mode: Out-of-season {season} item with no stock - setting to 90% of RRP: £{no_stock_seasonal_price:.2f} (RRP: £{rrp_limit:.2f})")
+            return float(no_stock_seasonal_price)
+        elif not has_stock:
+            log(f"Steady mode: Out-of-season {season} item with no stock but no valid RRP found - maintaining current price")
+            return current_price
+        else:
+            # For out-of-season items with stock but no sales, increase price to prepare for next season
+            # Use a more aggressive increase (10%) to get away from potential sale prices
+            seasonal_increase_price = current_price * 1.10
+
+            # Apply constraints
+            seasonal_increase_price = max(seasonal_increase_price, minimum_price)  # Respect minimum margin
+            if rrp_limit:
+                seasonal_increase_price = min(seasonal_increase_price, rrp_limit)  # Respect RRP limit
+
+            # Choose the higher of historical best or seasonal increase price
+            if seasonal_increase_price > historical_best_price:
+                log(f"Steady mode: Out-of-season {season} item with no sales in 30 days - increasing from £{current_price:.2f} to £{seasonal_increase_price:.2f} for next season")
+                if rrp_limit:
+                    log(f"Steady mode: RRP limit £{rrp_limit:.2f} applied")
+                return float(seasonal_increase_price)
+            else:
+                log(f"Steady mode: Out-of-season seasonal increase £{seasonal_increase_price:.2f} not higher than historical best £{historical_best_price:.2f}")
+                return float(max(historical_best_price, minimum_price))
+
+    elif recent_sales_30d >= 2:
+        # Get RRP limit from skusummary
+        cur.execute("""
+            SELECT rrp
+            FROM skusummary
+            WHERE groupid = %s
+        """, (groupid,))
+
+        rrp_data = cur.fetchone()
+        rrp_limit = None
+        if rrp_data and rrp_data[0] and rrp_data[0].strip():
+            try:
+                rrp_limit = float(rrp_data[0])
+            except (ValueError, TypeError):
+                log(f"Warning: Invalid RRP value '{rrp_data[0]}' for {groupid}, ignoring RRP limit")
+
+        # Experiment with 5% price increase
+        experimental_price = current_price * 1.05
+
+        # Apply constraints
+        experimental_price = max(experimental_price, minimum_price)  # Respect minimum margin
+        if rrp_limit:
+            experimental_price = min(experimental_price, rrp_limit)  # Respect RRP limit
+
+        # Choose the higher of historical best or experimental price (within constraints)
+        if experimental_price > historical_best_price:
+            log(f"Steady mode: {recent_sales_30d} sales in 30 days - experimenting with 5% increase from £{current_price:.2f} to £{experimental_price:.2f}")
+            if rrp_limit:
+                log(f"Steady mode: RRP limit £{rrp_limit:.2f} applied")
+            return float(experimental_price)
+        else:
+            log(f"Steady mode: Experimental price £{experimental_price:.2f} not higher than historical best £{historical_best_price:.2f}")
+    else:
+        log(f"Steady mode: Only {recent_sales_30d} sales in 30 days - not enough for price experimentation (need 2+)")
+
+    return float(max(historical_best_price, minimum_price))
 
 def _calculate_clearance_price(df, current_price, minimum_price, cost):
     """Calculate Clearance mode price - highest average units/day with floor constraints"""
