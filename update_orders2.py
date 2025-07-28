@@ -384,8 +384,8 @@ def run_pick_allocation(cursor):
                 remaining_qty = pick_qty - 1
                 fallback_id = int(''.join(filter(str.isdigit, order_name)) + str(random.randint(100, 999)))
                 cursor.execute("""
-                    INSERT INTO localstock (id, updated, ordernum, location, groupid, code, supplier, qty, brand, allocated)
-                    VALUES (%s, CURRENT_TIMESTAMP, '#FREE', %s, %s, %s, %s, %s, %s, 'unallocated')
+                    INSERT INTO localstock (id, updated, ordernum, location, groupid, code, supplier, qty, brand, allocated, deleted)
+                    VALUES (%s, CURRENT_TIMESTAMP, '#FREE', %s, %s, %s, %s, %s, %s, 'unallocated', 0)
                 """, (fallback_id, location, groupid, shopifysku, supplier, remaining_qty, brand))
                 log(f"Pick split for {order_name}, SKU {shopifysku}, row {pick_id} (location: {location}) -> 1 pick + new row {fallback_id} with {remaining_qty}")
             else:
