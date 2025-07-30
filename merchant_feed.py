@@ -136,8 +136,8 @@ def generate_feed():
             # 1. GTIN from skumap.ean, remove "B" at end, validate length
             raw_gtin = str(row["ean"]) if row["ean"] else ""
             gtin = raw_gtin.rstrip("B")
-            # Only process rows with valid GTIN (exactly 13 characters)
-            if not (gtin and len(gtin) == 13 and gtin.isdigit()):
+            # Only process rows with valid GTIN (12 or 13 characters)
+            if not (gtin and len(gtin) in [12, 13] and gtin.isdigit()):
                 continue  # Skip this row entirely
 
             # 2. Gender and age_group logic
