@@ -119,22 +119,31 @@ WITH sales_summary AS (
 INSERT INTO performance (
     code, channel, groupid, brand,
     sold_qty, revenue, annual_profit, profit_per_unit,
-    gross_margin,
+    gross_margin, stock,
     segment, fail_reason
 )
 SELECT
-    code,
-    channel,
-    groupid,
-    brand,
-    net_qty,
-    net_revenue,
-    net_profit,
-    profit_per_unit,
-    gross_margin,
+    ss.code,
+    ss.channel,
+    ss.groupid,
+    ss.brand,
+    ss.net_qty,
+    ss.net_revenue,
+    ss.net_profit,
+    ss.profit_per_unit,
+    ss.gross_margin,
+    COALESCE(ls.stock_qty, 0) AS stock,
     NULL AS segment,
     NULL AS fail_reason
-FROM sales_summary
+FROM sales_summary ss
+LEFT JOIN (
+    SELECT
+        code,
+        SUM(qty) AS stock_qty
+    FROM localstock
+    WHERE deleted IS DISTINCT FROM 1
+    GROUP BY code
+) ls ON ss.code = ls.code
 ON CONFLICT (code, channel) DO UPDATE
 SET
     groupid = EXCLUDED.groupid,
@@ -143,14 +152,30 @@ SET
     revenue = EXCLUDED.revenue,
     annual_profit = EXCLUDED.annual_profit,
     profit_per_unit = EXCLUDED.profit_per_unit,
-    gross_margin = EXCLUDED.gross_margin;
+    gross_margin = EXCLUDED.gross_margin,
+    stock = EXCLUDED.stock;
+
+-- Update existing performance records that don't have stock data
+UPDATE performance
+SET stock = COALESCE(ls.stock_qty, 0)
+FROM (
+    SELECT
+        code,
+        SUM(qty) AS stock_qty
+    FROM localstock
+    WHERE deleted IS DISTINCT FROM 1
+    GROUP BY code
+) ls
+WHERE performance.code = ls.code
+  AND performance.channel = 'SHP'
+  AND performance.stock IS NULL;
 
 
 /*
 ===================================================================
 STEP 2: Roll up to 'groupid_performance' table
          - Aggregate by groupid & channel
-         - Includes new average gross margin
+         - Includes new average gross margin and stock
 ===================================================================
 */
 
@@ -161,7 +186,8 @@ WITH groupid_sales AS (
         SUM(annual_profit) AS total_profit,
         SUM(sold_qty) AS total_sold_qty,
         ROUND(AVG(profit_per_unit), 2) AS avg_profit_per_unit,
-        ROUND(AVG(gross_margin), 4) AS avg_gross_margin
+        ROUND(AVG(gross_margin), 4) AS avg_gross_margin,
+        SUM(stock) AS total_stock
     FROM performance
     GROUP BY groupid, channel
 )
@@ -174,6 +200,7 @@ INSERT INTO groupid_performance (
     sold_qty,
     avg_profit_per_unit,
     avg_gross_margin,
+    stock,
     owner
 )
 SELECT
@@ -183,6 +210,7 @@ SELECT
     total_sold_qty,
     avg_profit_per_unit,
     avg_gross_margin,
+    total_stock,
     NULL AS owner
 FROM groupid_sales
 ON CONFLICT (groupid, channel) DO UPDATE
@@ -190,4 +218,23 @@ SET
     annual_profit = EXCLUDED.annual_profit,
     sold_qty = EXCLUDED.sold_qty,
     avg_profit_per_unit = EXCLUDED.avg_profit_per_unit,
-    avg_gross_margin = EXCLUDED.avg_gross_margin;
+    avg_gross_margin = EXCLUDED.avg_gross_margin,
+    stock = EXCLUDED.stock;
+
+-- Update existing groupid_performance records that don't have stock data
+UPDATE groupid_performance
+SET stock = (
+    SELECT SUM(COALESCE(ls.stock_qty, 0))
+    FROM (
+        SELECT
+            code,
+            groupid,
+            SUM(qty) AS stock_qty
+        FROM localstock
+        WHERE deleted IS DISTINCT FROM 1
+        GROUP BY code, groupid
+    ) ls
+    WHERE ls.groupid = groupid_performance.groupid
+)
+WHERE groupid_performance.channel = 'SHP'
+  AND groupid_performance.stock IS NULL;

@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from logging_utils import get_db_config, manage_log_files, create_logger
 import sys
 import csv
+import glob
 
 # === CONFIGURATION ===
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
@@ -69,6 +70,71 @@ def get_current_datetime():
             log(f"No timezone adjustment needed: GMT active, using UTC time = {current_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return current_time.strftime("%Y%m%d %H:%M:%S")
+
+def manage_picklist_log_files():
+    """Manage picklist log files - keep 100 days, then delete and start again"""
+    picklist_dir = os.path.join("logs", "picklist_archive")
+
+    # Ensure directory exists
+    os.makedirs(picklist_dir, exist_ok=True)
+
+    # Get all existing picklist files
+    pattern = os.path.join(picklist_dir, "*-PickList.csv")
+    existing_files = glob.glob(pattern)
+
+    if len(existing_files) >= 100:
+        # Sort by creation time and remove oldest files
+        existing_files.sort(key=os.path.getctime)
+        files_to_remove = existing_files[:-99]  # Keep 99 files, so with new one we'll have 100
+
+        for file_path in files_to_remove:
+            try:
+                os.remove(file_path)
+                log(f"Removed old picklist log: {os.path.basename(file_path)}")
+            except OSError as e:
+                log(f"WARNING: Could not remove old picklist log {file_path}: {e}")
+
+def get_picklist_log_filename():
+    """Generate picklist log filename with current date-time"""
+    current_time = datetime.now()
+
+    # If system timezone is UTC, check if BST is active and add 1 hour if needed
+    if SYSTEM_TIMEZONE.upper() == 'UTC':
+        bst_active = is_bst_active()
+        if bst_active:
+            current_time = current_time + timedelta(hours=1)
+
+    return current_time.strftime("%Y%m%d-%H-%M-PickList.csv")
+
+def log_pick_to_csv(code, ordernum, location):
+    """Log a pick allocation to the picklist CSV file"""
+    try:
+        # Manage log files (cleanup old ones if needed)
+        manage_picklist_log_files()
+
+        # Get the log filename
+        filename = get_picklist_log_filename()
+        picklist_dir = os.path.join("logs", "picklist_archive")
+        filepath = os.path.join(picklist_dir, filename)
+
+        # Check if file exists to determine if we need to write headers
+        file_exists = os.path.exists(filepath)
+
+        # Write the pick log entry
+        with open(filepath, 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+
+            # Write header if this is a new file
+            if not file_exists:
+                writer.writerow(['code', 'ordernum', 'location'])
+
+            # Write the pick data
+            writer.writerow([code, ordernum, location])
+
+        log(f"Logged pick to CSV: {code}, {ordernum}, {location}")
+
+    except Exception as e:
+        log(f"ERROR: Failed to log pick to CSV: {e}")
 
 def get_supplier_for_sku(cursor, shopifysku):
     """Get supplier from skusummary table for a given SKU"""
@@ -222,6 +288,10 @@ def run_pick_allocation(cursor):
                     WHERE ordernum = %s AND shopifysku = %s
                 """, (amz_to_allocate, order_name, shopifysku))
 
+                # Log the AMZ pick allocation to CSV
+                for i in range(amz_to_allocate):
+                    log_pick_to_csv(shopifysku, order_name, "AMZ")
+
                 log(f"Order {order_name}, SKU {shopifysku} allocated from AMZ: {amz_to_allocate}/{picks_needed}")
                 continue
 
@@ -259,6 +329,10 @@ def run_pick_allocation(cursor):
                             UPDATE orderstatus SET ukd = %s
                             WHERE ordernum = %s AND shopifysku = %s
                         """, (ukd_to_allocate, order_name, shopifysku))
+
+                        # Log the UKD pick allocation to CSV
+                        for i in range(ukd_to_allocate):
+                            log_pick_to_csv(shopifysku, order_name, "UKD")
                     else:
                         # No UKD stock available, mark the amount needed for ordering
                         log(f"No UKD stock available for {order_name}, SKU {shopifysku} - marking UKD with {picks_needed} for ordering")
@@ -310,14 +384,17 @@ def run_pick_allocation(cursor):
                 remaining_qty = pick_qty - 1
                 fallback_id = int(''.join(filter(str.isdigit, order_name)) + str(random.randint(100, 999)))
                 cursor.execute("""
-                    INSERT INTO localstock (id, updated, ordernum, location, groupid, code, supplier, qty, brand, allocated)
-                    VALUES (%s, CURRENT_TIMESTAMP, '#FREE', %s, %s, %s, %s, %s, %s, 'unallocated')
+                    INSERT INTO localstock (id, updated, ordernum, location, groupid, code, supplier, qty, brand, allocated, deleted)
+                    VALUES (%s, CURRENT_TIMESTAMP, '#FREE', %s, %s, %s, %s, %s, %s, 'unallocated', 0)
                 """, (fallback_id, location, groupid, shopifysku, supplier, remaining_qty, brand))
                 log(f"Pick split for {order_name}, SKU {shopifysku}, row {pick_id} (location: {location}) -> 1 pick + new row {fallback_id} with {remaining_qty}")
             else:
                 # Use the entire pick (qty = 1)
                 cursor.execute("UPDATE localstock SET ordernum = %s WHERE id = %s", (order_name, pick_id))
                 log(f"Pick assigned for {order_name}, SKU {shopifysku} -> row {pick_id} (location: {location})")
+
+            # Log the local stock pick allocation to CSV
+            log_pick_to_csv(shopifysku, order_name, location)
 
             picks_allocated += 1
 
