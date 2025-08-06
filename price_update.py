@@ -75,6 +75,7 @@ def batch_search_variants_by_sku(skus, batch_size=50):
     # Process SKUs in batches to respect API limits
     for i in range(0, len(skus), batch_size):
         batch_skus = skus[i:i + batch_size]
+        batch_num = (i // batch_size) + 1
 
         # Build query string for multiple SKUs
         sku_queries = " OR ".join([f"sku:{sku}" for sku in batch_skus])
@@ -284,7 +285,7 @@ def update_variant_links_in_database(variant_updates, cur, conn):
         log(f"Updated {updated_count} variant links in database")
 
 
-def update_variant_price(variant_id, new_price):
+def update_variant_price(variant_id, new_price, rrp=None):
     if not variant_id:
         return False
 
@@ -299,6 +300,15 @@ def update_variant_price(variant_id, new_price):
             "price": new_price
         }
     }
+    
+    # Add compare_at_price if RRP is provided
+    if rrp and rrp.strip() and rrp != '0':
+        try:
+            rrp_float = float(rrp)
+            if rrp_float > 0:
+                payload["variant"]["compare_at_price"] = str(rrp_float)
+        except ValueError:
+            pass  # Invalid RRP format, skip
 
     retries = 5
     while retries > 0:
@@ -366,9 +376,11 @@ def show_usage():
     print("  python price_update.py full               # Force update all, Google enabled")
     print("  python price_update.py --no-google        # Only update changed, Google disabled")
     print("  python price_update.py full --no-google   # Force update all, Google disabled")
+    print("  python price_update.py --groupid <id>     # Update specific groupid only")
     print("  python price_update.py --help             # Show help")
     print("")
     print("Google updates: Uses googleid from skumap table, updates price only (no availability), currency always GBP")
+    print("RRP updates: Now includes compare_at_price from RRP field in skusummary table")
 
 
 def main():
@@ -382,12 +394,19 @@ def main():
     # Parse command line arguments
     mode = "changed"
     google_updates_enabled = True
+    specific_groupid = None
 
-    for arg in sys.argv[1:]:
+    i = 1
+    while i < len(sys.argv):
+        arg = sys.argv[i]
         if arg.lower() == "full":
             mode = "full"
         elif arg.lower() == "--no-google":
             google_updates_enabled = False
+        elif arg.lower() == "--groupid" and i + 1 < len(sys.argv):
+            specific_groupid = sys.argv[i + 1]
+            i += 1  # Skip the next argument since we consumed it
+        i += 1
 
     # Log start of operation
     log(f"Starting price update - mode: {mode}, Google updates: {'enabled' if google_updates_enabled else 'disabled'}")
@@ -404,10 +423,14 @@ def main():
     conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
-    if mode == "full":
-        cur.execute("SELECT groupid, shopifyprice FROM skusummary WHERE shopify = 1")
+    # Fetch RRP along with other data
+    if specific_groupid:
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1 AND groupid = %s", (specific_groupid,))
+        mode = "single"  # Set mode for logging
+    elif mode == "full":
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1")
     else:
-        cur.execute("SELECT groupid, shopifyprice FROM skusummary WHERE shopify = 1 AND shopifychange = 1")
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1 AND shopifychange = 1")
 
     group_rows = cur.fetchall()
     total_processed = 0
@@ -420,7 +443,7 @@ def main():
 
     # Collect all SKUs for batch variant lookup
     all_codes = []
-    for groupid, shopifyprice in group_rows:
+    for groupid, shopifyprice, rrp in group_rows:
         cur.execute("SELECT code FROM skumap WHERE groupid = %s", (groupid,))
         codes = [row[0] for row in cur.fetchall()]
         all_codes.extend(codes)
@@ -441,7 +464,7 @@ def main():
     price_update_start = datetime.now()
     log(f"Starting price update phase at {price_update_start.strftime('%H:%M:%S')}")
 
-    for groupid, shopifyprice in group_rows:
+    for groupid, shopifyprice, rrp in group_rows:
         processed_groups += 1
         cur.execute("SELECT code, variantlink, googleid FROM skumap WHERE groupid = %s", (groupid,))
         variants = cur.fetchall()
@@ -473,16 +496,17 @@ def main():
 
             # Compare prices as floats to avoid string formatting differences (e.g., "80.00" vs "80")
             if float(current_price) != float(shopifyprice):
-                # Update Shopify price
+                # Update Shopify price with RRP
                 shopify_start = datetime.now()
-                result = update_variant_price(variant_id, shopifyprice)
+                result = update_variant_price(variant_id, shopifyprice, rrp)
                 shopify_end = datetime.now()
                 shopify_duration = (shopify_end - shopify_start).total_seconds()
 
                 if result is True:
                     shopify_updates += 1
                     # Log detailed price change information for both modes
-                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice} (variant_id: {variant_id}) [Shopify: {shopify_duration:.2f}s]"
+                    rrp_info = f", RRP: £{rrp}" if rrp and rrp.strip() and rrp != '0' else ", RRP: None"
+                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice}{rrp_info} (variant_id: {variant_id}) [Shopify: {shopify_duration:.2f}s]"
                     log(price_change_msg)
 
                     # Track that this group had a price change (for database logging)
