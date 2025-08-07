@@ -687,6 +687,15 @@ def main():
             log("Order sync completed, now running pick allocation...")
             run_pick_allocation(cursor)
 
+        # Clean up deleted localstock records
+        log("Cleaning up deleted localstock records...")
+        cursor.execute("DELETE FROM localstock WHERE deleted = 1")
+        deleted_count = cursor.rowcount
+        if deleted_count > 0:
+            log(f"Cleaned up {deleted_count} deleted localstock records")
+        else:
+            log("No deleted localstock records to clean up")
+        
         conn.commit()
     except Exception as e:
         log(f"ERROR: Unexpected error: {e}")
