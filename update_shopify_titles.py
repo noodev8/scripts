@@ -195,7 +195,7 @@ def verify_title_update(product_id, expected_title):
         if r.status_code == 200:
             product_data = r.json().get("product", {})
             current_title = product_data.get("title", "")
-            return current_title == expected_title
+            return current_title.strip() == expected_title
         else:
             log(f"❌ Failed to verify title update for product {product_id}: HTTP {r.status_code}")
             return False
@@ -264,7 +264,7 @@ def main():
     for groupid, handle, shopifytitle in rows:
         handle_to_data[handle] = {
             'groupid': groupid,
-            'shopifytitle': shopifytitle
+            'shopifytitle': shopifytitle.strip() if shopifytitle else ''
         }
         handles.append(handle)
 
@@ -295,8 +295,8 @@ def main():
 
         product_id, current_title = product_data[handle]
 
-        # Only update if titles are different
-        if current_title == new_title:
+        # Only update if titles are different (comparing trimmed versions)
+        if current_title.strip() == new_title:
             log(f"{groupid}: Title already matches - no update needed")
             # Still update the tracking timestamp since we checked it
             try:
