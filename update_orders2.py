@@ -222,6 +222,7 @@ def run_pick_allocation(cursor):
           AND COALESCE(localstock, 0) = 0
           AND COALESCE(ukd, 0) = 0
           AND COALESCE(othersupplier, 0) = 0
+          AND (orderdate IS NULL OR LOWER(orderdate) NOT LIKE '%do not order%')
     """)
     orders = cursor.fetchall()
     for order_name, shopifysku, order_qty in orders:
