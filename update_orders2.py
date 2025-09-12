@@ -696,7 +696,41 @@ def main():
             log(f"Cleaned up {deleted_count} deleted localstock records")
         else:
             log("No deleted localstock records to clean up")
-        
+
+        # Additional cleanup operations
+        log("Running additional database cleanup operations...")
+
+        # Clean up orderstatus table
+        log("Cleaning up orderstatus records...")
+        cursor.execute("DELETE FROM orderstatus WHERE batch = '-1'")
+        batch_deleted = cursor.rowcount
+        if batch_deleted > 0:
+            log(f"Deleted {batch_deleted} orderstatus records with batch = '-1'")
+
+        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND createddate < NOW() - INTERVAL '30 days'")
+        old_deleted = cursor.rowcount
+        if old_deleted > 0:
+            log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 30 days)")
+
+        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND arrived = 1")
+        arrived_deleted = cursor.rowcount
+        if arrived_deleted > 0:
+            log(f"Deleted {arrived_deleted} arrived orderstatus records (ordertype <> 1)")
+
+        # Clean up localstock table
+        log("Cleaning up localstock records...")
+        cursor.execute("DELETE FROM localstock WHERE qty = 0 AND ordernum = '#FREE'")
+        free_deleted = cursor.rowcount
+        if free_deleted > 0:
+            log(f"Deleted {free_deleted} localstock records with qty = 0 and ordernum = '#FREE'")
+
+        cursor.execute("UPDATE localstock SET allocated = 'amz' WHERE location = 'C3-Amazon' and allocated = 'unallocated'")
+        amz_updated = cursor.rowcount
+        if amz_updated > 0:
+            log(f"Updated {amz_updated} localstock records: set allocated = 'amz' for C3-Amazon location")
+
+        log("Database cleanup operations completed")
+
         conn.commit()
     except Exception as e:
         log(f"ERROR: Unexpected error: {e}")
