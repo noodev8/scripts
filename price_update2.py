@@ -1,0 +1,615 @@
+# --- USAGE ---
+# python price_update2.py                    # Changed only (default), Google updates enabled
+# python price_update2.py full               # Force full update, Google updates enabled
+# python price_update2.py --no-google        # Changed only, Google updates disabled
+# python price_update2.py full --no-google   # Force full update, Google updates disabled
+# python price_update2.py --help             # Show usage help
+#
+# This version uses supplemental feeds via SFTP for Google price updates
+
+import psycopg2
+import requests
+import sys
+import time
+import os
+import pandas as pd
+import paramiko
+from datetime import datetime
+from dotenv import load_dotenv
+from logging_utils import manage_log_files, create_logger, get_db_config, save_report_file
+
+# --- SHOPIFY CONFIGURATION ---
+# Load environment variables from .env
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+
+SHOP_NAME = "brookfieldcomfort2"
+API_VERSION = "2025-04"
+ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
+LOG_RETENTION = 3  # days
+
+# Validate that the access token was loaded
+if not ACCESS_TOKEN:
+    raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
+
+# --- GOOGLE SFTP CONFIGURATION ---
+SFTP_HOST = 'partnerupload.google.com'
+SFTP_PORT = 19321
+SFTP_USERNAME = 'mc-sftp-124941872'  # From Merchant Center
+SFTP_PASSWORD = 'V[,:Ua1#2p'  # From Merchant Center
+
+# Global list to track Google price updates
+google_price_updates = []
+
+# Setup logging
+SCRIPT_NAME = "price_update2"
+manage_log_files(SCRIPT_NAME)
+log = create_logger(SCRIPT_NAME)
+
+
+def generate_supplemental_feed():
+    """Generate a supplemental feed TSV file with price updates"""
+    global google_price_updates
+    
+    if not google_price_updates:
+        log("No Google price updates to process")
+        return None
+    
+    # Create DataFrame from collected price updates
+    df = pd.DataFrame(google_price_updates)
+    
+    # Generate TSV content
+    tsv_content = df.to_csv(sep='\t', index=False)
+    
+    # Save to logs directory with fixed filename (overwrites previous)
+    filename = "GOOGLE-PRICE-UPDATE.txt"
+    output_file = save_report_file(filename, tsv_content)
+    
+    log(f"Generated supplemental feed with {len(google_price_updates)} price updates")
+    log(f"Supplemental feed saved to: {output_file}")
+    
+    return output_file
+
+
+def upload_supplemental_feed_to_google(local_file):
+    """Upload the supplemental price feed to Google Merchant Center via SFTP"""
+    if not local_file:
+        return False
+    
+    try:
+        transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
+        transport.connect(username=SFTP_USERNAME, password=SFTP_PASSWORD)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        
+        # Upload as supplemental feed with registered name
+        remote_file = "GOOGLE-PRICE-UPDATE.txt"
+        sftp.put(local_file, remote_file)
+        
+        log(f"Supplemental feed uploaded to Google Merchant SFTP as {remote_file}")
+        sftp.close()
+        transport.close()
+        return True
+        
+    except Exception as e:
+        log(f"SFTP upload failed: {str(e)}")
+        return False
+
+
+def batch_search_variants_by_sku(skus, batch_size=50):
+    """
+    Search for multiple variants by SKU using Shopify's GraphQL API in batches.
+    Returns dict: {sku: (variant_id, current_price, product_title)}
+    """
+    results = {}
+
+    # Process SKUs in batches to respect API limits
+    for i in range(0, len(skus), batch_size):
+        batch_skus = skus[i:i + batch_size]
+        batch_num = (i // batch_size) + 1
+
+        # Build query string for multiple SKUs
+        sku_queries = " OR ".join([f"sku:{sku}" for sku in batch_skus])
+
+        url = f"https://{SHOP_NAME}.myshopify.com/admin/api/{API_VERSION}/graphql.json"
+        headers = {
+            "X-Shopify-Access-Token": ACCESS_TOKEN,
+            "Content-Type": "application/json"
+        }
+
+        query = """
+        query($query: String!) {
+            productVariants(first: 250, query: $query) {
+                edges {
+                    node {
+                        id
+                        sku
+                        price
+                        product {
+                            title
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        """
+
+        variables = {"query": sku_queries}
+        payload = {"query": query, "variables": variables}
+
+        try:
+            batch_call_start = datetime.now()
+            r = requests.post(url, json=payload, headers=headers)
+            if r.status_code == 429:  # Rate limited
+                log(f"Rate limited on batch {batch_num}, waiting 5 seconds...")
+                time.sleep(5)
+                r = requests.post(url, json=payload, headers=headers)
+
+            batch_call_end = datetime.now()
+            call_duration = (batch_call_end - batch_call_start).total_seconds()
+
+            if r.status_code != 200:
+                log(f"Batch {batch_num} GraphQL request failed with status {r.status_code} (took {call_duration:.2f}s)")
+                continue
+            else:
+                log(f"Batch {batch_num} completed successfully (took {call_duration:.2f}s)")
+
+            data = r.json()
+
+            # Check for GraphQL errors
+            if "errors" in data:
+                log(f"❌ GraphQL errors in batch request: {data['errors']}")
+                continue
+
+            edges = data.get("data", {}).get("productVariants", {}).get("edges", [])
+
+            for edge in edges:
+                variant = edge["node"]
+                sku = variant["sku"]
+
+                if sku in batch_skus:  # Only process SKUs we asked for
+                    # Extract IDs (remove gid://shopify/ prefix)
+                    variant_id = variant["id"].split("/")[-1]
+                    current_price = variant["price"]
+                    product_title = variant["product"]["title"]
+
+                    results[sku] = (variant_id, current_price, product_title)
+
+            # Delay between batches
+            time.sleep(0.5)
+
+        except Exception as e:
+            log(f"Exception in batch_search_variants_by_sku: {str(e)}")
+            continue
+
+    return results
+
+
+def search_variant_by_sku(sku):
+    """
+    Search for a variant by SKU using Shopify's GraphQL API.
+    Returns variant_id, current_price, and product_title for verification.
+    """
+    url = f"https://{SHOP_NAME}.myshopify.com/admin/api/{API_VERSION}/graphql.json"
+    headers = {
+        "X-Shopify-Access-Token": ACCESS_TOKEN,
+        "Content-Type": "application/json"
+    }
+
+    query = """
+    query($sku: String!) {
+        productVariants(first: 1, query: $sku) {
+            edges {
+                node {
+                    id
+                    sku
+                    price
+                    product {
+                        title
+                        id
+                    }
+                }
+            }
+        }
+    }
+    """
+
+    variables = {"sku": f"sku:{sku}"}
+    payload = {"query": query, "variables": variables}
+
+    try:
+        r = requests.post(url, json=payload, headers=headers)
+        if r.status_code == 429:  # Rate limited
+            time.sleep(5)
+            r = requests.post(url, json=payload, headers=headers)
+
+        if r.status_code != 200:
+            return None, None, None
+
+        data = r.json()
+
+        # Check for GraphQL errors
+        if "errors" in data:
+            log(f"GraphQL error for SKU {sku}: {data['errors']}")
+            return None, None, None
+
+        edges = data.get("data", {}).get("productVariants", {}).get("edges", [])
+        if not edges:
+            return None, None, None
+
+        variant = edges[0]["node"]
+
+        # Extract data
+        variant_id = variant["id"].split("/")[-1]
+        current_price = variant["price"]
+        product_title = variant["product"]["title"]
+
+        # Small delay between API calls
+        time.sleep(0.1)
+
+        return variant_id, current_price, product_title
+
+    except Exception as e:
+        log(f"Exception in search_variant_by_sku for {sku}: {str(e)}")
+        return None, None, None
+
+
+def get_variant_info_by_sku(code):
+    """
+    Get variant info by searching for the SKU only.
+    This ensures we always get the current, correct variant ID and price.
+    If SKU is not found in Shopify, returns None to prevent incorrect updates.
+    """
+    # Search by the exact code (SKU) - this is the ONLY method we use
+    variant_id, current_price, product_title = search_variant_by_sku(code)
+
+    if variant_id and current_price is not None:
+        return variant_id, current_price, product_title
+
+    # If not found, do NOT use any fallback - safety first
+    return None, None, None
+
+
+def get_current_shopify_price(variant_id):
+    """Legacy function - kept for compatibility but should use get_variant_info_by_sku instead"""
+    url = f"https://{SHOP_NAME}.myshopify.com/admin/api/{API_VERSION}/variants/{variant_id}.json"
+    headers = {
+        "X-Shopify-Access-Token": ACCESS_TOKEN
+    }
+    try:
+        r = requests.get(url, headers=headers)
+        if r.status_code == 429:  # Rate limited
+            time.sleep(5)
+            r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            # Small delay between API calls
+            time.sleep(0.1)
+            return r.json()["variant"]["price"]
+        return None
+    except Exception:
+        return None
+
+
+def update_variant_links_in_database(variant_updates, cur, conn):
+    """
+    Update the variantlink field in the database with current variant IDs.
+    variant_updates: dict {code: variant_id}
+    """
+    if not variant_updates:
+        return
+
+    updated_count = 0
+    for code, variant_id in variant_updates.items():
+        try:
+            cur.execute(
+                "UPDATE skumap SET variantlink = %s WHERE code = %s",
+                (f"{variant_id}V", code)
+            )
+            if cur.rowcount > 0:
+                updated_count += 1
+        except Exception as e:
+            log(f"Failed to update variantlink for {code}: {str(e)}")
+
+    if updated_count > 0:
+        conn.commit()
+        log(f"Updated {updated_count} variant links in database")
+
+
+def update_variant_price(variant_id, new_price, rrp=None):
+    if not variant_id:
+        return False
+
+    url = f"https://{SHOP_NAME}.myshopify.com/admin/api/{API_VERSION}/variants/{variant_id}.json"
+    headers = {
+        "X-Shopify-Access-Token": ACCESS_TOKEN,
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "variant": {
+            "id": variant_id,
+            "price": new_price
+        }
+    }
+    
+    # Add compare_at_price if RRP is provided
+    if rrp and rrp.strip() and rrp != '0':
+        try:
+            rrp_float = float(rrp)
+            if rrp_float > 0:
+                payload["variant"]["compare_at_price"] = str(rrp_float)
+        except ValueError:
+            pass  # Invalid RRP format, skip
+
+    retries = 5
+    while retries > 0:
+        try:
+            response = requests.put(url, json=payload, headers=headers)
+            if response.status_code == 200:
+                # Small delay after successful update
+                time.sleep(0.1)
+                return True
+            elif response.status_code == 429:
+                retry_after = int(response.headers.get("Retry-After", "5"))
+                time.sleep(max(retry_after, 5))  # Wait at least 5 seconds
+                retries -= 1
+            else:
+                return f"Failed — HTTP {response.status_code}"
+        except Exception as e:
+            return f"Exception — {str(e)}"
+
+    return "Rate limit exceeded"
+
+
+def update_google_price(google_id, new_price, rrp=None):
+    """Collect Google price update for supplemental feed"""
+    global google_price_updates
+
+    if not google_id:
+        return "No Google ID provided"
+
+    try:
+        # Collect the price update for the supplemental feed
+        # Google expects the full ID format: online:en:GB:googleid
+        full_id = f"online:en:GB:{google_id}"
+        
+        # Prepare the price update entry
+        price_entry = {
+            'id': full_id,
+            'price': f"{float(rrp):.2f} GBP" if rrp and rrp != '0' else f"{float(new_price):.2f} GBP",
+            'sale_price': f"{float(new_price):.2f} GBP"
+        }
+        
+        google_price_updates.append(price_entry)
+        
+        return True
+
+    except Exception as e:
+        error_msg = f"Error preparing Google price update: {str(e)}"
+        log(error_msg)
+        return error_msg
+
+
+def show_usage():
+    print("Usage:")
+    print("  python price_update2.py                    # Only update changed, Google enabled")
+    print("  python price_update2.py full               # Force update all, Google enabled")
+    print("  python price_update2.py --no-google        # Only update changed, Google disabled")
+    print("  python price_update2.py full --no-google   # Force update all, Google disabled")
+    print("  python price_update2.py --groupid <id>     # Update specific groupid only")
+    print("  python price_update2.py --help             # Show help")
+    print("")
+    print("Google updates: Uses supplemental feeds via SFTP (no API calls)")
+    print("- Generates price-only TSV file for changed products")
+    print("- Uploads to Google Merchant Center via SFTP")
+    print("- Google automatically merges with main product feed")
+    print("RRP updates: Includes compare_at_price from RRP field in skusummary table")
+
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("--help", "-h"):
+        show_usage()
+        return
+
+    # Record start time
+    start_time = datetime.now()
+
+    # Parse command line arguments
+    mode = "changed"
+    google_updates_enabled = True
+    specific_groupid = None
+
+    i = 1
+    while i < len(sys.argv):
+        arg = sys.argv[i]
+        if arg.lower() == "full":
+            mode = "full"
+        elif arg.lower() == "--no-google":
+            google_updates_enabled = False
+        elif arg.lower() == "--groupid" and i + 1 < len(sys.argv):
+            specific_groupid = sys.argv[i + 1]
+            i += 1  # Skip the next argument since we consumed it
+        i += 1
+
+    # Log start of operation
+    log(f"Starting price update - mode: {mode}, Google updates: {'enabled (supplemental feed)' if google_updates_enabled else 'disabled'}")
+    
+    # Clear previous Google price updates
+    global google_price_updates
+    google_price_updates = []
+
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
+    cur = conn.cursor()
+
+    # Fetch RRP along with other data
+    if specific_groupid:
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1 AND groupid = %s", (specific_groupid,))
+        mode = "single"  # Set mode for logging
+    elif mode == "full":
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1")
+    else:
+        cur.execute("SELECT groupid, shopifyprice, rrp FROM skusummary WHERE shopify = 1 AND shopifychange = 1")
+
+    group_rows = cur.fetchall()
+    total_processed = 0
+    shopify_updates = 0
+    google_updates = 0
+    google_failures = 0
+    processed_groups = 0
+    total_groups = len(group_rows)
+    variant_updates = {}  # Track variant IDs that need database updates
+
+    # Collect all SKUs for batch variant lookup
+    all_codes = []
+    for groupid, shopifyprice, rrp in group_rows:
+        cur.execute("SELECT code FROM skumap WHERE groupid = %s", (groupid,))
+        codes = [row[0] for row in cur.fetchall()]
+        all_codes.extend(codes)
+
+    # Get all variant data in batches to minimize API calls
+    log(f"Fetching variant information for {len(all_codes)} SKUs across {total_groups} product groups...")
+    batch_start_time = datetime.now()
+    variant_data = batch_search_variants_by_sku(all_codes)
+    batch_end_time = datetime.now()
+    batch_duration = (batch_end_time - batch_start_time).total_seconds()
+    log(f"Found variant information for {len(variant_data)} out of {len(all_codes)} SKUs in {batch_duration:.1f} seconds")
+
+    # Log start details for full mode
+    if mode == "full":
+        log(f"Starting FULL price sync for {total_groups} product groups...")
+
+    # Start timing the price update phase
+    price_update_start = datetime.now()
+    log(f"Starting price update phase at {price_update_start.strftime('%H:%M:%S')}")
+
+    for groupid, shopifyprice, rrp in group_rows:
+        processed_groups += 1
+        cur.execute("SELECT code, variantlink, googleid FROM skumap WHERE groupid = %s", (groupid,))
+        variants = cur.fetchall()
+
+        success = True
+        group_price_changed = False  # Track if any variant in this group had a price change
+        first_price_change = None   # Store details of first price change for logging
+
+        for code, variantlink, googleid in variants:
+            # Check if we have variant data from the batch lookup
+            if code in variant_data:
+                variant_id, current_price, product_title = variant_data[code]
+
+                # Check if we need to update the stored variant link
+                stored_variant = variantlink.rstrip("V").strip() if variantlink else ""
+                if stored_variant != variant_id:
+                    variant_updates[code] = variant_id
+
+            else:
+                # Try individual lookup if not found in batch - SKU search only, no fallback
+                variant_id, current_price, product_title = get_variant_info_by_sku(code)
+                if not variant_id:
+                    log(f"{code}: ⚠️  SKU not found in Shopify - skipping price update for safety")
+                    success = False
+                    continue
+
+                # Track this variant for database update
+                variant_updates[code] = variant_id
+
+            # Compare prices as floats to avoid string formatting differences (e.g., "80.00" vs "80")
+            if float(current_price) != float(shopifyprice):
+                # Update Shopify price with RRP
+                shopify_start = datetime.now()
+                result = update_variant_price(variant_id, shopifyprice, rrp)
+                shopify_end = datetime.now()
+                shopify_duration = (shopify_end - shopify_start).total_seconds()
+
+                if result is True:
+                    shopify_updates += 1
+                    # Log detailed price change information for both modes
+                    rrp_info = f", RRP: £{rrp}" if rrp and rrp.strip() and rrp != '0' else ", RRP: None"
+                    price_change_msg = f"{code}: PRICE CHANGED - '{product_title}' from £{current_price} -> £{shopifyprice}{rrp_info} (variant_id: {variant_id}) [Shopify: {shopify_duration:.2f}s]"
+                    log(price_change_msg)
+
+                    # Track that this group had a price change (for database logging)
+                    if not group_price_changed:
+                        group_price_changed = True
+                        first_price_change = (current_price, shopifyprice)
+
+                    # Collect Google price update if enabled and googleid exists
+                    if google_updates_enabled and googleid:
+                        google_result = update_google_price(googleid, shopifyprice, rrp)
+                        
+                        if google_result is True:
+                            google_updates += 1
+                            log(f"{code}: Google price collected for supplemental feed")
+                        else:
+                            google_failures += 1
+                            log(f"{code}: Google price collection failed - {google_result}")
+                else:
+                    log(f"{code}: Shopify update failed - {result} [Shopify: {shopify_duration:.2f}s]")
+                    success = False
+
+            total_processed += 1
+
+            # Rate limiting: 2 second pause every 30 API calls to stay under 40/second limit
+            if total_processed % 30 == 0:
+                log(f"Rate limiting pause after {total_processed} API calls...")
+                time.sleep(2)
+
+
+
+        # Progress logging for full mode every 50 groups
+        if mode == "full" and processed_groups % 50 == 0:
+            log(f"Progress: {processed_groups}/{total_groups} groups processed, {total_processed} variants checked, {shopify_updates} Shopify updates, {google_updates} Google updates")
+
+        if mode == "changed" and success:
+            cur.execute("UPDATE skusummary SET shopifychange = 0 WHERE groupid = %s", (groupid,))
+
+    # Update variant links in database if we found any discrepancies
+    update_variant_links_in_database(variant_updates, cur, conn)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    # Generate and upload Google supplemental feed if enabled and there are updates
+    if google_updates_enabled and google_updates > 0:
+        log(f"\n=== GOOGLE SUPPLEMENTAL FEED GENERATION ===")
+        feed_file = generate_supplemental_feed()
+        if feed_file:
+            upload_success = upload_supplemental_feed_to_google(feed_file)
+            if upload_success:
+                log(f"Successfully uploaded {google_updates} price updates to Google Merchant Center")
+            else:
+                log("Failed to upload supplemental feed to Google")
+        else:
+            log("Failed to generate supplemental feed")
+
+    # Calculate duration and timing breakdown
+    end_time = datetime.now()
+    total_duration = end_time - start_time
+    batch_duration_total = batch_duration if 'batch_duration' in locals() else 0
+    price_update_duration = (end_time - price_update_start).total_seconds() if 'price_update_start' in locals() else 0
+
+    duration_str = str(total_duration).split('.')[0]  # Remove microseconds
+
+    # Final summary log with timing breakdown
+    summary = f"Sync complete - mode: {mode}, groups: {len(group_rows)}, total variants: {total_processed}"
+    summary += f", Shopify price changes: {shopify_updates}"
+    if google_updates_enabled:
+        summary += f", Google supplemental feed: {google_updates} prices"
+    else:
+        summary += ", Google updates: disabled"
+    summary += f", Total duration: {duration_str}"
+
+    log(summary)
+    log(f"TIMING BREAKDOWN:")
+    log(f"  - Batch variant lookup: {batch_duration_total:.1f}s")
+    log(f"  - Price update phase: {price_update_duration:.1f}s")
+    log(f"  - Total time: {total_duration.total_seconds():.1f}s")
+
+    # Additional summary for price changes
+    if shopify_updates > 0:
+        log(f"SUMMARY: {shopify_updates} price changes were made during this sync")
+    else:
+        log("SUMMARY: No price changes were needed during this sync")
+
+
+if __name__ == "__main__":
+    main()
