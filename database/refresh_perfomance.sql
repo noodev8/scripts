@@ -238,3 +238,48 @@ SET stock = (
 )
 WHERE groupid_performance.channel = 'SHP'
   AND groupid_performance.stock IS NULL;
+
+/*
+===================================================================
+STEP 3: Add any missing groupids from skusummary 
+         Ensures all active products are in groupid_performance,
+         even those without any performance data yet
+===================================================================
+*/
+
+INSERT INTO groupid_performance (
+    groupid,
+    channel,
+    annual_profit,
+    sold_qty,
+    avg_profit_per_unit,
+    avg_gross_margin,
+    stock,
+    owner
+)
+SELECT DISTINCT
+    ss.groupid,
+    'SHP' AS channel,
+    0 AS annual_profit,
+    0 AS sold_qty,
+    0 AS avg_profit_per_unit,
+    0 AS avg_gross_margin,
+    COALESCE(ls.total_stock, 0) AS stock,
+    NULL AS owner
+FROM skusummary ss
+LEFT JOIN (
+    SELECT 
+        groupid,
+        SUM(qty) AS total_stock
+    FROM localstock
+    WHERE deleted IS DISTINCT FROM 1
+    GROUP BY groupid
+) ls ON ss.groupid = ls.groupid
+WHERE ss.shopify = 1  -- Products marked for Shopify
+  AND NOT EXISTS (
+      SELECT 1 
+      FROM groupid_performance gp 
+      WHERE gp.groupid = ss.groupid 
+        AND gp.channel = 'SHP'
+  )
+ON CONFLICT (groupid, channel) DO NOTHING;

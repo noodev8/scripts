@@ -17,7 +17,7 @@ from logging_utils import manage_log_files, create_logger, get_db_config
 from price_recommendation import update_all_recommended_prices
 
 # Setup logging
-SCRIPT_NAME = "refresh_groupid_perfromance"
+SCRIPT_NAME = "refresh_groupid_performance"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
