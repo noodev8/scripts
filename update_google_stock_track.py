@@ -7,10 +7,14 @@ Captures two metrics:
 1. Live Stock: Products active on both Shopify and Google Merchant Centre
 2. Total Stock: All products in inventory (localstock + Amazon)
 
+Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
+
 This helps determine appropriate Google Shopping ad budget based on available inventory.
 """
 
 import psycopg2
+import csv
+import os
 from datetime import datetime
 from logging_utils import manage_log_files, create_logger, get_db_config
 
@@ -18,6 +22,172 @@ from logging_utils import manage_log_files, create_logger, get_db_config
 SCRIPT_NAME = "update_google_stock_track"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
+
+def parse_csv_number(value):
+    """
+    Parse number from CSV, removing commas (thousands separator).
+
+    Args:
+        value: String value from CSV
+
+    Returns:
+        int or float: Parsed number
+    """
+    if not value or value.strip() == '':
+        return 0
+    # Remove commas and quotes
+    cleaned = value.replace(',', '').replace('"', '').strip()
+    try:
+        # Try as integer first
+        if '.' not in cleaned:
+            return int(cleaned)
+        return float(cleaned)
+    except ValueError:
+        log(f"WARNING: Could not parse number '{value}', using 0")
+        return 0
+
+def read_google_ads_csv(csv_path):
+    """
+    Read Google Ads CSV file and extract data.
+
+    Expected format:
+    Row 1: Title (skip)
+    Row 2: Date range (skip)
+    Row 3: Headers (Day,Clicks,Impr.,Currency code,Cost)
+    Data rows: dates with metrics
+
+    Args:
+        csv_path: Path to CSV file
+
+    Returns:
+        list: List of dicts with date, clicks, impressions, cost
+    """
+    data = []
+
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+
+            # Skip first 2 rows (title and date range)
+            next(reader, None)
+            next(reader, None)
+
+            # Read header row (row 3)
+            headers = next(reader, None)
+            if not headers:
+                log("ERROR: CSV file appears to be empty")
+                return data
+
+            log(f"CSV Headers: {headers}")
+
+            # Read data rows
+            for row in reader:
+                if len(row) < 5:
+                    log(f"WARNING: Skipping incomplete row: {row}")
+                    continue
+
+                try:
+                    # Parse date (column 0)
+                    date_str = row[0].strip()
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+                    # Parse metrics
+                    clicks = parse_csv_number(row[1])
+                    impressions = parse_csv_number(row[2])
+                    # Skip currency code (row[3])
+                    cost = parse_csv_number(row[4])
+
+                    data.append({
+                        'date': date_obj,
+                        'clicks': clicks,
+                        'impressions': impressions,
+                        'cost': cost
+                    })
+
+                except Exception as e:
+                    log(f"ERROR: Failed to parse row {row}: {str(e)}")
+                    continue
+
+            log(f"Successfully parsed {len(data)} rows from CSV")
+            return data
+
+    except FileNotFoundError:
+        log(f"INFO: CSV file not found: {csv_path}")
+        return data
+    except Exception as e:
+        log(f"ERROR: Failed to read CSV file: {str(e)}")
+        return data
+
+def update_google_ads_data(cursor, csv_data):
+    """
+    Update google_stock_track records with Google Ads data.
+    Only updates records that don't already have Google Ads data.
+
+    Args:
+        cursor: Database cursor
+        csv_data: List of dicts with Google Ads metrics
+
+    Returns:
+        dict: Statistics (updated, skipped, not_found)
+    """
+    stats = {
+        'updated': 0,
+        'skipped': 0,
+        'not_found': 0
+    }
+
+    for row in csv_data:
+        # Check if record exists for this date
+        check_query = """
+        SELECT id, google_ad_spend, google_clicks, google_impressions
+        FROM google_stock_track
+        WHERE DATE(snapshot_date) = %s
+        """
+
+        try:
+            cursor.execute(check_query, (row['date'],))
+            result = cursor.fetchone()
+
+            if not result:
+                log(f"No stock tracking record found for {row['date']}")
+                stats['not_found'] += 1
+                continue
+
+            record_id = result[0]
+            existing_spend = result[1]
+            existing_clicks = result[2]
+            existing_impressions = result[3]
+
+            # Skip if already has Google Ads data
+            if existing_spend is not None:
+                log(f"Record for {row['date']} already has Google Ads data, skipping")
+                stats['skipped'] += 1
+                continue
+
+            # Update the record
+            update_query = """
+            UPDATE google_stock_track
+            SET google_ad_spend = %s,
+                google_clicks = %s,
+                google_impressions = %s
+            WHERE id = %s
+            """
+
+            cursor.execute(update_query, (
+                row['cost'],
+                row['clicks'],
+                row['impressions'],
+                record_id
+            ))
+
+            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions")
+            stats['updated'] += 1
+
+        except Exception as e:
+            log(f"ERROR: Failed to update record for {row['date']}: {str(e)}")
+            continue
+
+    return stats
 
 def calculate_live_stock(cursor):
     """
@@ -238,12 +408,13 @@ def check_already_run_today(cursor):
         raise
 
 def main():
-    """Main function to calculate and record stock levels"""
+    """Main function to import Google Ads data and calculate/record stock levels"""
     log("=== GOOGLE STOCK TRACKING STARTED ===")
     start_time = datetime.now()
 
     conn = None
     cursor = None
+    snapshot_created = False
 
     try:
         # Connect to database
@@ -253,49 +424,64 @@ def main():
         cursor = conn.cursor()
         log("Database connection established")
 
-        # Check if already run today
+        # Step 1: Check if today's snapshot exists, create if needed
         if check_already_run_today(cursor):
-            log("Skipping execution - already run today")
-            log("=== GOOGLE STOCK TRACKING SKIPPED ===")
-            return 0
-
-        # Calculate live stock (Shopify + Google)
-        log("--- Calculating Live Stock (Shopify + Google) ---")
-        live_units, live_value = calculate_live_stock(cursor)
-
-        # Calculate total stock (all products)
-        log("--- Calculating Total Stock (All Products) ---")
-        total_units, total_value = calculate_total_stock(cursor)
-
-        # Calculate yesterday's Shopify sales
-        log("--- Calculating Yesterday's Shopify Sales ---")
-        sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
-
-        # Insert snapshot
-        log("--- Inserting Stock Snapshot ---")
-        snapshot_id = insert_stock_snapshot(
-            cursor,
-            live_units,
-            live_value,
-            total_units,
-            total_value,
-            sales_units,
-            sales_revenue
-        )
-
-        if snapshot_id:
-            # Commit transaction
-            conn.commit()
-            log("Transaction committed successfully")
-
-            end_time = datetime.now()
-            total_duration = (end_time - start_time).total_seconds()
-            log(f"=== GOOGLE STOCK TRACKING COMPLETED SUCCESSFULLY ===")
-            log(f"Total execution time: {total_duration:.2f} seconds")
+            log("Stock snapshot already exists for today - skipping stock calculation")
         else:
-            log("ERROR: Failed to insert snapshot, rolling back")
-            conn.rollback()
-            return 1
+            log("--- Calculating Live Stock (Shopify + Google) ---")
+            live_units, live_value = calculate_live_stock(cursor)
+
+            log("--- Calculating Total Stock (All Products) ---")
+            total_units, total_value = calculate_total_stock(cursor)
+
+            log("--- Calculating Yesterday's Shopify Sales ---")
+            sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
+
+            log("--- Inserting Stock Snapshot ---")
+            snapshot_id = insert_stock_snapshot(
+                cursor,
+                live_units,
+                live_value,
+                total_units,
+                total_value,
+                sales_units,
+                sales_revenue
+            )
+
+            if snapshot_id:
+                snapshot_created = True
+                log("Stock snapshot created successfully")
+            else:
+                log("ERROR: Failed to insert snapshot, rolling back")
+                conn.rollback()
+                return 1
+
+        # Step 2: Check for CSV file and import Google Ads data (independent of snapshot)
+        csv_path = os.path.join(os.path.dirname(__file__), 'adcost_summary_30.csv')
+
+        if os.path.exists(csv_path):
+            log("--- Google Ads CSV File Found ---")
+            log(f"Reading CSV file: {csv_path}")
+            csv_data = read_google_ads_csv(csv_path)
+
+            if csv_data:
+                log("--- Updating Google Ads Data ---")
+                stats = update_google_ads_data(cursor, csv_data)
+                log(f"Google Ads import summary: {stats['updated']} updated, {stats['skipped']} skipped, {stats['not_found']} not found")
+            else:
+                log("WARNING: No data extracted from CSV file")
+        else:
+            log("INFO: No Google Ads CSV file found (adcost_summary_30.csv) - skipping ads data import")
+
+        # Commit all changes (snapshot and/or CSV updates)
+        conn.commit()
+        log("All changes committed successfully")
+
+        end_time = datetime.now()
+        total_duration = (end_time - start_time).total_seconds()
+        log(f"=== GOOGLE STOCK TRACKING COMPLETED SUCCESSFULLY ===")
+        log(f"Total execution time: {total_duration:.2f} seconds")
+        return 0
 
     except Exception as e:
         log(f"CRITICAL ERROR: Stock tracking failed: {str(e)}")

@@ -33,6 +33,7 @@ pnpm-debug.log*
 logs/
 *.txt
 *.csv
+!adcost_summary_30.csv
 
 # =========================================
 # Flutter (splitdine_flutter)
