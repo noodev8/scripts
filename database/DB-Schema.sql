@@ -5,7 +5,7 @@
 -- Dumped from database version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 17.4
 
--- Started on 2025-10-15 12:35:58
+-- Started on 2025-10-15 15:10:24
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -438,7 +438,12 @@ CREATE TABLE public.google_stock_track (
     live_stock_units integer,
     snapshot_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     total_stock_value numeric(10,2),
-    total_stock_units integer
+    total_stock_units integer,
+    shopify_sales numeric(10,2),
+    shopify_units integer,
+    google_ad_spend numeric(10,2),
+    google_clicks integer,
+    google_impressions integer
 );
 
 
@@ -1920,7 +1925,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2025-10-15 12:36:00
+-- Completed on 2025-10-15 15:10:26
 
 --
 -- PostgreSQL database dump complete

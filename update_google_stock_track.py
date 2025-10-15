@@ -129,7 +129,40 @@ def calculate_total_stock(cursor):
         log(f"ERROR: Failed to calculate total stock: {str(e)}")
         raise
 
-def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_value):
+def calculate_shopify_sales_yesterday(cursor):
+    """
+    Calculate Shopify sales from yesterday (CURRENT_DATE - 1).
+
+    Returns:
+        tuple: (units_sold, revenue)
+    """
+    query = """
+    SELECT
+        COALESCE(SUM(qty), 0) as units_sold,
+        COALESCE(SUM(soldprice * qty), 0) as revenue
+    FROM sales
+    WHERE channel = 'SHP'
+      AND solddate = CURRENT_DATE - 1
+    """
+
+    try:
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            units = int(result[0]) if result[0] is not None else 0
+            revenue = float(result[1]) if result[1] is not None else 0.0
+            log(f"Yesterday's Shopify sales: {units} units, £{revenue:.2f} revenue")
+            return units, revenue
+        else:
+            log("WARNING: No sales data returned for yesterday")
+            return 0, 0.0
+
+    except Exception as e:
+        log(f"ERROR: Failed to calculate yesterday's sales: {str(e)}")
+        raise
+
+def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_value, sales_units, sales_revenue):
     """
     Insert stock snapshot into google_stock_track table.
 
@@ -139,17 +172,20 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
         live_value: Live stock value
         total_units: Total stock unit count
         total_value: Total stock value
+        sales_units: Yesterday's Shopify sales units
+        sales_revenue: Yesterday's Shopify sales revenue
     """
     query = """
     INSERT INTO google_stock_track
-        (live_stock_units, live_stock_value, total_stock_units, total_stock_value, snapshot_date)
+        (live_stock_units, live_stock_value, total_stock_units, total_stock_value,
+         shopify_units, shopify_sales, snapshot_date)
     VALUES
-        (%s, %s, %s, %s, CURRENT_TIMESTAMP)
+        (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
     RETURNING id, snapshot_date
     """
 
     try:
-        cursor.execute(query, (live_units, live_value, total_units, total_value))
+        cursor.execute(query, (live_units, live_value, total_units, total_value, sales_units, sales_revenue))
         result = cursor.fetchone()
 
         if result:
@@ -174,6 +210,33 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
         log(f"ERROR: Failed to insert stock snapshot: {str(e)}")
         raise
 
+def check_already_run_today(cursor):
+    """
+    Check if the script has already run today.
+
+    Returns:
+        bool: True if already run today, False otherwise
+    """
+    query = """
+    SELECT COUNT(*)
+    FROM google_stock_track
+    WHERE DATE(snapshot_date) = CURRENT_DATE
+    """
+
+    try:
+        cursor.execute(query)
+        result = cursor.fetchone()
+        count = result[0] if result else 0
+
+        if count > 0:
+            log(f"WARNING: Script has already run {count} time(s) today")
+            return True
+        return False
+
+    except Exception as e:
+        log(f"ERROR: Failed to check if already run today: {str(e)}")
+        raise
+
 def main():
     """Main function to calculate and record stock levels"""
     log("=== GOOGLE STOCK TRACKING STARTED ===")
@@ -190,6 +253,12 @@ def main():
         cursor = conn.cursor()
         log("Database connection established")
 
+        # Check if already run today
+        if check_already_run_today(cursor):
+            log("Skipping execution - already run today")
+            log("=== GOOGLE STOCK TRACKING SKIPPED ===")
+            return 0
+
         # Calculate live stock (Shopify + Google)
         log("--- Calculating Live Stock (Shopify + Google) ---")
         live_units, live_value = calculate_live_stock(cursor)
@@ -198,6 +267,10 @@ def main():
         log("--- Calculating Total Stock (All Products) ---")
         total_units, total_value = calculate_total_stock(cursor)
 
+        # Calculate yesterday's Shopify sales
+        log("--- Calculating Yesterday's Shopify Sales ---")
+        sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
+
         # Insert snapshot
         log("--- Inserting Stock Snapshot ---")
         snapshot_id = insert_stock_snapshot(
@@ -205,7 +278,9 @@ def main():
             live_units,
             live_value,
             total_units,
-            total_value
+            total_value,
+            sales_units,
+            sales_revenue
         )
 
         if snapshot_id:
