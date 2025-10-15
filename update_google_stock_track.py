@@ -3,13 +3,16 @@
 Google Stock Tracking Script
 Calculates and records stock levels for Google Shopping campaign analysis.
 
-Captures two metrics:
+Creates daily snapshots dated for YESTERDAY with:
 1. Live Stock: Products active on both Shopify and Google Merchant Centre
 2. Total Stock: All products in inventory (localstock + Amazon)
+3. Shopify Sales: Sales from the day before the snapshot date
 
 Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
+The CSV data matches snapshot dates, ensuring no nulls in the database.
 
-This helps determine appropriate Google Shopping ad budget based on available inventory.
+This helps determine appropriate Google Shopping ad budget based on available inventory
+and historical performance.
 """
 
 import psycopg2
@@ -301,7 +304,8 @@ def calculate_total_stock(cursor):
 
 def calculate_shopify_sales_yesterday(cursor):
     """
-    Calculate Shopify sales from yesterday (CURRENT_DATE - 1).
+    Calculate Shopify sales from 2 days ago (CURRENT_DATE - 2).
+    This represents sales from the day before the snapshot date.
 
     Returns:
         tuple: (units_sold, revenue)
@@ -312,7 +316,7 @@ def calculate_shopify_sales_yesterday(cursor):
         COALESCE(SUM(soldprice * qty), 0) as revenue
     FROM sales
     WHERE channel = 'SHP'
-      AND solddate = CURRENT_DATE - 1
+      AND solddate = CURRENT_DATE - 2
     """
 
     try:
@@ -322,19 +326,19 @@ def calculate_shopify_sales_yesterday(cursor):
         if result:
             units = int(result[0]) if result[0] is not None else 0
             revenue = float(result[1]) if result[1] is not None else 0.0
-            log(f"Yesterday's Shopify sales: {units} units, £{revenue:.2f} revenue")
+            log(f"Sales from 2 days ago: {units} units, £{revenue:.2f} revenue")
             return units, revenue
         else:
-            log("WARNING: No sales data returned for yesterday")
+            log("WARNING: No sales data returned")
             return 0, 0.0
 
     except Exception as e:
-        log(f"ERROR: Failed to calculate yesterday's sales: {str(e)}")
+        log(f"ERROR: Failed to calculate sales: {str(e)}")
         raise
 
 def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_value, sales_units, sales_revenue):
     """
-    Insert stock snapshot into google_stock_track table.
+    Insert stock snapshot into google_stock_track table for yesterday.
 
     Args:
         cursor: Database cursor
@@ -342,15 +346,15 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
         live_value: Live stock value
         total_units: Total stock unit count
         total_value: Total stock value
-        sales_units: Yesterday's Shopify sales units
-        sales_revenue: Yesterday's Shopify sales revenue
+        sales_units: Sales units from day before snapshot
+        sales_revenue: Sales revenue from day before snapshot
     """
     query = """
     INSERT INTO google_stock_track
         (live_stock_units, live_stock_value, total_stock_units, total_stock_value,
          shopify_units, shopify_sales, snapshot_date)
     VALUES
-        (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+        (%s, %s, %s, %s, %s, %s, CURRENT_DATE - 1)
     RETURNING id, snapshot_date
     """
 
@@ -382,15 +386,15 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
 
 def check_already_run_today(cursor):
     """
-    Check if the script has already run today.
+    Check if snapshot for yesterday has already been created.
 
     Returns:
-        bool: True if already run today, False otherwise
+        bool: True if yesterday's snapshot exists, False otherwise
     """
     query = """
     SELECT COUNT(*)
     FROM google_stock_track
-    WHERE DATE(snapshot_date) = CURRENT_DATE
+    WHERE DATE(snapshot_date) = CURRENT_DATE - 1
     """
 
     try:
@@ -399,12 +403,12 @@ def check_already_run_today(cursor):
         count = result[0] if result else 0
 
         if count > 0:
-            log(f"WARNING: Script has already run {count} time(s) today")
+            log(f"Snapshot for yesterday already exists ({count} record(s))")
             return True
         return False
 
     except Exception as e:
-        log(f"ERROR: Failed to check if already run today: {str(e)}")
+        log(f"ERROR: Failed to check if yesterday's snapshot exists: {str(e)}")
         raise
 
 def main():
@@ -424,20 +428,21 @@ def main():
         cursor = conn.cursor()
         log("Database connection established")
 
-        # Step 1: Check if today's snapshot exists, create if needed
+        # Step 1: Check if yesterday's snapshot exists, create if needed
         if check_already_run_today(cursor):
-            log("Stock snapshot already exists for today - skipping stock calculation")
+            log("Snapshot for yesterday already exists - skipping stock calculation")
         else:
+            log("--- Creating Snapshot for Yesterday ---")
             log("--- Calculating Live Stock (Shopify + Google) ---")
             live_units, live_value = calculate_live_stock(cursor)
 
             log("--- Calculating Total Stock (All Products) ---")
             total_units, total_value = calculate_total_stock(cursor)
 
-            log("--- Calculating Yesterday's Shopify Sales ---")
+            log("--- Calculating Shopify Sales (Day Before Yesterday) ---")
             sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
 
-            log("--- Inserting Stock Snapshot ---")
+            log("--- Inserting Stock Snapshot for Yesterday ---")
             snapshot_id = insert_stock_snapshot(
                 cursor,
                 live_units,
@@ -450,7 +455,7 @@ def main():
 
             if snapshot_id:
                 snapshot_created = True
-                log("Stock snapshot created successfully")
+                log("Stock snapshot for yesterday created successfully")
             else:
                 log("ERROR: Failed to insert snapshot, rolling back")
                 conn.rollback()
