@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# Database Backup Script
+# Backs up to: Google Drive > ServerBackups folder
+# Google Account: brookfieldcomfort@gmail.com
+# Local retention: 3 days
+# Google Drive retention: Unlimited (version history)
+#
 
 BACKUP_DIR="/apps/scripts/database"
 DATE=$(date +%Y-%m-%d)
