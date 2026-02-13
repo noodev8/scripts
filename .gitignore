@@ -34,6 +34,8 @@ logs/
 *.txt
 *.csv
 !adcost_summary_30.csv
+!google_price/price_report_*.csv
+!google_price/price_action_*.csv
 
 # =========================================
 # Flutter (splitdine_flutter)

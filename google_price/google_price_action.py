@@ -82,7 +82,7 @@ def fetch_guardrail_data(groupids):
         sales_rows = cur.fetchall()
         sales_df = pd.DataFrame(sales_rows, columns=['groupid', 'sold_30d'])
 
-        # Fetch total stock across all sizes per groupid
+        # Fetch total stock across all sizes per groupid (local + FBA)
         cur.execute("""
             SELECT groupid, COALESCE(SUM(qty), 0) AS stock
             FROM localstock
@@ -91,6 +91,15 @@ def fetch_guardrail_data(groupids):
         """, (list(groupids),))
         stock_rows = cur.fetchall()
         stock_df = pd.DataFrame(stock_rows, columns=['groupid', 'stock'])
+
+        cur.execute("""
+            SELECT groupid, COALESCE(SUM(amzlive), 0) AS fba_stock
+            FROM amzfeed
+            WHERE groupid = ANY(%s)
+            GROUP BY groupid
+        """, (list(groupids),))
+        fba_rows = cur.fetchall()
+        fba_df = pd.DataFrame(fba_rows, columns=['groupid', 'fba_stock'])
 
         cur.close()
 
@@ -105,6 +114,10 @@ def fetch_guardrail_data(groupids):
         if not stock_df.empty:
             df = df.join(stock_df.set_index('groupid'), how='left')
         df['stock'] = df.get('stock', pd.Series(dtype='float')).fillna(0).astype(int)
+        if not fba_df.empty:
+            df = df.join(fba_df.set_index('groupid'), how='left')
+        df['fba_stock'] = df.get('fba_stock', pd.Series(dtype='float')).fillna(0).astype(int)
+        df['stock'] = df['stock'] + df['fba_stock']
 
         return df
     finally:

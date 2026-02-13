@@ -1,0 +1,211 @@
+groupid,brand,title,our_price,cost,rrp,benchmark_avg,benchmark_min,benchmark_max,benchmark_clicks,suggested_avg,suggested_min,suggested_max,total_click_uplift,total_conversion_uplift,sizes_in_report,margin_at_current,margin_at_suggested
+0034701-MILANO,Birkenstock,Birkenstock Milano Birko-Flor Sandals Dark Brown Regular Fit,80.0,37.5,90.0,84.77,48.84,90.36,12.0,71.26,68.0,76.5,5.06,5.47,10,53.1,47.4
+0034703-MILANO,Birkenstock,Birkenstock Milano Birko-Flor Sandals Dark Brown Narrow Fit,75.0,37.5,90.0,87.02,78.76,88.73,4.0,70.2,70.2,70.2,0.45,0.44,8,50.0,46.6
+0034791-MILANO,Birkenstock,Birkenstock Milano Birko-Flor Sandals Black Regular Fit,83.0,37.5,90.0,,86.98,92.3,0.0,68.32,66.59,69.3,21.22,21.14,9,54.8,45.1
+0034793-MILANO,Birkenstock,Birkenstock Milano Birko-Flor Sandals Black Narrow Fit,71.0,37.5,90.0,82.8,75.7,89.63,5.0,62.76,58.5,67.49,18.54,17.43,13,47.2,40.2
+0040301-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Sandals Patent Black Regular Fit,70.0,33.33,80.0,75.77,70.0,79.23,3.0,60.66,57.59,65.6,11.77,13.13,5,52.4,45.1
+0040303-MADRID,Birkenstock,Birkenstock Madrid Sandals Patent Black Narrow Fit,64.0,33.33,80.0,73.5,69.74,79.13,24.0,56.71,56.0,59.99,3.15,4.53,7,47.9,41.2
+0040391-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Dark Brown Regular Fit,65.0,31.25,75.0,74.04,74.04,75.28,1.0,56.99,56.99,56.99,1.33,1.61,3,51.9,45.2
+0040393-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Dark Brown Narrow Fit,65.0,31.25,75.0,,58.44,72.04,0.0,56.24,56.24,56.24,2.85,3.46,5,51.9,44.4
+0040731-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor White Regular Fit,75.0,31.25,75.0,,53.2,60.47,0.0,,,,,,4,58.3,
+0040733-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor White Narrow Fit,62.0,31.25,75.0,71.9,66.86,79.26,13.0,57.11,56.99,57.75,2.43,2.55,6,49.6,45.3
+0040791-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Black Regular Fit,70.81,31.25,75.0,,64.14,75.0,0.0,57.34,56.99,58.49,15.27,17.85,8,55.9,45.5
+0040793-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Black Narrow Fit,60.0,31.25,75.0,67.42,50.02,73.16,2.0,51.3,49.5,56.24,8.55,10.17,7,47.9,39.1
+0043661-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals Black Regular Fit,73.55,37.5,85.0,82.95,82.95,89.44,1.0,66.54,66.19,68.84,8.11,8.92,5,49.0,43.6
+0043663-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals Black Narrow Fit,70.0,37.5,85.0,,,,,63.84,60.35,67.15,11.38,15.97,6,46.4,41.3
+0043691-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Black Regular Fit,70.43,35.42,85.0,83.37,65.61,84.79,8.0,57.77,56.95,58.65,39.39,42.34,8,49.7,38.7
+0043693-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Black Narrow Fit,72.0,35.42,85.0,,57.03,89.19,0.0,58.16,57.8,58.65,14.0,14.9,6,50.8,39.1
+0051101-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Natural Leather Sandals Brown Regular Fit,81.0,39.58,95.0,90.56,90.56,95.0,4.0,70.75,68.4,76.95,8.01,8.14,10,51.1,44.1
+0051103-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Natural Leather Sandals Brown Narrow Fit,76.0,39.58,95.0,,88.69,95.0,0.0,71.24,71.24,71.24,0.28,0.34,8,47.9,44.4
+0051191-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Natural Leather Sandals Black Regular Fit,79.26,39.58,95.0,93.43,90.88,95.0,4.0,69.21,68.4,71.24,5.05,5.45,10,50.1,42.8
+0051193-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Natural Leather Sandals Black Narrow Fit,68.0,39.58,95.0,81.25,79.61,90.41,5.0,64.6,64.6,64.6,0.64,0.66,7,41.8,38.7
+0051701-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Dark Brown Regular Fit,76.0,35.42,80.0,70.63,65.6,84.21,3.0,65.58,63.99,69.6,27.15,29.9,14,53.4,46.0
+0051703-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Dark Brown Narrow Fit,71.8,35.42,80.0,,65.05,84.89,0.0,64.22,59.19,68.8,26.05,29.26,13,50.7,44.8
+0051751-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Blue Regular Fit,80.0,35.42,80.0,,70.82,85.0,0.0,65.6,65.6,65.6,14.93,14.76,11,55.7,46.0
+0051753-ARIZONA,Birkenstock,Birkenstock Arizona Birko-Flor Sandals Navy Blue Narrow Fit,80.0,35.42,80.0,,68.79,84.46,0.0,67.2,67.2,67.2,2.47,2.7,8,55.7,47.3
+0051791-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Black Regular Fit,70.0,35.42,80.0,83.18,52.84,85.0,3.0,59.95,57.59,63.99,45.8,44.94,13,49.4,40.9
+0051793-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Black Narrow Fit,68.0,35.42,80.0,80.02,74.03,84.83,13.0,59.05,57.59,60.79,7.07,7.9,13,47.9,40.0
+0071051-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals White Regular Fit,69.0,35.42,85.0,72.51,69.34,79.89,4.0,57.98,56.95,65.55,5.96,6.33,7,48.7,38.9
+0071053-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals White Narrow Fit,70.0,35.42,85.0,,59.52,76.0,0.0,63.33,60.35,65.45,3.13,3.15,5,49.4,44.1
+0071791-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals Black Regular Fit,68.0,35.42,85.0,75.69,62.89,85.0,31.0,58.08,56.95,59.5,13.38,12.86,7,47.9,39.0
+0071793-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals Black Narrow Fit,75.05,35.42,85.0,77.16,77.16,84.71,1.0,66.29,66.29,66.29,6.94,7.89,7,52.8,46.6
+0128161-MADRID,Birkenstock,Birkenstock Madrid EVA Sandals Black Regular Fit,34.5,16.67,40.0,37.03,36.49,39.87,4.0,29.07,28.79,29.59,16.79,18.84,6,51.7,42.7
+0128163-MADRID,Birkenstock,Birkenstock Madrid EVA Sandals Black Narrow Fit,35.0,16.67,40.0,38.63,38.63,39.84,1.0,29.65,28.79,31.5,13.72,15.67,6,52.4,43.8
+0128181-MADRID,Birkenstock,Birkenstock Madrid EVA Sandals White Regular Fit,25.0,16.67,40.0,39.1,38.59,39.31,2.0,,,,,,3,33.3,
+0128183-MADRID,Birkenstock,Birkenstock Madrid EVA Sandals White Narrow Fit,36.42,16.67,40.0,,35.3,39.71,0.0,,,,,,6,54.2,
+0128201-GIZEH,Birkenstock,Birkenstock Gizeh EVA Sandals Black Regular Fit,40.0,18.75,45.0,,41.53,46.78,0.0,34.65,34.65,34.65,2.12,1.78,11,53.1,45.9
+0128221-GIZEH,Birkenstock,Birkenstock Gizeh EVA Sandals White Regular Fit,40.87,18.75,45.0,31.69,31.35,37.25,1.0,35.19,32.84,39.15,19.36,20.85,11,54.1,46.7
+0129421-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Black Regular Fit,42.32,20.83,45.0,43.15,43.15,49.52,1.0,,,,,,6,50.8,
+0129423-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Black Narrow Fit,39.0,20.83,45.0,49.12,46.33,49.84,5.0,32.5,31.5,35.1,14.18,12.69,6,46.6,35.9
+0129441-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals White Regular Fit,40.0,20.83,50.0,46.55,41.88,48.92,4.0,35.84,35.0,38.0,4.34,3.86,6,47.9,41.9
+0129443-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals White Narrow Fit,40.0,20.83,45.0,48.95,46.95,49.76,4.0,35.1,35.1,35.1,8.58,7.45,7,47.9,40.7
+0143621-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Blue Regular Fit,76.55,35.42,85.0,83.87,68.29,85.0,2.0,67.52,66.29,68.89,1.73,1.96,7,53.7,47.5
+0143623-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Blue Narrow Fit,80.0,35.42,85.0,84.35,83.7,84.35,1.0,69.65,68.84,76.5,2.21,2.67,3,55.7,49.1
+03354-26,Rieker,Mens Rieker Extra Width Shoes Brown,60.0,28.8,67.0,,41.6,61.72,0.0,,,,,,4,52.0,
+0552681-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals White Regular Fit,80.0,35.42,80.0,,64.14,82.09,0.0,,,,,,7,55.7,
+0552683-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals White Narrow Fit,67.0,35.42,80.0,79.05,79.05,85.07,1.0,59.19,59.19,59.19,2.53,2.37,7,47.1,40.2
+0745531-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals White Regular Fit,85.0,35.42,85.0,,73.31,83.87,0.0,75.15,71.4,76.5,2.65,3.34,6,58.3,52.9
+0943871-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Graceful Pearl White Regular Fit,80.0,37.5,85.0,87.55,86.73,89.9,1.0,67.34,65.45,76.5,8.31,9.12,7,53.1,44.3
+0943873-GIZEH,Birkenstock,Birkenstock Gizeh Birko-Flor Sandals Graceful Pearl White Narrow Fit,85.0,37.5,85.0,,89.27,89.27,0.0,71.34,69.7,78.2,8.96,11.51,3,55.9,47.4
+10001-001,Crocs,Crocs Classic Clogs Black,28.0,22.0,50.0,46.8,35.14,47.25,8.0,26.5,26.5,26.5,0.44,0.43,9,21.4,17.0
+10001-1LM,Crocs,Crocs Classic Clogs Elephant,28.0,22.0,50.0,,42.2,47.43,0.0,,,,,,5,21.4,
+10001-78R,Crocs,Crocs Classic Clogs Yellow Daylily,28.0,22.0,50.0,,34.04,36.15,0.0,,,,,,3,21.4,
+1002443-SOCK,Birkenstock,Womens Birkenstock Cotton Socks Dark Grey,15.95,6.38,15.95,,,,,13.84,13.71,14.03,6.43,5.96,2,60.0,53.9
+1002445-SOCK,Birkenstock,Womens Birkenstock Cotton Twist Socks Blue,15.95,6.38,15.95,,,,,13.71,13.71,13.71,1.04,1.09,1,60.0,53.5
+1005291-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Patent Sandals Black Regular Fit,72.0,37.5,90.0,80.76,75.66,89.5,16.0,66.48,65.69,67.49,5.9,6.66,8,47.9,43.6
+1005292-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Patent Sandals Black Narrow Width,80.0,37.5,90.0,52.54,52.54,84.09,2.0,67.03,65.69,69.3,12.7,13.81,6,53.1,44.1
+1005293-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Patent Sandals White Regular Fit,75.0,37.5,90.0,78.95,73.09,84.77,13.0,67.01,65.69,69.3,2.37,2.31,4,50.0,44.0
+1005294-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Patent Sandals White Narrow Width,73.44,37.5,90.0,,62.41,80.12,0.0,67.49,67.49,67.49,7.52,7.6,7,48.9,44.4
+1005299-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals White Regular Fit,75.5,37.5,90.0,86.58,82.36,92.99,10.0,71.1,71.1,71.1,0.38,0.52,5,50.3,47.3
+1005300-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals White Narrow Fit,75.0,37.5,90.0,,,,,68.03,67.5,69.3,2.78,2.85,4,50.0,44.9
+1005309-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Sandals Patent White Regular Width,60.5,33.33,80.0,,70.94,73.1,0.0,,,,,,2,44.9,
+1005310-MADRID,Birkenstock,Birkenstock Madrid Birko-Flor Sandals Patent White Narrow Width,70.0,33.33,80.0,71.74,70.88,75.42,5.0,57.8,56.0,59.99,19.96,22.08,6,52.4,42.3
+1008039-SOCK,Birkenstock,Mens Birkenstock Cotton Socks Dark Grey,13.95,5.58,13.95,14.07,13.95,14.07,1.0,12.95,12.55,13.11,5.8,6.19,3,60.0,56.9
+1008060-SOCK,Birkenstock,Mens Birkenstock Cotton Socks Light Grey,13.95,5.58,13.95,,10.18,14.25,0.0,12.31,11.99,13.11,3.7,4.15,3,60.0,54.7
+1008061-SOCK,Birkenstock,Mens Birkenstock Cotton Slub Socks White Beige,13.95,5.58,13.95,13.95,13.95,13.95,2.0,12.62,12.55,12.83,2.97,2.96,3,60.0,55.8
+1009829-SOCK,Birkenstock,Womens Birkenstock Cotton Sole Invisible Sock White,8.95,3.58,8.95,,,,,8.59,8.59,8.59,0.19,0.2,1,60.0,58.3
+1009920-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Graceful Pearl White Regular Fit,73.0,37.5,90.0,,74.64,87.71,0.0,66.56,65.7,69.3,4.55,4.35,7,48.6,43.7
+1009921-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Graceful Pearl White Narrow Fit,71.0,37.5,90.0,,79.09,89.0,0.0,63.9,63.9,63.9,0.83,0.85,7,47.2,41.3
+1013069-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Patent Sandals Sand Brown Regular Fit,70.0,37.5,90.0,,,,,62.29,57.6,66.59,5.75,6.95,3,46.4,39.8
+1013075-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals Sand Brown Regular Fit,75.0,37.5,90.0,,,,,68.8,67.5,70.2,2.95,3.62,5,50.0,45.5
+1013076-GIZEH,Birkenstock,Birkenstock Gizeh Patent Sandals Sand Brown Narrow Fit,64.01,37.5,90.0,,,,,59.29,57.61,60.3,1.05,1.47,3,41.4,36.7
+1014190-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals White Regular Fit,75.0,35.42,85.0,,82.1,84.51,0.0,66.67,65.45,68.84,6.19,6.61,4,52.8,46.9
+1014614-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Rose Reptile Narrow Fit,41.21,20.83,50.0,38.86,38.57,44.75,4.0,39.0,39.0,39.0,0.7,0.58,6,49.5,46.6
+1014932-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Dark Anthracite Grey Narrow Fit,49.0,25.0,60.0,58.55,55.88,60.01,22.0,40.05,39.6,44.1,18.23,16.19,7,49.0,37.6
+1014934-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Light Grey Narrow Fit,50.0,25.0,60.0,53.25,47.5,59.69,10.0,42.18,40.2,47.99,11.88,11.68,8,50.0,40.7
+1014938-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Dark Anthracite Grey Regular Fit,52.0,25.0,60.0,,51.77,60.6,0.0,,,,,,11,51.9,
+1015080-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Light Grey Regular Fit,50.0,60.0,60.0,,49.72,63.08,0.0,,,,,,10,-20.0,
+1015084-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Dark Anthracite Grey Narrow Fit,81.0,37.5,90.0,85.68,77.79,88.86,2.0,66.6,64.8,68.85,24.53,27.5,7,53.7,43.7
+1015086-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Light Grey Narrow Fit,82.0,37.5,90.0,83.56,67.64,89.85,1.0,68.82,67.49,76.5,13.14,14.69,8,54.3,45.5
+1015090-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Dark Anthracite Grey Regular Fit,81.0,37.5,90.0,79.85,64.0,91.34,16.0,66.35,65.69,67.49,12.86,17.12,9,53.7,43.5
+1015092-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Light Grey Regular Fit,80.0,37.5,90.0,87.55,79.22,90.06,6.0,66.87,65.69,76.5,11.94,14.4,11,53.1,43.9
+1015398-BARBADOS,Birkenstock,Birkenstock Barbados EVA Slide On Sandals Black Regular Fit,35.0,16.67,40.0,,25.49,39.58,0.0,29.24,28.0,31.5,7.14,8.03,9,52.4,43.0
+1015399-BARBADOS,Birkenstock,Birkenstock Barbados EVA Slide On Sandals White Regular Fit,32.0,16.67,40.0,39.27,38.46,39.27,3.0,,,,,,4,47.9,
+1016570-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Mocha Brown Regular Fit,76.0,37.5,90.0,,70.3,90.0,0.0,69.3,69.3,69.3,1.61,1.78,8,50.7,45.9
+1016571-ZERMATT,Birkenstock,Birkenstock Zermatt Shearling Felt Slippers Mocha Brown Narrow Fit,70.0,37.5,90.0,70.99,70.75,71.14,3.0,64.45,63.0,65.69,2.34,2.52,4,46.4,41.8
+1017519-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Dark Blue Navy Regular fit,54.1,25.0,60.0,57.42,54.54,58.71,5.0,46.59,45.59,49.8,6.51,6.51,4,53.8,46.3
+1017523-ZERMATT,Birkenstock,Birkenstock Zermatt Cork Latex Footbed Slippers Dark Blue Navy Narrow fit,54.0,25.0,60.0,56.98,51.19,59.99,6.0,46.5,45.59,48.6,4.63,4.76,6,53.7,46.2
+1017721-BEND,Birkenstock,Birkenstock Bend Low Natural Leather Trainer Style Black Regular Fit,92.0,56.25,135.0,115.14,104.29,137.96,34.0,87.43,86.4,87.75,1.49,1.61,11,38.9,35.7
+1017722-BEND,Birkenstock,Birkenstock Bend Low Natural Leather Trainer Style Black Narrow Fit,96.0,56.25,135.0,126.39,124.29,133.99,2.0,87.43,86.4,87.75,3.95,5.22,8,41.4,35.7
+1017723-BEND,Birkenstock,Birkenstock Bend Low Natural Leather Trainer Style White Regular Fit,108.0,56.25,135.0,125.81,117.12,133.11,28.0,87.09,86.4,87.75,13.61,14.13,11,47.9,35.4
+1017724-BEND,Birkenstock,Birkenstock Bend Low Natural Leather Trainer Style White Narrow Fit,95.0,56.25,135.0,125.38,124.33,134.1,18.0,88.69,87.75,89.1,3.93,4.07,9,40.8,36.6
+1019051-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Navy Blue Regular Fit,36.73,20.83,45.0,,44.04,49.76,0.0,,,,,,6,43.3,
+1019094-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Khaki Green Regular Fit,42.0,20.83,50.0,48.5,46.33,49.71,13.0,36.16,35.7,36.99,17.68,14.79,6,50.4,42.4
+1019115-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Vegan Sandals Black Regular Fit,81.01,37.5,90.0,,88.2,89.44,0.0,,,,,,4,53.7,
+1019142-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Blue Narrow Fit,40.0,20.83,45.0,48.95,47.47,50.0,9.0,35.55,35.1,36.44,2.74,2.47,7,47.9,41.4
+1019152-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Khaki Green Narrow Fit,40.0,20.83,45.0,47.43,33.92,47.79,2.0,36.87,36.0,38.25,2.6,2.13,7,47.9,43.5
+1019163-BEND,Birkenstock,Birkenstock Bend Low Canvas Suede Trainer Style Sandcastle Regular Fit,90.0,52.08,125.0,,,,,80.96,78.75,86.25,4.07,4.96,6,42.1,35.7
+1019180-BEND,Birkenstock,Birkenstock Bend Low Canvas Suede Trainer Style Midnight Blue Regular Fit,125.0,52.08,125.0,,,,,102.07,100.0,110.0,19.57,22.03,6,58.3,49.0
+1019635-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Vegan Light Rose Narrow Fit,81.5,37.5,90.0,,86.4,90.0,0.0,68.76,68.39,69.27,3.89,4.59,5,54.0,45.5
+1019662-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Vegan Light Rose Regular Fit,50.0,37.5,90.0,,91.0,91.0,0.0,,,,,,1,25.0,
+1019717-BEND,Birkenstock,Birkenstock Bend Low Canvas Suede Trainer Style Sandcastle Narrow Fit,90.0,52.08,125.0,,,,,82.19,78.75,86.25,5.03,5.88,8,42.1,36.6
+1019723-BEND,Birkenstock,Birkenstock Bend Low Canvas Suede Trainer Style Midnight Blue Narrow Fit,80.41,52.08,125.0,102.7,102.7,102.7,6.0,76.39,76.39,76.39,0.38,0.56,2,35.2,31.8
+1022433-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Gold Regular Fit,38.01,20.83,50.0,49.07,49.07,49.07,2.0,36.11,36.11,36.11,0.38,0.31,2,45.2,42.3
+1022465-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Gold Narrow Fit,40.0,20.83,50.0,,39.32,48.62,0.0,38.0,38.0,38.0,0.59,0.58,5,47.9,45.2
+1022466-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Popcorn Narrow Fit,41.21,20.83,45.0,46.43,43.26,50.24,2.0,35.55,35.55,35.55,2.03,2.07,7,49.5,41.4
+1023657-SOCK,Birkenstock,Womens Birkenstock Cotton Twist Sock White,15.95,6.38,15.95,,,,,15.31,15.31,15.31,1.86,2.21,1,60.0,58.3
+1025006-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Vegan Sandals Pecan Regular Fit,54.53,37.5,90.0,,71.29,71.29,0.0,,,,,,1,31.2,
+1025046-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Vegan Pecan Narrow Fit,72.17,37.5,90.0,,81.08,87.94,0.0,68.01,66.59,68.56,1.95,1.96,4,48.0,44.9
+1025049-GIZEH,Birkenstock,Birkenstock Gizeh Sandals Vegan Birkibuc Pecan Brown Narrow Fit,64.0,37.5,90.0,,,,,60.3,60.3,60.3,0.5,0.79,2,41.4,37.8
+1025062-GIZEH,Birkenstock,Birkenstock Gizeh Sandals Vegan Birkibuc Pecan Brown Regular Fit,82.0,37.5,90.0,,73.05,73.05,0.0,76.7,73.8,78.3,5.99,8.02,7,54.3,51.1
+1025583-UPPSALA,Birkenstock,Birkenstock Uppsala Shearling Natural Leather Womens Boots Regular Width Black,90.0,75.0,180.0,113.45,102.35,125.48,61.0,,,,,,3,16.7,
+1026202-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Rose Reptile Regular Fit,30.0,20.83,50.0,45.8,44.0,49.54,6.0,,,,,,3,30.6,
+1026697-MAYARI,Birkenstock,Birkenstock Mayari Soft Vegan Sandals Grey Brown Taupe Narrow Fit,90.0,37.5,90.0,,,,,79.2,79.2,79.2,1.06,1.27,1,58.3,52.7
+1027305-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Eggshell Regular Fit,40.0,20.83,50.0,47.75,40.57,49.56,3.0,35.5,35.5,35.5,3.49,2.66,4,47.9,41.3
+1027339-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals White Eggshell Narrow Fit,65.0,35.42,85.0,81.67,76.5,85.55,4.0,58.56,56.1,59.5,2.52,2.68,6,45.5,39.5
+1027346-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals White Eggshell Regular Fit,65.0,35.42,85.0,77.54,74.71,82.02,12.0,57.04,56.1,57.8,6.3,6.42,7,45.5,37.9
+1027384-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals White Eggshell Narrow Fit,41.5,20.83,50.0,48.08,47.2,49.5,5.0,37.41,36.49,39.0,12.46,11.71,6,49.8,44.3
+1027696-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Stone Coin Narrow Fit,64.4,35.42,85.0,81.64,80.43,85.26,4.0,57.47,56.95,57.96,1.77,1.93,5,45.0,38.4
+1027720-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Stone Coin Regular Fit,65.0,35.42,85.0,82.84,79.13,89.24,8.0,58.54,56.95,59.5,6.46,6.62,10,45.5,39.5
+1027721-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals New Beige Regular Fit,72.0,35.42,85.0,,67.0,84.55,0.0,67.99,67.99,67.99,0.51,0.47,6,50.8,47.9
+1027723-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals New Beige Narrow Fit,75.0,35.42,85.0,,60.25,81.94,0.0,66.66,65.45,68.84,5.7,5.64,6,52.8,46.9
+1028566-BARBADOS,Birkenstock,Birkenstock Barbados EVA Slide On Sandals Khaki Green Regular Fit,34.0,16.67,40.0,39.73,31.66,40.0,4.0,,,,,,6,51.0,
+1029224-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Metallic Black Narrow Fit,70.0,35.42,85.0,,79.92,84.99,0.0,60.14,57.8,65.45,2.3,2.51,6,49.4,41.1
+1029233-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Metallic Black Regular Fit,75.0,35.42,85.0,84.2,79.45,85.0,1.0,66.72,66.29,68.84,9.5,9.81,7,52.8,46.9
+1029439-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Graceful Taupe Narrow Fit,70.0,37.5,90.0,,70.46,88.8,0.0,65.69,65.69,65.69,0.98,0.9,8,46.4,42.9
+1029470-ARIZONA,Birkenstock,Birkenstock Arizona Two-Strap Birko-Flor Sandals Graceful Taupe Regular Fit,78.4,37.5,90.0,89.78,87.02,90.02,2.0,67.49,67.49,67.49,0.94,0.85,6,52.2,44.4
+1029671-PASADENA,Birkenstock,Birkenstock Pasadena Suede Leather Shoes Taupe Regular Fit,70.0,64.58,155.0,109.77,82.66,153.64,11.0,,,,,,9,7.7,
+1029726-MAYARI,Birkenstock,Birkenstock Mayari Birk-Flor Sandals Sandcastle Brown Narrow Fit,75.0,35.42,85.0,70.93,60.56,84.21,4.0,67.22,66.29,68.84,8.44,9.37,6,52.8,47.3
+1029737-FLORIDA,Birkenstock,Birkenstock Florida Papillio Sandals Black Narrow Fit,48.0,37.5,90.0,84.28,78.83,85.39,3.0,,,,,,6,21.9,
+1029751-FLORIDA,Birkenstock,Birkenstock Florida Papillio Sandals EggShell White Narrow Fit,40.7,37.5,90.0,,47.89,82.56,0.0,,,,,,4,7.9,
+1029777-FLORIDA,Birkenstock,Birkenstock Florida Birko-Flor Sandals Graceful Pearl White Regular Fit,45.0,39.58,95.0,82.61,81.25,88.83,4.0,,,,,,5,12.0,
+1029811-MAYARI,Birkenstock,Birkenstock Mayari Birko-Flor Sandals Sandcastle Brown Regular Fit,75.0,35.42,85.0,79.59,78.0,85.32,9.0,66.85,66.29,68.84,7.15,7.67,7,52.8,47.0
+1030447-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Taupe Regular Fit,45.0,20.83,50.0,49.35,47.62,49.92,16.0,39.5,39.5,39.5,1.63,1.48,3,53.7,47.3
+1030466-ARIZONA,Birkenstock,Birkenstock Arizona EVA Sandals Grey Taupe Narrow Fit,40.0,20.83,50.0,47.56,44.46,50.0,39.0,38.0,38.0,38.0,0.33,0.31,6,47.9,45.2
+1031949-SOCK,Birkenstock,Womens Birkenstock Cotton Socks Light Grey,13.95,5.58,13.95,,,,,12.28,11.99,12.83,1.53,1.38,2,60.0,54.6
+124836-NVW,Skechers,Womens Skechers Slip-ins GO WALK Flex Grand Entry Trainers Navy,48.0,36.5,75.0,59.19,47.79,71.27,11.0,39.95,39.0,43.2,2.84,2.63,6,24.0,8.6
+124836-ROS,Skechers,Womens Skechers Slip Ins Go Walk Flex Trainers Pink,61.0,36.5,75.0,,64.62,64.62,0.0,56.18,54.9,58.49,1.79,1.44,4,40.2,35.0
+14621-00,Rieker,Mens Rieker Elasticated Shoes Black,87.0,37.15,87.0,,45.76,76.25,0.0,71.34,71.34,71.34,1.56,2.62,7,57.3,47.9
+14621-24,Rieker,Mens Rieker Elasticated Shoes Brown,87.0,37.15,87.0,,44.61,74.94,0.0,,,,,,5,57.3,
+150128-BKGD,Skechers,Womens Skechers Slipins Summits Classy Night Black Trainers,49.0,36.5,75.0,,51.86,71.72,0.0,45.75,45.75,45.75,0.74,0.88,6,25.5,20.2
+150128-TPGD,Skechers,Womens Skechers Slip Ins Summits Vegan Classy Night Trainers Taupe,49.0,36.5,75.0,41.5,34.64,50.08,9.0,,,,,,5,25.5,
+150620-BKW,Skechers,Womens Skechers Skech-Lite Pro 2.0 Everyday Pace Vegan Trainers Black,49.0,31.5,70.0,42.68,42.68,50.22,1.0,39.91,39.2,46.55,1.94,2.56,4,35.7,21.1
+205334-BBK,Skechers,Mens Skechers Pollard Osgood Slip-Ins Relaxed Fit Memory Foam Trainers Black,66.0,46.0,90.0,75.99,73.75,89.09,20.0,,,,,,8,30.3,
+205334-COC,Skechers,Mens Skechers Slip Ins Relaxed Fit Pollard Osgood Shoes Brown,67.0,46.0,90.0,69.92,58.22,89.71,12.0,60.99,58.5,63.0,1.26,1.72,9,31.3,24.6
+205517-CDB,Skechers,Mens Skechers Slip In Garza Rowan Relaxed Fit Shoes Brown,64.0,43.5,90.0,76.57,60.46,90.0,3.0,57.6,57.6,57.6,0.77,0.83,8,32.0,24.5
+232457-BKCC,Skechers,Mens Skechers Slip-ins Summits High Range Trainers Black,50.0,36.5,75.0,,51.89,64.38,0.0,,,,,,5,27.0,
+232457-DKNV,Skechers,Mens Skechers Slip Ins Summits Trainers Dark Navy,55.0,36.5,75.0,61.73,55.3,68.86,15.0,46.5,46.5,46.5,1.96,2.3,8,33.6,21.5
+232457-GRY,Skechers,Mens Skechers Slip Ins Summits High Range Trainers Grey,55.0,36.5,80.0,55.5,48.18,64.68,3.0,49.45,46.75,52.25,3.0,3.13,7,33.6,26.2
+232758-CCOR,Skechers,Mens Skechers Track Leshur Memory Foam Trainers Grey,50.0,29.0,65.0,,47.04,60.89,0.0,41.08,40.3,43.55,2.87,3.88,8,42.0,29.4
+232758-TPNV,Skechers,Mens Skechers Track Memory Foam Trainers Taupe,48.0,29.0,60.0,,41.76,50.06,0.0,,,,,,4,39.6,
+233103-BBK,Skechers,Mens Skechers Slip ins Relaxed Fit Equalizer Shoes Black,70.0,38.5,80.0,,47.3,70.01,0.0,,,,,,8,45.0,
+233103-NVY,Skechers,Mens Skechers Slip Ins Relaxed Fit Equalizer Shoes Navy,65.0,38.5,80.0,,56.51,81.77,0.0,59.19,59.19,59.19,0.63,0.6,7,40.8,35.0
+45973-00,Rieker,Womens Rieker Elasticated Shoes Black,67.0,30.85,72.0,,52.98,70.61,0.0,57.59,57.59,57.59,2.25,2.65,6,54.0,46.4
+45973-36,Rieker,Womens Rieker Elasticated Trainer Style Shoes Red,55.0,30.85,72.0,63.41,45.48,63.41,2.0,46.08,46.08,46.08,1.39,1.6,6,43.9,33.1
+48954-00,Rieker,Womens Rieker Extra Wide Touch Fastening Shoes Black,58.5,27.95,65.0,49.58,45.57,61.0,3.0,55.9,55.9,55.9,0.19,0.25,5,52.2,50.0
+72581-14,Rieker,Womens Rieker Fleece Lined Boots Blue,62.0,30.05,70.0,,47.96,70.19,0.0,58.1,58.1,58.1,0.89,1.28,5,51.5,48.3
+72581-54,Rieker,Womens Rieker Ankle Boots Green,56.0,30.05,70.0,46.28,45.98,70.07,1.0,46.9,46.9,46.9,1.03,1.26,5,46.3,35.9
+74260-25,Rieker,Womens Rieker Lined Ankle Boots Brown,75.0,32.1,75.0,,44.09,53.62,0.0,67.5,67.5,67.5,0.17,0.37,6,57.2,52.4
+B710AP,Goor,Boys Goor Oxford Tie Leather Shoe Patent Black,27.0,13.98,30.0,25.15,20.9,35.7,7.0,25.5,25.5,25.5,0.41,0.43,10,48.2,45.2
+D0700-22,Remonte,Womens Remonte Zip Shoes Brown,70.0,34.2,80.0,,47.14,79.99,0.0,66.82,65.6,67.2,2.2,2.52,6,51.1,48.8
+D0772-15,Remonte,Womens Remonte Zip Boots Blue,80.0,38.4,90.0,,65.88,86.32,0.0,,,,,,6,52.0,
+D0772-52,Remonte,Womens Remonte Zip Up Boots Green,81.0,38.4,90.0,,72.17,89.91,0.0,68.39,68.39,68.39,1.66,2.09,6,52.6,43.9
+DLA003-JAYNE-KHAKI,Lunar,Womens Lunar Jayne II khaki trainer,20.0,11.99,35.0,23.36,23.36,23.36,3.0,,,,,,1,40.0,
+ELZ006-LAKE-BL,Lunar,Womens Lazy Dogz Ankle Wellingtons Navy,35.0,17.5,45.0,34.97,34.74,39.27,4.0,29.05,28.8,29.25,20.12,20.85,5,50.0,39.8
+ELZ006-LAKE-CR,Lunar,Womens Lazy Dogz Ankle Wellingtons Cream,35.0,17.5,45.0,39.49,35.52,42.62,1.0,31.5,31.5,31.5,2.26,2.46,5,50.0,44.4
+ELZ006-LAKE-OL,Lunar,Womens Lazy Dogz Ankle Wellingtons Olive,35.0,17.5,45.0,40.04,35.47,40.53,10.0,31.91,31.5,32.84,3.25,3.34,5,50.0,45.2
+ELZ006-LAKE-PK,Lunar,Womens Lazy Dogz Ankle Wellingtons Pink,35.0,17.5,45.0,45.0,34.08,45.0,2.0,,,,,,5,50.0,
+FLE030-IVES-BEIGE,Lunar,Womens Lunar St Ives Leather Casual Trainer Beige,40.5,15.99,45.0,,38.38,43.52,0.0,35.55,35.55,35.55,0.72,0.92,3,60.5,55.0
+FLE030-IVES-BLACK,Lunar,Womens Lunar St Ives Leather Casual Trainer Black,32.0,15.99,45.0,38.55,37.05,41.13,4.0,28.94,28.8,29.25,3.14,3.42,6,50.0,44.7
+FLE030-IVES-BLACKSOLE,Lunar,Womens Lunar St Ives Leather Casual Trainer All Black Sole,32.5,15.99,45.0,39.99,39.07,40.67,9.0,29.47,29.25,29.7,5.15,5.41,6,50.8,45.7
+FLE030-IVES-GREY,Lunar,Womens Lunar St-Ives Leather Casual Trainer Grey,40.5,15.99,45.0,,41.42,43.99,0.0,35.85,34.65,36.45,3.79,4.39,5,60.5,55.4
+FLE030-IVES-KHAKI,Lunar,Womens Lunar St Ives Leather Casual Trainer Khaki,33.0,15.99,45.0,40.55,34.58,41.05,3.0,31.5,31.5,31.5,0.43,0.41,5,51.5,49.2
+FLE030-IVES-MIDBLUE,Lunar,Womens Lunar St Ives Leather Casual Trainer Mid Blue,32.0,15.99,45.0,37.95,35.45,40.23,16.0,27.39,26.55,29.25,9.94,9.82,6,50.0,41.6
+FLE030-IVES-NAVY-BLUE,Lunar,Womens Lunar St Ives Leather Casual Trainer Navy,34.0,15.99,45.0,37.34,36.9,40.49,3.0,28.98,27.45,29.25,20.14,24.13,7,53.0,44.8
+FLE030-IVES-RED,Lunar,Womens Lunar St Ives Leather Casual Trainer Red,39.99,15.99,45.0,43.74,41.66,43.74,1.0,32.84,32.84,32.84,1.61,1.56,2,60.0,51.3
+FLE030-IVES-STONE,Lunar,Womens Lunar St Ives Leather Casual Trainer Beige,32.0,15.99,45.0,24.92,24.92,43.45,1.0,27.5,26.55,28.8,3.16,3.16,5,50.0,41.8
+FLE030-IVES-WHITE,Lunar,Womens Lunar St Ives Leather Casual Trainer White,33.0,15.99,45.0,39.55,37.43,40.53,29.0,28.87,28.35,29.25,10.05,11.16,7,51.5,44.6
+FLE051-WHITE-IVA,Lunar,Womens Lunar Pump Shoes White Floral,30.0,16.99,50.0,36.14,36.14,45.62,1.0,,,,,,4,43.4,
+FLN002-NATASHA,Lunar,Womens Lunar Elasticated Comfort Shoes Black,35.0,11.5,35.0,,,,,32.51,32.2,32.9,0.45,0.64,2,67.1,64.6
+FLN038-ESTHER-BK,Lunar,Womens Lunar Comfort Wedge Shoes Black,37.0,11.5,37.0,,18.25,18.25,0.0,,,,,,1,68.9,
+JLH321-BLAISE-BLACK,Lunar,Womens Lunar Blaise Open Toe Strap Sandals Black,26.04,11.99,35.0,,26.69,31.07,0.0,,,,,,5,54.0,
+JLH321-BLAISE-SILVER,Lunar,Womens Lunar Blaise Open Toe Strap Sandals Silver,20.0,11.99,35.0,36.48,35.52,36.66,1.0,,,,,,5,40.0,
+JLH331-MARIELLA-BEIGE,Lunar,Womens Lunar Mariella Open Toe Sandals Beige,24.0,11.99,35.0,,27.99,36.46,0.0,,,,,,5,50.0,
+JLH331-MARIELLA-WHITE,Lunar,Womens Lunar Mariella Open Toe Sandals White,35.0,11.99,35.0,,17.72,24.13,0.0,,,,,,5,65.7,
+JLH356-DEANNAII-PK,Lunar,Womens Lunar Two Strap Sandals Pink,45.0,14.99,45.0,,34.49,34.49,0.0,39.15,39.15,39.15,1.27,1.4,1,66.7,61.7
+JLH356-DEANNAII-WT,Lunar,Womens Lunar Two Strap Sandals White And Blue,45.0,14.99,45.0,,44.98,44.99,0.0,,,,,,3,66.7,
+JLH358-CLUSTER-NAVY,Lunar,Womens Lunar Wedged Sandals Navy,20.0,13.99,43.0,32.64,31.75,36.0,2.0,,,,,,4,30.0,
+JLH455-CHARL-BLK,Lunar,Womens Lunar Charlotte II Soft Footbed Toe Post Womens Sandals Black,15.0,12.99,40.0,,36.24,39.24,0.0,,,,,,5,13.4,
+JLH478-EPSOM-NAVY,Lunar,Womens Lunar Wedge Sandals Navy,20.0,11.99,37.0,23.9,23.9,33.0,3.0,,,,,,5,40.0,
+JLH523-PARADISE-BK,Lunar,Womens Lunar Leopard Detail Sandals Black,40.0,12.99,40.0,,38.51,39.99,0.0,,,,,,2,67.5,
+JLH950-BLAZE-BLACK,Lunar,Lunar Womens Blaze Sandal Patent Heel T-Bar Black,25.18,12.99,39.0,35.4,34.38,36.95,4.0,,,,,,6,48.4,
+JLH950-BLAZE-NAVY,Lunar,Lunar Womens Blaze Sandal Patent Heel T-Bar Navy,24.0,12.99,39.0,30.91,29.63,32.53,3.0,,,,,,6,45.9,
+JLH950-BLAZE-NUDE,Lunar,Lunar Womens Blaze Sandal Patent Heel T-Bar Nude,26.91,12.99,39.0,31.25,29.8,35.13,1.0,25.74,25.74,25.74,0.37,0.37,6,51.7,49.5
+L7514-14,Rieker,Womens Rieker Fleece Lining Zip Boots Navy,72.0,34.2,80.0,79.07,49.17,79.31,3.0,66.4,66.4,66.4,1.45,1.79,5,52.5,48.5
+L830B,Cipriata,Womens Cipriata Press Stud Fold Down Biker Style Ankle Boots Brown,45.0,17.95,45.0,,30.16,33.02,0.0,,,,,,6,60.1,
+M014A,Goor,Mens Goor Brogue Oxford Shoes Black,40.0,15.98,40.0,,34.28,44.26,0.0,,,,,,8,60.0,
+M014B,Goor,Mens Goor Brogue Oxford Shoes Brown,40.0,15.98,40.0,,30.09,34.63,0.0,36.0,36.0,36.0,0.48,0.52,7,60.0,55.6
+M113BT,R21,Mens R21 Imitation Nubuck 6 Eye Ankle Boots Brown,50.0,17.75,50.0,,30.62,34.91,0.0,,,,,,6,64.5,
+M113DB,R21,Mens R21 Imitation Nubuck Ankle Boots Brown,50.0,17.75,50.0,,33.48,39.58,0.0,,,,,,4,64.5,
+M196A,Roamers,Mens Roamers Extra Wide Smart Casual Shoe Black,50.0,22.95,58.0,47.72,45.43,69.59,4.0,47.56,47.56,47.56,0.68,0.8,8,54.1,51.7
+M291AP,Goor,Mens Goor Smart Oxford Tie Shoes Patent Black,35.0,15.98,40.0,33.17,28.84,33.17,1.0,31.99,31.99,31.99,0.47,0.55,7,54.3,50.0
+M404A,Roamers,Mens Roamers Wide Touch Shoes Black,53.55,22.95,60.0,,42.85,55.62,0.0,,,,,,8,57.1,
+M410B,Goor,Mens Goor 4 Eye Brogue Smart Gibson Shoe Tan,40.0,15.98,40.0,36.5,27.17,38.95,6.0,35.14,33.6,36.0,5.64,7.83,7,60.0,54.5
+M620A,Scimitar,Mens Scimitar Smart Capped Oxford Cadet Shoe Black,36.0,14.95,36.0,,25.27,29.83,0.0,30.21,28.8,33.84,3.62,7.84,12,58.5,50.5
+M710AP,Goor,Mens Goor Smart Patent Oxford Tie Tuxedo Dress Shoe Black,35.0,15.98,40.0,34.18,30.08,35.75,1.0,31.13,29.59,32.39,5.78,6.11,9,54.3,48.7
+M968BC,Goor,Mens Goor Tan Navy Lace Up Smart Brogue Oxford Shoes,36.0,15.45,40.0,34.35,31.78,37.1,12.0,31.61,29.59,34.4,4.67,6.02,5,57.1,51.1
+N42T0-14,Rieker,Womens Rieker Slip On Trainer-style Shoes Blue,30.0,30.85,72.0,,59.78,72.67,0.0,,,,,,6,-2.8,
+R1402-16,Remonte,Womens Remonte Zip Shoes Blue,70.0,35.05,82.0,65.8,65.8,80.94,2.0,63.95,63.95,63.95,0.94,0.79,6,49.9,45.2
+SHAKE-II-BLACK,Hotter,Womens Hotter Shake II Shoes Mary Jane Standard and Wide Fit Black,47.4,36.21,79.0,69.0,59.58,72.6,4.0,,,,,,18,23.6,
+XM620A,Grafters,Mens Grafters Capped Oxford Cadet School Smart Shoe Black,36.0,14.25,36.0,,26.98,29.72,0.0,31.68,31.68,31.68,0.5,0.62,12,60.4,55.0
+Y0783-00,Rieker,Womens Rieker Velvet Fur Lining Boots Black,50.0,28.8,67.0,,48.32,52.98,0.0,41.5,40.87,42.21,3.54,7.05,5,42.4,30.6
