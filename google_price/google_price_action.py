@@ -82,6 +82,16 @@ def fetch_guardrail_data(groupids):
         sales_rows = cur.fetchall()
         sales_df = pd.DataFrame(sales_rows, columns=['groupid', 'sold_30d'])
 
+        # Fetch total stock across all sizes per groupid
+        cur.execute("""
+            SELECT groupid, COALESCE(SUM(qty), 0) AS stock
+            FROM localstock
+            WHERE groupid = ANY(%s)
+            GROUP BY groupid
+        """, (list(groupids),))
+        stock_rows = cur.fetchall()
+        stock_df = pd.DataFrame(stock_rows, columns=['groupid', 'stock'])
+
         cur.close()
 
         df = df.set_index('groupid')
@@ -92,6 +102,9 @@ def fetch_guardrail_data(groupids):
         if not sales_df.empty:
             df = df.join(sales_df.set_index('groupid'), how='left')
         df['sold_30d'] = df.get('sold_30d', pd.Series(dtype='float')).fillna(0).astype(int)
+        if not stock_df.empty:
+            df = df.join(stock_df.set_index('groupid'), how='left')
+        df['stock'] = df.get('stock', pd.Series(dtype='float')).fillna(0).astype(int)
 
         return df
     finally:
@@ -199,16 +212,17 @@ def build_action_report(report_df, guardrail_df, mode):
 
         rows.append({
             'groupid': gid,
+            'new_price': target,
+            'description': description,
             'brand': row.get('brand', ''),
             'title': row.get('title', ''),
             'current_price': current_price,
-            'new_price': target,
             'change': change,
             'change_pct': change_pct,
             'margin_current': margin_current,
             'margin_new': margin_new,
             'sold_30d': g.get('sold_30d', 0),
-            'description': description,
+            'stock': g.get('stock', 0),
         })
 
     action_df = pd.DataFrame(rows)
