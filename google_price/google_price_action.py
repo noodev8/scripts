@@ -44,7 +44,7 @@ def find_latest_data_report():
 
 
 def fetch_guardrail_data(groupids):
-    """Fetch cost, tax, rrp, shopifyprice from skusummary for the given groupids."""
+    """Fetch cost, tax, rrp, shopifyprice from skusummary and latest reason_notes from price_change_log."""
     db_config = get_db_config()
     conn = psycopg2.connect(**db_config)
     try:
@@ -59,8 +59,41 @@ def fetch_guardrail_data(groupids):
         df = pd.DataFrame(rows, columns=cols)
         for col in ['shopifyprice', 'cost', 'rrp', 'tax']:
             df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        # Fetch latest reason_notes per groupid
+        cur.execute("""
+            SELECT DISTINCT ON (groupid) groupid, reason_notes
+            FROM price_change_log
+            WHERE groupid = ANY(%s)
+            ORDER BY groupid, change_date DESC, id DESC
+        """, (list(groupids),))
+        notes_rows = cur.fetchall()
+        notes_df = pd.DataFrame(notes_rows, columns=['groupid', 'last_description'])
+
+        # Fetch units sold in last 30 days per groupid
+        cur.execute("""
+            SELECT groupid, COALESCE(SUM(qty), 0) AS sold_30d
+            FROM sales
+            WHERE groupid = ANY(%s)
+              AND solddate >= CURRENT_DATE - INTERVAL '30 days'
+              AND channel = 'SHP'
+            GROUP BY groupid
+        """, (list(groupids),))
+        sales_rows = cur.fetchall()
+        sales_df = pd.DataFrame(sales_rows, columns=['groupid', 'sold_30d'])
+
         cur.close()
-        return df.set_index('groupid')
+
+        df = df.set_index('groupid')
+        if not notes_df.empty:
+            df = df.join(notes_df.set_index('groupid'), how='left')
+        else:
+            df['last_description'] = None
+        if not sales_df.empty:
+            df = df.join(sales_df.set_index('groupid'), how='left')
+        df['sold_30d'] = df.get('sold_30d', pd.Series(dtype='float')).fillna(0).astype(int)
+
+        return df
     finally:
         conn.close()
 
@@ -155,6 +188,15 @@ def build_action_report(report_df, guardrail_df, mode):
         margin_current = calc_margin(current_price, net_cost)
         margin_new = calc_margin(target, net_cost)
 
+        # Use existing description from price_change_log, or generate a new one
+        last_desc = g.get('last_description')
+        if pd.notna(last_desc) and str(last_desc).strip():
+            description = str(last_desc).strip()
+        else:
+            direction = "reduced" if change < 0 else "raised"
+            source_label = source.replace("_", " ")
+            description = f"{mode.capitalize()} mode: {direction} from {current_price:.2f} to {target:.2f} ({source_label})"
+
         rows.append({
             'groupid': gid,
             'brand': row.get('brand', ''),
@@ -165,7 +207,8 @@ def build_action_report(report_df, guardrail_df, mode):
             'change_pct': change_pct,
             'margin_current': margin_current,
             'margin_new': margin_new,
-            'source': source,
+            'sold_30d': g.get('sold_30d', 0),
+            'description': description,
         })
 
     action_df = pd.DataFrame(rows)
