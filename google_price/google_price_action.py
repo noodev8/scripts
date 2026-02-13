@@ -147,8 +147,8 @@ def build_action_report(report_df, guardrail_df, mode):
         if pd.isna(current_price) or pd.isna(cost):
             continue
 
-        # Net cost: if tax=1, cost is VAT-inclusive -> divide by 1.2
-        net_cost = cost / 1.2 if tax == 1 else cost
+        # Cost is already ex-VAT in the database
+        net_cost = cost
 
         # Determine raw target price based on mode
         if mode == 'grow':
@@ -212,12 +212,14 @@ def build_action_report(report_df, guardrail_df, mode):
 
         rows.append({
             'groupid': gid,
+            'change': '',
             'new_price': target,
             'description': description,
             'brand': row.get('brand', ''),
             'title': row.get('title', ''),
             'current_price': current_price,
-            'change': change,
+            'rrp': rrp if pd.notna(rrp) else '',
+            'price_diff': change,
             'change_pct': change_pct,
             'margin_current': margin_current,
             'margin_new': margin_new,
@@ -230,6 +232,8 @@ def build_action_report(report_df, guardrail_df, mode):
     if not action_df.empty:
         # Sort by magnitude of change_pct (largest opportunity first)
         action_df = action_df.sort_values('change_pct', key=abs, ascending=False).reset_index(drop=True)
+        # Drop noisy columns from CSV output (keep internally for sorting)
+        action_df = action_df.drop(columns=['price_diff', 'change_pct', 'margin_current', 'margin_new'])
 
     return action_df
 
@@ -277,23 +281,12 @@ def main():
     total_reviewed = len(report_df)
     actionable = len(action_df)
 
-    if actionable > 0:
-        avg_change_pct = round(action_df['change_pct'].mean(), 1)
-        avg_margin_impact = round(
-            (action_df['margin_new'] - action_df['margin_current']).mean(), 1
-        )
-    else:
-        avg_change_pct = 0.0
-        avg_margin_impact = 0.0
-
     summary = (
         f"\n{'='*40}\n"
         f"GOOGLE PRICE ACTION REPORT ({mode_label})\n"
         f"{'='*40}\n"
         f"Products reviewed:  {total_reviewed:>6}\n"
         f"Actionable changes: {actionable:>6}\n"
-        f"Avg price change:   {avg_change_pct:>5}%\n"
-        f"Avg margin impact:  {avg_margin_impact:>5}pp\n"
         f"Output: {output_path}\n"
         f"{'='*40}"
     )

@@ -182,8 +182,8 @@ def build_report(benchmark_df, suggestion_df, sku_df):
         brand = p.get('brand')
         tax = p.get('tax', 0)
 
-        # Net cost for margin calc (if tax=1, cost is VAT-inclusive → divide by 1.2)
-        net_cost = cost / 1.2 if tax == 1 and cost else cost
+        # Cost is already ex-VAT in the database
+        net_cost = cost
 
         title = b.get('title_bench') or s.get('title_sugg') or ''
         suggested_avg = s.get('suggested_avg')
