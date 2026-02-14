@@ -27,12 +27,16 @@ The process is designed to be run manually with gaps between phases. Drop the Go
 - Output: `price_action_grow_YYYY-MM-DD.csv` or `price_action_protect_YYYY-MM-DD.csv` (10 columns: groupid, brand, title, current_price, new_price, change, change_pct, margin_current, margin_new, source)
 - No database changes
 
-### Phase 3: Apply (Future)
-- Review the Phase 2 action report and decide which changes to accept
-- Update `skusummary.shopifyprice` with the new price
-- Set `skusummary.shopifychange = 1` to flag for the nightly sync
-- Log the change to `price_change_log` table
+### Phase 3: Apply (`google_price_apply.py`)
+- Review the Phase 2 action report CSV and set `change=1` for rows to accept, `change=0` to skip
+- Add notes in the `description` column to record your reasoning
+- Run the apply script (dry run by default, `--confirm` to apply)
+- Only processes rows where `change=1`
+- Guardrail: blocks any price below cost + 10% margin
+- Updates `skusummary.shopifyprice` and sets `shopifychange = 1`
+- Logs each change to `price_change_log` (reason_code: `google_price`)
 - The existing `price_update2.py` nightly cron picks up `shopifychange = 1` and pushes to Shopify + Google Merchant
+- Edited CSVs are archived in `google_price/archive/` for future pattern analysis
 
 ## Key Database Mappings
 
@@ -70,9 +74,9 @@ skumap.googleid          -->  skumap.groupid  -->  skusummary.groupid
 | `old_price` | Price before change |
 | `new_price` | Price after change |
 | `change_date` | Date of change |
-| `reason_code` | e.g. "google_benchmark" or "google_sale_suggestion" |
-| `reason_notes` | Details from the Google report |
-| `changed_by` | "google_price_check" |
+| `reason_code` | `google_price` |
+| `reason_notes` | Description/notes from the action report |
+| `changed_by` | `google_price_action` |
 | `channel` | "SHP" |
 
 ## Google Report Formats
@@ -112,5 +116,8 @@ python google_price/google_price_check.py              # Phase 1: Data report (m
 python google_price/google_price_action.py             # Phase 2: Grow mode (default) — price decreases
 python google_price/google_price_action.py --protect   # Phase 2: Protect mode — price increases
 
-# 3. Phase 3 (apply) not yet implemented
+# 3. Review the action report CSV — set change=1 to accept, change=0 to skip, add notes in description
+# 4. Apply changes:
+python google_price/google_price_apply.py google_price/price_action_grow_YYYY-MM-DD.csv            # Dry run (review only)
+python google_price/google_price_apply.py google_price/price_action_grow_YYYY-MM-DD.csv --confirm  # Apply to database
 ```
