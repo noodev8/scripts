@@ -19,7 +19,11 @@
       "mcp__postgres__query",
       "Bash(cmd.exe /c \"cd C:\\\\scripts\\\\google-ads-stocktrack && python update_google_stock_track.py\")",
       "Bash(powershell.exe -Command \"cd ''C:\\\\scripts\\\\google-ads-stocktrack''; python update_google_stock_track.py\")",
-      "Bash(powershell.exe:*)"
+      "Bash(powershell.exe:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": []
   }
