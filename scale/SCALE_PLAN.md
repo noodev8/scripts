@@ -51,6 +51,29 @@ Scaling to £1M on Birkenstock alone would need ~£700k Birkenstock revenue at 1
 Current mix (Lunar + Birkenstock) at £310k already generates £86k GP.
 **Protecting and growing the Lunar/Amazon profit engine is as important as scaling Shopify/Birkenstock volume.**
 
+### Reality Check: Where Does £1M Come From? (Feb 2026)
+
+**Realistic ceiling from current operations (~£500-630k):**
+
+| Source | Current | Realistic Growth Path | Year 2-3 Target |
+|--------|--------:|:----------------------|----------------:|
+| Birkenstock/Shopify | £136k | Google Ads scaling (ROAS 10x→5x with more volume), spring/summer push | £250-300k |
+| Lunar/Amazon | £142k | Ives stock depth, Buy Box protection, new customer acquisition | £200-250k |
+| Rieker/Winter/Other | £32k | Winter Rieker (shipping direct to FBA), Birkenstock slippers, seasonal smoothing | £50-80k |
+
+This gets to **~£500-630k** by doing more of what already works. No new risk, just execution.
+
+**The gap from £630k to £1M (~£350-400k) needs something new:**
+
+1. **Expand Rieker range on Amazon** — most natural next move. Already proven at 32% margin. Previously stocked more styles but cut back. Revisit selectively using sales data — don't speculate, bring back styles with evidence. Account and infrastructure already in place.
+2. **Deeper Birkenstock range on Shopify** — more models = more long-tail Google search traffic at the same ROAS. Are there Birkenstock styles with demand that we don't stock?
+3. **Waldlaufer on Amazon** — similar demographic, worth evaluating. Amazon ranking not as strong as Rieker so lower priority. Look at when cash allows.
+4. **Amazon/Shopify crossover** — Lunar barely sells on Shopify (£12.7k at 11.6% margin vs 43% on Amazon). May just not be where those customers shop.
+
+**2026 is a stabilisation year.** No chasing new brands. Go deep on proven winners (Ives, Birkenstock core, Rieker). Turn a profit first. Expand cautiously when traction and cash allow — Rieker range expansion is the lowest-risk next step when ready.
+
+**Ruled out:** TikTok Shop (wrong demographic), Skechers (margins too thin, same problem as Birkenstock).
+
 ---
 
 ## 3. Growth Levers (Prioritised)
@@ -227,6 +250,24 @@ Revenue is near-identical. Lunar generates ~3x the gross profit.
 - **The risk is not Birkenstock itself — it's letting Birkenstock distract from Lunar.** Every pound of cash tied up in Birkenstock stock sitting through winter could be Lunar stock at 43% margin.
 
 **Action:** Never let Lunar stock run low to fund Birkenstock. Birkenstock cash commitment should be seasonal and controlled.
+
+### St Ives Repeat Purchase Analysis
+
+**Run date:** 2026-02-17
+
+| Metric | 12 months | 24 months |
+|--------|----------:|----------:|
+| Total St Ives customers | — | 428 |
+| Repeat buyers | 7 | 11 |
+| Repeat rate | — | 2.6% |
+
+Extending from 12 to 24 months only added 4 repeat buyers. These customers are not coming back — it's not a timing issue, it's the nature of the purchase. St Ives is a ~£38 Amazon sandal bought by price-driven shoppers, not brand-loyal ones. They need sandals, they find ours, they buy once.
+
+**What this means for strategy:**
+- **No Lunar/St Ives repeat purchase email campaign** — the data says it won't work at 2.6%
+- **Lunar growth = new customer acquisition, not retention** — win the Amazon listing, win new buyers
+- **Protect Lunar by protecting the listing** — reviews, stock depth, pricing, Buy Box position. That's what drives volume.
+- **Klaviyo repurchase efforts stay focused on Birkenstock** — higher price point, brand-conscious Shopify buyers, where loyalty has a realistic chance
 
 ---
 
