@@ -7,7 +7,19 @@
       "Bash(git add:*)",
       "Bash(git log:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebSearch",
+      "WebFetch(domain:support.google.com)",
+      "WebFetch(domain:supermetrics.com)",
+      "WebFetch(domain:docs.supermetrics.com)",
+      "Bash(while read id)",
+      "Bash(do grep \"^$id\" docs/day-before-1753.txt)",
+      "Bash(done)",
+      "Bash(copy \"C:\\\\scripts\\\\google_price\\\\price_action_grow_2026-02-13.csv\" \"C:\\\\scripts\\\\google_price\\\\archive\\\\price_action_grow_2026-02-13.csv\")",
+      "mcp__postgres__query",
+      "Bash(cmd.exe /c \"cd C:\\\\scripts\\\\google-ads-stocktrack && python update_google_stock_track.py\")",
+      "Bash(powershell.exe -Command \"cd ''C:\\\\scripts\\\\google-ads-stocktrack''; python update_google_stock_track.py\")",
+      "Bash(powershell.exe:*)"
     ],
     "deny": []
   }

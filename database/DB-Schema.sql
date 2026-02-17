@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
+-- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 17.4
 
--- Started on 2025-10-15 15:10:24
+-- Started on 2026-02-16 19:41:35
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -466,7 +466,7 @@ CREATE SEQUENCE public.google_stock_track_id_seq
 ALTER SEQUENCE public.google_stock_track_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3682 (class 0 OID 0)
+-- TOC entry 3683 (class 0 OID 0)
 -- Dependencies: 262
 -- Name: google_stock_track_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -574,7 +574,7 @@ CREATE SEQUENCE public.incoming_stock_id_seq
 ALTER SEQUENCE public.incoming_stock_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3683 (class 0 OID 0)
+-- TOC entry 3684 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: incoming_stock_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -826,7 +826,7 @@ CREATE SEQUENCE public.pickpin_pin_seq
 ALTER SEQUENCE public.pickpin_pin_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3684 (class 0 OID 0)
+-- TOC entry 3685 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: pickpin_pin_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -871,7 +871,7 @@ CREATE SEQUENCE public.price_change_log_id_seq
 ALTER SEQUENCE public.price_change_log_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3685 (class 0 OID 0)
+-- TOC entry 3686 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: price_change_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -909,7 +909,7 @@ CREATE SEQUENCE public.price_change_reasons_id_seq
 ALTER SEQUENCE public.price_change_reasons_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3686 (class 0 OID 0)
+-- TOC entry 3687 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: price_change_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -1007,7 +1007,7 @@ CREATE SEQUENCE public.sales_id_seq
 ALTER SEQUENCE public.sales_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3687 (class 0 OID 0)
+-- TOC entry 3688 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -1067,7 +1067,9 @@ CREATE TABLE public.skusummary (
     ignore_auto_price integer,
     catalogue integer,
     check_stock date,
-    check_stock_notes text
+    check_stock_notes text,
+    forwardorder character varying(20),
+    forwardqty integer
 );
 
 
@@ -1820,6 +1822,14 @@ ALTER TABLE ONLY public.ukdstock
 
 
 --
+-- TOC entry 3532 (class 1259 OID 21987)
+-- Name: idx_google_stock_track_snapshot_date; Type: INDEX; Schema: public; Owner: brookfield_prod_user
+--
+
+CREATE INDEX idx_google_stock_track_snapshot_date ON public.google_stock_track USING btree (snapshot_date);
+
+
+--
 -- TOC entry 3474 (class 1259 OID 16651)
 -- Name: idx_localstock_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
@@ -1916,7 +1926,7 @@ CREATE INDEX idx_skusummary_groupid ON public.skusummary USING btree (groupid);
 
 
 --
--- TOC entry 3681 (class 0 OID 0)
+-- TOC entry 3682 (class 0 OID 0)
 -- Dependencies: 5
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
 --
@@ -1925,7 +1935,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2025-10-15 15:10:26
+-- Completed on 2026-02-16 19:41:37
 
 --
 -- PostgreSQL database dump complete

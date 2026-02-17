@@ -19,7 +19,7 @@ import psycopg2
 import csv
 import os
 from datetime import datetime
-from logging_utils import manage_log_files, create_logger, get_db_config
+from adcost_logging import manage_log_files, create_logger, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "update_google_stock_track"
