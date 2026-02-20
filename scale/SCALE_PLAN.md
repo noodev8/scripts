@@ -98,6 +98,7 @@ This gets to **~£500-630k** by doing more of what already works. No new risk, j
   - [ ] Seasonal budget acceleration (Mar–Jul) and pullback (Nov–Feb)
   - [ ] Track via `google_stock_track` table for spend/stock/sales correlation
 - **Constraint:** Stock must be available before increasing spend
+- **Budget review process:** See `google-ads-stocktrack/BUDGET_REVIEW_PROCESS.md`
 
 ### Lever 3: Lunar/Amazon Expansion (Profit growth)
 - Lunar is the #1 brand by profit with 40%+ margins
