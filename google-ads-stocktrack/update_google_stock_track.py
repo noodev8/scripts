@@ -56,14 +56,14 @@ def read_google_ads_csv(csv_path):
     Expected format:
     Row 1: Title (skip)
     Row 2: Date range (skip)
-    Row 3: Headers (Day,Clicks,Impr.,Currency code,Cost)
+    Row 3: Headers (Day,Clicks,Impr.,Currency code,Cost,Search impr. share)
     Data rows: dates with metrics
 
     Args:
         csv_path: Path to CSV file
 
     Returns:
-        list: List of dicts with date, clicks, impressions, cost
+        list: List of dicts with date, clicks, impressions, cost, search_imp_share
     """
     data = []
 
@@ -100,11 +100,22 @@ def read_google_ads_csv(csv_path):
                     # Skip currency code (row[3])
                     cost = parse_csv_number(row[4])
 
+                    # Parse search impression share (column 5, optional)
+                    search_imp_share = None
+                    if len(row) > 5:
+                        share_str = row[5].strip().replace('%', '')
+                        if share_str and share_str != '--':
+                            try:
+                                search_imp_share = float(share_str)
+                            except ValueError:
+                                log(f"WARNING: Could not parse search imp share '{row[5]}' for {date_str}")
+
                     data.append({
                         'date': date_obj,
                         'clicks': clicks,
                         'impressions': impressions,
-                        'cost': cost
+                        'cost': cost,
+                        'search_imp_share': search_imp_share
                     })
 
                 except Exception as e:
@@ -142,7 +153,7 @@ def update_google_ads_data(cursor, csv_data):
     for row in csv_data:
         # Check if record exists for this date
         check_query = """
-        SELECT id, google_ad_spend, google_clicks, google_impressions
+        SELECT id, google_ad_spend, google_clicks, google_impressions, google_search_imp_share
         FROM google_stock_track
         WHERE DATE(snapshot_date) = %s
         """
@@ -160,11 +171,21 @@ def update_google_ads_data(cursor, csv_data):
             existing_spend = result[1]
             existing_clicks = result[2]
             existing_impressions = result[3]
+            existing_imp_share = result[4]
 
-            # Skip if already has Google Ads data
+            # If already has spend data, only update if impression share is missing
             if existing_spend is not None:
-                log(f"Record for {row['date']} already has Google Ads data, skipping")
-                stats['skipped'] += 1
+                if existing_imp_share is None and row.get('search_imp_share') is not None:
+                    backfill_query = """
+                    UPDATE google_stock_track
+                    SET google_search_imp_share = %s
+                    WHERE id = %s
+                    """
+                    cursor.execute(backfill_query, (row['search_imp_share'], record_id))
+                    log(f"Backfilled impression share for {row['date']}: {row['search_imp_share']}%")
+                    stats['updated'] += 1
+                else:
+                    stats['skipped'] += 1
                 continue
 
             # Update the record
@@ -172,7 +193,8 @@ def update_google_ads_data(cursor, csv_data):
             UPDATE google_stock_track
             SET google_ad_spend = %s,
                 google_clicks = %s,
-                google_impressions = %s
+                google_impressions = %s,
+                google_search_imp_share = %s
             WHERE id = %s
             """
 
@@ -180,10 +202,12 @@ def update_google_ads_data(cursor, csv_data):
                 row['cost'],
                 row['clicks'],
                 row['impressions'],
+                row.get('search_imp_share'),
                 record_id
             ))
 
-            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions")
+            share_str = f", {row.get('search_imp_share')}% imp share" if row.get('search_imp_share') else ""
+            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions{share_str}")
             stats['updated'] += 1
 
         except Exception as e:

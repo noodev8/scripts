@@ -2,6 +2,7 @@
 
 **Created:** 2026-02-20
 **Current budget:** £14/day
+**Current tROAS:** 400%
 **Review cadence:** Weekly (every Monday or Tuesday)
 
 ---
@@ -22,7 +23,8 @@
 
 | Metric | Floor | Target | Ceiling | Source |
 |--------|:-----:|:------:|:-------:|--------|
-| ROAS | 5x (minimum profitable) | 7x+ | — | `google_stock_track` |
+| ROAS | 5x (minimum profitable) | 7x+ | — | `google_stock_track` (shopify_sales / google_ad_spend) |
+| Search impression share | — | 85%+ | — | `google_stock_track` (google_search_imp_share) |
 | Daily spend vs budget | — | 80%+ of budget | Consistently hitting cap | `adcost_summary_30.csv` |
 | Impressions trend | — | Week-on-week growth in spring | — | `google_stock_track` |
 | Birkenstock stock (total units) | 50+ units | 100+ units | — | `localstock` |
@@ -56,9 +58,21 @@ SELECT
 FROM daily WHERE snapshot_date >= CURRENT_DATE - 14 AND snapshot_date < CURRENT_DATE - 7;
 ```
 
-### 2. Check if budget is being hit
+### 2. Check search impression share and budget pressure
 
-Look at `adcost_summary_30.csv` — how many days in the last 7 exceeded or came close to the daily budget? If 3+ days are within £1 of the cap, the budget is constraining.
+```sql
+SELECT snapshot_date, google_ad_spend, google_search_imp_share
+FROM google_stock_track
+WHERE google_ad_spend IS NOT NULL
+ORDER BY snapshot_date DESC LIMIT 14;
+```
+
+**Reading impression share:**
+- **85%+** — capturing most available traffic, budget is not limiting
+- **70-85%** — missing some traffic, budget may be constraining
+- **Below 70%** — significant traffic being missed, budget or tROAS is limiting
+
+Also check `adcost_summary_30.csv` — how many days in the last 7 came close to the daily budget? If 3+ days are within £1 of the cap, the budget is constraining.
 
 ### 3. Check stock levels
 
@@ -81,6 +95,20 @@ ORDER BY snapshot_date DESC LIMIT 14;
 
 ---
 
+## The Two Levers
+
+### 1. Daily Budget
+Controls **how much** Google can spend per day. Raising it allows more spend; lowering it caps spend.
+
+### 2. Target ROAS (tROAS)
+Controls **how aggressively** Google bids. Currently 400%.
+- **Lowering tROAS** (e.g. 400% → 300%) = Google bids on more auctions, more volume, potentially lower efficiency
+- **Raising tROAS** (e.g. 400% → 500%) = Google is pickier, less volume, higher efficiency
+
+**Budget is the primary lever.** Adjust tROAS only if impression share is low but spend isn't hitting the budget cap — that means tROAS is the constraint, not budget.
+
+---
+
 ## Decision Rules
 
 ### Increase budget (by £2 increments)
@@ -88,6 +116,7 @@ ORDER BY snapshot_date DESC LIMIT 14;
 ALL of the following must be true:
 - ROAS >= 7x for the last 7 days
 - Average daily spend is within £1.50 of current budget (budget is constraining)
+- Search impression share dropping below 85% (traffic being missed)
 - Key Birkenstock models have stock (50+ total units across Bend/Milano/Arizona/Gizeh)
 - We are in or approaching peak season (Mar-Jul) OR demand is clearly rising (impressions up week-on-week)
 
@@ -96,6 +125,7 @@ ALL of the following must be true:
 Any of the following:
 - ROAS is between 5x and 7x (profitable but not confidently so)
 - Average daily spend is well below budget (Google isn't spending it — no point raising)
+- Search impression share is 85%+ (already capturing most traffic)
 - Stock is low or patchy (< 50 units across key models)
 - Recently changed budget (< 7 days since last change) — let it settle
 
@@ -121,12 +151,13 @@ Any of the following:
 
 ---
 
-## Budget Change Log
+## Budget & tROAS Change Log
 
-| Date | Change | ROAS (7d) | Avg Daily Spend | Stock (units) | Rationale | Next Review |
-|------|--------|:---------:|:---------------:|:-------------:|-----------|:-----------:|
-| 2026-02-16 | £12 → £14 | 13.5x | ~£11.50 | ~2,100 | Mid-Feb, impressions rising. Small step before spring. | w/c 24 Feb |
-| | | | | | | |
+| Date | Change | ROAS (7d) | Imp Share | Avg Daily Spend | Stock (units) | Rationale | Next Review |
+|------|--------|:---------:|:---------:|:---------------:|:-------------:|-----------|:-----------:|
+| 2026-02-16 | Budget £12 → £14 | 13.5x | ~86% | ~£11.50 | ~2,100 | Mid-Feb, impressions rising. Small step before spring. | w/c 24 Feb |
+| 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | ~£13 | ~2,140 | Monitoring only. No change. | w/c 24 Feb |
+| | | | | | | | |
 
 ---
 
@@ -134,9 +165,10 @@ Any of the following:
 
 When asked to review the Google Ads budget:
 
-1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates
+1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates — include `google_search_imp_share`
 2. Query `localstock` for current Birkenstock stock levels (key models)
 3. Check the latest `adcost_summary_30.csv` for days hitting the budget cap
-4. Compare against the decision rules above
-5. Make a recommendation: increase / hold / decrease with reasoning
-6. If changing: update the Budget Change Log in this doc and the Decision Log in `scale/SCALE_PLAN.md`
+4. Review impression share trend — is it dropping? (signals budget or tROAS constraint)
+5. Compare against the decision rules above
+6. Make a recommendation: increase / hold / decrease with reasoning
+7. If changing: update the Budget & tROAS Change Log in this doc and the Decision Log in `scale/SCALE_PLAN.md`
