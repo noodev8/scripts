@@ -17,14 +17,21 @@
       "Bash(done)",
       "Bash(copy \"C:\\\\scripts\\\\google_price\\\\price_action_grow_2026-02-13.csv\" \"C:\\\\scripts\\\\google_price\\\\archive\\\\price_action_grow_2026-02-13.csv\")",
       "mcp__postgres__query",
-      "Bash(cmd.exe /c \"cd C:\\\\scripts\\\\google-ads-stocktrack && python update_google_stock_track.py\")",
-      "Bash(powershell.exe -Command \"cd ''C:\\\\scripts\\\\google-ads-stocktrack''; python update_google_stock_track.py\")",
+      "Bash(cmd.exe /c \"cd C:\\\\scripts\\\\google_ads && python update_google_stock_track.py\")",
+      "Bash(powershell.exe -Command \"cd ''C:\\\\scripts\\\\google_ads''; python update_google_stock_track.py\")",
       "Bash(powershell.exe:*)",
       "Bash(git checkout:*)",
       "Bash(find:*)",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
-      "Bash(del C:scriptstest_stock_count.sql)"
+      "Bash(del C:scriptstest_stock_count.sql)",
+      "Bash(claude mcp:*)",
+      "Bash(npm update:*)",
+      "Bash(claude update:*)",
+      "Bash(claude:*)",
+      "mcp__postgres-brookfield__query",
+      "Bash(ls:*)",
+      "Bash(git mv:*)"
     ],
     "deny": []
   }
