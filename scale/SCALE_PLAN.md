@@ -279,6 +279,7 @@ Extending from 12 to 24 months only added 4 repeat buyers. These customers are n
 | 2026-02-16 | Google Ads daily budget £12 → £14 | Mid-Feb, impressions rising (2,310 on 15th). Baseline ROAS 13.5x. Small step to test before spring ramp. | Check w/c 24 Feb |
 | 2026-02-16 | Klaviyo email playbook created | 3 campaign types: Repurchase (90-day), New Arrivals, Clearance. See `scale/KLAVIYO_EMAIL_PLAYBOOK.md` | Launch repurchase first |
 | 2026-02-17 | Simplified Klaviyo playbook to one campaign | Stripped back to 90-day Birkenstock non-buyer repurchase only. One segment, one email. Prove it works before adding complexity. | Review after first 2-3 sends |
+| 2026-02-28 | Google Ads daily budget £14 → £16 | User-initiated increase. | — |
 
 ---
 

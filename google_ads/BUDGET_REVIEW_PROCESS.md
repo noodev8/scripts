@@ -1,9 +1,9 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £14/day
+**Current budget:** £16/day
 **Current tROAS:** 400%
-**Review cadence:** Weekly (every Monday or Tuesday)
+**Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
 
 ---
 
@@ -105,13 +105,36 @@ Controls **how aggressively** Google bids. Currently 400%.
 - **Lowering tROAS** (e.g. 400% → 300%) = Google bids on more auctions, more volume, potentially lower efficiency
 - **Raising tROAS** (e.g. 400% → 500%) = Google is pickier, less volume, higher efficiency
 
-**Budget is the primary lever.** Adjust tROAS only if impression share is low but spend isn't hitting the budget cap — that means tROAS is the constraint, not budget.
+**Budget is the primary lever.** Only adjust one lever at a time so you can isolate what's driving the result.
+
+### When to consider adjusting tROAS
+
+tROAS should rarely need changing. The following are signals to look for, not rigid triggers — always use judgement based on the full picture.
+
+- **Consider lowering tROAS** (e.g. 400% → 300%): Impression share is low, but spend isn't hitting the budget cap. This means Google can't find enough auctions at the current tROAS bar — lowering it unlocks more volume at slightly lower efficiency.
+- **Consider raising tROAS** (e.g. 400% → 500%): ROAS is trending toward the 5x floor and you want to tighten efficiency, or stock is running low and you want to slow volume without cutting budget.
+- **Leave it alone**: The algorithm is outperforming the target and budget is the clear constraint. Changing tROAS forces a new learning phase, so don't adjust it just because you can.
+
+**Diagnosing which lever is the constraint:**
+
+| Impression share | Spend vs budget | Constraint | Action |
+|-----------------|----------------|------------|--------|
+| Low (< 85%) | Hitting cap | Budget | Increase budget |
+| Low (< 85%) | Below cap | tROAS | Consider lowering tROAS |
+| High (85%+) | Below cap | Neither | Hold — capturing most demand |
 
 ---
 
 ## Decision Rules
 
-### Increase budget (by £2 increments)
+**Important:** These are guidelines, not rigid rules. Each review should use judgement based on what the data is actually showing. Context matters — consider the ROAS trajectory, seasonal timing, and algorithm stability rather than applying thresholds mechanically.
+
+### Increment sizing
+
+- **Default: £2 increments** — preferred when the algorithm is learning well and ROAS is improving. Small steps preserve algorithm stability and avoid resetting the learning phase.
+- **£4 increments** may be appropriate when ROAS has significant headroom (e.g. 15x+ with a 5x floor), impression share is clearly constrained, and we are entering peak season. Use judgement — if in doubt, go with £2 and review sooner.
+
+### Increase budget
 
 ALL of the following must be true:
 - ROAS >= 7x for the last 7 days
@@ -127,14 +150,18 @@ Any of the following:
 - Average daily spend is well below budget (Google isn't spending it — no point raising)
 - Search impression share is 85%+ (already capturing most traffic)
 - Stock is low or patchy (< 50 units across key models)
-- Recently changed budget (< 7 days since last change) — let it settle
+- Recently changed budget and not yet enough data to assess the impact — let it settle
 
-### Decrease budget (by £2 increments)
+### Decrease budget
 
 Any of the following:
 - ROAS < 5x for 2 consecutive weeks
 - Stock is critically low (< 20 units across key models)
 - Off-season (Nov-Jan) with low impressions and poor conversion
+
+### Algorithm stability note
+
+When the algorithm is on a good trajectory (ROAS improving week-on-week), favour smaller increments to avoid disrupting its learning. A steady upward path with £2 steps is better than a larger jump that causes the algorithm to re-learn and potentially lose days of efficiency.
 
 ---
 
@@ -157,6 +184,7 @@ Any of the following:
 |------|--------|:---------:|:---------:|:---------------:|:-------------:|-----------|:-----------:|
 | 2026-02-16 | Budget £12 → £14 | 13.5x | ~86% | ~£11.50 | ~2,100 | Mid-Feb, impressions rising. Small step before spring. | w/c 24 Feb |
 | 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | ~£13 | ~2,140 | Monitoring only. No change. | w/c 24 Feb |
+| 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | — |
 | | | | | | | | |
 
 ---
