@@ -23,6 +23,7 @@ from adcost_logging import manage_log_files, create_logger, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "update_google_stock_track"
+CURRENT_TROAS = 400  # Current Google Ads target ROAS setting (%). Update when changed in Google Ads.
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
@@ -153,7 +154,7 @@ def update_google_ads_data(cursor, csv_data):
     for row in csv_data:
         # Check if record exists for this date
         check_query = """
-        SELECT id, google_ad_spend, google_clicks, google_impressions, google_search_imp_share
+        SELECT id, google_ad_spend, google_clicks, google_impressions, google_search_imp_share, troas
         FROM google_stock_track
         WHERE DATE(snapshot_date) = %s
         """
@@ -172,17 +173,30 @@ def update_google_ads_data(cursor, csv_data):
             existing_clicks = result[2]
             existing_impressions = result[3]
             existing_imp_share = result[4]
+            existing_troas = result[5]
 
-            # If already has spend data, only update if impression share is missing
+            # If already has spend data, backfill any missing fields
             if existing_spend is not None:
+                backfill_sets = []
+                backfill_params = []
+
                 if existing_imp_share is None and row.get('search_imp_share') is not None:
-                    backfill_query = """
+                    backfill_sets.append("google_search_imp_share = %s")
+                    backfill_params.append(row['search_imp_share'])
+
+                if existing_troas is None:
+                    backfill_sets.append("troas = %s")
+                    backfill_params.append(CURRENT_TROAS)
+
+                if backfill_sets:
+                    backfill_query = f"""
                     UPDATE google_stock_track
-                    SET google_search_imp_share = %s
+                    SET {', '.join(backfill_sets)}
                     WHERE id = %s
                     """
-                    cursor.execute(backfill_query, (row['search_imp_share'], record_id))
-                    log(f"Backfilled impression share for {row['date']}: {row['search_imp_share']}%")
+                    backfill_params.append(record_id)
+                    cursor.execute(backfill_query, backfill_params)
+                    log(f"Backfilled {row['date']}: {', '.join(backfill_sets)}")
                     stats['updated'] += 1
                 else:
                     stats['skipped'] += 1
@@ -194,7 +208,8 @@ def update_google_ads_data(cursor, csv_data):
             SET google_ad_spend = %s,
                 google_clicks = %s,
                 google_impressions = %s,
-                google_search_imp_share = %s
+                google_search_imp_share = %s,
+                troas = %s
             WHERE id = %s
             """
 
@@ -203,6 +218,7 @@ def update_google_ads_data(cursor, csv_data):
                 row['clicks'],
                 row['impressions'],
                 row.get('search_imp_share'),
+                CURRENT_TROAS,
                 record_id
             ))
 
@@ -376,14 +392,14 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
     query = """
     INSERT INTO google_stock_track
         (live_stock_units, live_stock_value, total_stock_units, total_stock_value,
-         shopify_units, shopify_sales, snapshot_date)
+         shopify_units, shopify_sales, snapshot_date, troas)
     VALUES
-        (%s, %s, %s, %s, %s, %s, CURRENT_DATE - 1)
+        (%s, %s, %s, %s, %s, %s, CURRENT_DATE - 1, %s)
     RETURNING id, snapshot_date
     """
 
     try:
-        cursor.execute(query, (live_units, live_value, total_units, total_value, sales_units, sales_revenue))
+        cursor.execute(query, (live_units, live_value, total_units, total_value, sales_units, sales_revenue, CURRENT_TROAS))
         result = cursor.fetchone()
 
         if result:
