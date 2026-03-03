@@ -184,7 +184,8 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 |------|--------|:---------:|:---------:|:---------------:|:-------------:|-----------|:-----------:|
 | 2026-02-16 | Budget £12 → £14 | 13.5x | ~86% | ~£11.50 | ~2,100 | Mid-Feb, impressions rising. Small step before spring. | w/c 24 Feb |
 | 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | ~£13 | ~2,140 | Monitoring only. No change. | w/c 24 Feb |
-| 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | — |
+| 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | w/c 2 Mar |
+| 2026-03-03 | Hold at £16 | 18.1x | ~85% | £15.58 | 1,328 (163 key) | All increase criteria met but only 3 days at £16. Algorithm responding well — sales up, impressions up, ROAS strong. Let it settle, then decide. | 7 Mar |
 | | | | | | | | |
 
 ---

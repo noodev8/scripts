@@ -59,16 +59,16 @@ Current mix (Lunar + Birkenstock) at £310k already generates £86k GP.
 |--------|--------:|:----------------------|----------------:|
 | Birkenstock/Shopify | £136k | Google Ads scaling (ROAS 10x→5x with more volume), spring/summer push | £250-300k |
 | Lunar/Amazon | £142k | Ives stock depth, Buy Box protection, new customer acquisition | £200-250k |
-| Rieker/Winter/Other | £32k | Winter Rieker (shipping direct to FBA), Birkenstock slippers, seasonal smoothing | £50-80k |
+| Rieker/Winter/Other | £32k | Rieker range expansion on Amazon (2-week lead time, 33% margin). Birkenstock slippers not working — see section 8. | £50-80k |
 
 This gets to **~£500-630k** by doing more of what already works. No new risk, just execution.
 
 **The gap from £630k to £1M (~£350-400k) needs something new:**
 
-1. **Expand Rieker range on Amazon** — most natural next move. Already proven at 32% margin. Previously stocked more styles but cut back. Revisit selectively using sales data — don't speculate, bring back styles with evidence. Account and infrastructure already in place.
-2. **Deeper Birkenstock range on Shopify** — more models = more long-tail Google search traffic at the same ROAS. Are there Birkenstock styles with demand that we don't stock?
-3. **Waldlaufer on Amazon** — similar demographic, worth evaluating. Amazon ranking not as strong as Rieker so lower priority. Look at when cash allows.
-4. **Amazon/Shopify crossover** — Lunar barely sells on Shopify (£12.7k at 11.6% margin vs 43% on Amazon). May just not be where those customers shop.
+1. **Expand Rieker range on Amazon** — most natural next move. Already proven at 33% margin, 2-week lead time. Currently 8 styles doing £5.2k GP. Previously stocked more styles but cut back. Revisit selectively using sales data — don't speculate, bring back styles with evidence. Amazon only — no Shopify.
+2. **Deeper Birkenstock core on Shopify** — not more models, more stock depth on the proven 15. Width doesn't help (115 styles sold off-season at 0% margin). Depth on best sellers during peak = more revenue in the 3 months that actually make money.
+3. **Lunar new style exploration (summer only)** — 4-day lead time makes testing cheap. But Ives is dominant and other styles have been losers. Test in summer when the customer base is buying. Never order winter Lunar books again.
+4. **Waldlaufer on Amazon** — similar demographic, worth evaluating when cash allows. Lower priority than Rieker.
 
 **2026 is a stabilisation year.** No chasing new brands. Go deep on proven winners (Ives, Birkenstock core, Rieker). Turn a profit first. Expand cautiously when traction and cash allow — Rieker range expansion is the lowest-risk next step when ready.
 
@@ -102,22 +102,26 @@ This gets to **~£500-630k** by doing more of what already works. No new risk, j
 
 ### Lever 3: Lunar/Amazon Expansion (Profit growth)
 - Lunar is the #1 brand by profit with 40%+ margins
-- St Ives model has loyal following
+- St Ives (Ives) is the proven winner — other styles tested and none come close
+- **4-day lead time** — biggest strategic advantage in the business. React to demand, not forecast.
 - **Actions:**
-  - [ ] Identify top-performing Lunar styles and increase stock depth
-  - [ ] Test broader Lunar range on Amazon
-  - [ ] Evaluate Lunar on Shopify (cross-sell opportunity for Birkenstock buyers?)
+  - [ ] Maintain relentless Ives stock depth across all colourways — every stockout day is lost profit
+  - [ ] Explore new Lunar styles **in summer only** when customer base is active (winter books were failures — cleared below cost)
   - [ ] Protect Amazon margin — don't race to bottom on pricing
 - **Impact:** Every £10k of Lunar revenue = ~£4k GP vs £1.5k GP from Birkenstock
+- **What didn't work:** Lunar winter ranges (total loss, cleared below cost). Don't repeat.
 
 ### Lever 4: Seasonal Smoothing (Off-season revenue)
 - Nov–Feb currently does £8–16k/month vs £30–62k in peak
 - Already improving YoY (+96% to +145% growth in off-season months)
+- **Birkenstock off-season is structurally unprofitable** — 976 units Jul–Feb at 0% margin. See section 8. Birkenstock slippers (Zermatt) also failed. Don't chase winter Birkenstock revenue.
+- **Lunar is profitable year-round** (37–43% margin even in winter) — Lunar IS the seasonal smoothing
 - **Actions:**
-  - [ ] Evaluate winter-focused brands/products (boots, slippers)
-  - [ ] Birkenstock indoor/wool models for autumn/winter push
-  - [ ] Amazon winter strategy (Lunar already has year-round styles?)
-  - [ ] Adjust Google Ads strategy for winter — different keywords, different products
+  - [ ] Rieker range expansion on Amazon — 33% margin, 2-week lead time, proven at small scale. This is the lowest-risk winter revenue growth.
+  - [ ] Maintain Lunar Ives stock through winter — it's the only brand making money Nov–Feb
+  - [ ] Reduce Google Ads spend Nov–Feb (Birkenstock generates zero profit off-season anyway)
+  - ~~Birkenstock indoor/wool models~~ — tested, doesn't work. Zermatt makes £0 or negative.
+  - ~~Lunar winter books~~ — tested, total failure. Cleared below cost.
 
 ### Lever 5: Operational Efficiency (Protect cash flow)
 - **Actions:**
@@ -158,9 +162,12 @@ This gets to **~£500-630k** by doing more of what already works. No new risk, j
 
 1. ~~Launch Birkenstock 90-day repurchase test~~ — Email designed, sending w/c 17 Feb
 2. ~~Analyse top SKUs by profit~~ — Done, see section 7
-3. **Model ad spend scenarios** — What does ROAS look like at £25k, £35k, £50k annual spend?
-4. **Map Lunar growth opportunity** — Which styles, which sizes, what's the stock investment needed?
-5. **Build monthly revenue dashboard** — Track progress against the milestones above
+3. ~~Analyse Birkenstock off-season margin~~ — Done, see section 8. Structural 0% margin Jul–Feb confirmed.
+4. **Model ad spend scenarios** — What does ROAS look like at £25k, £35k, £50k annual spend?
+5. **Map Lunar growth opportunity** — Ives is the winner. Focus on stock depth, explore new styles in summer only (4-day lead time makes testing cheap)
+6. **Rieker range expansion plan** — Review previously stocked styles, identify candidates for Amazon relaunch. 2-week lead time, 33% margin.
+7. **Build monthly revenue dashboard** — Track progress against the milestones above
+8. **Birkenstock ordering review (Sep/Oct)** — Use birkenstock-sales.csv report. Order depth on core 15, target sell-through by June/July. Don't over-order width.
 
 ---
 
@@ -272,7 +279,92 @@ Extending from 12 to 24 months only added 4 repeat buyers. These customers are n
 
 ---
 
-## 8. Decision Log
+## 8. Analysis — Birkenstock Off-Season Margin Problem (Mar 2026)
+
+**Run date:** 2026-03-02
+**Finding:** Birkenstock off-season (Jul–Feb) is structurally unprofitable. This is not a range width problem — it's a margin problem that affects all styles equally, including the core 15 best sellers.
+
+### The Numbers
+
+| Period | Styles sold | Units | Revenue | GP | Net margin |
+|--------|------:|------:|--------:|---:|-------:|
+| Peak (Mar–Jun 2025) | 92 | 1,545 | £94,970 | £22,771 | 24.0% |
+| Off-season (Jul 2025–Feb 2026) | 115 | 976 | £64,699 | £290 | 0.4% |
+
+Even restricting to only the core 15 best-selling styles:
+
+| Off-season category | Styles | Units | Revenue | GP |
+|---------------------|------:|------:|--------:|---:|
+| Core 15 best sellers | 15 | 267 | £20,070 | £0 |
+| Other 100 styles | 100 | 709 | £44,629 | £290 |
+
+### Root Cause
+
+Discounted selling prices cover product cost but after Shopify fees (~2%), payment processing (~2%), and shipping costs there is no margin left. During peak season, strong demand holds enough price headroom to absorb these costs. Off-season prices drop too low for the fixed per-transaction costs.
+
+This is structural — narrowing the range to fewer styles would not fix it. The core 15 made exactly £0 GP off-season.
+
+### Zermatt Slippers — Not Working
+
+Birkenstock Zermatt slippers were positioned as winter seasonal smoothing products. The data shows they make zero or negative profit in both seasons:
+- Zermatt 1014938: **-£354 GP** during peak (26 units clearing at a loss), £0 GP off-season
+- Zermatt 1015092: £0 GP off-season despite 29 units sold
+
+These are winter products that lose money even in winter. Reconsider stocking.
+
+### Implications for 2026 Ordering
+
+Heavier Birkenstock orders this year (to extend the selling season past June) carry a specific risk: any stock not sold by end of June will likely sell Jul–Feb at 0% margin. The ideal outcome is stock runs out in June/July, not stock sitting through winter.
+
+**Key question for Sep/Oct ordering:** Can we order tighter quantities targeting sell-through by June/July rather than maximum range? The birkenstock-sales.csv report (£1k+ GP threshold, 360-day window) is the right tool — focus depth on the 15 proven styles, don't order the long tail.
+
+### Lead Time Advantage — Use It
+
+| Brand | Lead time | Implication |
+|-------|-----------|-------------|
+| Birkenstock | 6 months | Must bet in advance, high risk |
+| Lunar (Ives) | **4 days** | React to demand, near-zero risk |
+| Rieker | **2 weeks** | React to demand, low risk |
+
+Lunar and Rieker's short lead times are the single biggest strategic advantage in the business. Every pound of growth investment should favour brands where you can respond to actual demand rather than forecast 6 months ahead.
+
+### Lunar Context (Updated Mar 2026)
+
+- Other Lunar styles tested — Ives remains the clear winner
+- **Lunar winter books were total failures** — had to clear below cost at end of season. Do not repeat.
+- Lunar style exploration should happen **in summer only**, when the customer base is active and testing risk is lowest
+- Rieker expansion goes **Amazon only** — no Shopify
+
+---
+
+## 9. Open Consideration — Shopify as a Seasonal Channel (Mar 2026)
+
+**Status:** Under review. No decision made yet.
+
+Shopify is a Birkenstock shop. Last 6 weeks: Birkenstock was 88% of Shopify revenue (£7,309 of £8,306). Non-Birkenstock Shopify brands average ~£1,900/month — not viable as a standalone channel.
+
+Monthly Birkenstock share of Shopify revenue ranges from 71% (Oct) to 93% (Jul), averaging ~85%. Remove Birkenstock and Shopify does ~£23k/year. That's not a business.
+
+Combined with section 8's finding that Birkenstock makes £0 GP from July onwards, this means **Shopify as a channel generates meaningful profit only March–May/June**.
+
+### Option: Treat Shopify + Google Ads as a seasonal operation
+
+- **March–June:** Full Google Ads spend, active stock management, price engine running. This is where the ~£23k GP comes from.
+- **July–February:** Cut Google Ads to minimal/zero. Store stays live but on autopilot. Accept ~£3–5k/month organic sales at zero margin — don't spend to drive them.
+- **Saving:** Currently ~£16/day Google Ads. Pausing Jul–Feb saves ~£3,900/year in ad spend that was driving zero-margin sales anyway.
+- **Risk:** Lose some brand visibility and search ranking continuity over winter. Harder to ramp back up in March? Needs testing.
+
+### Alternative: Find something to sell on Shopify in winter
+
+Nothing has worked so far. Non-Birkenstock brands (Lunar, Skechers, Goor, Roamers) do ~£160/week combined on Shopify. Birkenstock Zermatt slippers failed. Lunar winter books failed. The Shopify customer base searches for Birkenstock — they're not looking for other brands on this site.
+
+### Decision needed
+
+Is Shopify worth investing in year-round, or should it be treated as a 4-month Birkenstock engine with the rest of the year on autopilot? Come back to this after the 2026 spring season with data on whether heavier Birkenstock ordering extends the profitable window past June.
+
+---
+
+## 10. Decision Log
 
 | Date | Decision | Rationale | Review |
 |------|----------|-----------|--------|
@@ -280,10 +372,15 @@ Extending from 12 to 24 months only added 4 repeat buyers. These customers are n
 | 2026-02-16 | Klaviyo email playbook created | 3 campaign types: Repurchase (90-day), New Arrivals, Clearance. See `scale/KLAVIYO_EMAIL_PLAYBOOK.md` | Launch repurchase first |
 | 2026-02-17 | Simplified Klaviyo playbook to one campaign | Stripped back to 90-day Birkenstock non-buyer repurchase only. One segment, one email. Prove it works before adding complexity. | Review after first 2-3 sends |
 | 2026-02-28 | Google Ads daily budget £14 → £16 | User-initiated increase. | — |
+| 2026-03-02 | Birkenstock off-season confirmed as structural 0% margin | Analysis of Jul–Feb sales: 976 units, £65k revenue, £290 GP. Core 15 styles also £0 GP. Not a width problem — all styles affected equally. | Informs Sep/Oct ordering |
+| 2026-03-02 | Zermatt slippers flagged as non-viable | Negative GP in peak, zero GP in winter. Winter product losing money in both seasons. | Review at next order |
+| 2026-03-02 | Lunar winter books ruled out permanently | Cleared below cost. Only explore new Lunar styles in summer. | — |
+| 2026-03-02 | Rieker confirmed Amazon-only expansion | 33% margin, 2-week lead time. No Shopify. | Expand when cash allows |
+| 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x, all increase criteria met. Only 3 days at £16 — letting algorithm settle. £12→£14 transition was seamless (ROAS improved 11.7x→19.2x). | 7 Mar |
 
 ---
 
-## 9. Reference
+## 11. Reference
 
 - **Strategy docs:** `scale/` folder
 - **DB schema:** `database/DB-Schema.sql`

@@ -6,7 +6,7 @@ Calculates and records stock levels for Google Shopping campaign analysis.
 Creates daily snapshots dated for YESTERDAY with:
 1. Live Stock: Products active on both Shopify and Google Merchant Centre
 2. Total Stock: All products in inventory (localstock + Amazon)
-3. Shopify Sales: Sales from the day before the snapshot date
+3. Shopify Sales: Sales from the snapshot date (yesterday)
 
 Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
 The CSV data matches snapshot dates, ensuring no nulls in the database.
@@ -344,8 +344,8 @@ def calculate_total_stock(cursor):
 
 def calculate_shopify_sales_yesterday(cursor):
     """
-    Calculate Shopify sales from 2 days ago (CURRENT_DATE - 2).
-    This represents sales from the day before the snapshot date.
+    Calculate Shopify sales from yesterday (CURRENT_DATE - 1).
+    Matches the snapshot_date so all data on a row represents the same day.
 
     Returns:
         tuple: (units_sold, revenue)
@@ -356,7 +356,7 @@ def calculate_shopify_sales_yesterday(cursor):
         COALESCE(SUM(soldprice * qty), 0) as revenue
     FROM sales
     WHERE channel = 'SHP'
-      AND solddate = CURRENT_DATE - 2
+      AND solddate = CURRENT_DATE - 1
     """
 
     try:
@@ -366,7 +366,7 @@ def calculate_shopify_sales_yesterday(cursor):
         if result:
             units = int(result[0]) if result[0] is not None else 0
             revenue = float(result[1]) if result[1] is not None else 0.0
-            log(f"Sales from 2 days ago: {units} units, £{revenue:.2f} revenue")
+            log(f"Sales from yesterday: {units} units, £{revenue:.2f} revenue")
             return units, revenue
         else:
             log("WARNING: No sales data returned")
@@ -479,7 +479,7 @@ def main():
             log("--- Calculating Total Stock (All Products) ---")
             total_units, total_value = calculate_total_stock(cursor)
 
-            log("--- Calculating Shopify Sales (Day Before Yesterday) ---")
+            log("--- Calculating Shopify Sales (Yesterday) ---")
             sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
 
             log("--- Inserting Stock Snapshot for Yesterday ---")
