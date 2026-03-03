@@ -377,10 +377,57 @@ Is Shopify worth investing in year-round, or should it be treated as a 4-month B
 | 2026-03-02 | Lunar winter books ruled out permanently | Cleared below cost. Only explore new Lunar styles in summer. | — |
 | 2026-03-02 | Rieker confirmed Amazon-only expansion | 33% margin, 2-week lead time. No Shopify. | Expand when cash allows |
 | 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x, all increase criteria met. Only 3 days at £16 — letting algorithm settle. £12→£14 transition was seamless (ROAS improved 11.7x→19.2x). | 7 Mar |
+| 2026-03-03 | Arizona EVA: keep this year, cut to top 5 next year | Analysis shows Arizona EVA is an outlier — 45.5% margin, profitable year-round (unlike rest of Birkenstock range). Low cost (£20.83) gives headroom even at discounted prices. 17 colourways is too wide — top 5 account for ~75% of GP. Stock already ordered for 2026 (6-month lead time). This year: hold price as long as possible, drop prices on tail colours if not moving by Jul. Next year: order only Black (Narrow + Regular), Khaki Green (Narrow + Regular), White Narrow. | Sep/Oct ordering |
 
 ---
 
-## 11. Reference
+## 12. Analysis — Arizona EVA (Mar 2026)
+
+**Run date:** 2026-03-03
+**Finding:** Arizona EVA is the exception to the Birkenstock off-season margin problem. Worth continuing but with a tighter range.
+
+### Why Arizona EVA works
+
+Cost is £20.83 (vs £35–40 for leather Arizona). Break-even after fees is ~£21.70. Even at off-season prices of £38–40, margin is ~45%. The rest of the Birkenstock range has 0% off-season margin because higher costs eat all the headroom.
+
+### Performance (2025)
+
+| Period | Units | Revenue | GP (raw) | Margin |
+|--------|------:|--------:|---------:|-------:|
+| Peak (Mar–Jun) | 224 | £8,336 | £3,670 | 44.0% |
+| Off-season (Jul–Feb) | 137 | £5,473 | £2,619 | 47.8% |
+| **Total** | **361** | **£13,809** | **£6,289** | **45.5%** |
+
+Return rate: 6.6% (24 returns on 361 units).
+
+### Top 5 (next year's core range)
+
+| GroupID | Colourway | Units | GP | Avg price |
+|---------|-----------|------:|---:|----------:|
+| 0129423-ARIZONA | Black Narrow | 48 | £889 | £39.35 |
+| 1019094-ARIZONA | Khaki Green Regular | 44 | £858 | £40.34 |
+| 0129443-ARIZONA | White Narrow | 50 | £821 | £37.26 |
+| 0129421-ARIZONA | Black Regular | 41 | £789 | £40.07 |
+| 1019152-ARIZONA | Khaki Green Narrow | 36 | £570 | £36.67 |
+
+### Tail to cut (after 2026 season)
+
+| GroupID | Colourway | Units | GP |
+|---------|-----------|------:|---:|
+| 1022433-ARIZONA | Gold Regular | 6 | £91 |
+| 1026202-ARIZONA | Rose Reptile Regular | 5 | £70 |
+| 1027305-ARIZONA | Eggshell Regular | 1 | £19 |
+| 1022466-ARIZONA | Popcorn Narrow | 10 | £197 |
+
+Low volume, not worth the stock commitment.
+
+### 2026 strategy
+
+Stock already committed. Maximise price Mar–Jun, discount tail colours from July if not moving. Clear everything by autumn if possible — EVA won't lose money even at £30, but aim higher.
+
+---
+
+## 13. Reference
 
 - **Strategy docs:** `scale/` folder
 - **DB schema:** `database/DB-Schema.sql`

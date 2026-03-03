@@ -5,7 +5,7 @@
 -- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 17.4
 
--- Started on 2026-02-27 15:23:05
+-- Started on 2026-03-03 21:57:46
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1071,7 +1071,8 @@ CREATE TABLE public.skusummary (
     check_stock date,
     check_stock_notes text,
     forwardorder character varying(20),
-    forwardqty integer
+    forwardqty integer,
+    segment character varying(20)
 );
 
 
@@ -1937,7 +1938,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2026-02-27 15:23:07
+-- Completed on 2026-03-03 21:57:48
 
 --
 -- PostgreSQL database dump complete
