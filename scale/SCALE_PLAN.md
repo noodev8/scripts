@@ -67,10 +67,10 @@ This gets to **~£500-630k** by doing more of what already works. No new risk, j
 
 1. **Expand Rieker range on Amazon** — most natural next move. Already proven at 33% margin, 2-week lead time. Currently 8 styles doing £5.2k GP. Previously stocked more styles but cut back. Revisit selectively using sales data — don't speculate, bring back styles with evidence. Amazon only — no Shopify.
 2. **Deeper Birkenstock core on Shopify** — not more models, more stock depth on the proven 15. Width doesn't help (115 styles sold off-season at 0% margin). Depth on best sellers during peak = more revenue in the 3 months that actually make money.
-3. **Lunar new style exploration (summer only)** — 4-day lead time makes testing cheap. But Ives is dominant and other styles have been losers. Test in summer when the customer base is buying. Never order winter Lunar books again.
+3. **Lunar new style exploration (summer only)** — 4-day lead time makes testing cheap. But Ives is dominant and other styles have been losers. Test in summer when the customer base is buying. Never order winter Lunar books again. **Note (Mar 2026):** Ives appears to be approaching its ceiling — we're ordering as much as we can but volume is plateauing. This makes finding complementary brands more important for the next growth phase.
 4. **Waldlaufer on Amazon** — similar demographic, worth evaluating when cash allows. Lower priority than Rieker.
 
-**2026 is a stabilisation year.** No chasing new brands. Go deep on proven winners (Ives, Birkenstock core, Rieker). Turn a profit first. Expand cautiously when traction and cash allow — Rieker range expansion is the lowest-risk next step when ready.
+**2026 is a stabilisation year.** Go deep on proven winners (Ives, Birkenstock core, Rieker). Turn a profit first. Expand cautiously when traction and cash allow — Rieker range expansion is the lowest-risk next step when ready. However, stabilisation doesn't mean closed to opportunity — always be investigating potential new brands and suppliers so we're not caught flat-footed when it's time to grow. Investigation is free; commitment is what costs money.
 
 **Ruled out:** TikTok Shop (wrong demographic), Skechers (margins too thin, same problem as Birkenstock).
 
@@ -364,7 +364,53 @@ Is Shopify worth investing in year-round, or should it be treated as a 4-month B
 
 ---
 
-## 10. Decision Log
+## 10. Brand Investigation Pipeline (Mar 2026)
+
+Stabilisation year means no rushed commitments — but always be investigating so we're ready when growth demands it. Ives is approaching its volume ceiling, which makes this pipeline essential for the next phase.
+
+**Principles:**
+- Investigation costs nothing. Always be open to approaches from existing suppliers and potential new ones.
+- Evaluate against proven benchmarks: Lunar (41% margin, 4-day lead), Rieker (31% margin, 2-week lead).
+- Only commit when: margin is proven, lead time is short, and there's a clear gap being filled (not just duplicating what Ives already does).
+
+### Under Investigation
+
+| Brand | Distributor | Status | Why Interesting | Key Questions | Channel |
+|-------|-----------|--------|-----------------|---------------|---------|
+| **Free Spirit — Frisco** | West Midlands Shoe Company (WMSC), Uttoxeter. enquiries@wmsc.co.uk / 01889 561790 | Investigated Mar 2026 — wholesale price list obtained (SS25). Narrowed to Frisco only. | They approached us (2025). We have SS25 trade price list (`scale/Free Spirit Sterling with RRP.pdf`). Frisco is the standout: 164 Amazon reviews, 4.6–4.7 stars, best-seller in the range. Wholesale £20.95 (ex VAT), RRP £52.50, realistic Amazon sell £38–45. Gross margin 28–37% (same basis as all brands) — not Ives (43%) but solidly between Birkenstock (14%) and Rieker (31%). Ives is at ceiling so this is incremental summer volume in the same demographic. Pack sizes 8 or 12 pairs — low test cost (~£168 for 8 pairs). Also ask about autumn/winter range (boots/closed-toe) which could address the Oct–Feb gap. | Amazon |
+| **Waldlaufer** | TBC | Not started | Similar demographic, mentioned in original plan. Lower priority than Rieker. | Wholesale terms, lead time, Amazon viability | Amazon |
+
+### Ruled Out
+
+| Brand | Why |
+|-------|-----|
+| Skechers | Margins too thin (~16.5%), same problem as Birkenstock |
+| TikTok Shop | Wrong demographic |
+| Lunar winter books | Total loss, cleared below cost |
+
+### Amazon Price Research (Mar 2026)
+
+Free Spirit styles are widely discounted below RRP on Amazon. Multiple sellers including potentially WMSC themselves (seller ID `A11TUGHSDV22PS`). Shoe Zone, Humphries also discount heavily. Cleveland worst affected (down to £25 on £57.50 RRP). Frisco holds up best at £35–48. This is a price-eroded market — don't expect to sell at RRP.
+
+| Style | Wholesale (ex VAT) | RRP | Amazon Range | Gross Margin (same basis as all brands) |
+|-------|----------:|----:|:-----------:|:------------------------:|
+| **Frisco** | £20.95 | £52.50 | £35–48 | **28% at £38, 37% at £45** |
+| Cleveland | £22.95 | £57.50 | £25–40 | Too eroded — prices near wholesale |
+| Fairmont | £20.95 | £52.50 | £30–40 | ~19% at £35 |
+| Wickford | £18.95 | £47.50 | ~£35 | ~23% |
+| Juliet | £18.95 | £47.50 | £30–45 | Variable |
+
+Margin note: calculated on same basis as all other brands (ex-VAT revenue minus cost, divided by inc-VAT sell price). For context: Ives = 43%, Rieker = 31%, Birkenstock = 14%. Frisco at realistic £38–45 sell = 28–37%, solidly between Birkenstock and Rieker.
+
+**Conclusion:** Frisco is the only style worth testing. Best reviews (164, 4.6 stars), best price resilience, lowest risk.
+
+### Next Actions
+- [ ] Contact WMSC — confirm lead time, ask about autumn/winter range, confirm Amazon selling policy (are they competing on Amazon themselves?)
+- [ ] If terms are right, test one pack of Frisco (8 or 12 pairs) on Amazon in summer
+
+---
+
+## 11. Decision Log
 
 | Date | Decision | Rationale | Review |
 |------|----------|-----------|--------|
@@ -377,57 +423,12 @@ Is Shopify worth investing in year-round, or should it be treated as a 4-month B
 | 2026-03-02 | Lunar winter books ruled out permanently | Cleared below cost. Only explore new Lunar styles in summer. | — |
 | 2026-03-02 | Rieker confirmed Amazon-only expansion | 33% margin, 2-week lead time. No Shopify. | Expand when cash allows |
 | 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x, all increase criteria met. Only 3 days at £16 — letting algorithm settle. £12→£14 transition was seamless (ROAS improved 11.7x→19.2x). | 7 Mar |
-| 2026-03-03 | Arizona EVA: keep this year, cut to top 5 next year | Analysis shows Arizona EVA is an outlier — 45.5% margin, profitable year-round (unlike rest of Birkenstock range). Low cost (£20.83) gives headroom even at discounted prices. 17 colourways is too wide — top 5 account for ~75% of GP. Stock already ordered for 2026 (6-month lead time). This year: hold price as long as possible, drop prices on tail colours if not moving by Jul. Next year: order only Black (Narrow + Regular), Khaki Green (Narrow + Regular), White Narrow. | Sep/Oct ordering |
+| 2026-03-03 | Ives ceiling acknowledged | Ordering as much as possible, lots of stock, but volume plateauing. Reinforces need to investigate complementary brands for next growth phase. | Ongoing |
+| 2026-03-03 | Free Spirit investigated — narrowed to Frisco only | They approached us (2025). Obtained SS25 wholesale price list. Amazon price research shows most styles heavily discounted (Cleveland down to £25 on £57.50 RRP). Frisco holds up best: 164 reviews, 4.6 stars, £35–48 Amazon range, 28–37% gross margin (same basis as all brands). Between Birkenstock and Rieker. Not Ives, but adds incremental summer volume where Ives is capped. Also enquire about winter range. | Contact WMSC to confirm terms and lead time |
 
 ---
 
-## 12. Analysis — Arizona EVA (Mar 2026)
-
-**Run date:** 2026-03-03
-**Finding:** Arizona EVA is the exception to the Birkenstock off-season margin problem. Worth continuing but with a tighter range.
-
-### Why Arizona EVA works
-
-Cost is £20.83 (vs £35–40 for leather Arizona). Break-even after fees is ~£21.70. Even at off-season prices of £38–40, margin is ~45%. The rest of the Birkenstock range has 0% off-season margin because higher costs eat all the headroom.
-
-### Performance (2025)
-
-| Period | Units | Revenue | GP (raw) | Margin |
-|--------|------:|--------:|---------:|-------:|
-| Peak (Mar–Jun) | 224 | £8,336 | £3,670 | 44.0% |
-| Off-season (Jul–Feb) | 137 | £5,473 | £2,619 | 47.8% |
-| **Total** | **361** | **£13,809** | **£6,289** | **45.5%** |
-
-Return rate: 6.6% (24 returns on 361 units).
-
-### Top 5 (next year's core range)
-
-| GroupID | Colourway | Units | GP | Avg price |
-|---------|-----------|------:|---:|----------:|
-| 0129423-ARIZONA | Black Narrow | 48 | £889 | £39.35 |
-| 1019094-ARIZONA | Khaki Green Regular | 44 | £858 | £40.34 |
-| 0129443-ARIZONA | White Narrow | 50 | £821 | £37.26 |
-| 0129421-ARIZONA | Black Regular | 41 | £789 | £40.07 |
-| 1019152-ARIZONA | Khaki Green Narrow | 36 | £570 | £36.67 |
-
-### Tail to cut (after 2026 season)
-
-| GroupID | Colourway | Units | GP |
-|---------|-----------|------:|---:|
-| 1022433-ARIZONA | Gold Regular | 6 | £91 |
-| 1026202-ARIZONA | Rose Reptile Regular | 5 | £70 |
-| 1027305-ARIZONA | Eggshell Regular | 1 | £19 |
-| 1022466-ARIZONA | Popcorn Narrow | 10 | £197 |
-
-Low volume, not worth the stock commitment.
-
-### 2026 strategy
-
-Stock already committed. Maximise price Mar–Jun, discount tail colours from July if not moving. Clear everything by autumn if possible — EVA won't lose money even at £30, but aim higher.
-
----
-
-## 13. Reference
+## 12. Reference
 
 - **Strategy docs:** `scale/` folder
 - **DB schema:** `database/DB-Schema.sql`
