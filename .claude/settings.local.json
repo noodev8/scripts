@@ -40,7 +40,8 @@
       "WebFetch(domain:www.beggshoes.com)",
       "WebFetch(domain:www.shuperb.co.uk)",
       "WebFetch(domain:www.humphriesshoes.co.uk)",
-      "WebFetch(domain:www.shuperb.com)"
+      "WebFetch(domain:www.shuperb.com)",
+      "Bash(pip install:*)"
     ],
     "deny": []
   }

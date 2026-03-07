@@ -5,26 +5,9 @@
 
 ### Segment Map
 
-| Segment code | Segment | Styles | Revenue (12m) | GP (12m) |
-|:-------------|---------|-------:|--------------:|---------:|
-| IVES-WHITE | Lunar Ives White | 1 | £57k | £39k |
-| IVES | Lunar Ives Colours | 7 | £79k | £54k |
-| BIRK-EVA | Birkenstock EVA | 7 | £10k | £7.3k |
-| BLAZE | Lunar Blaze | 3 | £12k | £7k |
-| RIEKER-WIN | Rieker Winter | 11 | £16k | £7.7k |
-| RIEKER-SUM | Rieker Summer | TBD | TBD | TBD |
-| MILANO | Milano | 4 | £16k | £7.9k |
-| BEND | Bend | 8 | £21k | £9.4k |
-| AZ-BF-REG | Arizona BF Regular | 10 | £18k | £8.7k |
-| AZ-BF-NAR | Arizona BF Narrow | 10 | £8k | £3.6k |
-| GIZEH | Gizeh Regular | 7 | £12k | £5.9k |
-| | **Total: 11 segments** | **68+** | **£249k+** | **£150k+** |
-| | *Unallocated (NULL)* | *Mayari + others* | | |
-| | *CRAP* | *Zermatt, Florida, tails* | *clearing* | |
-| | | | | |
-| | *Blank slot* | | | |
-| | *Blank slot* | | | |
-| | *Blank slot* | | | |
+**See `scale/segment-summary.md`** — full segment overview with codes, channels, revenue, GP, and status.
+
+**13 segments | 258k+ revenue | 153k+ GP**
 
 **Minimum to qualify as a segment: £5k+ revenue.** Below that, nobody owns it.
 **Keep segments under ~10 styles.** More than that — split it.
@@ -36,7 +19,7 @@
 
 **Strategy:** Stock depth. Never run out. This is the profit engine.
 **Lead time:** 4 days
-**Cost:** £12.50 | **Avg sell price:** ~£39–41 | **Margin:** ~68%
+**Cost:** £12.50 | **Avg sell price:** ~£39–41 | **GP margin:** ~43% (after Amazon fees)
 
 ### Core Colourways (ordered by GP)
 
@@ -78,7 +61,7 @@
 | 0129421-ARIZONA | Black Regular | £45 | £40 | £36 |
 | 1019152-ARIZONA | Khaki Green Narrow | £42 | £38 | £35 |
 
-See `scale/birk-eva-pricing.md` for full pricing data per colourway.
+Pricing data per colourway is in the table above.
 
 ### Gizeh EVA
 
@@ -104,7 +87,7 @@ EVA Black is 100% peak season (Mar–Jun). EVA White sells year-round.
 
 **Strategy:** Restock all 3 colours to get reorder screen showing real data. Then manage like Ives.
 **Lead time:** 4 days (same supplier as Ives)
-**Cost:** £12.99 | **Avg sell price:** ~£34.99 | **Margin:** ~63%
+**Cost:** £12.99 | **Avg sell price:** ~£34.99 | **GP margin:** ~46% (after Amazon fees)
 
 ### 3 Colours
 
@@ -452,6 +435,78 @@ This is not a segment. It has no owner. It's a clearance list.
 
 ---
 
+## REMONTE-WIN: Remonte Winter (Amazon)
+
+**Strategy:** Sister brand to Rieker. Same supplier, same 2-week lead time, same seasonal cycle. Manage alongside RIEKER-WIN.
+**Lead time:** 2 weeks (in-season reorder) | 6 months (pre-order)
+**Cost:** £34-38 | **Avg sell price:** £75-80 | **Margin:** ~49%
+**Selling season:** Oct-Feb
+**DB flag:** `segment = 'REMONTE-WIN'`
+
+### Why this is a segment
+
+£28.31 average profit per sale — the highest per-unit economics of any unsegmented product. Only needs ~180 units to hit £5k GP. Currently doing £1.1k from 39 units with zero active management.
+
+### Current Winter Styles (2025/26 season)
+
+| GroupID | Style | Units (12m) | GP | Avg profit/sale | Last sale |
+|---------|-------|------------:|---:|----------------:|-----------|
+| D0700-22 | Zip Boots Brown | 12 | £344 | £28.65 | 15 Feb |
+| D0772-15 | Ankle Boots Brown | 11 | £309 | £28.13 | 12 Jan |
+| R1402-16 | Ankle Boots Blue | 10 | £291 | £29.11 | 17 Feb |
+| D0772-52 | Ankle Boots Rose | 6 | £160 | £26.62 | 16 Feb |
+
+**Total 12m GP: £1,104** from 4 styles. All Amazon. All profitable.
+
+### Owner's Seasonal Cycle
+
+Same as RIEKER-WIN:
+1. **Sep:** Winter order arrives — tag `REMONTE-WIN`, price, send to FBA
+2. **Oct-Feb:** Sell. Monitor. Reorder winners (2-week lead time).
+3. **Mar:** Clear remaining stock at reduced prices.
+4. **~Jun:** Pre-order next winter range alongside Rieker.
+
+### Actions
+
+- [ ] Tag all 4 groupids as `REMONTE-WIN` in database
+- [ ] Clear remaining winter stock at reduced prices (season ending)
+- [ ] Use 2025/26 data to inform 2026/27 pre-order (~Jun) — expand range to 6-8 styles
+- [ ] Target: £5k GP for winter 2026/27 season
+- [ ] Amazon only. Same owner as RIEKER-WIN.
+
+---
+
+## Absorption Actions — Boosting Existing Segments
+
+### Madrid EVA — add to BIRK-EVA
+
+| GroupID | Style | Units (12m) | GP |
+|---------|-------|------------:|---:|
+| 0128183-MADRID | EVA Black Narrow | 32 | £258 |
+| 0128163-MADRID | EVA White Narrow | 29 | £213 |
+
+**Action:** Tag these as BIRK-EVA. Same cost base (£16.67), same pricing logic. Adds ~£400-500 GP to the segment.
+
+### Arizona Patent — add to AZ-BF-REG / AZ-BF-NAR
+
+| GroupID | Style | Units (12m) | GP | Width |
+|---------|-------|------------:|---:|-------|
+| 1005291-ARIZONA | Patent White Reg | 20 | £380 | Regular |
+| 1005294-ARIZONA | Patent Sand Reg | 27 | £360 | Regular |
+| 1005293-ARIZONA | Patent Black Reg | 40 | £225 | Regular |
+| 1005292-ARIZONA | Patent Sand Narrow | 30 | £216 | Narrow |
+
+**Action:** Tag Regular widths into AZ-BF-REG, Narrow into AZ-BF-NAR. Boosts those segments by ~£700-1,000 GP combined.
+
+### Absorption checklist
+
+- [ ] Tag Madrid EVA groupids as BIRK-EVA
+- [ ] Tag Arizona Patent Regular groupids as AZ-BF-REG
+- [ ] Tag Arizona Patent Narrow groupids as AZ-BF-NAR
+- [ ] Add these styles to the relevant segment tables in this doc
+
+---
+
 ## Investigations — Potential New Segments
 
 Styles or brands being tested. Not yet proven enough for a segment. Low stock, early data, or new to the range.
@@ -468,8 +523,7 @@ Styles or brands being tested. Not yet proven enough for a segment. Low stock, e
 
 | Brand/Style | Channel | Status | Notes |
 |-------------|---------|--------|-------|
-| Free Spirit Frisco | Amazon | Contacted supplier | Previous Amazon winner. Awaiting order confirmation. |
-| Free Spirit Cleveland | Amazon | Contacted supplier | Previous Amazon winner. Awaiting order confirmation. |
+| Free Spirit Frisco | Amazon | Contacted supplier | Only Free Spirit style worth testing. 164 reviews, 4.6 stars, 28-37% margin. See SCALE_PLAN section 8. |
 | Lunar new styles (summer) | Amazon | Summer only | 4-day lead time. Test in summer when customer base is active. Never winter. |
 | Rieker range expansion | Amazon | Post-winter review | Review sell-through of current 7 styles. Identify next candidates. |
 | Blue Narrow Arizona BF | Shopify | Seed stock needed | `0051753-ARIZONA` — exists, zero sales. Stock issue or no demand? |
