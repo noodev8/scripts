@@ -204,6 +204,7 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x. £12->£14 was seamless (11.7x->19.2x). Letting £16 settle. | 7 Mar |
 | 2026-03-03 | Ives ceiling acknowledged | See Established Facts. | Ongoing |
 | 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. | Contact WMSC |
+| 2026-03-08 | Google Ads daily budget £16 → £18 | ROAS 19.3x, imp share ~80%, budget constraining, 2,042 stock units. Spring ramp. Switching to ~20% increments every 5 days. | Review 13 Mar |
 
 ---
 

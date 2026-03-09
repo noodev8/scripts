@@ -1,7 +1,7 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £16/day
+**Current budget:** £18/day
 **Current tROAS:** 400%
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
 
@@ -131,8 +131,25 @@ tROAS should rarely need changing. The following are signals to look for, not ri
 
 ### Increment sizing
 
-- **Default: £2 increments** — preferred when the algorithm is learning well and ROAS is improving. Small steps preserve algorithm stability and avoid resetting the learning phase.
-- **£4 increments** may be appropriate when ROAS has significant headroom (e.g. 15x+ with a 5x floor), impression share is clearly constrained, and we are entering peak season. Use judgement — if in doubt, go with £2 and review sooner.
+- **Default: ~20% increases every 5 days** — percentage-based keeps steps proportional as budget grows. Review every 5 days during peak ramp (Mar–Jul). Round to nearest £1.
+- **Hold or slow down** if ROAS drops below 7x, stock runs low, or the algorithm shows instability after an increase.
+- **Speed up** (shorten to 4-day reviews) only if ROAS stays well above 10x and impression share is clearly constrained.
+
+### Recommended ramp schedule (from 8 Mar at £18)
+
+This is a guide, not a commitment. Each step requires the increase criteria to be met.
+
+| Review date | Budget | Step | Cumulative |
+|-------------|:------:|:----:|:----------:|
+| 8 Mar | £18 | — | current |
+| 13 Mar | £22 | +£4 | +22% |
+| 18 Mar | £26 | +£4 | +44% |
+| 23 Mar | £32 | +£6 | +78% |
+| 28 Mar | £38 | +£6 | +111% |
+| 2 Apr | £46 | +£8 | +156% |
+| 7 Apr | £55 | +£9 | +206% |
+
+At any step, if ROAS < 7x or stock drops below threshold, hold at current level until next review.
 
 ### Increase budget
 
@@ -186,6 +203,7 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 | 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | ~£13 | ~2,140 | Monitoring only. No change. | w/c 24 Feb |
 | 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | w/c 2 Mar |
 | 2026-03-03 | Hold at £16 | 18.1x | ~85% | £15.58 | 1,328 (163 key) | All increase criteria met but only 3 days at £16. Algorithm responding well — sales up, impressions up, ROAS strong. Let it settle, then decide. | 7 Mar |
+| 2026-03-08 | Budget £16 → £18 | 19.3x | ~80% | £15.74 | 2,042 | All 5 increase criteria met. ROAS 19.3x (huge headroom), budget constraining (spending to cap daily), imp share ~80% (traffic missed), stock healthy at 2,042 units. March spring ramp. Moving to ~20% increments every 5 days through peak season. | 13 Mar |
 | | | | | | | | |
 
 ---
