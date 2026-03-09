@@ -30,23 +30,34 @@ REQUIRED_COLUMNS = ['groupid', 'new_price', 'description']
 
 
 def load_csv(filepath):
-    """Load and validate the edited action report CSV."""
+    """Load and validate the edited action report CSV.
+
+    Returns (price_changes_df, all_rows_df):
+        price_changes_df: rows with change=1 for price updates
+        all_rows_df: all rows for description saving
+    """
     df = pd.read_csv(filepath)
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
         raise ValueError(f"CSV missing required columns: {', '.join(missing)}")
-    # Only process rows explicitly flagged with change=1
+
+    # All valid rows (for saving descriptions)
+    all_rows = df[df['groupid'].notna()].copy()
+
+    # Price changes: only rows explicitly flagged with change=1
     if 'change' in df.columns:
-        df = df[pd.to_numeric(df['change'], errors='coerce') == 1].copy()
-    # Keep only rows with valid groupid and new_price
-    df = df[df['groupid'].notna() & df['new_price'].notna()].copy()
-    df['new_price'] = pd.to_numeric(df['new_price'], errors='coerce')
-    df = df[df['new_price'].notna()]
-    return df
+        changes = df[pd.to_numeric(df['change'], errors='coerce') == 1].copy()
+    else:
+        changes = df.copy()
+    changes = changes[changes['groupid'].notna() & changes['new_price'].notna()].copy()
+    changes['new_price'] = pd.to_numeric(changes['new_price'], errors='coerce')
+    changes = changes[changes['new_price'].notna()]
+
+    return changes, all_rows
 
 
-def fetch_current_prices(conn, groupids):
-    """Fetch current shopifyprice and cost from skusummary."""
+def fetch_current_data(conn, groupids):
+    """Fetch current shopifyprice, cost, and latest description from DB."""
     cur = conn.cursor()
     cur.execute("""
         SELECT groupid, shopifyprice, cost
@@ -54,13 +65,26 @@ def fetch_current_prices(conn, groupids):
         WHERE groupid = ANY(%s)
     """, (list(groupids),))
     rows = cur.fetchall()
-    cur.close()
     result = {}
     for groupid, shopifyprice, cost in rows:
         result[groupid] = {
             'shopifyprice': float(shopifyprice) if shopifyprice is not None else None,
             'cost': float(cost) if cost is not None else None,
+            'last_description': '',
         }
+
+    # Fetch latest description per groupid from price_change_log
+    cur.execute("""
+        SELECT DISTINCT ON (groupid) groupid, reason_notes
+        FROM price_change_log
+        WHERE groupid = ANY(%s)
+        ORDER BY groupid, change_date DESC, id DESC
+    """, (list(groupids),))
+    for groupid, reason_notes in cur.fetchall():
+        if groupid in result:
+            result[groupid]['last_description'] = str(reason_notes).strip() if reason_notes else ''
+
+    cur.close()
     return result
 
 
@@ -135,7 +159,44 @@ def apply_changes(conn, changes):
     cur.close()
 
 
-def print_summary(to_apply, blocked, skipped, confirm):
+def save_descriptions(conn, all_rows_df, current_data, applied_groupids):
+    """Save updated descriptions to price_change_log for rows where the note changed.
+
+    Skips groupids that already got a price_change_log entry from apply_changes.
+    Inserts a note-only entry (old_price = new_price = current price) so the
+    description carries forward to the next Phase 2 run.
+    """
+    cur = conn.cursor()
+    saved = []
+    for _, row in all_rows_df.iterrows():
+        gid = row['groupid']
+        desc = str(row.get('description', '')).strip()
+
+        # Skip if no description, not in DB, or already updated via price change
+        if not desc or gid not in current_data or gid in applied_groupids:
+            continue
+
+        current_desc = current_data[gid].get('last_description', '')
+        if desc == current_desc:
+            continue  # No change
+
+        current_price = current_data[gid]['shopifyprice']
+        if current_price is None:
+            continue
+
+        cur.execute("""
+            INSERT INTO price_change_log
+                (groupid, old_price, new_price, reason_code, reason_notes, changed_by, channel)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (gid, current_price, current_price, 'google_price_note', desc, 'google_price_action', 'SHP'))
+        saved.append(gid)
+
+    conn.commit()
+    cur.close()
+    return saved
+
+
+def print_summary(to_apply, blocked, skipped, confirm, saved_notes=None):
     """Print a human-readable summary to console."""
     mode_label = "GOOGLE PRICE APPLY" if confirm else "GOOGLE PRICE APPLY - DRY RUN"
     prefix = "Applied" if confirm else "Would update"
@@ -158,6 +219,9 @@ def print_summary(to_apply, blocked, skipped, confirm):
 
     if skipped:
         print(f"Skipped: {len(skipped)}")
+
+    if saved_notes:
+        print(f"Description updates saved: {len(saved_notes)}")
 
     if confirm and to_apply:
         print("Flagged for Shopify sync (shopifychange=1)")
@@ -186,39 +250,48 @@ def main():
 
     # Load and validate CSV
     try:
-        csv_df = load_csv(csv_path)
+        csv_df, all_rows_df = load_csv(csv_path)
     except ValueError as e:
         print(f"Error: {e}")
         log(f"ERROR: {e}")
         sys.exit(1)
 
-    log(f"Loaded {len(csv_df)} rows from CSV")
+    log(f"Loaded {len(csv_df)} price change rows, {len(all_rows_df)} total rows from CSV")
 
-    if csv_df.empty:
+    if csv_df.empty and all_rows_df.empty:
         print("No valid rows in CSV. Nothing to do.")
         log("No valid rows in CSV")
         return
 
-    # Connect to DB and fetch current prices
+    # Connect to DB and fetch current data (prices + descriptions)
     db_config = get_db_config()
     conn = psycopg2.connect(**db_config)
     try:
-        groupids = csv_df['groupid'].tolist()
-        current_prices = fetch_current_prices(conn, groupids)
-        log(f"Fetched current prices for {len(current_prices)} groupids")
+        all_groupids = all_rows_df['groupid'].tolist()
+        current_data = fetch_current_data(conn, all_groupids)
+        log(f"Fetched current data for {len(current_data)} groupids")
 
-        # Process changes
-        to_apply, blocked, skipped = process_changes(csv_df, current_prices)
+        # Process price changes (change=1 rows)
+        to_apply, blocked, skipped = process_changes(csv_df, current_data)
         log(f"To apply: {len(to_apply)}, Blocked: {len(blocked)}, Skipped: {len(skipped)}")
 
         # Apply if confirmed
+        applied_groupids = set()
         if confirm and to_apply:
             apply_changes(conn, to_apply)
+            applied_groupids = {ch['groupid'] for ch in to_apply}
             log(f"Applied {len(to_apply)} price changes")
         elif confirm and not to_apply:
             log("Confirmed but nothing to apply")
 
-        print_summary(to_apply, blocked, skipped, confirm)
+        # Save description updates for ALL rows (including change=0)
+        saved_notes = []
+        if confirm:
+            saved_notes = save_descriptions(conn, all_rows_df, current_data, applied_groupids)
+            if saved_notes:
+                log(f"Saved {len(saved_notes)} description updates")
+
+        print_summary(to_apply, blocked, skipped, confirm, saved_notes)
     finally:
         conn.close()
 

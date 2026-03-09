@@ -23,8 +23,13 @@ The process is designed to be run manually with gaps between phases. Drop the Go
   - **Grow** (default): Target = Google's suggested sale price (click-uplift-weighted). Falls back to benchmark avg if no suggestion. Only recommends **price decreases**.
   - **Protect** (`--protect`): Target = benchmark avg. Only recommends **price increases**.
 - Applies guardrails: 10% min margin above cost (VAT-adjusted), RRP ceiling, round to 2dp
+- **Auto-decision rules** pre-sort each row into `accept` / `review` / `reject`:
+  - **Reject**: no stock, or selling well and Google wants an aggressive drop
+  - **Accept**: has stock, low/no sales, modest drop
+  - **Review**: everything else (large drops, mixed signals)
+  - Rule thresholds are defined at the top of `google_price_action.py` — adjust there as needed
 - Filters to actionable rows only (skips no-data, no-change, wrong direction)
-- Output: `price_action_grow_YYYY-MM-DD.csv` or `price_action_protect_YYYY-MM-DD.csv` (10 columns: groupid, brand, title, current_price, new_price, change, change_pct, margin_current, margin_new, source)
+- Output: `price_action_grow_YYYY-MM-DD.csv` or `price_action_protect_YYYY-MM-DD.csv` with columns: groupid, auto_decision, auto_reason, change, new_price, description, brand, title, current_price, rrp, change_pct, sold_30d, stock
 - No database changes
 
 ### Phase 3: Apply (`google_price_apply.py`)

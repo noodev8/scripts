@@ -34,6 +34,39 @@ REPORT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Guardrail constants (matches price_recommendation.py)
 MINIMUM_MARGIN_MULTIPLIER = 1.10  # Cost * 1.10 minimum price floor
 
+# ============================================================
+# AUTO-DECISION RULES
+# ============================================================
+# Pre-sorts rows into accept / reject / review to reduce manual
+# review effort. These are GUIDANCE only — the human always has
+# final say via the 'change' column.
+#
+# Adjust thresholds here as you learn what works.
+# Claude Code: read this section to understand current rules.
+# ============================================================
+
+# -- Reject: high confidence these should NOT change --
+REJECT_NO_STOCK = True                # Reject when stock = 0 (no point changing price)
+REJECT_SELLING_MIN_SOLD = 2           # At least this many sold in 30d = "it's selling".
+                                      # If selling, trust actual sales over Google — reject regardless of drop size.
+                                      # (Validated 2026-03-09: every item with 2+ sold was rejected or price-increased by user)
+
+# -- Increase: items selling well enough to test a higher price --
+# When an item hits the "selling well" threshold, instead of just rejecting
+# Google's decrease, suggest a modest increase. The logic: if it's selling
+# at the current price, there may be room to push higher.
+INCREASE_UPLIFT_PCT = 5               # Default uplift % to suggest (capped at RRP)
+INCREASE_MIN_STOCK = 3                # Need at least this much stock to suggest increase
+                                      # (low stock + selling = let it run, don't increase)
+
+# -- Review: large drops that MIGHT be right but need a human eye --
+REVIEW_LARGE_DROP_PCT = -20           # Drops bigger than this get flagged for review
+
+# -- Accept: high confidence these are worth doing --
+ACCEPT_MIN_STOCK = 5                  # Need at least this much stock to auto-accept
+ACCEPT_MAX_SOLD_30D = 1              # "Not selling" means this many or fewer in 30d
+ACCEPT_MAX_DROP_PCT = -15             # Modest drop = within this % (negative = decrease)
+
 
 def find_latest_data_report():
     """Find the most recently modified price_report_*.csv."""
@@ -129,6 +162,84 @@ def calc_margin(price, net_cost):
     if price and net_cost and price > 0:
         return round((price - net_cost) / price * 100, 1)
     return None
+
+
+def apply_auto_rules(df):
+    """Apply auto-decision rules to pre-sort rows into accept/reject/review/increase.
+
+    Rules are evaluated top-to-bottom; first match wins.
+    See the AUTO-DECISION RULES config block at the top of this file.
+
+    For 'increase' candidates, new_price and change_pct are overridden with
+    a suggested increase (capped at RRP).
+    """
+    decisions = []
+    reasons = []
+    price_overrides = {}  # row index -> new suggested increase price
+
+    for idx, row in df.iterrows():
+        stock = row.get('stock', 0)
+        sold = row.get('sold_30d', 0)
+        current_price = row['current_price']
+        new_price = row['new_price']
+        rrp = row.get('rrp', None)
+        drop_pct = ((new_price - current_price) / current_price * 100) if current_price > 0 else 0
+
+        # --- Reject: no stock ---
+        if REJECT_NO_STOCK and stock == 0:
+            decisions.append('reject')
+            reasons.append('no stock')
+            continue
+
+        # --- Selling well: suggest increase or reject ---
+        if sold >= REJECT_SELLING_MIN_SOLD:
+            # Enough stock to sustain sales? Suggest an increase.
+            if stock >= INCREASE_MIN_STOCK:
+                increase_target = round(current_price * (1 + INCREASE_UPLIFT_PCT / 100), 2)
+                # Cap at RRP
+                if pd.notna(rrp) and rrp > 0:
+                    if current_price >= rrp:
+                        decisions.append('reject')
+                        reasons.append(f'selling ({sold} sold 30d) but already at RRP')
+                        continue
+                    increase_target = min(increase_target, rrp)
+                pct = round((increase_target - current_price) / current_price * 100, 1)
+                price_overrides[idx] = increase_target
+                decisions.append('increase')
+                reasons.append(f'selling well ({sold} sold 30d, stock {stock}) — suggest +{pct}%')
+            else:
+                # Low stock + selling = let it run through, don't touch
+                decisions.append('reject')
+                reasons.append(f'selling ({sold} sold 30d), low stock ({stock}) — let it run')
+            continue
+
+        # --- Review: large drops ---
+        if drop_pct <= REVIEW_LARGE_DROP_PCT:
+            decisions.append('review')
+            reasons.append(f'large drop ({drop_pct:.0f}%) — check if warranted')
+            continue
+
+        # --- Accept: stock + not selling + modest drop ---
+        if stock >= ACCEPT_MIN_STOCK and sold <= ACCEPT_MAX_SOLD_30D and drop_pct >= ACCEPT_MAX_DROP_PCT:
+            decisions.append('accept')
+            reasons.append(f'stock {stock}, {sold} sold 30d, modest drop ({drop_pct:.0f}%)')
+            continue
+
+        # --- Everything else → review ---
+        decisions.append('review')
+        reasons.append('mixed signals — needs human check')
+
+    df.insert(1, 'auto_decision', decisions)
+    df.insert(2, 'auto_reason', reasons)
+
+    # Override new_price and change_pct for increase candidates
+    for idx, price in price_overrides.items():
+        df.at[idx, 'new_price'] = price
+        current = df.at[idx, 'current_price']
+        if current > 0:
+            df.at[idx, 'change_pct'] = round((price - current) / current * 100, 1)
+
+    return df
 
 
 def build_action_report(report_df, guardrail_df, mode):
@@ -243,10 +354,14 @@ def build_action_report(report_df, guardrail_df, mode):
     action_df = pd.DataFrame(rows)
 
     if not action_df.empty:
-        # Sort by magnitude of change_pct (largest opportunity first)
-        action_df = action_df.sort_values('change_pct', key=abs, ascending=False).reset_index(drop=True)
-        # Drop noisy columns from CSV output (keep internally for sorting)
-        action_df = action_df.drop(columns=['price_diff', 'change_pct', 'margin_current', 'margin_new'])
+        # Apply auto-decision rules
+        action_df = apply_auto_rules(action_df)
+
+        # Sort: accept first, then review, then reject — within each group by drop magnitude
+        decision_order = {'increase': 0, 'accept': 1, 'review': 2, 'reject': 3}
+        action_df['_sort'] = action_df['auto_decision'].map(decision_order)
+        action_df = action_df.sort_values(['_sort', 'change_pct'], ascending=[True, True]).reset_index(drop=True)
+        action_df = action_df.drop(columns=['_sort', 'price_diff', 'margin_current', 'margin_new'])
 
     return action_df
 
@@ -294,17 +409,31 @@ def main():
     total_reviewed = len(report_df)
     actionable = len(action_df)
 
+    # Auto-decision breakdown
+    if not action_df.empty and 'auto_decision' in action_df.columns:
+        counts = action_df['auto_decision'].value_counts()
+        n_increase = counts.get('increase', 0)
+        n_accept = counts.get('accept', 0)
+        n_review = counts.get('review', 0)
+        n_reject = counts.get('reject', 0)
+    else:
+        n_increase = n_accept = n_review = n_reject = 0
+
     summary = (
         f"\n{'='*40}\n"
         f"GOOGLE PRICE ACTION REPORT ({mode_label})\n"
         f"{'='*40}\n"
         f"Products reviewed:  {total_reviewed:>6}\n"
         f"Actionable changes: {actionable:>6}\n"
+        f"  Auto-increase:    {n_increase:>6}\n"
+        f"  Auto-accept:      {n_accept:>6}\n"
+        f"  Needs review:     {n_review:>6}\n"
+        f"  Auto-reject:      {n_reject:>6}\n"
         f"Output: {output_path}\n"
         f"{'='*40}"
     )
     print(summary)
-    log(f"Report complete: {actionable} actionable changes from {total_reviewed} reviewed ({mode_label} mode)")
+    log(f"Report complete: {actionable} actionable ({n_increase} increase, {n_accept} accept, {n_review} review, {n_reject} reject) from {total_reviewed} reviewed ({mode_label} mode)")
     log(f"=== GOOGLE PRICE ACTION REPORT ({mode_label}) FINISHED ===")
 
 
