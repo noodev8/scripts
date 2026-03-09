@@ -12,7 +12,6 @@ These are confirmed by data analysis. Referenced throughout but stated only here
 
 - **Birkenstock off-season (Jul-Feb) is structurally 0% margin.** 976 units, £65k revenue, £290 GP. Applies equally to core 15 and long tail. Root cause: discounted prices cover product cost but not Shopify fees + payment processing + shipping. Not fixable by narrowing range.
 - **Lunar winter books were total failures.** Cleared below cost. Never repeat.
-- **Zermatt slippers are non-viable.** Negative GP in peak, zero in winter. Don't restock.
 - **Ives is approaching its volume ceiling.** We order as much as possible but volume is plateauing (Mar 2026).
 - **Lunar 4-day lead time is the biggest strategic advantage.** React to demand, not forecast.
 - **Rieker: 2-week lead time, ~49% margin, Amazon only.** Lowest-risk expansion route.
@@ -154,7 +153,7 @@ Shopify is a Birkenstock shop (85% of Shopify revenue on average, ranging 71-93%
 - **Risk:** Lose search ranking continuity. Harder to ramp in March? Needs testing.
 
 ### Option B: Find something to sell on Shopify in winter
-- Nothing has worked so far. Zermatt, Lunar winter, non-Birk brands all failed.
+- Nothing has worked so far. Lunar winter, non-Birk brands all failed.
 
 **Decision needed** after 2026 spring season: does heavier Birkenstock ordering extend the profitable window past June?
 
@@ -198,7 +197,6 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | 2026-02-17 | Simplified Klaviyo to one campaign | 90-day Birkenstock non-buyer repurchase only. Prove it first. | Review after 2-3 sends |
 | 2026-02-28 | Google Ads daily budget £14 -> £16 | User-initiated increase. | - |
 | 2026-03-02 | Birkenstock off-season confirmed 0% margin | See Established Facts. | Informs Sep/Oct ordering |
-| 2026-03-02 | Zermatt slippers non-viable | See Established Facts. | Review at next order |
 | 2026-03-02 | Lunar winter books ruled out permanently | See Established Facts. | - |
 | 2026-03-02 | Rieker confirmed Amazon-only | See Established Facts. | Expand when cash allows |
 | 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x. £12->£14 was seamless (11.7x->19.2x). Letting £16 settle. | 7 Mar |

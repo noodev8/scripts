@@ -7,7 +7,7 @@
 
 **See `scale/segment-summary.md`** — full segment overview with codes, channels, revenue, GP, and status.
 
-**13 segments | 258k+ revenue | 153k+ GP**
+**14 segments | 275k+ revenue | 158k+ GP**
 
 **Minimum to qualify as a segment: £5k+ revenue.** Below that, nobody owns it.
 **Keep segments under ~10 styles.** More than that — split it.
@@ -408,6 +408,52 @@ White Regular alone (£3.3k GP) outperforms most entire Birkenstock models. Whit
 
 ---
 
+## ZERMATT-SEG: Birkenstock Zermatt (Shopify)
+
+**Strategy:** Winter slippers, two product lines (cork latex + shearling). Regular fit only. Price optimisation, keep winners stocked.
+**Lead time:** 6 months
+**Cost:** £25 (cork) / £37.50 (shearling) | **RRP:** £60 / £90 | **Margin:** ~44–47%
+**Selling season:** Year-round — cork peaks Mar–Jun, shearling peaks Jul–Feb
+**DB flag:** `segment = 'ZERMATT-SEG'`
+
+### All 5 Styles
+
+| GroupID | Style | Cost | Units (12m) | Revenue | GP | Avg price | Stock | Last sale |
+|---------|-------|-----:|------------:|--------:|---:|----------:|------:|-----------|
+| 1015080-ZERMATT | Light Grey Reg (cork) | £25 | 76 | £3,661 | £1,615 | £48 | 17 | 9 Mar |
+| 1015092-ZERMATT | Light Grey Reg (shearling) | £37.50 | 33 | £2,492 | £1,155 | £75 | 15 | 9 Mar |
+| 1014938-ZERMATT | Dark Anthracite Reg (cork) | £25 | 42 | £2,190 | £1,052 | £52 | 0 | Dec '25 |
+| 1016570-ZERMATT | Mocha Brown Reg (shearling) | £37.50 | 18 | £1,377 | £647 | £76 | 1 | Dec '25 |
+| 1015090-ZERMATT | Dark Anthracite Reg (shearling) | £37.50 | 15 | £1,173 | £563 | £78 | 3 | Feb '26 |
+
+**Total 12m GP: £5,032** from 5 styles. All Regular fit.
+
+### Key Pricing
+
+- Cork styles sell at **£48** (66% of 1015080 sales at this price). Do not drop below £48.
+- Shearling styles sell at **£70–75**. Higher cost base but strong margin.
+
+### Stock Pipeline
+
+- **1014938** (Dark Anthracite cork): 0 stock but 60 on order across 4 deliveries (Mar–Aug)
+- **1015080** (Light Grey cork): 17 stock + 6 on order (Feb). Ordering more for Sep delivery — top seller needs depth
+- **1015092** (Light Grey shearling): 15 stock + 40 on order (Jul–Aug)
+- **1016570** (Mocha Brown shearling): 1 stock + 29 on order (Aug)
+- **1015090** (Dark Anthracite shearling): 3 stock + 1 on order (Jul)
+
+### What was dropped
+
+Narrow fits, Navy (high return rates), and low-volume shearling tail — all stay in CRAP. Only Regular fit in the segment.
+
+### Actions
+
+- [ ] Price 1015080 back to £48 (was dropped to £40 in error)
+- [ ] Order 1015080 cork for Sep delivery — fill sizes 37–41 as priority
+- [ ] Monitor 1014938 restock (Mar delivery first) — was out of stock, strong seller
+- [ ] Shearling order (Aug) is committed — sell through winter, assess in spring
+
+---
+
 ## CRAP — Can't Realise A Profit
 
 Styles that fall below the segment threshold or sit in the tail of a segment. Nobody actively manages these. One task: **clear them.**
@@ -425,7 +471,7 @@ Styles that fall below the segment threshold or sit in the tail of a segment. No
 - Tail styles from Arizona EVA (Gold, Rose Reptile, Eggshell, Popcorn)
 - Tail styles from Arizona BF Regular (New Beige, Pearl White, Light Rose, Eggshell)
 - Tail styles from Arizona BF Narrow (Pearl White, Pecan, Light Rose, Eggshell, Metallic Black)
-- Zermatt (all 12 styles — flagged as non-viable in scale plan)
+- Zermatt tail: all Narrow fits + Navy (`1014932`, `1014934`, `1016571`, `1015086`, `1015084`, `1017519`, `1017523`)
 - Gizeh Narrow tail: Birko-Flor Black (`0043693`), Birko-Flor Blue (`0143623`), Patent White (`1005300`), Patent Sand Brown (`1013076`), Vegan Pecan Brown (`1025049`)
 - Gizeh Graceful Pearl White Regular (`0943871`) — 1 sale, £43 GP
 - Mayari, Florida, and other unallocated Birkenstock
@@ -542,7 +588,6 @@ Styles or brands being tested. Not yet proven enough for a segment. Low stock, e
 | Brand/Style | When | Reason |
 |-------------|------|--------|
 | Lunar winter books | Pre-2026 | Cleared below cost. Total loss. |
-| Birkenstock Zermatt | Mar 2026 | Negative/zero GP in both seasons. |
 
 ---
 
