@@ -25,11 +25,11 @@ The process is designed to be run manually with gaps between phases. Drop the Go
 - Applies guardrails: 10% min margin above cost (VAT-adjusted), RRP ceiling, round to 2dp
 - **Auto-decision rules** pre-sort each row into `accept` / `review` / `reject`:
   - **Reject**: no stock, or selling well and Google wants an aggressive drop
-  - **Accept**: has stock, low/no sales, modest drop
-  - **Review**: everything else (large drops, mixed signals)
+  - **Accept**: has stock, low/no sales, modest drop, AND no proven demand at current price
+  - **Review**: everything else (large drops, mixed signals, or proven demand — 10+ units sold within 5% of current price in last 365 days)
   - Rule thresholds are defined at the top of `google_price_action.py` — adjust there as needed
 - Filters to actionable rows only (skips no-data, no-change, wrong direction)
-- Output: `price_action_grow_YYYY-MM-DD.csv` or `price_action_protect_YYYY-MM-DD.csv` with columns: groupid, auto_decision, auto_reason, change, new_price, description, brand, title, current_price, rrp, change_pct, sold_30d, stock
+- Output: `price_action_grow_YYYY-MM-DD.csv` or `price_action_protect_YYYY-MM-DD.csv` with columns: groupid, auto_decision, auto_reason, change, new_price, description, brand, title, current_price, rrp, change_pct, sold_30d, stock, sold_near_price
 - No database changes
 
 ### Phase 3: Apply (`google_price_apply.py`)

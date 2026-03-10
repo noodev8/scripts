@@ -67,6 +67,10 @@ ACCEPT_MIN_STOCK = 5                  # Need at least this much stock to auto-ac
 ACCEPT_MAX_SOLD_30D = 1              # "Not selling" means this many or fewer in 30d
 ACCEPT_MAX_DROP_PCT = -15             # Modest drop = within this % (negative = decrease)
 
+# -- Proven demand: block auto-accept if current price has strong track record --
+ACCEPT_PROVEN_DEMAND_TOLERANCE = 0.05  # 5% price band (e.g. £64.00 and £64.22 = same price)
+ACCEPT_PROVEN_DEMAND_MIN_SOLD = 10     # 10+ units sold at nearby price in 365d = proven demand → review
+
 
 def find_latest_data_report():
     """Find the most recently modified price_report_*.csv."""
@@ -134,6 +138,23 @@ def fetch_guardrail_data(groupids):
         fba_rows = cur.fetchall()
         fba_df = pd.DataFrame(fba_rows, columns=['groupid', 'fba_stock'])
 
+        # Historical sales near current price (proven demand check)
+        cur.execute("""
+            SELECT s.groupid, COALESCE(SUM(s.qty), 0) AS sold_near_price
+            FROM sales s
+            JOIN skusummary ss ON s.groupid = ss.groupid
+            WHERE s.groupid = ANY(%s)
+              AND s.channel = 'SHP'
+              AND s.qty > 0
+              AND s.solddate >= CURRENT_DATE - INTERVAL '365 days'
+              AND ss.shopifyprice IS NOT NULL
+              AND ss.shopifyprice::numeric > 0
+              AND ABS(s.soldprice - ss.shopifyprice::numeric) / ss.shopifyprice::numeric <= %s
+            GROUP BY s.groupid
+        """, (list(groupids), ACCEPT_PROVEN_DEMAND_TOLERANCE))
+        demand_rows = cur.fetchall()
+        demand_df = pd.DataFrame(demand_rows, columns=['groupid', 'sold_near_price'])
+
         cur.close()
 
         df = df.set_index('groupid')
@@ -151,6 +172,9 @@ def fetch_guardrail_data(groupids):
             df = df.join(fba_df.set_index('groupid'), how='left')
         df['fba_stock'] = df.get('fba_stock', pd.Series(dtype='float')).fillna(0).astype(int)
         df['stock'] = df['stock'] + df['fba_stock']
+        if not demand_df.empty:
+            df = df.join(demand_df.set_index('groupid'), how='left')
+        df['sold_near_price'] = df.get('sold_near_price', pd.Series(dtype='float')).fillna(0).astype(int)
 
         return df
     finally:
@@ -217,6 +241,15 @@ def apply_auto_rules(df):
         if drop_pct <= REVIEW_LARGE_DROP_PCT:
             decisions.append('review')
             reasons.append(f'large drop ({drop_pct:.0f}%) — check if warranted')
+            continue
+
+        # --- Review: proven demand at current price (would otherwise auto-accept) ---
+        sold_near = row.get('sold_near_price', 0)
+        if (stock >= ACCEPT_MIN_STOCK and sold <= ACCEPT_MAX_SOLD_30D
+                and drop_pct >= ACCEPT_MAX_DROP_PCT
+                and sold_near >= ACCEPT_PROVEN_DEMAND_MIN_SOLD):
+            decisions.append('review')
+            reasons.append(f'proven demand ({sold_near} sold near current price in 365d) — seasonal lull?')
             continue
 
         # --- Accept: stock + not selling + modest drop ---
@@ -349,6 +382,7 @@ def build_action_report(report_df, guardrail_df, mode):
             'margin_new': margin_new,
             'sold_30d': g.get('sold_30d', 0),
             'stock': g.get('stock', 0),
+            'sold_near_price': g.get('sold_near_price', 0),
         })
 
     action_df = pd.DataFrame(rows)
