@@ -43,7 +43,9 @@
       "WebFetch(domain:www.shuperb.com)",
       "Bash(pip install:*)",
       "Bash(python.exe:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git update-index:*)",
+      "mcp__postgres-nook__query"
     ],
     "deny": []
   }
