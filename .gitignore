@@ -20,8 +20,8 @@ dist/
 out/
 
 
-# Google merchant api
-merchant-feed-api-462809-23c712978791.json
+# Google merchant api credentials (any JSON key in merchant-feed/)
+merchant-feed/*.json
 
 =======
 # Logs
@@ -31,6 +31,8 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 logs/
+**/logs/
+**/archive_logs/
 *.txt
 *.csv
 !adcost_summary_30.csv
@@ -64,7 +66,6 @@ android/key.properties
 **/android/app/.cxx/
 
 # API credentials and sensitive configuration files
-merchant-feed-api-462809-23c712978791.json
 .env
 shopify_api.env
 server.txt
