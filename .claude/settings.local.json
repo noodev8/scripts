@@ -45,7 +45,8 @@
       "Bash(python.exe:*)",
       "Bash(git fetch:*)",
       "Bash(git update-index:*)",
-      "mcp__postgres-nook__query"
+      "mcp__postgres-nook__query",
+      "Bash(git ls-files:*)"
     ],
     "deny": []
   }
