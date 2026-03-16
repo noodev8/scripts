@@ -22,7 +22,7 @@ out/
 
 # Google merchant api credentials
 merchant-feed/*.json
-NOT-USED-merchant-feed-api-*.json
+merchant-feed-api-*.json
 
 =======
 # Logs
