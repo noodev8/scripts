@@ -20,8 +20,9 @@ dist/
 out/
 
 
-# Google merchant api credentials (any JSON key in merchant-feed/)
+# Google merchant api credentials
 merchant-feed/*.json
+NOT-USED-merchant-feed-api-*.json
 
 =======
 # Logs
