@@ -10,6 +10,9 @@ Thumbs.db
 # VS Code
 .vscode/
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # =========================================
 # Node.js & Next.js (splitdine_server + Next frontend)
 node_modules/
