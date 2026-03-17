@@ -1,17 +1,38 @@
+-- ================================================================
+-- clean_sales.sql
+-- Runs weekly via clean_sales.py (cron: Mondays 4am)
+--
+-- Two jobs:
+--   1. Purge old data from sales, bclog, stockorder, orderstatus_archive
+--   2. Fix returns that arrived with soldprice = 0
+--      (so GP/margin calculations aren't skewed)
+--
+-- Replaces the manual PowerBuilder cleanup process.
+-- ================================================================
+
+
 -- ----------------------------------------------------------------
--- STEP 1: Remove deleted and expired products from sales
+-- STEP 1: Purge old data
 -- ----------------------------------------------------------------
 DELETE FROM sales
-WHERE solddate < CURRENT_DATE - INTERVAL '2 years';
+WHERE solddate < CURRENT_DATE - INTERVAL '900 days';
 
-DELETE FROM sales
-WHERE groupid NOT IN (
-    SELECT groupid FROM skusummary
-);
+DELETE FROM bclog
+WHERE date < CURRENT_DATE - INTERVAL '30 days';
+
+DELETE FROM stockorder
+WHERE orderdate < CURRENT_DATE - INTERVAL '365 days';
+
+DELETE FROM orderstatus_archive
+WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 
 
 -- ----------------------------------------------------------------
--- STEP 2: Exact matching via ordernum
+-- STEP 2: Fix return prices — match by original order
+--
+-- Returns (qty < 0) sometimes arrive with soldprice = 0.
+-- Find the original sale using ordernum + code + channel
+-- and copy the soldprice across.
 -- ----------------------------------------------------------------
 WITH bad_returns AS (
     SELECT id, code, channel, ordernum
@@ -41,7 +62,10 @@ WHERE sales.id = ms.return_id;
 
 
 -- ----------------------------------------------------------------
--- STEP 3: Estimate remaining returns using skusummary and amzfeed
+-- STEP 3: Fix return prices — estimate from current price
+--
+-- For returns we couldn't match by order, use the current
+-- Shopify or Amazon price as a best-guess estimate.
 -- ----------------------------------------------------------------
 UPDATE sales
 SET soldprice = CASE
@@ -58,7 +82,10 @@ WHERE sales.groupid = ss.groupid
 
 
 -- ----------------------------------------------------------------
--- STEP 4: Delete any remaining returns with soldprice = 0
+-- STEP 4: Delete unresolvable returns
+--
+-- Any returns still at soldprice = 0 after steps 2-3 can't be
+-- fixed. Delete them so they don't drag down margin numbers.
 -- ----------------------------------------------------------------
 DELETE FROM sales
 WHERE qty < 0
