@@ -39,7 +39,6 @@ logs/
 **/archive_logs/
 *.txt
 *.csv
-!adcost_summary_30.csv
 !google_price/price_report_*.csv
 !google_price/price_action_*.csv
 !google_price/archive/price_action_*.csv
