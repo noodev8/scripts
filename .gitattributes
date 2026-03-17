@@ -1,0 +1,5 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Force CSV files to use CRLF on checkout (Windows-friendly)
+*.csv text eol=crlf
