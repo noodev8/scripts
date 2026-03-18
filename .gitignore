@@ -27,6 +27,9 @@ out/
 merchant-feed/*.json
 merchant-feed-api-*.json
 
+# Amazon upload (generated output)
+amz-product/AMZ-Upload.xlsm
+
 =======
 # Logs
 npm-debug.log*
