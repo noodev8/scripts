@@ -1,7 +1,7 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £18/day
+**Current budget:** £26/day
 **Current tROAS:** 400%
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
 
@@ -13,7 +13,7 @@
 |--------|-----------------|--------------|
 | `google_stock_track` table | Daily spend, clicks, impressions, Shopify sales, stock levels | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
 | `localstock` table | Current warehouse stock by SKU (source of truth) | `SELECT groupid, SUM(qty) as units FROM localstock WHERE deleted = 0 AND brand = 'Birkenstock' GROUP BY groupid ORDER BY units DESC;` |
-| `adcost_summary_30.csv` | Raw Google Ads export (30-day daily breakdown) | Export from Google Ads, save to `google_ads/` folder |
+| `adcost_summary_30.csv` | Raw Google Ads export (30-day daily breakdown) | Export from Google Ads, save to `google-ads/` folder |
 
 **Note:** `localstock` is the source of truth for Birkenstock stock. Birkenstock is Shopify-only (not on Amazon), so no need to check `amzfeed`.
 
@@ -204,6 +204,8 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 | 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | w/c 2 Mar |
 | 2026-03-03 | Hold at £16 | 18.1x | ~85% | £15.58 | 1,328 (163 key) | All increase criteria met but only 3 days at £16. Algorithm responding well — sales up, impressions up, ROAS strong. Let it settle, then decide. | 7 Mar |
 | 2026-03-08 | Budget £16 → £18 | 19.3x | ~80% | £15.74 | 2,042 | All 5 increase criteria met. ROAS 19.3x (huge headroom), budget constraining (spending to cap daily), imp share ~80% (traffic missed), stock healthy at 2,042 units. March spring ramp. Moving to ~20% increments every 5 days through peak season. | 13 Mar |
+| 2026-03-13 | Budget £18 → £22 | 27.1x | ~75% | £17.72 | 2,060 | Per ramp schedule. ROAS 27x, imp share dropping to ~70-75% (traffic being missed), stock healthy. | 18 Mar |
+| 2026-03-20 | Budget £22 → £26 | 26.0x | ~77% | £22.35 | 2,292 (224 key) | All criteria met. ROAS 26x, budget constraining (spending to cap), imp share ~77% (traffic missed), stock healthy. Algorithm absorbed £22 cleanly — no efficiency loss. Per ramp schedule. | 25 Mar |
 | | | | | | | | |
 
 ---

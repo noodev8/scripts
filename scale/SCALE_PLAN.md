@@ -90,7 +90,7 @@ These are confirmed by data analysis. Referenced throughout but stated only here
 - Current spend: ~£17k/year, ROAS 10x. Headroom to 5x ROAS and still profitable.
 - Incrementally increase daily budget, seasonal acceleration (Mar-Jul) and pullback (Nov-Feb)
 - **Constraint:** Stock must be available before increasing spend
-- **Budget review process:** See `google_ads/BUDGET_REVIEW_PROCESS.md`
+- **Budget review process:** See `google-ads/BUDGET_REVIEW_PROCESS.md`
 
 ### Lever 3: Lunar/Amazon Expansion (Profit growth)
 - Maintain relentless Ives stock depth — every stockout day is lost profit
