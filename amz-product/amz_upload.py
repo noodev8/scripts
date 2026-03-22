@@ -58,6 +58,7 @@ COL_CONDITION = 168    # FL
 COL_LIST_PRICE = 170   # FN
 COL_FULFILLMENT = 193  # GK
 COL_PRICE = 198        # GP
+COL_BATTERIES_REQ = 267  # JG - "Are batteries required?"
 
 # Data rows start at row 7 in the template (rows 1-6 are settings/headers/examples)
 DATA_START_ROW = 7
@@ -91,10 +92,22 @@ def read_groupids():
     return ids
 
 
+def fetch_existing_codes(conn, groupids):
+    """Return set of codes already in amzfeed for the given GROUPIDs."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT code FROM amzfeed WHERE groupid = ANY(%s)",
+            (groupids,),
+        )
+        return {row[0] for row in cur.fetchall()}
+
+
 def fetch_product_data(conn, groupids):
     """Fetch brand/rrp from skusummary and variant data from skumap."""
     rows = []
+    skipped = 0
     yymm = datetime.now().strftime("%y%m")
+    existing_codes = fetch_existing_codes(conn, groupids)
 
     with conn.cursor() as cur:
         for gid in groupids:
@@ -133,6 +146,11 @@ def fetch_product_data(conn, groupids):
                 continue
 
             for sku, code, ean in variants:
+                # Skip variants already on Amazon
+                if code in existing_codes:
+                    skipped += 1
+                    continue
+
                 # SKU: use existing or generate
                 if sku and sku.strip():
                     amz_sku = sku.strip()
@@ -147,12 +165,33 @@ def fetch_product_data(conn, groupids):
 
                 rows.append({
                     "sku": amz_sku,
+                    "code": code,
                     "brand": brand,
                     "ean": clean_ean,
                     "rrp": rrp_val,
                 })
 
+    if skipped:
+        print(f"Skipped {skipped} variant(s) already in Amazon (amzfeed)")
+
     return rows
+
+
+def update_skumap(conn, rows):
+    """Update skumap with SKU, status, and date so PowerBuilder knows it's on Amazon."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    updated = 0
+    with conn.cursor() as cur:
+        for row in rows:
+            cur.execute(
+                """UPDATE skumap
+                   SET sku = %s, status = '1', updated = %s
+                   WHERE UPPER(code) = UPPER(%s)""",
+                (row["sku"], today, row["code"]),
+            )
+            updated += cur.rowcount
+    conn.commit()
+    print(f"Updated {updated} row(s) in skumap (sku, status, updated)")
 
 
 def generate_upload(rows):
@@ -171,7 +210,8 @@ def generate_upload(rows):
             break
         for col in [COL_SKU, COL_PRODUCT_TYPE, COL_LISTING_ACTION, COL_BRAND,
                      COL_PROD_ID_TYPE, COL_PROD_ID, COL_CONDITION,
-                     COL_LIST_PRICE, COL_FULFILLMENT, COL_PRICE]:
+                     COL_LIST_PRICE, COL_FULFILLMENT, COL_PRICE,
+                     COL_BATTERIES_REQ]:
             ws.cell(row=r, column=col, value=None)
 
     # Write data rows
@@ -187,6 +227,7 @@ def generate_upload(rows):
         ws.cell(row=r, column=COL_LIST_PRICE, value=row["rrp"])
         ws.cell(row=r, column=COL_FULFILLMENT, value="AMAZON_EU")
         ws.cell(row=r, column=COL_PRICE, value=row["rrp"])
+        ws.cell(row=r, column=COL_BATTERIES_REQ, value="No")
 
     wb.save(OUTPUT_PATH)
     print(f"Created {OUTPUT_PATH}")
@@ -204,10 +245,11 @@ def main():
     try:
         rows = fetch_product_data(conn, groupids)
         print(f"Fetched {len(rows)} variant(s) from database")
+        generate_upload(rows)
+        update_skumap(conn, rows)
     finally:
         conn.close()
 
-    generate_upload(rows)
     print("Done. Upload AMZ-Upload.xlsm to Amazon Seller Central.")
 
 
