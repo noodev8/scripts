@@ -194,27 +194,42 @@ Rieker rotates its catalogue each season. The groupids change year to year. This
 
 ---
 
-## RIEKER-SUM: Rieker Summer (Amazon)
+## RIEKER-SUM: Rieker Summer
 
 **Strategy:** Brand ownership — rotating range. Same model as RIEKER-WIN but for summer catalogue.
+**Channels:** Amazon is the core channel. Shopify listed but won't move much Rieker. Physical shop: keep 1 pair of each winning style on display (sells at RRP), but send the bulk to FBA immediately — don't let shop stock hold back Amazon.
 **Lead time:** 2 weeks (in-season reorder) | 6 months (pre-order)
-**Cost:** £28–31 | **Avg sell price:** TBD | **Margin:** ~49% expected
+**Cost:** £26–29 | **Avg sell price:** ~£53 | **Margin:** ~49%
 **Selling season:** Mar–Sep
 **DB flag:** `segment = 'RIEKER-SUM'` — applied to all summer Rieker groupids
 
-### Current Summer Styles
+### Current Summer Styles (tagged Mar 2026)
 
-New order arriving imminently. Groupids TBD — tag as `RIEKER-SUM` when they appear in the system.
+| GroupID | Colour | Cost | Stock | Sales | Channel |
+|---------|--------|------|-------|-------|---------|
+| 64870-14 | Blue | £27.95 | 15 | — | On FBA (not live yet) |
+| 64870-81 | White | £27.95 | 12 | — | FBA (2 sizes live) |
+| 65918-52 | Green | £25.90 | 15 | — | Not on Amazon yet |
+| 659C7-16 | Blue | £27.95 | 14 | 1 unit | CM3 (physical shop) |
+| M1655-14 | Blue | £28.80 | 9 | 2 units | 1 AMZ, 1 CM3 |
+| M1655-54 | Green | £28.80 | 10 | 4 units | 4 AMZ |
 
-One existing summer style from last year:
+Previous summer style (cleared): N42T0-14 — 17 units, £322 GP.
 
-| GroupID | Style | Notes |
-|---------|-------|-------|
-| N42T0-14 | Slip On Trainer Blue | Only summer Rieker with sales data. 17 units, £322 GP. Mostly cleared. |
+**Totals (as of Mar 2026):** 6 styles, 7 units sold, £368 revenue, £152 GP. Season just starting.
+
+### Stock allocation rule (decided Mar 2026)
+
+**Amazon first.** Last year Rieker stock sat in the shop doing nothing while Amazon could have shifted it. The shop sold some at RRP but held back the channel that actually moves volume. A couple of shop sales shouldn't change the plan.
+
+- When stock arrives: keep **1 pair per winning style** in the shop (sells at RRP, £67 — good margin if it goes)
+- Send **everything else straight to FBA** — don't wait
+- Shopify price left to pricing engine — it won't sell much Rieker but no harm having it listed
+- If a reorder comes in, same rule: 1 for the shop, rest to FBA
 
 ### Owner's Seasonal Cycle
 
-1. **Mar:** Summer order arrives → add to system, tag `RIEKER-SUM`, price, send to FBA
+1. **Mar:** Summer order arrives → add to system, tag `RIEKER-SUM`, price, send bulk to FBA (keep 1 per style for shop)
 2. **Mar–Sep:** Sell. Monitor reorder screen. Best sellers → reorder mid-season (2-week lead time). Introduce new styles if performing well.
 3. **Oct:** Season ends. Clear remaining stock — drop prices monthly until gone.
 4. **~Dec:** Pre-order next summer range from Rieker catalogue, using this season's sales data.
@@ -235,11 +250,12 @@ WHERE brand ILIKE 'Rieker' AND segment IS NULL;
 
 ### Actions (current — season starting)
 
-- [ ] Summer order landing now — list, price, send to FBA as it arrives
-- [ ] Tag all new groupids as `RIEKER-SUM` in database
-- [ ] Monitor first 4 weeks of sales to identify winners
-- [ ] Winners → reorder mid-season (2-week lead time)
-- [ ] Amazon only. No Shopify.
+- [x] Tag all new groupids as `RIEKER-SUM` in database (done Mar 2026)
+- [x] Repriced all 4 Amazon groupids to £55 (was £43-57) — profit marker price (Mar 2026)
+- [ ] Send more stock to FBA from existing supply — no new buying until £55 price test proves out
+- [ ] Get remaining styles live on FBA (64870-14, 65918-52, 659C7-16 need attention)
+- [ ] Monitor sales at £55 — does buy box come and does velocity hold?
+- **No reorders until profitability confirmed at £55.** Early sales were losing money at £43-48.
 
 ---
 

@@ -2,7 +2,16 @@
 
 ## Status
 
-**Last session (2026-03-16):**
+**Last session (2026-03-23):**
+- Reviewed all IVES colours one week after the Mar 16 price drops.
+- IVES-WHITE exploded: 28 units w/c Mar 16 (up from 1–3/wk). Size 06 at £36.99 did 11 of those — star SKU.
+- Concern: WHITE avg selling price now ~£37.80 vs £39.99+ before. Velocity restored but margin compressed. Need to monitor whether creeps stick without killing sales.
+- 17 price changes: 8 creeps up on strong sellers (£0.49–£1.50), 9 drops on dead stock.
+- Key creeps: WHITE-06 £36.99→£37.49, NAVY-05 £36.99→£37.49, BLACKSOLE-06 £39.99→£40.49.
+- Key drops: WHITE-07 £39.49→£37.99 (13 units dead), BLACKSOLE-04 £38.99→£37.49 (14 units dead).
+- Priority: check back within a few days on IVES-WHITE — has always been the best seller and the margin drop is a concern.
+
+**Session (2026-03-16):**
 - Pulled AMZ sales, confirmed IVES dominates. Chose IVES-WHITE first.
 - IVES-WHITE velocity had collapsed (7-9/week → 1-2/week). Dropped from £39.99 to £38.50 — 3 sales in 3 hours.
 - Analysed IVES-COLOUR by size across all 9 colours. 28 price changes — drops on stale stock, creeps on strong sellers. Beige held (already healthy), Khaki held (new colour).
@@ -150,6 +159,17 @@ Record in the price change log below for tracking.
 | 2026-03-16 | FLE030-IVES-WHITE (all sizes) | £39.99 | £38.50 | 5 sales same day — velocity restored |
 | 2026-03-16 | IVES-WHITE per size | various | £36.99–£39.49 | Drops on dead sizes (04, 06), creep up on star (07) |
 | 2026-03-16 | IVES-COLOUR all colours | various | £36.49–£40.49 | 28 changes: 24 drops on dead/overstocked, 4 creeps on stars. Beige and Khaki held. |
+| 2026-03-23 | IVES-WHITE-06 | £36.99 | £37.49 | Creep — 11/wk star seller |
+| 2026-03-23 | IVES-WHITE-07 | £39.49 | £37.99 | Drop — 0/wk, 13 stock sitting |
+| 2026-03-23 | IVES-WHITE-08 | £38.50 | £38.99 | Creep — steady 3/wk |
+| 2026-03-23 | IVES-NAVY 04,05 | £36.99 | £37.49 | Creep — 3+6/wk |
+| 2026-03-23 | IVES-NAVY 07,08,09 | £36.99–£39.99 | £35.99–£38.50 | Drops — 0/wk dead sizes |
+| 2026-03-23 | IVES-BEIGE-05 | £39.00 | £39.49 | Creep — 4/wk, low stock |
+| 2026-03-23 | IVES-BLACK 04 | £36.99 | £37.49 | Creep — 3/wk |
+| 2026-03-23 | IVES-BLACK 05 | £39.99 | £40.49 | Creep — 3/wk at higher price |
+| 2026-03-23 | IVES-BLACKSOLE 06 | £39.99 | £40.49 | Creep — 8/wk, 2 left |
+| 2026-03-23 | IVES-BLACKSOLE 03,04,05 | £37.99–£40.49 | £36.99–£38.99 | Drops — 0/wk dead sizes |
+| 2026-03-23 | IVES-GREY 07,08 | £36.49–£38.50 | £35.99–£36.99 | Drops — 0/wk |
 
 ## Segments
 
