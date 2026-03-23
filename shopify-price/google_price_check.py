@@ -229,8 +229,8 @@ def main():
     sugg_file = find_latest_csv(SUGGESTION_PATTERN)
 
     if not bench_file and not sugg_file:
-        log("ERROR: No Google CSV reports found in google_price/ directory.")
-        print("No Google CSV reports found. Place CSV files in google_price/ and re-run.")
+        log("ERROR: No Google CSV reports found in shopify-price/ directory.")
+        print("No Google CSV reports found. Place CSV files in shopify-price/ and re-run.")
         return
 
     if bench_file:

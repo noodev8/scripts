@@ -6,7 +6,7 @@ How to manually nudge prices outside of the Google Price Check process (Phases 1
 
 ### 1. Create a CSV
 
-Save a CSV in `google_price/` with these columns:
+Save a CSV in `shopify-price/` with these columns:
 
 ```
 groupid,new_price,description,change
@@ -33,7 +33,7 @@ ORDER BY groupid, change_date DESC, id DESC;
 ### 3. Dry run
 
 ```bash
-python google_price/google_price_apply.py google_price/your_file.csv
+python shopify-price/google_price_apply.py shopify-price/your_file.csv
 ```
 
 This shows what would change without touching the database. Check the output looks right.
@@ -41,7 +41,7 @@ This shows what would change without touching the database. Check the output loo
 ### 4. Apply
 
 ```bash
-python google_price/google_price_apply.py google_price/your_file.csv --confirm
+python shopify-price/google_price_apply.py shopify-price/your_file.csv --confirm
 ```
 
 This updates `skusummary.shopifyprice`, sets `shopifychange=1`, and logs to `price_change_log`. The nightly Shopify sync (`price_update2.py`) pushes changes live.

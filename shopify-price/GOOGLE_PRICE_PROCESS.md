@@ -4,12 +4,12 @@
 
 This process uses Google Merchant Center price benchmark and sale suggestion reports to identify pricing opportunities, then optionally adjusts prices via the existing nightly Shopify sync.
 
-The process is designed to be run manually with gaps between phases. Drop the Google CSV reports into `google_price/` and run the script when needed.
+The process is designed to be run manually with gaps between phases. Drop the Google CSV reports into `shopify-price/` and run the script when needed.
 
 ## How It Works (3 Phases)
 
 ### Phase 1: Data Report (`google_price_check.py`)
-- Parse the Google CSV reports from `google_price/` folder
+- Parse the Google CSV reports from `shopify-price/` folder
 - Match Google `Product ID` to `skumap.googleid` in the database
 - Join to `skusummary` to get current price, cost, RRP, season, margin info
 - Aggregate variant-level data to groupid level using click-weighted averages
@@ -41,7 +41,7 @@ The process is designed to be run manually with gaps between phases. Drop the Go
 - Updates `skusummary.shopifyprice` and sets `shopifychange = 1`
 - Logs each change to `price_change_log` (reason_code: `google_price`)
 - The existing `price_update2.py` nightly cron picks up `shopifychange = 1` and pushes to Shopify + Google Merchant
-- Edited CSVs are archived in `google_price/archive/` for future pattern analysis
+- Edited CSVs are archived in `shopify-price/archive/` for future pattern analysis
 
 ## Key Database Mappings
 
@@ -114,15 +114,15 @@ skumap.googleid          -->  skumap.groupid  -->  skusummary.groupid
 
 ## How to Run
 ```
-# 1. Drop Google CSV reports into google_price/ folder, then:
-python google_price/google_price_check.py              # Phase 1: Data report (must run first)
+# 1. Drop Google CSV reports into shopify-price/ folder, then:
+python shopify-price/google_price_check.py              # Phase 1: Data report (must run first)
 
 # 2. Generate action report (reads Phase 1 output):
-python google_price/google_price_action.py             # Phase 2: Grow mode (default) — price decreases
-python google_price/google_price_action.py --protect   # Phase 2: Protect mode — price increases
+python shopify-price/google_price_action.py             # Phase 2: Grow mode (default) — price decreases
+python shopify-price/google_price_action.py --protect   # Phase 2: Protect mode — price increases
 
 # 3. Review the action report CSV — set change=1 to accept, change=0 to skip, add notes in description
 # 4. Apply changes:
-python google_price/google_price_apply.py google_price/price_action_grow_YYYY-MM-DD.csv            # Dry run (review only)
-python google_price/google_price_apply.py google_price/price_action_grow_YYYY-MM-DD.csv --confirm  # Apply to database
+python shopify-price/google_price_apply.py shopify-price/price_action_grow_YYYY-MM-DD.csv            # Dry run (review only)
+python shopify-price/google_price_apply.py shopify-price/price_action_grow_YYYY-MM-DD.csv --confirm  # Apply to database
 ```

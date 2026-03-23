@@ -42,9 +42,9 @@ logs/
 **/archive_logs/
 *.txt
 *.csv
-!google_price/price_report_*.csv
-!google_price/price_action_*.csv
-!google_price/archive/price_action_*.csv
+!shopify-price/price_report_*.csv
+!shopify-price/price_action_*.csv
+!shopify-price/archive/price_action_*.csv
 
 # =========================================
 # Flutter (splitdine_flutter)

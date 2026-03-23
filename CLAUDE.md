@@ -92,5 +92,8 @@ All scripts use `logging_utils.get_db_config()` for consistent database configur
 ### Error Handling
 Scripts include comprehensive error handling with detailed logging. Check log files in `logs/` directory for troubleshooting.
 
+## Shopify Price Analysis
+For Shopify price analysis and review, read `shopify-price/SHOPIFY_PRICE_PLAN.md` first — it contains the full process, SQL, cost constants, summary format, and drill-down steps. When asked to "run the Shopify price analysis", follow that document.
+
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
