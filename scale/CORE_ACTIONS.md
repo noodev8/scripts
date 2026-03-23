@@ -507,18 +507,18 @@ This is not a segment. It has no owner. It's a clearance list.
 
 ### Why this is a segment
 
-£28.31 average profit per sale — the highest per-unit economics of any unsegmented product. Only needs ~180 units to hit £5k GP. Currently doing £1.1k from 39 units with zero active management.
+£28 average profit per sale — the highest per-unit economics of any unsegmented product. Only needs ~180 units to hit £5k GP. Currently doing £972 GP from 35 net units with zero active management.
 
 ### Current Winter Styles (2025/26 season)
 
-| GroupID | Style | Units (12m) | GP | Avg profit/sale | Last sale |
-|---------|-------|------------:|---:|----------------:|-----------|
-| D0700-22 | Zip Boots Brown | 12 | £344 | £28.65 | 15 Feb |
-| D0772-15 | Ankle Boots Brown | 11 | £309 | £28.13 | 12 Jan |
-| R1402-16 | Ankle Boots Blue | 10 | £291 | £29.11 | 17 Feb |
-| D0772-52 | Ankle Boots Rose | 6 | £160 | £26.62 | 16 Feb |
+| GroupID | Style | Net Units | GP | Avg profit/sale | FBA Stock | Last sale |
+|---------|-------|----------:|---:|----------------:|----------:|-----------|
+| D0700-22 | Zip Shoes Brown | 12 | £310 | £28 | 7 | 23 Mar |
+| D0772-15 | Zip Boots Blue | 10 | £288 | £29 | 0 | 12 Jan |
+| R1402-16 | Zip Shoes Blue | 9 | £291 | £32 | 6 | 17 Feb |
+| D0772-52 | Zip Up Boots Green | 4 | £83 | £21 | 0 | 16 Feb |
 
-**Total 12m GP: £1,104** from 4 styles. All Amazon. All profitable.
+**Total season GP: £972** from 35 net units across 4 styles. 13 units remain at FBA. All Amazon.
 
 ### Owner's Seasonal Cycle
 
@@ -530,8 +530,8 @@ Same as RIEKER-WIN:
 
 ### Actions
 
-- [ ] Tag all 4 groupids as `REMONTE-WIN` in database
-- [ ] Clear remaining winter stock at reduced prices (season ending)
+- [x] Tag all 4 groupids as `REMONTE-WIN` in database
+- [ ] 13 units remain at FBA (7x D0700-22, 6x R1402-16) — leave in place for next season
 - [ ] Use 2025/26 data to inform 2026/27 pre-order (~Jun) — expand range to 6-8 styles
 - [ ] Target: £5k GP for winter 2026/27 season
 - [ ] Amazon only. Same owner as RIEKER-WIN.

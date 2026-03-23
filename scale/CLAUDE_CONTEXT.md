@@ -95,7 +95,7 @@ ORDER BY s.groupid;
 - Channel codes: SHP = Shopify, AMZ = Amazon, CM3 = other marketplace
 
 ### Cost reference (common)
-- Lunar Ives: £12.50
+- Lunar Ives: £15.99
 - Lunar Blaze: £12.99
 - Arizona EVA: £20.83
 - Birkenstock Birko-Flor (Arizona/Gizeh/Milano): £35.42–37.50
