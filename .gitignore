@@ -92,6 +92,11 @@ price_change_logic.md
 nul
 screenshot*.jpg
 
+# PowerBuilder generated/compiled files
+powerbuilder/*.pbd
+powerbuilder/*.exe
+powerbuilder/*.zip
+
 # Database backup
 *.dump
 *.gz
