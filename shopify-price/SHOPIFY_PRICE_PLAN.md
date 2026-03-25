@@ -320,6 +320,7 @@ Add columns to the Phase 1 report:
 - Respect RRP ceiling
 - Skip ignore_auto_price = 1
 - All changes logged to price_change_log
+- **Max 3-4 price increases per batch.** Google Shopping (target ROAS) re-enters a learning phase after price increases — conversion rates dip for 1-3 days while the algorithm recalibrates bids to hit the ROAS target at the new prices. Confirmed 2026-03-23: batch of increases on Monday caused a noticeable Tuesday dip, recovery started Wednesday. Price *decreases* don't have this problem — Google rewards the higher conversion rate immediately. Wait for the campaign to stabilise before the next batch of increases.
 
 ---
 
