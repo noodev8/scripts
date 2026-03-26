@@ -161,8 +161,9 @@ Scanned all unsegmented groupids with sales in the last 12 months. Grouped by na
 
 | Segment | Target GP | When | Confidence |
 |---------|----------:|------|:----------:|
-| RIEKER-SUM | £5-8k | Summer 2026 | High |
+| RIEKER-SUM | £5-8k | Summer 2026 | Medium — stock in place but slow start, summer Rieker historically weak |
 | REMONTE-WIN | £3-5k (year 1), £5-8k (year 2) | Winter 2026/27 | High |
+| FREE-SPIRIT | £2-5k (year 1) | Summer 2026 | Medium — first sales promising (£27 GP/unit), FBA stock landing. Amazon only. |
 
 ### What this does to Ives dependency
 
@@ -172,7 +173,7 @@ Scanned all unsegmented groupids with sales in the last 12 months. Grouped by na
 | **+Absorb +RIEKER-SUM +REMONTE-WIN** | ~£112-120k | **50-53%** |
 | **+Full RIEKER-SUM maturity +Remonte +one new brand** | ~£125-135k | **44-48%** |
 
-Getting Ives under 50% of profit is achievable by end of 2026. Under 40% needs the new brand pipeline (Free Spirit, Waldlaufer, or something we haven't found yet).
+Getting Ives under 50% of profit is achievable by end of 2026. Under 40% needs the new brand pipeline to deliver. Free Spirit Frisco is the first new brand to show live sales (Mar 2026) — if it scales, it becomes a meaningful brick.
 
 ---
 
@@ -184,7 +185,7 @@ The numbers confirm the approach: **don't look for another Ives. Build reliable 
 - Every existing segment that's properly managed is already in or near the £5-10k range
 - The unsegmented products aren't hidden unicorns — they're incremental contributors that need to be absorbed or built into new segments
 - The biggest untapped opportunity is Remonte (same playbook as Rieker, proven economics, zero active management today)
-- RIEKER-SUM is the next segment most likely to hit £5-10k — it's already set up, stock is arriving
+- RIEKER-SUM has stock in place but summer Rieker has historically been weak — confidence downgraded from High to Medium (Mar 2026). Free Spirit Frisco is showing early promise as an alternative summer brick.
 
 **Rule of thumb for new brand evaluation:** Can it produce 3-5 styles doing £1-2k GP each on Amazon, with short lead times? That's the bar. Not "can it be the next Ives" but "can it be another reliable brick."
 

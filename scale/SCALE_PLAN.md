@@ -168,11 +168,16 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 - Evaluate against benchmarks: Lunar (41% margin, 4-day lead), Rieker (31% margin, 2-week lead).
 - Only commit when: margin proven, lead time short, clear gap being filled.
 
+### Active — Testing
+
+| Brand | Status | Economics | Channel |
+|-------|--------|-----------|---------|
+| **Free Spirit Frisco** | **Live on Amazon FBA.** First sales 21 Mar 2026 (Navy + Smoke Grey, 1 unit each at ~£50). Segment: `FREE-SPIRIT`. 3 Frisco colours + 2 Cleveland stocked (8 units each). Only Frisco Navy and Smoke on Amazon FBA (partial sizes live, rest landing). Black not listed on Amazon. Cleveland not on Amazon. Shopify listed but no sales — Amazon only, same pattern as Rieker. Wholesale £20.95, selling ~£50, **~£27 GP/unit (~52% margin after fees)**. Distributor: WMSC, Uttoxeter. enquiries@wmsc.co.uk / 01889 561790 | Amazon |
+
 ### Under Investigation
 
 | Brand | Status | Why Interesting | Channel |
 |-------|--------|-----------------|---------|
-| **Free Spirit Frisco** | Investigated Mar 2026. Wholesale £20.95 (ex VAT), RRP £52.50. | 164 Amazon reviews, 4.6 stars, best price resilience in range. Amazon sell £38-45, margin 28-37%. Not Ives but incremental summer volume. Also enquire about winter range. Distributor: WMSC, Uttoxeter. enquiries@wmsc.co.uk / 01889 561790 | Amazon |
 | **Waldlaufer** | Not started | Similar demographic. Lower priority than Rieker. | Amazon |
 
 ### Ruled Out
@@ -183,8 +188,11 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | TikTok Shop | Wrong demographic |
 
 ### Next Actions
-- [ ] Contact WMSC — confirm lead time, ask about autumn/winter range, confirm Amazon selling policy
-- [ ] If terms right, test one pack of Frisco (8 or 12 pairs) on Amazon in summer
+- [ ] Get full Frisco FBA stock landed (sizes 4, 6, 8 still in transit for Navy/Smoke)
+- [ ] Monitor Frisco sell-through rate over Apr-May — target: 5+ units/colour/month
+- [ ] Decide on Frisco Black for Amazon listing based on Navy/Smoke performance
+- [ ] Cleveland — evaluate whether to list on Amazon or leave as Shopify-only test
+- [ ] Ask WMSC about autumn/winter Free Spirit range if summer proves out
 
 ---
 
@@ -203,6 +211,7 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | 2026-03-03 | Ives ceiling acknowledged | See Established Facts. | Ongoing |
 | 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. | Contact WMSC |
 | 2026-03-08 | Google Ads daily budget £16 → £18 | ROAS 19.3x, imp share ~80%, budget constraining, 2,042 stock units. Spring ramp. Switching to ~20% increments every 5 days. | Review 13 Mar |
+| 2026-03-25 | Free Spirit Frisco promoted from investigation to active test | First 2 Amazon sales (21 Mar), £27 GP/unit. Stock sent to FBA, partial sizes live. Segment `FREE-SPIRIT` created. | Review end Apr |
 
 ---
 
