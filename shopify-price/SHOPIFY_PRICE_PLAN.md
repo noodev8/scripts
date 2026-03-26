@@ -346,7 +346,7 @@ The long-term goal is for Claude to execute the full cycle autonomously — run 
 ## Relationship to Existing Tools
 
 This is **complementary** to the Google price process:
-- Google process uses external benchmark data (what competitors charge)
+- Google process uses the **benchmark report only** (what competitors charge) — the sale price suggestions report was dropped (Mar 2026) as it only ever recommends drops and optimises for Google's clicks, not our margin
 - This process uses internal sales data (what's actually selling and at what margin)
 - Both feed into the same apply pipeline and price_change_log
 - Over time, could merge signals from both into a single review report

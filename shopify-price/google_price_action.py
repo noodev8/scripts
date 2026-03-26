@@ -5,8 +5,12 @@ Google Price Action Report (Grow / Protect modes)
 Reads the data report CSV from google_price_check.py and produces a clean,
 short list of recommended price changes based on a chosen strategy mode:
 
-- Grow (default): Price aggressively to win clicks/sales (targets Google's suggested sale price)
-- Protect: Price conservatively to increase margin (targets benchmark average)
+- Grow (default): Price to match benchmark average (targets price decreases to match competition)
+- Protect: Price conservatively to increase margin (targets benchmark average for increases)
+
+Both modes use the benchmark report only. Sale price suggestions report was
+dropped (Mar 2026) — it only ever recommends drops and optimises for Google's
+clicks, not our profit.
 
 Read-only: no database writes.
 """
@@ -307,19 +311,13 @@ def build_action_report(report_df, guardrail_df, mode):
         # Cost is already ex-VAT in the database
         net_cost = cost
 
-        # Determine raw target price based on mode
+        # Determine raw target price based on mode (both use benchmark only)
         if mode == 'grow':
-            suggested = row.get('suggested_avg')
             benchmark = row.get('benchmark_avg')
-
-            if pd.notna(suggested):
-                raw_target = suggested
-                source = "google_suggestion"
-            elif pd.notna(benchmark):
-                raw_target = benchmark
-                source = "benchmark_fallback"
-            else:
-                continue  # No data to act on
+            if pd.isna(benchmark):
+                continue  # No benchmark data
+            raw_target = benchmark
+            source = "benchmark"
         else:  # protect
             benchmark = row.get('benchmark_avg')
             if pd.isna(benchmark):

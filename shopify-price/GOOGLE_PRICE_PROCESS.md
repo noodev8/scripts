@@ -2,14 +2,16 @@
 
 ## Overview
 
-This process uses Google Merchant Center price benchmark and sale suggestion reports to identify pricing opportunities, then optionally adjusts prices via the existing nightly Shopify sync.
+This process uses the Google Merchant Center **price benchmark report only** to identify pricing opportunities, then optionally adjusts prices via the existing nightly Shopify sync.
 
-The process is designed to be run manually with gaps between phases. Drop the Google CSV reports into `shopify-price/` and run the script when needed.
+The process is designed to be run manually with gaps between phases. Drop the Google benchmark CSV into `shopify-price/` and run the script when needed.
+
+> **Note (Mar 2026):** We previously used two Google reports — benchmarks and sale price suggestions. The sale price suggestions report has been dropped. It only ever recommends price decreases (416/416 products = "drop price", zero increases), averages ~11% drops regardless of effectiveness tier, and optimises for Google's clicks, not our profit. It even suggested dropping Ives from £33 to £26.55 — gutting our best margin product. The benchmark report shows where we sit vs actual competitors, which is actionable. The suggestions report just says "be cheaper" to everything, which isn't.
 
 ## How It Works (3 Phases)
 
 ### Phase 1: Data Report (`google_price_check.py`)
-- Parse the Google CSV reports from `shopify-price/` folder
+- Parse the Google benchmark CSV from `shopify-price/` folder (sale price suggestions CSV no longer used)
 - Match Google `Product ID` to `skumap.googleid` in the database
 - Join to `skusummary` to get current price, cost, RRP, season, margin info
 - Aggregate variant-level data to groupid level using click-weighted averages
@@ -20,7 +22,7 @@ The process is designed to be run manually with gaps between phases. Drop the Go
 - Reads the Phase 1 data report CSV
 - Fetches guardrail data (cost, tax, rrp, shopifyprice) from `skusummary`
 - Calculates target prices based on chosen mode:
-  - **Grow** (default): Target = Google's suggested sale price (click-uplift-weighted). Falls back to benchmark avg if no suggestion. Only recommends **price decreases**.
+  - **Grow** (default): Target = benchmark average price. Only recommends **price decreases**. (Previously used Google's sale price suggestions, now uses benchmark only.)
   - **Protect** (`--protect`): Target = benchmark avg. Only recommends **price increases**.
 - Applies guardrails: 10% min margin above cost (VAT-adjusted), RRP ceiling, round to 2dp
 - **Auto-decision rules** pre-sort each row into `accept` / `review` / `reject`:
@@ -84,19 +86,19 @@ skumap.googleid          -->  skumap.groupid  -->  skusummary.groupid
 | `changed_by` | `google_price_action` |
 | `channel` | "SHP" |
 
-## Google Report Formats
+## Google Report Format
 
-### Report 1: Price Benchmarks
+### Price Benchmarks (the only report we use)
 **Filename pattern**: `Your most popular products with price benchmarks_*.csv`
 - 2 header rows before data (title + date range)
 - Columns: Title, Brand, Product ID, Your price, Benchmark, Price gap, Clicks
 - **Price gap** is negative when your price is below benchmark (room to raise)
 - Price gap is positive when you're above benchmark
 
-### Report 2: Sale Price Suggestions
+### Sale Price Suggestions — NOT USED
 **Filename pattern**: `Sale price suggestions with highest performance impact_*.csv`
-- 1 header row before data (title)
-- Columns: Product ID, Title, Brand, Category, Your price, Suggested price, Click uplift, Conversion uplift, Effectiveness
+- Dropped from the process (Mar 2026). Do not download or import this report.
+- Reason: only ever suggests price drops, optimises for Google's click volume not our margin, contradicts the benchmark data. See note at top of this document.
 
 ## Existing Nightly Sync (price_update2.py)
 - Runs as cron job
@@ -114,7 +116,7 @@ skumap.googleid          -->  skumap.groupid  -->  skusummary.groupid
 
 ## How to Run
 ```
-# 1. Drop Google CSV reports into shopify-price/ folder, then:
+# 1. Drop the Google benchmark CSV into shopify-price/ folder (benchmarks report only, not sale suggestions), then:
 python shopify-price/google_price_check.py              # Phase 1: Data report (must run first)
 
 # 2. Generate action report (reads Phase 1 output):
