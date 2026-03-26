@@ -32,6 +32,55 @@
 
 ---
 
+## Baseline Conversion Rate (Monthly Health Check)
+
+Daily conversion rates are noisy — at our volume (~76 clicks/day, ~9 units/day), a single multi-buy customer or a quiet afternoon can swing the day by 10 percentage points. Don't react to individual days. Instead, track the **baseline conversion rate** monthly.
+
+### How to calculate it
+
+1. Pull all daily conversion rates for the month (clicks → Shopify units)
+2. Sort them lowest to highest
+3. The **median** (middle value) is the baseline — half your days are above, half below. Unlike an average, one 22% spike day or one 3% crash day can't distort it.
+4. The **baseline band** is the interquartile range (IQR) — the middle 50% of days. This is the range where "normal" days land.
+
+```sql
+-- Monthly baseline conversion rate (median + IQR)
+SELECT
+  TO_CHAR(snapshot_date, 'YYYY-MM') AS month,
+  COUNT(*) AS days,
+  ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY
+    GREATEST(shopify_units::integer, 0)::numeric / NULLIF(google_clicks, 0) * 100
+  ), 1) AS median_conv_pct,
+  ROUND(PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY
+    GREATEST(shopify_units::integer, 0)::numeric / NULLIF(google_clicks, 0) * 100
+  ), 1) AS q1_conv_pct,
+  ROUND(PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY
+    GREATEST(shopify_units::integer, 0)::numeric / NULLIF(google_clicks, 0) * 100
+  ), 1) AS q3_conv_pct
+FROM google_stock_track
+WHERE google_clicks IS NOT NULL AND google_clicks > 0
+  AND snapshot_date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '3 months'
+GROUP BY TO_CHAR(snapshot_date, 'YYYY-MM')
+ORDER BY 1;
+```
+
+### How to read it
+
+- **Median rising month-over-month** (e.g. Feb 8% → Mar 12%) = business fundamentals improving, supports budget increases
+- **Median stable** = steady state, budget decisions based on other factors (ROAS, impression share)
+- **Median dropping** (e.g. 12% → 7%) = something structural has changed — investigate before increasing budget. Could be: price changes suppressing conversion, stock gaps, seasonal shift, or competitive pressure.
+
+### March 2026 reference
+
+- Median: **12.3%**
+- Baseline band (IQR): **9.8% – 16.3%** (14 of 24 days)
+- Outlier bad days (under 6%): 3 days — normal, always bounce back within 1-2 days
+- Outlier great days (over 17%): 5 days — don't use these to justify decisions
+
+At current volume, expect this pattern every month: ~3 bad days, ~3 great days, ~20 steady days in the baseline band. As budget scales and daily clicks increase, variance reduces naturally.
+
+---
+
 ## Weekly Review Checklist
 
 ### 1. Check ROAS (last 7 days vs prior 7 days)
