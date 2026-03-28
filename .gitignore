@@ -1,4 +1,8 @@
 # =========================================
+# MCP config (contains API keys)
+.mcp.json
+
+# =========================================
 # General (Windows/macOS/IDEs)
 .DS_Store
 Thumbs.db
