@@ -46,9 +46,9 @@ logs/
 **/archive_logs/
 *.txt
 *.csv
-!shopify-price/price_report_*.csv
-!shopify-price/price_action_*.csv
-!shopify-price/archive/price_action_*.csv
+
+# Shopify price session data (overwritten each run, not tracked)
+shopify-price/report/
 
 # =========================================
 # Flutter (splitdine_flutter)
