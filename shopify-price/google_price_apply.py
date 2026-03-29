@@ -116,11 +116,12 @@ def process_changes(csv_df, current_prices):
             skipped.append((gid, 'no change'))
             continue
 
-        # Min margin guardrail (cost is already ex-VAT)
-        min_price = round(cost * MINIMUM_MARGIN_MULTIPLIER, 2)
-        if new_price < min_price:
-            blocked.append((gid, old_price, new_price, min_price))
-            continue
+        # Min margin guardrail — disabled for now while human-in-the-loop.
+        # Re-enable when auto-pricing is active to prevent accidental below-cost pricing.
+        # min_price = round(cost * MINIMUM_MARGIN_MULTIPLIER, 2)
+        # if new_price < min_price:
+        #     blocked.append((gid, old_price, new_price, min_price))
+        #     continue
 
         to_apply.append({
             'groupid': gid,

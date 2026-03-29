@@ -103,8 +103,32 @@ Same as section 4 but with additional filter: days since last price change >= 14
 
 When the user picks a product from the candidates list, run this standard analysis:
 
-**Step 1 — Full sales history**
+**Step 1 — Full sales history + stock quality check**
 Query ALL sales for the product (not just last 30 days). Also pull price_change_log for the full timeline.
+
+**Stock quality check (always run during drill-down):**
+Total stock can be misleading — 50 units means nothing if they're all size 36 and 47. Check stock vs sales by size:
+```sql
+-- Stock by size
+SELECT code, SUM(qty) AS stock
+FROM localstock
+WHERE groupid = '{groupid}' AND deleted = 0 AND qty > 0
+GROUP BY code ORDER BY code;
+
+-- Which sizes actually sell (last 365 days)
+SELECT REGEXP_REPLACE(code, '.*-', '') AS size, SUM(qty) AS units_sold
+FROM sales
+WHERE groupid = '{groupid}' AND channel = 'SHP' AND qty > 0
+  AND solddate >= CURRENT_DATE - 365
+GROUP BY REGEXP_REPLACE(code, '.*-', '')
+ORDER BY units_sold DESC;
+```
+
+**Sellable stock** = stock in sizes that have sold at least 1 unit in the past year. Report both numbers:
+- Total stock: X (all sizes)
+- Sellable stock: Y (in sizes with proven demand)
+
+If sellable stock is significantly lower than total stock, the product's real position is weaker than the headline number suggests. Decisions should be based on sellable stock, not total.
 
 **Step 2 — Velocity by price point**
 Group sales by the price they sold at (excluding returns, qty < 0). Present as a table:
@@ -346,7 +370,7 @@ The long-term goal is for Claude to execute the full cycle autonomously — run 
 ## Relationship to Existing Tools
 
 This is **complementary** to the Google price process:
-- Google process uses the **benchmark report only** (what competitors charge) — the sale price suggestions report was dropped (Mar 2026) as it only ever recommends drops and optimises for Google's clicks, not our margin
+- Google process uses **two reports**: the benchmark report (what competitors charge) and the performance/sale price suggestions report (Google's view on what prices drive the most sales)
 - This process uses internal sales data (what's actually selling and at what margin)
 - Both feed into the same apply pipeline and price_change_log
 - Over time, could merge signals from both into a single review report

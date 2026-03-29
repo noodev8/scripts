@@ -8,9 +8,9 @@ short list of recommended price changes based on a chosen strategy mode:
 - Grow (default): Price to match benchmark average (targets price decreases to match competition)
 - Protect: Price conservatively to increase margin (targets benchmark average for increases)
 
-Both modes use the benchmark report only. Sale price suggestions report was
-dropped (Mar 2026) — it only ever recommends drops and optimises for Google's
-clicks, not our profit.
+Both modes can use the benchmark report and the sale price suggestions
+(performance) report. The performance report targets maximum sales volume
+and is useful for high-stock, end-of-season, or ramp-up scenarios.
 
 Read-only: no database writes.
 """
@@ -71,13 +71,23 @@ ACCEPT_MIN_STOCK = 5                  # Need at least this much stock to auto-ac
 ACCEPT_MAX_SOLD_30D = 1              # "Not selling" means this many or fewer in 30d
 ACCEPT_MAX_DROP_PCT = -15             # Modest drop = within this % (negative = decrease)
 
+# -- Performance-supported accept: upgrade borderline review → accept when Google agrees --
+PERF_ACCEPT_MIN_STOCK = 5             # Need stock to justify a performance-supported drop
+PERF_ACCEPT_MAX_SOLD_30D = 1          # Not selling = candidate for performance-supported drop
+PERF_ACCEPT_MAX_DROP_PCT = -25        # Extends the accept window from -15% to -25% when performance agrees
+
 # -- Proven demand: block auto-accept if current price has strong track record --
 ACCEPT_PROVEN_DEMAND_TOLERANCE = 0.05  # 5% price band (e.g. £64.00 and £64.22 = same price)
 ACCEPT_PROVEN_DEMAND_MIN_SOLD = 10     # 10+ units sold at nearby price in 365d = proven demand → review
 
 
 def find_latest_data_report():
-    """Find the most recently modified price_report_*.csv."""
+    """Find the data report CSV in report/ subfolder (or legacy dated files)."""
+    # Check report/ subfolder first (current)
+    report_path = os.path.join(REPORT_DIR, 'report', 'price_report.csv')
+    if os.path.exists(report_path):
+        return report_path
+    # Fallback: legacy dated files in main folder
     files = glob.glob(os.path.join(REPORT_DIR, "price_report_*.csv"))
     if not files:
         return None
@@ -212,11 +222,16 @@ def apply_auto_rules(df):
         new_price = row['new_price']
         rrp = row.get('rrp', None)
         drop_pct = ((new_price - current_price) / current_price * 100) if current_price > 0 else 0
+        perf_price = row.get('performance_price', None)
+        perf_tag = f' (perf: £{perf_price:.2f})' if pd.notna(perf_price) else ''
+
+        # Does the performance report support this direction?
+        perf_supports = (pd.notna(perf_price) and perf_price <= new_price)
 
         # --- Reject: no stock ---
         if REJECT_NO_STOCK and stock == 0:
             decisions.append('reject')
-            reasons.append('no stock')
+            reasons.append(f'no stock{perf_tag}')
             continue
 
         # --- Selling well: suggest increase or reject ---
@@ -228,23 +243,34 @@ def apply_auto_rules(df):
                 if pd.notna(rrp) and rrp > 0:
                     if current_price >= rrp:
                         decisions.append('reject')
-                        reasons.append(f'selling ({sold} sold 30d) but already at RRP')
+                        reasons.append(f'selling ({sold} sold 30d) but already at RRP{perf_tag}')
                         continue
                     increase_target = min(increase_target, rrp)
                 pct = round((increase_target - current_price) / current_price * 100, 1)
                 price_overrides[idx] = increase_target
                 decisions.append('increase')
-                reasons.append(f'selling well ({sold} sold 30d, stock {stock}) — suggest +{pct}%')
+                reasons.append(f'selling well ({sold} sold 30d, stock {stock}) — suggest +{pct}%{perf_tag}')
             else:
                 # Low stock + selling = let it run through, don't touch
                 decisions.append('reject')
-                reasons.append(f'selling ({sold} sold 30d), low stock ({stock}) — let it run')
+                reasons.append(f'selling ({sold} sold 30d), low stock ({stock}) — let it run{perf_tag}')
             continue
 
-        # --- Review: large drops ---
+        # --- Review: large drops (but check if performance supports it first) ---
         if drop_pct <= REVIEW_LARGE_DROP_PCT:
+            # Performance-supported accept: if Google agrees AND stock/sales qualify,
+            # upgrade from review to accept for drops between -15% and -25%
+            if (perf_supports
+                    and stock >= PERF_ACCEPT_MIN_STOCK
+                    and sold <= PERF_ACCEPT_MAX_SOLD_30D
+                    and drop_pct >= PERF_ACCEPT_MAX_DROP_PCT):
+                sold_near = row.get('sold_near_price', 0)
+                if sold_near < ACCEPT_PROVEN_DEMAND_MIN_SOLD:
+                    decisions.append('accept')
+                    reasons.append(f'stock {stock}, {sold} sold 30d, drop ({drop_pct:.0f}%) supported by performance{perf_tag}')
+                    continue
             decisions.append('review')
-            reasons.append(f'large drop ({drop_pct:.0f}%) — check if warranted')
+            reasons.append(f'large drop ({drop_pct:.0f}%) — check if warranted{perf_tag}')
             continue
 
         # --- Review: proven demand at current price (would otherwise auto-accept) ---
@@ -253,18 +279,18 @@ def apply_auto_rules(df):
                 and drop_pct >= ACCEPT_MAX_DROP_PCT
                 and sold_near >= ACCEPT_PROVEN_DEMAND_MIN_SOLD):
             decisions.append('review')
-            reasons.append(f'proven demand ({sold_near} sold near current price in 365d) — seasonal lull?')
+            reasons.append(f'proven demand ({sold_near} sold near current price in 365d) — seasonal lull?{perf_tag}')
             continue
 
         # --- Accept: stock + not selling + modest drop ---
         if stock >= ACCEPT_MIN_STOCK and sold <= ACCEPT_MAX_SOLD_30D and drop_pct >= ACCEPT_MAX_DROP_PCT:
             decisions.append('accept')
-            reasons.append(f'stock {stock}, {sold} sold 30d, modest drop ({drop_pct:.0f}%)')
+            reasons.append(f'stock {stock}, {sold} sold 30d, modest drop ({drop_pct:.0f}%){perf_tag}')
             continue
 
         # --- Everything else → review ---
         decisions.append('review')
-        reasons.append('mixed signals — needs human check')
+        reasons.append(f'mixed signals — needs human check{perf_tag}')
 
     df.insert(1, 'auto_decision', decisions)
     df.insert(2, 'auto_reason', reasons)
@@ -374,6 +400,7 @@ def build_action_report(report_df, guardrail_df, mode):
             'title': row.get('title', ''),
             'current_price': current_price,
             'rrp': rrp if pd.notna(rrp) else '',
+            'performance_price': row.get('performance_price', ''),
             'price_diff': change,
             'change_pct': change_pct,
             'margin_current': margin_current,
@@ -393,7 +420,8 @@ def build_action_report(report_df, guardrail_df, mode):
         decision_order = {'increase': 0, 'accept': 1, 'review': 2, 'reject': 3}
         action_df['_sort'] = action_df['auto_decision'].map(decision_order)
         action_df = action_df.sort_values(['_sort', 'change_pct'], ascending=[True, True]).reset_index(drop=True)
-        action_df = action_df.drop(columns=['_sort', 'price_diff', 'margin_current', 'margin_new'])
+        drop_cols = ['_sort', 'price_diff', 'margin_current', 'margin_new']
+        action_df = action_df.drop(columns=[c for c in drop_cols if c in action_df.columns])
 
     return action_df
 
@@ -430,10 +458,10 @@ def main():
     # Build action report
     action_df = build_action_report(report_df, guardrail_df, mode)
 
-    # Save output CSV
-    date_str = datetime.now().strftime('%Y-%m-%d')
-    output_filename = f"price_action_{mode}_{date_str}.csv"
-    output_path = os.path.join(REPORT_DIR, output_filename)
+    # Save output CSV (always overwrite latest in report/)
+    report_subdir = os.path.join(REPORT_DIR, 'report')
+    os.makedirs(report_subdir, exist_ok=True)
+    output_path = os.path.join(report_subdir, f'price_action_{mode}.csv')
     action_df.to_csv(output_path, index=False)
     log(f"Action report saved: {output_path}")
 

@@ -92,8 +92,10 @@ All scripts use `logging_utils.get_db_config()` for consistent database configur
 ### Error Handling
 Scripts include comprehensive error handling with detailed logging. Check log files in `logs/` directory for troubleshooting.
 
-## Shopify Price Analysis
-For Shopify price analysis and review, read `shopify-price/SHOPIFY_PRICE_PLAN.md` first — it contains the full process, SQL, cost constants, summary format, and drill-down steps. When asked to "run the Shopify price analysis", follow that document.
+## Shopify Pricing
+When asked to work on pricing ("pricing review", "let's do prices", "shopify price check", "run the pricing analysis", or similar), read `shopify-price/PRICING_STRATEGY.md` first — it is the master document covering the gear model (Push/Steady/Conserve), session flow, which tools to use, and auto-decision rules. Follow the "Starting a Pricing Session" section step by step. Detailed process docs are linked from there:
+- `shopify-price/SHOPIFY_PRICE_PLAN.md` — sales analysis SQL, summary format, drill-down steps
+- `shopify-price/GOOGLE_PRICE_PROCESS.md` — Google report pipeline (Phase 1-3), auto-rules config
 
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
