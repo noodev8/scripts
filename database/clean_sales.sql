@@ -2,10 +2,12 @@
 -- clean_sales.sql
 -- Runs weekly via clean_sales.py (cron: Mondays 4am)
 --
--- Two jobs:
+-- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, orderstatus_archive
---   2. Fix returns that arrived with soldprice = 0
---      (so GP/margin calculations aren't skewed)
+--   2-3. Fix returns that arrived with soldprice = 0
+--        (so GP/margin calculations aren't skewed)
+--   4. Delete unresolvable returns
+--   5. Refresh 365-day sales totals on skumap (amz365, shp365, cmb365)
 --
 -- Replaces the manual PowerBuilder cleanup process.
 -- ================================================================
@@ -91,3 +93,63 @@ DELETE FROM sales
 WHERE qty < 0
   AND soldprice = 0
   AND solddate >= CURRENT_DATE - INTERVAL '365 days';
+
+
+-- ----------------------------------------------------------------
+-- STEP 5: Update 365-day sales totals on skumap
+--
+-- Refresh amz365, shp365, cmb365 columns with rolling 365-day
+-- unit counts per channel. Runs after return-price fixes so
+-- the totals reflect corrected data.
+-- ----------------------------------------------------------------
+
+-- Reset all values to zero
+UPDATE skumap
+SET amz365 = 0,
+    shp365 = 0,
+    cmb365 = 0;
+
+-- Update with actual sales data for CM3, AMZ, and SHP
+WITH cm3_sales AS (
+    SELECT
+        code,
+        SUM(qty) AS total_qty_sold
+    FROM sales
+    WHERE channel = 'CM3'
+      AND solddate >= CURRENT_DATE - INTERVAL '365 days'
+    GROUP BY code
+),
+amz_sales AS (
+    SELECT
+        code,
+        SUM(qty) AS total_qty_sold
+    FROM sales
+    WHERE channel = 'AMZ'
+      AND solddate >= CURRENT_DATE - INTERVAL '365 days'
+    GROUP BY code
+),
+shp_sales AS (
+    SELECT
+        code,
+        SUM(qty) AS total_qty_sold
+    FROM sales
+    WHERE channel = 'SHP'
+      AND solddate >= CURRENT_DATE - INTERVAL '365 days'
+    GROUP BY code
+),
+combined_sales AS (
+    SELECT
+        COALESCE(cs.code, ams.code, ss.code) AS code,
+        COALESCE(cs.total_qty_sold, 0) AS cmb365,
+        COALESCE(ams.total_qty_sold, 0) AS amz365,
+        COALESCE(ss.total_qty_sold, 0) AS shp365
+    FROM cm3_sales cs
+    FULL OUTER JOIN amz_sales ams ON cs.code = ams.code
+    FULL OUTER JOIN shp_sales ss ON COALESCE(cs.code, ams.code) = ss.code
+)
+UPDATE skumap
+SET cmb365 = COALESCE(cs.cmb365, 0),
+    amz365 = COALESCE(cs.amz365, 0),
+    shp365 = COALESCE(cs.shp365, 0)
+FROM combined_sales cs
+WHERE skumap.code = cs.code;
