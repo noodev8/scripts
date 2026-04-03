@@ -1,7 +1,7 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £26/day
+**Current budget:** £38/day
 **Current tROAS:** 400%
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
 
@@ -296,80 +296,17 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 | 2026-03-08 | Budget £16 → £18 | 19.3x | ~80% | £15.74 | 2,042 | All 5 increase criteria met. ROAS 19.3x (huge headroom), budget constraining (spending to cap daily), imp share ~80% (traffic missed), stock healthy at 2,042 units. March spring ramp. Moving to ~20% increments every 5 days through peak season. | 13 Mar |
 | 2026-03-13 | Budget £18 → £22 | 27.1x | ~75% | £17.72 | 2,060 | Per ramp schedule. ROAS 27x, imp share dropping to ~70-75% (traffic being missed), stock healthy. | 18 Mar |
 | 2026-03-20 | Budget £22 → £26 | 26.0x | ~77% | £22.35 | 2,292 (224 key) | All criteria met. ROAS 26x, budget constraining (spending to cap), imp share ~77% (traffic missed), stock healthy. Algorithm absorbed £22 cleanly — no efficiency loss. Per ramp schedule. | 25 Mar |
-| 2026-03-25 | Hold at £26 | 24.3x | ~87% | £25.37 | 732 (segments), 18 READY | Increase criteria met on paper (ROAS 24x, budget constraining, 18 READY styles). Holding because: (1) Shopify prices adjusted on 23 Mar — 7 increases on Birkenstock best sellers (Gizeh +5%, Arizona +5%, Madrid +6%, Zermatt +7%). (2) Tue 24th conversion crashed to 4.8% (5 units on 104 clicks) vs 13.3% pre-change baseline. Need 2-3 days to confirm whether algorithm settles or prices are suppressing conversion. Also fixed: cron path broken since Mar 20 folder rename (google_ads → google-ads), 4 days backfilled. Stock query now uses ad-readiness (READY/PARTIAL/THIN). | Tonight or 27-28 Mar |
-| | | | | | | | |
-
-### Tonight's decision (25 Mar): Increase to £32 or hold?
-
-**Benchmark: today's (25 Mar) conversion rate.**
-
-Pre-change baseline (Mar 16-22): **13.3% conversion** (clicks → units), avg **12.9 units/day**, avg **£642 revenue/day**.
-
-| Today's result | Signal | Action |
-|---|---|---|
-| **8+ units AND £400+ revenue** | Conversion recovering (10%+). Tuesday was a one-day blip, algorithm adjusting to new prices. | **Increase to £32 tonight** |
-| **5-7 units OR £250-400 revenue** | Partial recovery. Not clear yet whether prices or just variance. | **Hold at £26, review Thu/Fri** |
-| **< 5 units AND < £250 revenue** | Two bad days in a row. Price changes likely suppressing conversion. | **Hold at £26, review prices on Thu/Fri** |
-
-Note: today already has 2 sales / £212 as of mid-morning, which is a stronger start than yesterday.
-
-### Thu/Fri review (27-28 Mar): Price change impact check
-
-Run these queries to isolate whether the price changes are helping or hurting:
-
-**1. Conversion trend — has it recovered?**
-
-```sql
-SELECT snapshot_date, google_clicks,
-  shopify_units::integer as units,
-  ROUND(shopify_units::numeric / NULLIF(google_clicks, 0) * 100, 1) as conv_pct,
-  shopify_sales::numeric as revenue,
-  ROUND(shopify_sales::numeric / NULLIF(google_ad_spend::numeric, 0), 1) as roas
-FROM google_stock_track
-WHERE snapshot_date >= '2026-03-20'
-ORDER BY snapshot_date;
-```
-
-**Benchmark:** conversion should be back to 10%+ by Thu. If still below 8% across Wed-Thu, the price increases are the likely cause.
-
-**2. Which increased products are still selling?**
-
-Check each product that was increased on 23 Mar — are they converting at the new price?
-
-```sql
-SELECT s.groupid, ss.colour,
-  pcl.old_price, pcl.new_price,
-  SUM(s.qty) as units_since_change,
-  ROUND(AVG(s.soldprice)::numeric, 2) as avg_sold_price
-FROM sales s
-JOIN skusummary ss ON ss.groupid = s.groupid
-JOIN price_change_log pcl ON pcl.groupid = s.groupid
-  AND pcl.change_date = '2026-03-23' AND pcl.channel = 'SHP'
-WHERE s.channel = 'SHP' AND s.solddate >= '2026-03-23' AND s.qty > 0
-  AND pcl.new_price > pcl.old_price
-GROUP BY s.groupid, ss.colour, pcl.old_price, pcl.new_price
-ORDER BY units_since_change DESC;
-```
-
-**What to look for:**
-- Products selling at the new price = increase is holding, keep it
-- Products with zero sales since change but were selling before = price may be too high, consider reverting
-- Cross-reference with the velocity-by-price data from the original drill-down
-
-**3. Decision matrix for Thu/Fri:**
-
-| Conversion recovered? | Increased products selling? | Action |
-|---|---|---|
-| Yes (10%+) | Yes | Price changes are fine. Increase budget to £32. |
-| Yes (10%+) | Some not selling | Budget to £32, but revert the non-sellers to old price |
-| No (< 8%) | Most not selling | Revert price increases first, then reassess budget |
-| No (< 8%) | Yes, selling fine | Something else is off — check impression share, stock, competition |
+| 2026-03-25 | Hold at £26 | 24.3x | ~87% | £25.37 | 732 (segments), 18 READY | Holding to check price change impact: 7 Birkenstock increases on 23 Mar, conversion crashed to 4.8% on 24th. Need 2-3 days to confirm recovery. | 27-28 Mar |
+| 2026-03-29 | Budget £26 → £32 | 20.6x | ~83% | £26.47 | 2,264 (18 READY) | Conversion recovered to baseline (12%+ on Mar 27-28). Price changes not suppressing. Budget constraining (spending to cap daily), imp share 80-85% (traffic missed). Algorithm already spending £28-30 on overspend days — £32 formalises that with small stretch. Spring peak, ROAS has huge headroom above 7x floor. | 3 Apr |
+| 2026-04-03 | Budget £32 → £38 | 21.6x | ~83% | £30.63 | 2,248 (18 READY) | All 5 criteria met. ROAS 21.6x, budget constraining (3/7 days at cap, overspent to £39.68), imp share 82-85%, stock healthy. Algorithm absorbed £32 with zero efficiency loss. Conversion holding at 11.7% into April. £38 formalises what Google is already trying to spend on high-demand days. Effective midnight 3 Apr. | 8 Apr |
 
 ---
 
 ## Process for Claude Code Review
 
 When asked to review the Google Ads budget:
+
+**Important:** Do not run budget analysis on stale data. Check the latest `snapshot_date` with ad spend data first — if it is more than 2 days old, flag it and wait for user confirmation before proceeding.
 
 1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates — include `google_search_imp_share`
 2. Run the ad-readiness query to check stock by style (READY / PARTIAL / THIN)

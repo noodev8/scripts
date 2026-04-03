@@ -2,14 +2,22 @@
 
 ## Status
 
-**Last session (2026-03-23):**
+**Last session (2026-04-03):**
+- Full IVES portfolio review — 33 price changes across WHITE + all 9 colours.
+- IVES-WHITE velocity sustained: 40/wk. Mar 23 creeps held. Range tightened to £37.49–£38.99.
+- IVES-COLOUR: 28 changes. Creeps on strong sellers (BLACKSOLE-06 to £40.99, NAVY/GREY creeps). Aggressive drops on dead stock (NAVY-06 £40.49→£38.99, BLACK-05 £40.49→£38.99, BLACKSOLE/MIDBLUE-07 aggressive drops to find range).
+- Key finding: £40+ kills velocity on most sizes — only BLACKSOLE-06 holds above £40.
+- Larger FBA shipment in transit, reorder imminent. WHITE 04/06 OOS.
+- Stone set to flat £36.99 as baseline for incoming stock.
+- Created `amz_price_log` DB table — price changes now logged automatically.
+- Next: check creeps hold in a few days, especially the aggressive drops on size 07s.
+
+**Session (2026-03-23):**
 - Reviewed all IVES colours one week after the Mar 16 price drops.
 - IVES-WHITE exploded: 28 units w/c Mar 16 (up from 1–3/wk). Size 06 at £36.99 did 11 of those — star SKU.
-- Concern: WHITE avg selling price now ~£37.80 vs £39.99+ before. Velocity restored but margin compressed. Need to monitor whether creeps stick without killing sales.
 - 17 price changes: 8 creeps up on strong sellers (£0.49–£1.50), 9 drops on dead stock.
 - Key creeps: WHITE-06 £36.99→£37.49, NAVY-05 £36.99→£37.49, BLACKSOLE-06 £39.99→£40.49.
 - Key drops: WHITE-07 £39.49→£37.99 (13 units dead), BLACKSOLE-04 £38.99→£37.49 (14 units dead).
-- Priority: check back within a few days on IVES-WHITE — has always been the best seller and the margin drop is a concern.
 
 **Session (2026-03-16):**
 - Pulled AMZ sales, confirmed IVES dominates. Chose IVES-WHITE first.
@@ -128,7 +136,9 @@ Three steps: (1) generate upload file, (2) run `python amz-price/update_amz_pric
 
 #### 1. Generate the upload file
 
-Template is `amz-price/AMZ-Price-Template.txt`. Format is tab-separated:
+**Upload file: `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt`**. If the file exists, append new rows. If it doesn't exist, create it with a header row. The user deletes the file from Downloads after uploading to Amazon Seller Central.
+
+Format is tab-separated:
 
 ```
 sku	price	minimum-seller-allowed-price	maximum-seller-allowed-price
@@ -150,26 +160,17 @@ Run `python amz-price/update_amz_price.py` — it reads `AMZ-Price-Upload.txt` a
 
 #### 3. Log the change
 
-Record in the price change log below for tracking.
+Price changes are logged automatically to the `amz_price_log` table when `update_amz_price.py` runs.
 
-### Price Change Log
+```sql
+-- View recent price changes
+SELECT log_date, code, old_price, new_price, notes
+FROM amz_price_log
+ORDER BY id DESC
+LIMIT 20
+```
 
-| Date | SKU (code) | Old Price | New Price | Result |
-|------|-----------|-----------|-----------|--------|
-| 2026-03-16 | FLE030-IVES-WHITE (all sizes) | £39.99 | £38.50 | 5 sales same day — velocity restored |
-| 2026-03-16 | IVES-WHITE per size | various | £36.99–£39.49 | Drops on dead sizes (04, 06), creep up on star (07) |
-| 2026-03-16 | IVES-COLOUR all colours | various | £36.49–£40.49 | 28 changes: 24 drops on dead/overstocked, 4 creeps on stars. Beige and Khaki held. |
-| 2026-03-23 | IVES-WHITE-06 | £36.99 | £37.49 | Creep — 11/wk star seller |
-| 2026-03-23 | IVES-WHITE-07 | £39.49 | £37.99 | Drop — 0/wk, 13 stock sitting |
-| 2026-03-23 | IVES-WHITE-08 | £38.50 | £38.99 | Creep — steady 3/wk |
-| 2026-03-23 | IVES-NAVY 04,05 | £36.99 | £37.49 | Creep — 3+6/wk |
-| 2026-03-23 | IVES-NAVY 07,08,09 | £36.99–£39.99 | £35.99–£38.50 | Drops — 0/wk dead sizes |
-| 2026-03-23 | IVES-BEIGE-05 | £39.00 | £39.49 | Creep — 4/wk, low stock |
-| 2026-03-23 | IVES-BLACK 04 | £36.99 | £37.49 | Creep — 3/wk |
-| 2026-03-23 | IVES-BLACK 05 | £39.99 | £40.49 | Creep — 3/wk at higher price |
-| 2026-03-23 | IVES-BLACKSOLE 06 | £39.99 | £40.49 | Creep — 8/wk, 2 left |
-| 2026-03-23 | IVES-BLACKSOLE 03,04,05 | £37.99–£40.49 | £36.99–£38.99 | Drops — 0/wk dead sizes |
-| 2026-03-23 | IVES-GREY 07,08 | £36.49–£38.50 | £35.99–£36.99 | Drops — 0/wk |
+**Note:** Pre-2026-04-03 changes were tracked in a markdown table. Historical entries from Mar 16 and Mar 23 sessions are summarised in the Status section above.
 
 ## Segments
 
@@ -219,5 +220,5 @@ Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, g
 
 - Amazon and Shopify pricing are treated as completely separate — different customer base, different pricing strategy.
 - **Priority 1:** Lunar St Ives (FLE030-IVES) is the core Amazon product. Keep it stocked and priced as efficiently as possible.
-- **Priority 2:** Expand the range — grow sales on other items beyond IVES.
+- **Priority 2:** Expand the range — grow sales on other items beyond IVES. Next candidates: Free Spirit brand, Lunar Charlotte sandals.
 - **Price testing:** When sales stall, make a price change and monitor daily sales via the `sales` table to measure impact. Track what price was changed, when, and what happened.

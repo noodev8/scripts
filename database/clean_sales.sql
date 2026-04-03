@@ -28,6 +28,9 @@ WHERE orderdate < CURRENT_DATE - INTERVAL '365 days';
 DELETE FROM orderstatus_archive
 WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 
+DELETE FROM amz_price_log
+WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
 
 -- ----------------------------------------------------------------
 -- STEP 2: Fix return prices — match by original order

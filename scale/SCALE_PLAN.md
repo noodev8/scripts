@@ -212,6 +212,7 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. | Contact WMSC |
 | 2026-03-08 | Google Ads daily budget £16 → £18 | ROAS 19.3x, imp share ~80%, budget constraining, 2,042 stock units. Spring ramp. Switching to ~20% increments every 5 days. | Review 13 Mar |
 | 2026-03-25 | Free Spirit Frisco promoted from investigation to active test | First 2 Amazon sales (21 Mar), £27 GP/unit. Stock sent to FBA, partial sizes live. Segment `FREE-SPIRIT` created. | Review end Apr |
+| 2026-03-29 | Google Ads daily budget £26 → £32 | ROAS 20.6x, conversion recovered after Mar 23 price changes (12%+ on Mar 27-28). Budget constraining, imp share ~83%. Algorithm already hitting £28-30 on overspend days. | 3 Apr |
 
 ---
 

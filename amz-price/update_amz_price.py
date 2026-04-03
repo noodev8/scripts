@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import psycopg2
 from logging_utils import get_db_config
 
-UPLOAD_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'AMZ-Price-Upload.txt')
+UPLOAD_FILE = os.path.join(os.path.expanduser('~'), 'Downloads', 'AMZ-Price-Upload.txt')
 
 def main():
     if not os.path.exists(UPLOAD_FILE):
@@ -44,12 +44,23 @@ def main():
 
     print(f"Updating {len(changes)} price(s) in amzfeed...")
     for sku, price in changes:
-        cur.execute("UPDATE amzfeed SET amzprice = %s WHERE sku = %s", (price, sku))
-        rows = cur.rowcount
-        if rows:
-            print(f"  {sku} -> {price}")
-        else:
+        # Get current price and code before updating
+        cur.execute("SELECT code, amzprice FROM amzfeed WHERE sku = %s", (sku,))
+        row = cur.fetchone()
+        if not row:
             print(f"  {sku} -> {price} (WARNING: no matching SKU found)")
+            continue
+
+        code, old_price = row
+        cur.execute("UPDATE amzfeed SET amzprice = %s WHERE sku = %s", (price, sku))
+        print(f"  {sku} -> {price}")
+
+        # Log the change
+        if old_price and str(old_price).strip() != str(price).strip():
+            cur.execute(
+                "INSERT INTO amz_price_log (code, old_price, new_price) VALUES (%s, %s, %s)",
+                (code, old_price, price)
+            )
 
     conn.commit()
     cur.close()

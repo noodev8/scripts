@@ -18,6 +18,8 @@ and historical performance.
 import psycopg2
 import csv
 import os
+import shutil
+from pathlib import Path
 from datetime import datetime
 from adcost_logging import manage_log_files, create_logger, get_db_config
 
@@ -502,7 +504,16 @@ def main():
                 return 1
 
         # Step 2: Check for CSV file and import Google Ads data (independent of snapshot)
-        csv_path = os.path.join(os.path.dirname(__file__), 'adcost_summary_30.csv')
+        csv_filename = 'adcost_summary_30.csv'
+        csv_path = os.path.join(os.path.dirname(__file__), csv_filename)
+
+        # Check Downloads folder for a fresh export and move it into place
+        downloads_dir = os.environ.get('DOWNLOADS_DIR', str(Path.home() / 'Downloads'))
+        downloads_csv = os.path.join(downloads_dir, csv_filename)
+        if os.path.exists(downloads_csv):
+            log(f"Found CSV in Downloads: {downloads_csv}")
+            shutil.move(downloads_csv, csv_path)
+            log(f"Moved to: {csv_path}")
 
         if os.path.exists(csv_path):
             log("--- Google Ads CSV File Found ---")
@@ -515,8 +526,15 @@ def main():
                 log(f"Google Ads import summary: {stats['updated']} updated, {stats['skipped']} skipped, {stats['not_found']} not found")
             else:
                 log("WARNING: No data extracted from CSV file")
+
+            # Delete CSV after processing to avoid re-importing stale data
+            try:
+                os.remove(csv_path)
+                log(f"Deleted processed CSV: {csv_path}")
+            except OSError as e:
+                log(f"WARNING: Could not delete CSV: {e}")
         else:
-            log("INFO: No Google Ads CSV file found (adcost_summary_30.csv) - skipping ads data import")
+            log("INFO: No Google Ads CSV file found (checked script folder and Downloads) - skipping ads data import")
 
         # Commit all changes (snapshot and/or CSV updates)
         conn.commit()
