@@ -4,6 +4,50 @@ Tracks each Phase 1 run so we can see trends over time.
 
 ---
 
+## 2026-04-04
+
+| Metric | Value |
+|---|---|
+| Period | Last 30 days (2026-03-05 to 2026-04-04) |
+| Products sold | 108 |
+| Total units | 302 |
+| Total revenue | £16,772.94 |
+| Total net profit | £2,304.12 |
+| Avg net profit/unit | £7.63 |
+| Loss-making products | 16 (-£241) |
+| Trend (14d vs prev 14d) | 10.6 units/day vs 10.3 — up 3% units, +13% revenue |
+
+**Cost constants used:** Payment 2.9% + £0.30 | VAT 1/6 (where tax=1) | Wages £1.00 | Postage £3.44
+
+**Google reports processed:** Benchmark (148 groupids) + Performance (124 groupids, 98 with both)
+
+**Gear:** Steady
+
+**Changes applied (6):**
+- 0051701-ARIZONA: £65.50 → £68.00 (step toward summer sweet spot £73, selling 3/wk, 51 incoming)
+- 0040791-MADRID: £59.50 → £62.00 (mirrors last year spring step-up, selling 3/wk, 24 stock)
+- 0034701-MILANO: £68.21 → £80.00 (prep for 100 incoming, sold 8 at £90 RRP May 25, odd sizes left)
+- 1029470-ARIZONA: £78.40 → £72.00 (decrease — stalling 0.3/wk for 8 months, proven 1.5/wk at £72)
+- 0043661-GIZEH: £72.68 → £75.00 (performing 1.0/wk, best non-summer rate, step toward summer)
+- 1005291-ARIZONA: £69.00 → £72.00 (proven year-round price, prep for 47 incoming)
+
+**Products reviewed but no change:**
+- 1015092-ZERMATT: Hold at £75 — slipper, not seasonal for spring. Revisit later.
+- 1017721-BEND: Hold at £95 — only 19 days since change, spring building. Revisit in 2 weeks. May need to drop — lots of stock.
+- 0051703-ARIZONA: Hold at £64.22 — at proven year-round price. May decrease into summer to replicate last year's 2.9/wk burst.
+
+**15 candidates remaining from this session** — filtered list (14+ days, positive margin, headroom >£10). Pick up next session.
+
+**Key observations:**
+- All metrics up vs Mar 29: units +10%, revenue +13%, profit +17%. Pricing changes landing well.
+- Profit growing faster than revenue — mix improving, not just chasing volume.
+- Spring/summer lines picking up pace (Arizonas, Gizehs, Mayaris).
+- Google ad budget increased to £38/day. ROAS still strong (10x+ even on quiet days).
+- Process improvement: Google CSVs now picked up from Downloads folder (script updated). Doc updated to remind (not enforce) CSV download at session start.
+- Discussion: auto-drill-down script to pre-calculate velocity-by-price and produce recommendations with confidence levels. Would reduce session time and enable staff to run sessions. Not yet built — revisit next session.
+
+---
+
 ## 2026-03-29
 
 | Metric | Value |

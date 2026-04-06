@@ -4,14 +4,14 @@
 
 This process uses two Google Merchant Center reports — the **price benchmark** report and the **sale price suggestions (performance)** report — to identify pricing opportunities, then optionally adjusts prices via the existing nightly Shopify sync.
 
-The process is designed to be run manually with gaps between phases. Drop the Google benchmark CSV into `shopify-price/` and run the script when needed.
+The process is designed to be run manually with gaps between phases. Download the Google CSVs to your **Downloads folder** — `google_price_check.py` picks them up from there and deletes them after processing.
 
 > **Note (Mar 2026 — updated):** We use both Google reports. The **benchmark** report shows where we sit vs competitors — great for everyday pricing. The **sale price suggestions (performance)** report recommends prices that drive the most sales volume on Google Shopping. It tends to suggest lower prices, so it won't always suit us — but it's valuable when we *want* to ramp sales: high stock levels, end-of-season clearance, or products we want to push. The decision on whether to follow the performance suggestion for a given product is ours to make during review.
 
 ## How It Works (3 Phases)
 
 ### Phase 1: Data Report (`google_price_check.py`)
-- Parse the Google benchmark CSV and sale price suggestions (performance) CSV from `shopify-price/`
+- Parse the Google benchmark CSV and sale price suggestions (performance) CSV from the **Downloads folder**
 - Performance CSV is optional — report works with benchmark only but has fewer signals
 - Match Google `Product ID` to `skumap.googleid` in the database
 - Join to `skusummary` for current price, cost, RRP, margin info

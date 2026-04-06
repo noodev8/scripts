@@ -31,8 +31,11 @@ SCRIPT_NAME = "google_price_check"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
-# Directory where Google CSV reports live (same as this script)
-REPORT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Directory where this script lives (for report output)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Directory where Google CSV downloads are placed
+DOWNLOADS_DIR = os.path.join(os.path.expanduser("~"), "Downloads")
 
 # Filename patterns
 BENCHMARK_PATTERN = "Your most popular products with price benchmarks_*.csv"
@@ -43,8 +46,8 @@ EFFECTIVENESS_RANK = {'High': 3, 'Medium': 2, 'Low': 1}
 
 
 def find_latest_csv(pattern):
-    """Find the most recently modified CSV matching the given glob pattern."""
-    files = glob.glob(os.path.join(REPORT_DIR, pattern))
+    """Find the most recently modified CSV matching the given glob pattern in Downloads."""
+    files = glob.glob(os.path.join(DOWNLOADS_DIR, pattern))
     if not files:
         return None
     return max(files, key=os.path.getmtime)
@@ -294,8 +297,8 @@ def main():
     perf_file = find_latest_csv(PERFORMANCE_PATTERN)
 
     if not bench_file:
-        log("ERROR: No Google benchmark CSV found in shopify-price/ directory.")
-        print("No benchmark report found. Place the Google benchmark CSV in shopify-price/ and re-run.")
+        log(f"ERROR: No Google benchmark CSV found in {DOWNLOADS_DIR}")
+        print(f"No benchmark report found. Download the Google benchmark CSV to {DOWNLOADS_DIR} and re-run.")
         return
 
     log(f"Benchmark file: {os.path.basename(bench_file)}")
@@ -343,7 +346,7 @@ def main():
         return
 
     # --- Save output CSV (always overwrite latest in report/) ---
-    report_subdir = os.path.join(REPORT_DIR, 'report')
+    report_subdir = os.path.join(SCRIPT_DIR, 'report')
     os.makedirs(report_subdir, exist_ok=True)
     output_path = os.path.join(report_subdir, 'price_report.csv')
     report_df.to_csv(output_path, index=False)

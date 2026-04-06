@@ -11,10 +11,17 @@
 
 **Claude does:**
 
+### Step 0 — Pick up where we left off
+
+Check for `PRICING_LOG.md` in `shopify-price/`. If it exists, read it first — it shows what was changed, what was reviewed and skipped, and what's still queued. Each entry has initials so multiple people can work through the same log. If the user says "continue prices" or "pick up where we left off", skip the full summary and jump to the next queued candidate.
+
 ### Step 1 — Refresh & Present (always, every session)
 
-1. Run the 30-day Shopify sales analysis SQL (from [SHOPIFY_PRICE_PLAN.md](SHOPIFY_PRICE_PLAN.md))
-2. Check for Google CSVs in `shopify-price/` (benchmark + performance)
+1. Check for Google CSVs in the user's **Downloads folder** (benchmark + performance). Remind the user if either is missing — both reports improve Steady and Push gears, but the session can continue without them using Shopify data only. The two files are:
+   - **Benchmark report** — competitor pricing (Google Merchant Center → Products → Pricing → Benchmark)
+   - **Performance / Sale price suggestions report** — Google's volume-optimised suggestions (Products → Pricing → Sale price suggestions)
+   - Download both to the **Downloads folder** — `google_price_check.py` picks them up from there and deletes them after processing
+2. Run the 30-day Shopify sales analysis SQL (from [SHOPIFY_PRICE_PLAN.md](SHOPIFY_PRICE_PLAN.md))
 3. Present the standard summary:
    - **Overview table**: products sold, units, revenue, net profit, loss-making count
    - **Trend**: last 14 days vs previous 14 days (units/day, revenue/day) — are we up or down?
@@ -223,7 +230,7 @@ The AI pre-sorts recommendations into categories to reduce manual review. These 
 
 **Planned enhancements** (to be built as we learn):
 - Factor in net profit per unit (protect high-margin products even if they match accept rules)
-- Factor in seasonality (out-of-season = different thresholds)
+- Factor in seasonality (out-of-season = different thresholds). **Key learning (2026-04-04):** Summer products should NOT get Grow-mode decreases during off-season — low sales in winter are seasonal, not price-driven. Grow mode dropped 1025062-GIZEH from £90 to £67 chasing volume that wasn't there, destroying £18/unit margin on a product that sold 1.3/wk at RRP in summer. Rule: if season=Summer and current month is Oct-Mar, reject Grow-mode decreases unless stock is truly aging (18+ months)
 - Factor in **sellable stock** not just total stock (stock in sizes that have sold in the past year — fringe sizes with no sales history shouldn't count toward stock-based decisions)
 - Factor in stock age / incoming stock (heavy stock = more aggressive)
 - Factor in price change history (avoid yo-yo — reject if changed < 14 days ago)
