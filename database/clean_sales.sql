@@ -3,7 +3,8 @@
 -- Runs weekly via clean_sales.py (cron: Mondays 4am)
 --
 -- Jobs:
---   1. Purge old data from sales, bclog, stockorder, orderstatus_archive
+--   1. Purge old data from sales, bclog, stockorder, orderstatus_archive,
+--      orderstatus (stale Amazon orders), amz_price_log
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
@@ -30,6 +31,11 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
+DELETE FROM orderstatus
+WHERE ordertype = 3
+  AND arrived = 0
+  AND createddate < CURRENT_DATE - INTERVAL '9 days';
 
 
 -- ----------------------------------------------------------------
