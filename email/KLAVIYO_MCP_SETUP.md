@@ -47,6 +47,21 @@ If Klaviyo tools don't appear after restart:
 3. Use `ToolSearch` with query `klaviyo` to check if tools loaded — look for `mcp__klaviyo__*` tools.
 4. If tools still missing, the server may be timing out during the MCP handshake on startup.
 
+## Troubleshooting (2026-04-10) — fakeredis / pydocket import error
+
+Symptom: `claude mcp list` shows `klaviyo: ... ✗ Failed to connect`. Running `uvx klaviyo-mcp-server@latest --help` crashes with:
+```
+ImportError: cannot import name 'FakeConnection' from 'fakeredis.aioredis'
+```
+Cause: newer `fakeredis` (≥2.30) renamed `FakeConnection` → `FakeRedisConnection`, but `pydocket 0.18.2` (pulled in by `fastmcp 2.14.6`) still imports the old name.
+
+Fix: pin an older fakeredis via uvx `--with` in `.mcp.json` args:
+```json
+"args": ["--with", "fakeredis<2.30", "klaviyo-mcp-server@latest"]
+```
+Then restart Claude Code. Verify with `claude mcp list` — klaviyo should show `✓ Connected`.
+Revisit once `pydocket` / `fastmcp` publish a release compatible with fakeredis ≥2.30 — the pin can then be removed.
+
 ## Notes
 - `READ_ONLY: true` means Claude can view but not modify anything in Klaviyo
 - Change to `false` later if you want Claude to create campaigns/segments
