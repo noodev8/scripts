@@ -57,3 +57,24 @@ Amazon is migrating templates. Old Inventory Loader format still works for basic
 creation but cannot set `brand`. The SHOES category template (.xlsm) with `partial_update`
 listing action successfully sets brand and price on existing ASINs (tested 5/5 success,
 zero errors).
+
+## FBA vs FBM — important (April 2026)
+This script DOES NOT create FBA offers, even though col GK is set to `AMAZON_EU`.
+Spreadsheet upload can only create the listing — the offer always lands as FBM.
+
+Why: Amazon's listings parser ignores `fulfillment_channel_code` when *creating* a new
+offer via flat-file/spreadsheet. To exist as FBA, a SKU has to be known to FBA inventory
+first (i.e. have a Send-to-Amazon shipment plan), and that can only be done after the
+listing exists. Chicken-and-egg — there is no one-step path.
+
+Also: `partial_update` cannot flip an existing FBM offer to FBA. The
+`fulfillment_channel_code` field is set-at-create-time. Re-uploading with `AMAZON_EU`
+silently no-ops on that field (other fields like brand/price still update).
+
+Workflow for new products:
+1. Run `amz_upload.py` — creates the listing (lands as FBM, that's expected)
+2. In Seller Central → Manage Inventory → tick the SKU → "Change to Fulfilled by Amazon",
+   OR add the SKU to a Send to Amazon shipment plan
+3. Once converted, future `amz_upload.py` runs will partial_update the now-FBA offer fine
+
+Step 2 is manual and unavoidable via this script.
