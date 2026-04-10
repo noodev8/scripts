@@ -213,6 +213,8 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 | 2026-03-08 | Google Ads daily budget £16 → £18 | ROAS 19.3x, imp share ~80%, budget constraining, 2,042 stock units. Spring ramp. Switching to ~20% increments every 5 days. | Review 13 Mar |
 | 2026-03-25 | Free Spirit Frisco promoted from investigation to active test | First 2 Amazon sales (21 Mar), £27 GP/unit. Stock sent to FBA, partial sizes live. Segment `FREE-SPIRIT` created. | Review end Apr |
 | 2026-03-29 | Google Ads daily budget £26 → £32 | ROAS 20.6x, conversion recovered after Mar 23 price changes (12%+ on Mar 27-28). Budget constraining, imp share ~83%. Algorithm already hitting £28-30 on overspend days. | 3 Apr |
+| 2026-04-03 | Google Ads daily budget £32 → £38 | All 5 criteria met. ROAS 21.6x, budget constraining (spending to cap), imp share 82-85%, stock healthy. Per ramp schedule. | 8 Apr |
+| 2026-04-10 | Google Ads daily budget £38 → £42 | Conservative +11% step (vs schedule's +21%) to protect algorithm. Easter + 16 Birk price changes on Apr 5 confounded conv for 4 days; post-Easter ROAS 18.7x with conv recovering. Imp share crashed to 62-68% — Google clearly has room. tROAS held at 400%. | 15 Apr |
 
 ---
 
