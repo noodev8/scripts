@@ -103,6 +103,8 @@ Preferred send window: Tuesday/Wednesday, 10–11am UK time (but not a rule).
 
 Three people (Andreas, Summer, Martin) each own a third of the list. Each writes their own email. After each send, compare results and adopt what works. No more A/B testing — one email per person per campaign.
 
+> **Update 2026-04-10:** Going forward this is a **two-person** competition — Andreas and Summer only. Martin has been moved to packing and is no longer writing campaigns. List splits 2 ways from Campaign 3 onwards.
+
 ### What We Know — Design Analysis (2026-03-28)
 
 We compared the two most important emails: Andreas Var B (best CTR) vs Summer Birkenstock 2 (only sale).
