@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Update amzfeed.amzprice in the database from a price upload file.
-Reads AMZ-Price-Upload.txt and updates the corresponding rows in amzfeed.
+Log Amazon price changes from a price upload file to amz_price_log.
+
+Reads AMZ-Price-Upload.txt and inserts one row per actual price change into
+amz_price_log. Does NOT update amzfeed — that table is refreshed daily from
+Amazon, so any change we make is overwritten the next morning anyway.
 
 Usage: python amz-price/update_amz_price.py
 """
@@ -42,9 +45,9 @@ def main():
     conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
-    print(f"Updating {len(changes)} price(s) in amzfeed...")
+    print(f"Logging {len(changes)} price change(s)...")
+    logged = 0
     for sku, price in changes:
-        # Get current price and code before updating
         cur.execute("SELECT code, amzprice FROM amzfeed WHERE sku = %s", (sku,))
         row = cur.fetchone()
         if not row:
@@ -52,20 +55,22 @@ def main():
             continue
 
         code, old_price = row
-        cur.execute("UPDATE amzfeed SET amzprice = %s WHERE sku = %s", (price, sku))
-        print(f"  {sku} -> {price}")
 
-        # Log the change
         if old_price and str(old_price).strip() != str(price).strip():
             cur.execute(
                 "INSERT INTO amz_price_log (code, old_price, new_price) VALUES (%s, %s, %s)",
                 (code, old_price, price)
             )
+            print(f"  {code}: {old_price} -> {price} (logged)")
+            logged += 1
+        else:
+            print(f"  {code}: {price} (no change, skipped)")
+
+    print(f"Done. {logged} change(s) logged.")
 
     conn.commit()
     cur.close()
     conn.close()
-    print("Done.")
 
 if __name__ == '__main__':
     main()

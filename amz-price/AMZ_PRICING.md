@@ -2,7 +2,19 @@
 
 ## Status
 
-**Last session (2026-04-03):**
+**Last session (2026-04-11):**
+- IVES-WHITE follow-up. **Key finding: all WHITE sizes had been OOS**, which explains apparent velocity softness since Apr 3 — not a price problem. WHITE-06 (31 FBA) just landed, more inbound across the range.
+- Aggregate trend: 40 → 37 → 30 /wk across wc Mar 23/29/Apr 5, avg price £37.85 → £38.12 → £38.06, profit £606 → £553 → £426. Most of the profit drop is stockouts + returns, not creeps breaking.
+- 5 changes: creeps on 03/04/05/09, drop on 08.
+  - WHITE-03 £38.50→£38.99 (tail size low-risk test)
+  - WHITE-04 £37.49→£37.99 (last creep held 7/7d, matches old 06 price)
+  - WHITE-05 £38.99→£39.49 (9/7d strong, 60 total stock — £39.99 ceiling established previously so stop there)
+  - WHITE-08 £38.50→£37.99 (laggard 1/7d, find range)
+  - WHITE-09 £38.50→£38.99 (tail size low-risk test)
+- **Held:** WHITE-06 (just restocked, Apr 3 £37.99 creep untested under stock), WHITE-07 (softening, don't compound).
+- Next: check creeps in 3–5 days once FBA stock is flowing. Main risk: WHITE-05 at £39.49 — watch closely, pull back to £38.99 if velocity breaks.
+
+**Session (2026-04-03):**
 - Full IVES portfolio review — 33 price changes across WHITE + all 9 colours.
 - IVES-WHITE velocity sustained: 40/wk. Mar 23 creeps held. Range tightened to £37.49–£38.99.
 - IVES-COLOUR: 28 changes. Creeps on strong sellers (BLACKSOLE-06 to £40.99, NAVY/GREY creeps). Aggressive drops on dead stock (NAVY-06 £40.49→£38.99, BLACK-05 £40.49→£38.99, BLACKSOLE/MIDBLUE-07 aggressive drops to find range).
@@ -132,7 +144,9 @@ When sales slow down on an item:
 
 ### Applying Price Changes
 
-Three steps: (1) generate upload file, (2) run `python amz-price/update_amz_price.py` to update DB, (3) user uploads file to Amazon.
+Two steps: (1) generate upload file, (2) run `python amz-price/update_amz_price.py` to log the changes. The user then uploads the file to Amazon Seller Central.
+
+**Important: do NOT update the `amzfeed` table.** `amzfeed` is refreshed every morning from real Amazon data, so any change we make is overwritten the next day — there is no point touching it. The script only writes to `amz_price_log`. This rule also applies to ad-hoc SQL: leave `amzfeed` alone, let the daily refresh handle it. In-session analysis between a price change and the next refresh will see stale prices on the affected SKUs — that's expected and acceptable.
 
 #### 1. Generate the upload file
 
@@ -148,19 +162,10 @@ sku	price	minimum-seller-allowed-price	maximum-seller-allowed-price
 - `maximum-seller-allowed-price` = RRP (e.g. 45.00 for IVES).
 - `minimum-seller-allowed-price` can be left blank.
 - The template file contains a sample row — **always remove it** when generating a new file.
-- Output file: save as `amz-price/AMZ-Price-Upload.txt` (or similar descriptive name).
 
-#### 2. Update amzfeed in the database
+#### 2. Log the changes
 
-After generating the upload file, update `amzfeed.amzprice` to reflect the new prices so that any analysis before the next morning feed refresh uses the correct price:
-
-Run `python amz-price/update_amz_price.py` — it reads `AMZ-Price-Upload.txt` and updates `amzfeed.amzprice` for each SKU in the file.
-
-**Note:** `amzfeed` is refreshed every morning from real Amazon data, so this update is temporary — it just keeps the DB accurate until the next refresh.
-
-#### 3. Log the change
-
-Price changes are logged automatically to the `amz_price_log` table when `update_amz_price.py` runs.
+Run `python amz-price/update_amz_price.py` — it reads `AMZ-Price-Upload.txt` and inserts one row per actual price change into `amz_price_log`. Skips rows where the new price equals the current `amzfeed.amzprice` (idempotent — safe to re-run).
 
 ```sql
 -- View recent price changes
@@ -170,18 +175,24 @@ ORDER BY id DESC
 LIMIT 20
 ```
 
+The script does not capture reasoning/notes. Backfill notes with a one-shot SQL `UPDATE` after running the script, targeting the most recent NULL-notes row per code.
+
 **Note:** Pre-2026-04-03 changes were tracked in a markdown table. Historical entries from Mar 16 and Mar 23 sessions are summarised in the Status section above.
 
 ## Segments
 
-IVES products are split into two segments (tracked in the Google Sheet segment tracker):
+IVES products are split into four segments (tracked in the Google Sheet segment tracker). Split done 2026-04-11 to break out top AMZ colour performers as standalone segments.
 
-| Segment | Name | Styles | Revenue (12m) | GP (12m) |
-|---------|------|--------|---------------|----------|
-| IVES-COLOUR | Lunar Ives Colours | 7 | £79,000 | £54,000 |
-| IVES-WHITE | Lunar Ives White | 1 | £57,000 | £39,000 |
+| Segment | Styles | AMZ Rev 12m | AMZ Profit 12m | Notes |
+|---------|--------|-------------|----------------|-------|
+| IVES-WHITE | 1 (WHITE) | — | — | Standalone. Historically top AMZ seller. |
+| IVES-BLACKSOLE | 1 (BLACKSOLE) | £16,907 | £6,103 | Top AMZ colour by units/revenue. Split out 2026-04-11. |
+| IVES-NAVY-BLUE | 1 (NAVY-BLUE) | £16,277 | £6,293 | #2 AMZ colour, within £600 of BLACKSOLE. Split out 2026-04-11. |
+| IVES-COLOUR | 7 (BEIGE, BLACK, MIDBLUE, GREY, RED, STONE, KHAKI) | £46,311 | £16,690 | Mid/tail tier. Batch review with summary dashboard flow. |
 
 Segment is stored in `skusummary.segment`. All IVES groupids follow the pattern `FLE030-IVES-*`.
+
+**Segment strategy:** Segments are "bricks" toward the £1m revenue target. The goal is as many segments as possible each making a decent profit. Top AMZ performers get standalone segments so they can be reviewed and grown individually rather than lost in a batch.
 
 ### IVES Product Reference
 
@@ -192,10 +203,10 @@ All variants share: **cost £15.99, RRP £45.00, Shopify price £32.00**
 | FLE030-IVES-WHITE | White | IVES-WHITE |
 | FLE030-IVES-BEIGE | Beige | IVES-COLOUR |
 | FLE030-IVES-BLACK | Black | IVES-COLOUR |
-| FLE030-IVES-BLACKSOLE | Black (all black sole) | IVES-COLOUR |
+| FLE030-IVES-BLACKSOLE | Black (all black sole) | IVES-BLACKSOLE |
 | FLE030-IVES-GREY | Grey | IVES-COLOUR |
 | FLE030-IVES-MIDBLUE | Blue | IVES-COLOUR |
-| FLE030-IVES-NAVY-BLUE | Navy | IVES-COLOUR |
+| FLE030-IVES-NAVY-BLUE | Navy | IVES-NAVY-BLUE |
 | FLE030-IVES-KHAKI | Green | IVES-COLOUR |
 | FLE030-IVES-RED | Red | IVES-COLOUR |
 | FLE030-IVES-STONE | Beige | IVES-COLOUR |
@@ -215,6 +226,23 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 ```
 
 Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, gitignored).
+
+## Session Flow
+
+**Review order when doing a full AMZ pricing session:**
+
+1. **IVES-WHITE** — top priority, always first. Standalone segment, per-size analysis.
+2. **IVES-BLACKSOLE** — standalone segment, per-size analysis.
+3. **IVES-NAVY-BLUE** — standalone segment, per-size analysis.
+4. **IVES-COLOUR** (batch of 7: BEIGE, BLACK, MIDBLUE, GREY, RED, STONE, KHAKI) — start with a **summary dashboard** showing all 7 colours with key metrics (recent velocity, avg price, total stock, one-line status). Then ask whether to go colour-by-colour or batch-apply. Don't dump all 7 colours with size-level detail in one go.
+5. **Other segments** (Charlotte test, Free Spirit, etc.) — only if time allows and user wants them.
+
+**Session etiquette:**
+- Short sessions preferred — user has limited time for AMZ reviews.
+- Stock context matters: if a large FBA shipment is mid-flow, note it and consider whether signals are trustworthy before making changes. Stockouts look like softening velocity.
+- Don't dump all data at once. Each segment = one clear table + recommendations, then wait for confirmation before moving on.
+- Price changes log automatically via `update_amz_price.py` → `amz_price_log`. Backfill notes if the script didn't capture them (common pattern: inline SQL update after the main script).
+- Finding new colours or dropping colours is a separate task from pricing — don't mix them into a pricing session.
 
 ## Strategy
 
