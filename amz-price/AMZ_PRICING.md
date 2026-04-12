@@ -181,14 +181,18 @@ The script does not capture reasoning/notes. Backfill notes with a one-shot SQL 
 
 ## Segments
 
-IVES products are split into four segments (tracked in the Google Sheet segment tracker). Split done 2026-04-11 to break out top AMZ colour performers as standalone segments.
+IVES products are split into eight segments (tracked in the Google Sheet segment tracker). Top AMZ performers broken out as standalone segments 2026-04-11/12.
 
 | Segment | Styles | AMZ Rev 12m | AMZ Profit 12m | Notes |
 |---------|--------|-------------|----------------|-------|
 | IVES-WHITE | 1 (WHITE) | — | — | Standalone. Historically top AMZ seller. |
 | IVES-BLACKSOLE | 1 (BLACKSOLE) | £16,907 | £6,103 | Top AMZ colour by units/revenue. Split out 2026-04-11. |
-| IVES-NAVY-BLUE | 1 (NAVY-BLUE) | £16,277 | £6,293 | #2 AMZ colour, within £600 of BLACKSOLE. Split out 2026-04-11. |
-| IVES-COLOUR | 7 (BEIGE, BLACK, MIDBLUE, GREY, RED, STONE, KHAKI) | £46,311 | £16,690 | Mid/tail tier. Batch review with summary dashboard flow. |
+| IVES-NAVY-BLUE | 1 (NAVY-BLUE) | £16,277 | £6,293 | #2 AMZ colour. Split out 2026-04-11. |
+| IVES-GREY | 1 (GREY) | £9,657 | £3,309 | Consistent, low returns. Split out 2026-04-12. |
+| IVES-BEIGE | 1 (BEIGE) | £10,992 | £4,001 | Highest volume mid-tier. Split out 2026-04-12. |
+| IVES-MIDBLUE | 1 (MIDBLUE) | £10,237 | £3,657 | Strong recent velocity. Split out 2026-04-12. |
+| IVES-BLACK | 1 (BLACK) | £10,257 | £4,010 | Consistent seller, zero returns. Split out 2026-04-12. |
+| IVES-COLOUR | 3 (RED, STONE, KHAKI) | — | — | Tail tier. Batch review. |
 
 Segment is stored in `skusummary.segment`. All IVES groupids follow the pattern `FLE030-IVES-*`.
 
@@ -201,11 +205,11 @@ All variants share: **cost £15.99, RRP £45.00, Shopify price £32.00**
 | GroupID | Colour | Segment |
 |---------|--------|---------|
 | FLE030-IVES-WHITE | White | IVES-WHITE |
-| FLE030-IVES-BEIGE | Beige | IVES-COLOUR |
-| FLE030-IVES-BLACK | Black | IVES-COLOUR |
+| FLE030-IVES-BEIGE | Beige | IVES-BEIGE |
+| FLE030-IVES-BLACK | Black | IVES-BLACK |
 | FLE030-IVES-BLACKSOLE | Black (all black sole) | IVES-BLACKSOLE |
-| FLE030-IVES-GREY | Grey | IVES-COLOUR |
-| FLE030-IVES-MIDBLUE | Blue | IVES-COLOUR |
+| FLE030-IVES-GREY | Grey | IVES-GREY |
+| FLE030-IVES-MIDBLUE | Blue | IVES-MIDBLUE |
 | FLE030-IVES-NAVY-BLUE | Navy | IVES-NAVY-BLUE |
 | FLE030-IVES-KHAKI | Green | IVES-COLOUR |
 | FLE030-IVES-RED | Red | IVES-COLOUR |
@@ -234,7 +238,11 @@ Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, g
 1. **IVES-WHITE** — top priority, always first. Standalone segment, per-size analysis.
 2. **IVES-BLACKSOLE** — standalone segment, per-size analysis.
 3. **IVES-NAVY-BLUE** — standalone segment, per-size analysis.
-4. **IVES-COLOUR** (batch of 7: BEIGE, BLACK, MIDBLUE, GREY, RED, STONE, KHAKI) — start with a **summary dashboard** showing all 7 colours with key metrics (recent velocity, avg price, total stock, one-line status). Then ask whether to go colour-by-colour or batch-apply. Don't dump all 7 colours with size-level detail in one go.
+4. **IVES-GREY** — standalone segment, per-size analysis. Split out 2026-04-12.
+5. **IVES-BEIGE** — standalone segment, per-size analysis. Split out 2026-04-12.
+6. **IVES-MIDBLUE** — standalone segment, per-size analysis. Split out 2026-04-12.
+7. **IVES-BLACK** — standalone segment, per-size analysis. Split out 2026-04-12.
+8. **IVES-COLOUR** (batch of 3: RED, STONE, KHAKI) — start with a **summary dashboard** showing all 6 colours with key metrics (recent velocity, avg price, total stock, one-line status). Then ask whether to go colour-by-colour or batch-apply. Don't dump all 6 colours with size-level detail in one go.
 5. **Other segments** (Charlotte test, Free Spirit, etc.) — only if time allows and user wants them.
 
 **Session etiquette:**
@@ -243,6 +251,10 @@ Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, g
 - Don't dump all data at once. Each segment = one clear table + recommendations, then wait for confirmation before moving on.
 - Price changes log automatically via `update_amz_price.py` → `amz_price_log`. Backfill notes if the script didn't capture them (common pattern: inline SQL update after the main script).
 - Finding new colours or dropping colours is a separate task from pricing — don't mix them into a pricing session.
+
+## Auto-Pricing Plan
+
+See `amz-price/AMZ_AUTO_PRICING_PLAN.md` for the automation roadmap. It captures the decision rules applied during manual sessions and defines the path from manual → dry-run → script → cron. Read it at the start of any pricing session and update the Observations Log after each session.
 
 ## Strategy
 
