@@ -6,7 +6,13 @@ The goal is simple: **find the best price for each SKU.** This folder holds the 
 
 There's no ritual. A session starts with the user saying what they want to look at — a specific product, recent sales, loss-makers, something flagged by Google, whatever. Claude queries the database live, reads any Google CSVs sitting in the Downloads folder if they're relevant, and we discuss.
 
-When we agree on a change (or a batch of changes), Claude drafts a CSV in `staging/` and we apply it with `apply_prices.py`.
+**Standing defaults** (unless the user says otherwise):
+- Local stock only — FBA is handled separately in `amz-price/`
+- Exclude SKUs with `ignore_auto_price` set
+
+Specific thresholds (how many days, how many sales, etc.) are decided per session — they change depending on what we're hunting for.
+
+Claude keeps a running list of agreed changes in the conversation as we go. At the **end of the session**, Claude writes one CSV to `staging/` containing all the changes and applies it with `apply_prices.py` — no per-change files, no dry runs unless the user asks.
 
 Everything after that lives in the database. The `price_change_log` table is the history — don't keep markdown logs of past sessions.
 
