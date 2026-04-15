@@ -47,8 +47,8 @@ logs/
 *.txt
 *.csv
 
-# Shopify price session data (overwritten each run, not tracked)
-shopify-price/report/
+# Shopify price session data (staged CSVs, not tracked)
+shopify-price/staging/
 
 # =========================================
 # Flutter (splitdine_flutter)

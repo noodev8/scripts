@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
-Google Price Apply (Phase 3)
+Apply Prices
 
-Reads an edited action report CSV and applies price changes to the database.
-The nightly Shopify sync (price_update2.py) picks up rows where shopifychange=1.
+Reads a CSV of price changes and writes them to the database. The nightly
+Shopify sync (price_update2.py) picks up rows where shopifychange=1.
+
+CSV columns: groupid, new_price, description, change
+Rows with change=1 are applied. Rows with change=0 can still have their
+description carried forward as a note-only entry in price_change_log.
 
 Dry run by default — pass --confirm to apply changes.
 """
@@ -19,18 +23,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from logging_utils import manage_log_files, create_logger, get_db_config
 
 # Setup logging
-SCRIPT_NAME = "google_price_apply"
+SCRIPT_NAME = "apply_prices"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
-
-# Guardrail constants (matches price_recommendation.py)
-MINIMUM_MARGIN_MULTIPLIER = 1.10
 
 REQUIRED_COLUMNS = ['groupid', 'new_price', 'description']
 
 
 def load_csv(filepath):
-    """Load and validate the edited action report CSV.
+    """Load and validate the price change CSV.
 
     Returns (price_changes_df, all_rows_df):
         price_changes_df: rows with change=1 for price updates
@@ -57,19 +58,18 @@ def load_csv(filepath):
 
 
 def fetch_current_data(conn, groupids):
-    """Fetch current shopifyprice, cost, and latest description from DB."""
+    """Fetch current shopifyprice and latest description from DB."""
     cur = conn.cursor()
     cur.execute("""
-        SELECT groupid, shopifyprice, cost
+        SELECT groupid, shopifyprice
         FROM skusummary
         WHERE groupid = ANY(%s)
     """, (list(groupids),))
     rows = cur.fetchall()
     result = {}
-    for groupid, shopifyprice, cost in rows:
+    for groupid, shopifyprice in rows:
         result[groupid] = {
             'shopifyprice': float(shopifyprice) if shopifyprice is not None else None,
-            'cost': float(cost) if cost is not None else None,
             'last_description': '',
         }
 
@@ -89,9 +89,8 @@ def fetch_current_data(conn, groupids):
 
 
 def process_changes(csv_df, current_prices):
-    """Evaluate each CSV row and categorise as apply, blocked, or skipped."""
+    """Evaluate each CSV row and categorise as apply or skipped."""
     to_apply = []
-    blocked = []
     skipped = []
 
     for _, row in csv_df.iterrows():
@@ -103,25 +102,16 @@ def process_changes(csv_df, current_prices):
             skipped.append((gid, 'not found in skusummary'))
             continue
 
-        cp = current_prices[gid]
-        old_price = cp['shopifyprice']
-        cost = cp['cost']
+        old_price = current_prices[gid]['shopifyprice']
 
-        if old_price is None or cost is None:
-            skipped.append((gid, 'missing price or cost'))
+        if old_price is None:
+            skipped.append((gid, 'missing current price'))
             continue
 
         # Skip no-change (within £0.01)
         if abs(new_price - old_price) < 0.01:
             skipped.append((gid, 'no change'))
             continue
-
-        # Min margin guardrail — disabled for now while human-in-the-loop.
-        # Re-enable when auto-pricing is active to prevent accidental below-cost pricing.
-        # min_price = round(cost * MINIMUM_MARGIN_MULTIPLIER, 2)
-        # if new_price < min_price:
-        #     blocked.append((gid, old_price, new_price, min_price))
-        #     continue
 
         to_apply.append({
             'groupid': gid,
@@ -130,7 +120,7 @@ def process_changes(csv_df, current_prices):
             'description': description,
         })
 
-    return to_apply, blocked, skipped
+    return to_apply, skipped
 
 
 def apply_changes(conn, changes):
@@ -197,9 +187,9 @@ def save_descriptions(conn, all_rows_df, current_data, applied_groupids):
     return saved
 
 
-def print_summary(to_apply, blocked, skipped, confirm, saved_notes=None):
+def print_summary(to_apply, skipped, confirm, saved_notes=None):
     """Print a human-readable summary to console."""
-    mode_label = "GOOGLE PRICE APPLY" if confirm else "GOOGLE PRICE APPLY - DRY RUN"
+    mode_label = "APPLY PRICES" if confirm else "APPLY PRICES - DRY RUN"
     prefix = "Applied" if confirm else "Would update"
 
     print(f"\n{mode_label}")
@@ -212,11 +202,6 @@ def print_summary(to_apply, blocked, skipped, confirm, saved_notes=None):
             print(f"  {ch['groupid']}: {ch['old_price']:.2f} -> {ch['new_price']:.2f}  \"{desc_snippet}\"")
     else:
         print(f"{prefix}: 0 prices")
-
-    if blocked:
-        print(f"Blocked: {len(blocked)} (below min margin)")
-        for gid, old_p, new_p, min_p in blocked:
-            print(f"  {gid}: {new_p:.2f} below floor {min_p:.2f}")
 
     if skipped:
         print(f"Skipped: {len(skipped)}")
@@ -233,15 +218,15 @@ def print_summary(to_apply, blocked, skipped, confirm, saved_notes=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Apply Google price action changes to database")
-    parser.add_argument('csv_file', help="Path to the edited action report CSV")
+    parser = argparse.ArgumentParser(description="Apply price changes from a CSV to the database")
+    parser.add_argument('csv_file', help="Path to the price change CSV")
     parser.add_argument('--confirm', action='store_true', help="Apply changes (default is dry run)")
     args = parser.parse_args()
 
     csv_path = args.csv_file
     confirm = args.confirm
 
-    log(f"=== GOOGLE PRICE APPLY {'CONFIRMED' if confirm else 'DRY RUN'} STARTED ===")
+    log(f"=== APPLY PRICES {'CONFIRMED' if confirm else 'DRY RUN'} STARTED ===")
     log(f"CSV file: {csv_path}")
 
     if not os.path.isfile(csv_path):
@@ -273,8 +258,8 @@ def main():
         log(f"Fetched current data for {len(current_data)} groupids")
 
         # Process price changes (change=1 rows)
-        to_apply, blocked, skipped = process_changes(csv_df, current_data)
-        log(f"To apply: {len(to_apply)}, Blocked: {len(blocked)}, Skipped: {len(skipped)}")
+        to_apply, skipped = process_changes(csv_df, current_data)
+        log(f"To apply: {len(to_apply)}, Skipped: {len(skipped)}")
 
         # Apply if confirmed
         applied_groupids = set()
@@ -292,11 +277,11 @@ def main():
             if saved_notes:
                 log(f"Saved {len(saved_notes)} description updates")
 
-        print_summary(to_apply, blocked, skipped, confirm, saved_notes)
+        print_summary(to_apply, skipped, confirm, saved_notes)
     finally:
         conn.close()
 
-    log(f"=== GOOGLE PRICE APPLY {'CONFIRMED' if confirm else 'DRY RUN'} FINISHED ===")
+    log(f"=== APPLY PRICES {'CONFIRMED' if confirm else 'DRY RUN'} FINISHED ===")
 
 
 if __name__ == '__main__':
