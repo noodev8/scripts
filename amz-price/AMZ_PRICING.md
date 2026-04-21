@@ -1,8 +1,44 @@
 # Amazon Pricing — Context
 
+## Quick reference
+
+For a comprehensive pass across all 8 IVES segments in one session, trigger with **"full ives review"** — procedure is in `AMZ_FULL_REVIEW.md`. **Scope: Amazon + IVES only**; other channels/product families are not covered by that procedure. Normal conversational flow (single colour, ad-hoc questions, investigations) works as documented below.
+
 ## Status
 
-**Last session (2026-04-11):**
+**Last session (2026-04-17) — FULL IVES REVIEW (20 changes across all 8 segments, 9 creeps / 11 drops):**
+
+**Hypotheses codified this session:**
+- **30p creeps** replace the old 50p default when current price is in the resistance zone (£38.50–£39.00) or when the last move was a successive creep. 50p overshot WHITE-05 at £39.49 (6d follow-up: 0 sales).
+- **£40 is not a hard ceiling** on any colour — treat as per-SKU data-driven. MIDBLUE-04 has 8 units sustained at £39.99 over 23 days, crept to £40.29 today to test the boundary.
+- **Log hygiene fix:** Claude now INSERTs into `amz_price_log` directly at agreement time (with rationale in `notes`) instead of batch-running a script. `update_amz_price.py` deleted.
+- **Phantom Apr 12 log entries** cleaned for BLACKSOLE (8 rows), GREY (8 rows), BEIGE (2 rows) — these were `update_amz_price.py` runs that were never actually uploaded to Amazon. MIDBLUE and BLACK Apr 11 changes WERE uploaded (matched amzfeed).
+
+**Changes by segment:**
+
+| Segment | # | Changes |
+|---------|---|---------|
+| WHITE | 4 | 04 £37.99→£38.29 ↑, 05 £39.49→£39.19 ↓ (£39 barrier test at 20p above last winning), 06 £37.99→£38.29 ↑, 09 £38.99→£38.50 ↓ |
+| BLACKSOLE | 2 | 04 £37.99→£37.49 ↓ (revert failed creep), 05 £39.49→£39.79 ↑ |
+| NAVY-BLUE | 2 | 04 £38.49→£37.49 ↓ (**£1 deeper revert** — price-by-price history showed £37.49 was the last sustained price; £37.99 only got 2 hot days then dead), 06 £39.49→£39.79 ↑ |
+| GREY | 3 | All drops (04/05 £38.50→£37.99, 06 £37.49→£36.99) — softening trend + Apr 11 planned drops never uploaded |
+| BEIGE | 1 | 04 £37.49→£37.79 ↑ (strong signal — 5 sold in 7d at new price) |
+| MIDBLUE | 4 | 03 £38.99→£37.99 ↓ (aggressive, 18d dead), **04 £39.99→£40.29 ↑ (£40 breakout test)**, 05 £37.99→£38.29 ↑, 07 £37.49→£37.79 ↑ |
+| BLACK | 1 | 06 £39.49→£39.79 ↑ (0 returns across weeks — protect star, single test) |
+| IVES-COLOUR | 3 | KHAKI-06 £37.49→£36.49 (29d dead), KHAKI-08 £38.50→£37.49 (23d dead), RED-05 £36.99→£35.99 (25d dead, to floor) |
+
+**Priority watches for next session (~3-5 days):**
+- **WHITE-05 at £39.19** — the £39+ barrier test. If dead, drop to £38.99.
+- **MIDBLUE-04 at £40.29** — £40 breakout. If dead in 3-4 days, pull back to £39.99.
+- **STONE (all 5 SKUs)** — 6 sold in partial week at £36.99 with 0 returns, stock too thin to price up this session. Once stock flows, test £37.49 creep.
+- **BEIGE-04 at £37.79** — aggressive profit test, creep again if holds.
+- **NAVY-04 at £37.49** — is this the real price? £37.99 broke, watching recovery.
+
+**Held across all segments:** Softening-trend SKUs (WHITE-07), high-return sizing issues (NAVY-08/09, BEIGE-08, MIDBLUE-08 — all 40-67% return rates — product/fit, not price), OOS SKUs (WHITE none, BLACK-03, STONE-04/08, RED-08), already-at-floor SKUs.
+
+**Session stats:** 20 changes, 9 creeps / 11 drops, net price delta −£5.12 across all SKUs (mix of small creeps and bigger aggressive drops on dead stock).
+
+**Session (2026-04-11):**
 - IVES-WHITE follow-up. **Key finding: all WHITE sizes had been OOS**, which explains apparent velocity softness since Apr 3 — not a price problem. WHITE-06 (31 FBA) just landed, more inbound across the range.
 - Aggregate trend: 40 → 37 → 30 /wk across wc Mar 23/29/Apr 5, avg price £37.85 → £38.12 → £38.06, profit £606 → £553 → £426. Most of the profit drop is stockouts + returns, not creeps breaking.
 - 5 changes: creeps on 03/04/05/09, drop on 08.
@@ -18,7 +54,7 @@
 - Full IVES portfolio review — 33 price changes across WHITE + all 9 colours.
 - IVES-WHITE velocity sustained: 40/wk. Mar 23 creeps held. Range tightened to £37.49–£38.99.
 - IVES-COLOUR: 28 changes. Creeps on strong sellers (BLACKSOLE-06 to £40.99, NAVY/GREY creeps). Aggressive drops on dead stock (NAVY-06 £40.49→£38.99, BLACK-05 £40.49→£38.99, BLACKSOLE/MIDBLUE-07 aggressive drops to find range).
-- Key finding: £40+ kills velocity on most sizes — only BLACKSOLE-06 holds above £40.
+- Observation (not a rule): £40+ felt sensitive on several colours during that session. BLACKSOLE-06 held above £40. Any SKU can be tested above £40 based on its own velocity data — don't treat this as a blanket ceiling.
 - Larger FBA shipment in transit, reorder imminent. WHITE 04/06 OOS.
 - Stone set to flat £36.99 as baseline for incoming stock.
 - Created `amz_price_log` DB table — price changes now logged automatically.
@@ -144,15 +180,20 @@ When sales slow down on an item:
 
 ### Applying Price Changes
 
-Two steps: (1) generate upload file, (2) run `python amz-price/update_amz_price.py` to log the changes. The user then uploads the file to Amazon Seller Central.
+Two things happen per change:
 
-**Important: do NOT update the `amzfeed` table.** `amzfeed` is refreshed every morning from real Amazon data, so any change we make is overwritten the next day — there is no point touching it. The script only writes to `amz_price_log`. This rule also applies to ad-hoc SQL: leave `amzfeed` alone, let the daily refresh handle it. In-session analysis between a price change and the next refresh will see stale prices on the affected SKUs — that's expected and acceptable.
+1. **Claude appends the row to the upload file** `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt` (for the user to upload to Amazon Seller Central).
+2. **Claude INSERTs into `amz_price_log` immediately** with the rationale in the `notes` field, at the moment the change is agreed. The user doesn't need to run any script.
 
-#### 1. Generate the upload file
+The user uploads the file to Seller Central whenever it suits them — the log is already written.
 
-**Upload file: `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt`**. If the file exists, append new rows. If it doesn't exist, create it with a header row. The user deletes the file from Downloads after uploading to Amazon Seller Central.
+**Important: do NOT update the `amzfeed` table.** `amzfeed` is refreshed every morning from real Amazon data, so any change we make is overwritten the next day — there is no point touching it. Only `amz_price_log` gets written to. This rule also applies to ad-hoc SQL: leave `amzfeed` alone, let the daily refresh handle it. In-session analysis between a price change and the next refresh will see stale prices on the affected SKUs — that's expected and acceptable.
 
-Format is tab-separated:
+#### Upload file format
+
+**Path: `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt`**. If the file exists, append new rows. If it doesn't exist, create it with a header row. The user deletes the file from Downloads after uploading to Amazon Seller Central.
+
+Tab-separated:
 
 ```
 sku	price	minimum-seller-allowed-price	maximum-seller-allowed-price
@@ -161,11 +202,17 @@ sku	price	minimum-seller-allowed-price	maximum-seller-allowed-price
 - **Use `amzfeed.sku`** for the SKU column — this is the Amazon SKU, NOT our `code`. They don't always match (e.g. code `FLE030-IVES-WHITE-05` → sku `AD-0XF8D-48L`).
 - `maximum-seller-allowed-price` = RRP (e.g. 45.00 for IVES).
 - `minimum-seller-allowed-price` can be left blank.
-- The template file contains a sample row — **always remove it** when generating a new file.
 
-#### 2. Log the changes
+#### Logging the change
 
-Run `python amz-price/update_amz_price.py` — it reads `AMZ-Price-Upload.txt` and inserts one row per actual price change into `amz_price_log`. Skips rows where the new price equals the current `amzfeed.amzprice` (idempotent — safe to re-run).
+At agreement time, run:
+
+```sql
+INSERT INTO amz_price_log (code, old_price, new_price, notes)
+VALUES ('FLE030-IVES-WHITE-04', 37.99, 38.29, '30p creep — strongest seller, ...')
+```
+
+`log_date` defaults to today. Capture the reasoning from the conversation in `notes` — don't leave it null.
 
 ```sql
 -- View recent price changes
@@ -174,8 +221,6 @@ FROM amz_price_log
 ORDER BY id DESC
 LIMIT 20
 ```
-
-The script does not capture reasoning/notes. Backfill notes with a one-shot SQL `UPDATE` after running the script, targeting the most recent NULL-notes row per code.
 
 **Note:** Pre-2026-04-03 changes were tracked in a markdown table. Historical entries from Mar 16 and Mar 23 sessions are summarised in the Status section above.
 
@@ -249,12 +294,8 @@ Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, g
 - Short sessions preferred — user has limited time for AMZ reviews.
 - Stock context matters: if a large FBA shipment is mid-flow, note it and consider whether signals are trustworthy before making changes. Stockouts look like softening velocity.
 - Don't dump all data at once. Each segment = one clear table + recommendations, then wait for confirmation before moving on.
-- Price changes log automatically via `update_amz_price.py` → `amz_price_log`. Backfill notes if the script didn't capture them (common pattern: inline SQL update after the main script).
+- Price changes are logged to `amz_price_log` by Claude via direct INSERT at the moment they're agreed, with rationale in `notes`. No separate script to run.
 - Finding new colours or dropping colours is a separate task from pricing — don't mix them into a pricing session.
-
-## Auto-Pricing Plan
-
-See `amz-price/AMZ_AUTO_PRICING_PLAN.md` for the automation roadmap. It captures the decision rules applied during manual sessions and defines the path from manual → dry-run → script → cron. Read it at the start of any pricing session and update the Observations Log after each session.
 
 ## Strategy
 

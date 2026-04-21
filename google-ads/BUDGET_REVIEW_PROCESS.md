@@ -1,7 +1,7 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £38/day
+**Current budget:** £50/day
 **Current tROAS:** 400%
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
 
@@ -300,6 +300,8 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 | 2026-03-29 | Budget £26 → £32 | 20.6x | ~83% | £26.47 | 2,264 (18 READY) | Conversion recovered to baseline (12%+ on Mar 27-28). Price changes not suppressing. Budget constraining (spending to cap daily), imp share 80-85% (traffic missed). Algorithm already spending £28-30 on overspend days — £32 formalises that with small stretch. Spring peak, ROAS has huge headroom above 7x floor. | 3 Apr |
 | 2026-04-03 | Budget £32 → £38 | 21.6x | ~83% | £30.63 | 2,248 (18 READY) | All 5 criteria met. ROAS 21.6x, budget constraining (3/7 days at cap, overspent to £39.68), imp share 82-85%, stock healthy. Algorithm absorbed £32 with zero efficiency loss. Conversion holding at 11.7% into April. £38 formalises what Google is already trying to spend on high-demand days. Effective midnight 3 Apr. | 8 Apr |
 | 2026-04-10 | Budget £38 → £42 | 16.1x (post-Easter 18.7x) | 62-68% ↓ | £38.35 | 1,352 Birk local (17 READY, 454u) | Conservative +11% step vs schedule's +21%. Easter weekend (Apr 3-6) + 16 Birk price changes on Apr 5 confounded 4 days of conversion. Post-Easter days (Apr 7-9) ROAS 18.7x, conv recovering (Apr 8 = 11.6%). Imp share crashed to 62-68% — Google clearly has room. Smaller step protects algorithm while still riding the wave; gives clean diagnostic for next review. tROAS held at 400%. Effective immediately. | 15 Apr |
+| 2026-04-17 | Budget £42 → £50 | 18.1x (last 7d), 17.0x (14d) | 73.9% avg 7d (67.1% on Apr 15) ↓ | £43.23 | 2,826 live units; ~20 READY Birk styles, 666u in READY across 7 segments | All 5 criteria met. ROAS 18.1x vs 7x floor (huge headroom). Imp share trending down 84→79→74% — budget constraining. Algorithm already overspent to £47.47/£47.66 on Sun 12/Mon 13 at 23.6x/16.0x ROAS — Google signalling it wants more. Behind ramp schedule (was due £55 on Apr 7; held cautious after post-Easter slowdown). Stock abundant: 2,826 live units, Birk burn 10.9/day. Weekly rev ramp confirmed: £5.8k (w/c Feb 9) → £11.3k (w/c Apr 6). +19% step, midnight-effective to give clean Sat (strongest weekday) as first full day. tROAS held at 400%. | ~22-23 Apr (Tue/Wed after full Sat/Sun data) |
+| 2026-04-21 | Budget £50 → £54 | 15.4x (last 7d) | 87.5% (Apr 18, only £50-day with data) | £46.52 | 2,839 live units | Conservative +8% nudge. Google overspent £50 cap on both clean days (£59.10 Apr 18, £55.45 Apr 19) at 15.6x combined ROAS. £54 formalises what Google is already trying to spend — no algorithm re-learn risk. Midnight-effective so Tue 21 Apr is first full day. Per algorithm-stability guidance: smaller step preserves learning while still riding the wave. Leaves room for full +15-20% step to £60-62 in 3-5 days if ROAS holds. tROAS held at 400%. User has paid £7.5k Birk invoice — stock pipeline secured. | ~24-25 Apr |
 
 ---
 
