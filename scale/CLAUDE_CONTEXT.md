@@ -41,7 +41,7 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 - Segments designed to be delegatable to staff
 - Each session: check progress, refine existing segments, add new ones
 - Minimum segment threshold: £5k revenue potential
-- 15 segments + CRAP. 0 NULL remaining (all groupids allocated as of Mar 2026)
+- 17 segments + CRAP. 0 NULL remaining (all groupids allocated as of Mar 2026)
 - CRAP: 166 groupids — pricing engine clears stock, revisit periodically
 - £500k→£1M needs new bricks (new brands, range expansions)
 - **Don't auto-log** to the Log tab — it has a different purpose (task tracking between user and Claude)

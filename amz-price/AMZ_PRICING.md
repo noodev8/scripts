@@ -6,7 +6,60 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 ## Status
 
-**Last session (2026-04-17) — FULL IVES REVIEW (20 changes across all 8 segments, 9 creeps / 11 drops):**
+**Session (2026-04-21) — FULL IVES REVIEW — inline-autopilot experiment (16 changes, 9 creeps / 6 drops / 1 revert):**
+
+**Experiment:** Ran full review with Claude's 🟡 decisions stated inline as firm calls (not "over to you"). User reviewed independently. **100% agreement — all 16 Claude decisions approved as-is, no adjustments.** First calibration data point.
+
+**Changes by segment:**
+
+| Segment | # | Changes |
+|---------|---|---------|
+| WHITE | 5 | 03 £38.99→£39.29 ↑, 04 £38.29→£38.59 ↑, 06 £38.29→£38.59 ↑, 07 £38.50→£38.80 ↑, 08 £37.99→£38.49 ↑ (all creeps — WHITE still accelerating, wc 4/13 = 48 units) |
+| BEIGE | 1 | 06 £39.00→£39.30 ↑ |
+| BLACK | 2 | 04 £37.49→£36.99 ↓ (**stalling-creep revert** — £36.99 sustained 6 in 25d, £37.49 only 1 in 9d), 05 £38.99→£39.29 ↑ |
+| BLACKSOLE | 3 | 03 £37.49→£36.99 ↓ (12d dead), 05 £39.79→£40.09 ↑ (**£40 breach test** — strong £39.99 precedent with 14 net-sold Jan-Mar), 07 £37.49→£37.99 ↑ |
+| GREY | 1 | 05 £37.99→£37.49 ↓ |
+| KHAKI | 2 | 04 £36.99→£36.49 ↓, 07 £38.50→£38.00 ↓ |
+| MIDBLUE | 1 | 08 £36.99→£36.49 ↓ |
+| NAVY-BLUE | 1 | 03 £38.99→£38.49 ↓ |
+
+**Priority watches for next session (~3-5 days):**
+- **BLACKSOLE-05 at £40.09** — £40 breach. Live stock thin (4). If dead in 4d, revert to £39.79. If sells through, investigate re-stocking priority.
+- **BLACK-04 at £36.99** — stalling-creep revert. Should restore £36.99 velocity pattern (~1.7/wk historically).
+- **WHITE-05 at £39.49** (carried over) — £39+ ceiling retest still running.
+- **WHITE all creeps (03/04/06/07/08)** — aggregate segment acceleration, watching whether the whole band can hold £0.30 higher.
+- **STONE** — still blocked on stock (04/08 OOS, no inbound).
+
+**Held 🟡 items (9) — worth re-checking next session:**
+- MIDBLUE-07, NAVY-05, NAVY-06 — potential stalling-creep but dSC too early (4-9d) and/or preP not actually sustained. Revisit at dSC≥8 with clearer signal.
+- WHITE-09, NAVY-09, GREY-08 — tail-size return-rate flags; classed as fit/product issues, not pricing.
+- BEIGE-07 — 50% rr on 2 events = noise; price is working.
+- KHAKI-08, RED-05 — tail colour/size, just dropped, at/near floor. Re-check in 4-5d.
+
+**Experiment observation:** The inline-autopilot shape (Claude decides everything, user approves batch) was notably faster than the per-🟡 dialogue pattern, and agreement was total. Worth another 2-3 runs before considering any rule changes — 1 data point is not a trend. Classified SKUs split 14 🟢 / 11 🟡 / 31 ⚪.
+
+---
+
+**Session (2026-04-21) — priority-watch follow-up (4 changes, 1 creep / 3 reverts):**
+
+4-day follow-up on 2026-04-17 priority watches. Clean outcomes — two framework-validating results:
+
+- **WHITE-05 £39.19 → £39.49 ↑** — £39+ barrier test **held**. 5 units in 3d at £39.19 (accelerating vs £38.99 run-rate). Retesting prior £39.49 ceiling (was previously bombed during an OOS period, so the ceiling may have been a stock artefact, not a price one). Stock plentiful (68 FBA).
+- **MIDBLUE-04 £40.29 → £39.99 ↓** — £40 breakout test **failed** (0 in 4d). Reverted to £39.99 (8 units over 23d sustained).
+- **BEIGE-04 £37.79 → £37.49 ↓** — stalling-creep revert. £37.49 had 5 units in 7d pre-creep, £37.79 got 0 in 4d. D3 rule textbook case.
+- **NAVY-04 £37.49 → £36.99 ↓** — £37.49 (already itself a revert) not holding either. Market drift down; £36.99 previously sold 3 in 3d.
+
+**Priority watches for next session (~3-5 days):**
+- **WHITE-05 at £39.49** — the big one. If it holds this time, the ceiling moves. If dead in 3-4d, back to £39.19.
+- **NAVY-04 at £36.99** — if still dead at proven level, the colour has a demand problem, not a price one.
+- **BEIGE-04 at £37.49** — confirm revert holds; if it does, that's the clean sustained level.
+- **STONE** — still blocked on stock. 04/08 OOS with 0 inbound. Flag when new FBA lands.
+
+**Held:** STONE (all, stock-thin). All other SKUs not on the watch-list were touched on Apr 17 and remain settling.
+
+**Observation to carry forward:** The "£X.49 previously bombed" heuristic needs an OOS-check caveat. WHITE-05's £39.49 in Apr was during a known stockout period — not a clean price signal. When previous price failures coincide with stock issues, retest once stock normalises.
+
+**Session (2026-04-17) — FULL IVES REVIEW (20 changes across all 8 segments, 9 creeps / 11 drops):**
 
 **Hypotheses codified this session:**
 - **30p creeps** replace the old 50p default when current price is in the resistance zone (£38.50–£39.00) or when the last move was a successive creep. 50p overshot WHITE-05 at £39.49 (6d follow-up: 0 sales).
@@ -182,7 +235,7 @@ When sales slow down on an item:
 
 Two things happen per change:
 
-1. **Claude appends the row to the upload file** `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt` (for the user to upload to Amazon Seller Central).
+1. **Claude appends the row to the upload file** at `%USERPROFILE%\Downloads\AMZ-Price-Upload.txt` (for the user to upload to Amazon Seller Central). Use whichever user profile the current session is running under — the user has two machines (usernames `aandr` and `UserPC`) and both Downloads folders are valid.
 2. **Claude INSERTs into `amz_price_log` immediately** with the rationale in the `notes` field, at the moment the change is agreed. The user doesn't need to run any script.
 
 The user uploads the file to Seller Central whenever it suits them — the log is already written.
@@ -191,7 +244,7 @@ The user uploads the file to Seller Central whenever it suits them — the log i
 
 #### Upload file format
 
-**Path: `C:\Users\UserPC\Downloads\AMZ-Price-Upload.txt`**. If the file exists, append new rows. If it doesn't exist, create it with a header row. The user deletes the file from Downloads after uploading to Amazon Seller Central.
+**Path: `%USERPROFILE%\Downloads\AMZ-Price-Upload.txt`** — resolve to the current machine's user profile (two valid values exist: `C:\Users\aandr\Downloads\...` and `C:\Users\UserPC\Downloads\...`). If the file exists, append new rows. If it doesn't exist, create it with a header row. The user deletes the file from Downloads after uploading to Amazon Seller Central.
 
 Tab-separated:
 
@@ -226,22 +279,16 @@ LIMIT 20
 
 ## Segments
 
-IVES products are split into eight segments (tracked in the Google Sheet segment tracker). Top AMZ performers broken out as standalone segments 2026-04-11/12.
+IVES products use two segments (tracked in the Google Sheet segment tracker).
 
-| Segment | Styles | AMZ Rev 12m | AMZ Profit 12m | Notes |
-|---------|--------|-------------|----------------|-------|
-| IVES-WHITE | 1 (WHITE) | — | — | Standalone. Historically top AMZ seller. |
-| IVES-BLACKSOLE | 1 (BLACKSOLE) | £16,907 | £6,103 | Top AMZ colour by units/revenue. Split out 2026-04-11. |
-| IVES-NAVY-BLUE | 1 (NAVY-BLUE) | £16,277 | £6,293 | #2 AMZ colour. Split out 2026-04-11. |
-| IVES-GREY | 1 (GREY) | £9,657 | £3,309 | Consistent, low returns. Split out 2026-04-12. |
-| IVES-BEIGE | 1 (BEIGE) | £10,992 | £4,001 | Highest volume mid-tier. Split out 2026-04-12. |
-| IVES-MIDBLUE | 1 (MIDBLUE) | £10,237 | £3,657 | Strong recent velocity. Split out 2026-04-12. |
-| IVES-BLACK | 1 (BLACK) | £10,257 | £4,010 | Consistent seller, zero returns. Split out 2026-04-12. |
-| IVES-COLOUR | 3 (RED, STONE, KHAKI) | — | — | Tail tier. Batch review. |
+| Segment | Styles | Notes |
+|---------|--------|-------|
+| IVES-WHITE | 1 (WHITE) | Standalone. Historically top AMZ seller. |
+| IVES-COLOUR | 9 (all other colours) | All non-white colours reviewed together. |
 
 Segment is stored in `skusummary.segment`. All IVES groupids follow the pattern `FLE030-IVES-*`.
 
-**Segment strategy:** Segments are "bricks" toward the £1m revenue target. The goal is as many segments as possible each making a decent profit. Top AMZ performers get standalone segments so they can be reviewed and grown individually rather than lost in a batch.
+Previously (2026-04-11/12) each colour had its own standalone segment. Consolidated back to IVES-COLOUR on 2026-04-21 as the per-colour breakdowns weren't being used.
 
 ### IVES Product Reference
 
@@ -250,12 +297,12 @@ All variants share: **cost £15.99, RRP £45.00, Shopify price £32.00**
 | GroupID | Colour | Segment |
 |---------|--------|---------|
 | FLE030-IVES-WHITE | White | IVES-WHITE |
-| FLE030-IVES-BEIGE | Beige | IVES-BEIGE |
-| FLE030-IVES-BLACK | Black | IVES-BLACK |
-| FLE030-IVES-BLACKSOLE | Black (all black sole) | IVES-BLACKSOLE |
-| FLE030-IVES-GREY | Grey | IVES-GREY |
-| FLE030-IVES-MIDBLUE | Blue | IVES-MIDBLUE |
-| FLE030-IVES-NAVY-BLUE | Navy | IVES-NAVY-BLUE |
+| FLE030-IVES-BEIGE | Beige | IVES-COLOUR |
+| FLE030-IVES-BLACK | Black | IVES-COLOUR |
+| FLE030-IVES-BLACKSOLE | Black (all black sole) | IVES-COLOUR |
+| FLE030-IVES-GREY | Grey | IVES-COLOUR |
+| FLE030-IVES-MIDBLUE | Blue | IVES-COLOUR |
+| FLE030-IVES-NAVY-BLUE | Navy | IVES-COLOUR |
 | FLE030-IVES-KHAKI | Green | IVES-COLOUR |
 | FLE030-IVES-RED | Red | IVES-COLOUR |
 | FLE030-IVES-STONE | Beige | IVES-COLOUR |
@@ -281,14 +328,8 @@ Service account file: `merchant-feed-api-462809-23c712978791.json` (repo root, g
 **Review order when doing a full AMZ pricing session:**
 
 1. **IVES-WHITE** — top priority, always first. Standalone segment, per-size analysis.
-2. **IVES-BLACKSOLE** — standalone segment, per-size analysis.
-3. **IVES-NAVY-BLUE** — standalone segment, per-size analysis.
-4. **IVES-GREY** — standalone segment, per-size analysis. Split out 2026-04-12.
-5. **IVES-BEIGE** — standalone segment, per-size analysis. Split out 2026-04-12.
-6. **IVES-MIDBLUE** — standalone segment, per-size analysis. Split out 2026-04-12.
-7. **IVES-BLACK** — standalone segment, per-size analysis. Split out 2026-04-12.
-8. **IVES-COLOUR** (batch of 3: RED, STONE, KHAKI) — start with a **summary dashboard** showing all 6 colours with key metrics (recent velocity, avg price, total stock, one-line status). Then ask whether to go colour-by-colour or batch-apply. Don't dump all 6 colours with size-level detail in one go.
-5. **Other segments** (Charlotte test, Free Spirit, etc.) — only if time allows and user wants them.
+2. **IVES-COLOUR** (all 9 non-white colours) — start with a **summary dashboard** showing all colours with key metrics (recent velocity, avg price, total stock, one-line status). Then ask whether to go colour-by-colour or batch-apply. Don't dump all colours with size-level detail in one go.
+3. **Other segments** (Charlotte test, Free Spirit, etc.) — only if time allows and user wants them.
 
 **Session etiquette:**
 - Short sessions preferred — user has limited time for AMZ reviews.

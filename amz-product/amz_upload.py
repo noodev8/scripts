@@ -250,6 +250,14 @@ def main():
     finally:
         conn.close()
 
+    downloads = os.path.join(os.path.expanduser("~"), "Downloads")
+    if os.path.isdir(downloads):
+        dest = os.path.join(downloads, "AMZ-Upload.xlsm")
+        shutil.copy2(OUTPUT_PATH, dest)
+        print(f"Copied to {dest}")
+    else:
+        print(f"Downloads folder not found at {downloads}; skipped copy")
+
     print("Done. Upload AMZ-Upload.xlsm to Amazon Seller Central.")
 
 

@@ -4,7 +4,7 @@
 
 **Trigger:** user says **"full ives review"** (or close variant).
 
-**Purpose:** single-session comprehensive pass across all 8 IVES segments. Replaces the segment-by-segment flow for weekly/biweekly reviews. Target: ~25 min for what previously took ~90 min.
+**Purpose:** single-session comprehensive pass across both IVES segments (IVES-WHITE + IVES-COLOUR). Replaces the segment-by-segment flow for weekly/biweekly reviews. Target: ~25 min for what previously took ~90 min.
 
 **When NOT to use this:** single-colour deep dives, exploratory questions, investigations of a specific issue — use the normal conversational flow documented in `AMZ_PRICING.md`.
 
@@ -174,7 +174,7 @@ Required sections in order:
 
 ### 1. Trend summary
 
-One table, 8 rows:
+One table, 2 rows (IVES-WHITE, IVES-COLOUR):
 
 | Segment | wc MM/DD | wc MM/DD | wc MM/DD | wc MM/DD | wc MM/DD (partial) | Returns (14d) | One-line status |
 |---------|----------|----------|----------|----------|-------------------|---------------|-----------------|
