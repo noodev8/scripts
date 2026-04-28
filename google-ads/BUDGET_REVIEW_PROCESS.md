@@ -1,9 +1,18 @@
 # Google Ads Budget Review Process
 
 **Created:** 2026-02-20
-**Current budget:** £50/day
-**Current tROAS:** 400%
-**Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule; increase as often as we can safely progress.
+**Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule.
+
+## Current State — updated 28 Apr 2026
+
+- **Cap:** £60/day (since ~22 Apr, user-initiated, retro-logged)
+- **tROAS:** 400%
+- **Last review:** 28 Apr 2026 — held at £60
+- **Next planned step (projection only):** £72 on Sun 3 May if criteria hold
+- **Open flags:** April conversion median 9.3% vs March 12.1% — watch through end of week
+- **Capture-before-act rule:** when the budget is changed in the UI, add a line to the change log the same day, even if rationale is filled in later. The £54→£60 ghost change happened because this didn't.
+
+> **Update this block whenever you change anything below — including the change log.** It is the single source of truth for "what's true today".
 
 ---
 
@@ -134,12 +143,24 @@ Stock is checked via Birkenstock segments defined in `skusummary.segment`. Segme
 - **PARTIAL** — 40%+ coverage AND 5+ units. Some conversions but size gaps lose sales.
 - **THIN** — Below thresholds. Mostly wasted clicks.
 
+**IMPORTANT — do not use `skusummary.variants` or `skusummary.stockvariants`** as the size-universe denominator. Both fields are stale (see CLAUDE.md). The size universe comes from `skumap` (the master (groupid, code) catalogue, one row per size). Do NOT use `localstock` for the denominator either — it does not preserve historical empty sizes (e.g. a style with 14 sizes in skumap may only have 4 codes in localstock if 10 sizes are currently empty), so it under-states the universe.
+
 ```sql
-WITH current_stock AS (
+WITH size_universe AS (
+  -- Total sizes per groupid from skumap (master catalogue, deleted=0 excludes retired sizes).
+  -- Source of truth for "how many sizes does this style have".
+  SELECT groupid, COUNT(DISTINCT code) AS total_sizes
+  FROM skumap
+  WHERE deleted = 0
+  GROUP BY groupid
+),
+current_stock AS (
+  -- Live stock: sizes currently sellable (#FREE, not deleted, qty > 0).
   SELECT groupid,
     SUM(qty) as units,
     COUNT(DISTINCT code) as sizes_in_stock
-  FROM localstock WHERE deleted = 0
+  FROM localstock
+  WHERE ordernum = '#FREE' AND deleted = 0 AND qty > 0
   GROUP BY groupid
 ),
 recent_sales AS (
@@ -152,17 +173,18 @@ SELECT
   ss.segment, ss.groupid, ss.colour,
   COALESCE(cs.units, 0) as stock_now,
   COALESCE(cs.sizes_in_stock, 0) as sizes_in_stock,
-  ss.variants as total_sizes,
-  ROUND(COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(ss.variants, 0) * 100, 0) as size_coverage_pct,
+  COALESCE(su.total_sizes, 0) as total_sizes,
+  ROUND(COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) * 100, 0) as size_coverage_pct,
   COALESCE(rs.sold_30d, 0) as sold_30d,
   CASE
-    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(ss.variants, 0) >= 0.7
+    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.7
          AND COALESCE(cs.units, 0) >= 15 THEN 'READY'
-    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(ss.variants, 0) >= 0.4
+    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.4
          AND COALESCE(cs.units, 0) >= 5 THEN 'PARTIAL'
     ELSE 'THIN'
   END as ad_readiness
 FROM skusummary ss
+LEFT JOIN size_universe su ON ss.groupid = su.groupid
 LEFT JOIN current_stock cs ON ss.groupid = cs.groupid
 LEFT JOIN recent_sales rs ON ss.groupid = rs.groupid
 WHERE ss.brand = 'Birkenstock' AND ss.segment IS NOT NULL AND ss.segment != 'CRAP'
@@ -225,21 +247,25 @@ tROAS should rarely need changing. The following are signals to look for, not ri
 - **Hold or slow down** if ROAS drops below 7x, stock runs low, or the algorithm shows instability after an increase.
 - **Speed up** (shorten to 4-day reviews) only if ROAS stays well above 10x and impression share is clearly constrained.
 
-### Recommended ramp schedule (from 8 Mar at £18)
+### 20%-every-5-days projection (guide, not a plan)
 
-This is a guide, not a commitment. Each step requires the increase criteria to be met.
+This is what 20% steps look like if criteria hold every time. **Each session decides on the day** against decision rules and current data — these dates and amounts are not a commitment. Tick `[x]` when a step is taken; leave `[ ]` for future projections.
 
-| Review date | Budget | Step | Cumulative |
-|-------------|:------:|:----:|:----------:|
-| 8 Mar | £18 | — | current |
-| 13 Mar | £22 | +£4 | +22% |
-| 18 Mar | £26 | +£4 | +44% |
-| 23 Mar | £32 | +£6 | +78% |
-| 28 Mar | £38 | +£6 | +111% |
-| 2 Apr | £46 | +£8 | +156% |
-| 7 Apr | £55 | +£9 | +206% |
+Projection from the current £60 cap (28 Apr 2026):
 
-At any step, if ROAS < 7x or stock drops below threshold, hold at current level until next review.
+| Target date | Budget | +20% from | Status |
+|-------------|:------:|:---------:|:------:|
+| Sun 3 May | £72 | £60 | [ ] |
+| Fri 8 May | £86 | £72 | [ ] |
+| Wed 13 May | £103 | £86 | [ ] |
+| Mon 18 May | £124 | £103 | [ ] |
+| Sat 23 May | £149 | £124 | [ ] |
+| Thu 28 May | £179 | £149 | [ ] |
+| Tue 2 Jun | £215 | £179 | [ ] |
+| Sun 7 Jun | £258 | £215 | [ ] |
+| Fri 12 Jun | £310 | £258 | [ ] |
+
+If ROAS dips, conversion stalls, or stock thins, the next-step decision skips or holds. Don't chase the dates.
 
 ### Increase budget
 
@@ -287,21 +313,32 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 
 ## Budget & tROAS Change Log
 
+Recent entries (last ~6 weeks) keep full rationale. Older entries collapsed to one-liners for scan speed — full rationale lives in git history.
+
+### Archive: Feb–Mar 2026
+
+| Date | Change | ROAS (7d) | Imp Share | Note |
+|------|--------|:---------:|:---------:|------|
+| 2026-02-16 | £12 → £14 | 13.5x | ~86% | Small step before spring. |
+| 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | Monitoring only. |
+| 2026-02-28 | £14 → £16 | — | — | User-initiated. |
+| 2026-03-03 | Hold £16 | 18.1x | ~85% | Letting £16 settle. Algorithm responding well. |
+| 2026-03-08 | £16 → £18 | 19.3x | ~80% | Spring ramp begins. ~20% steps every 5 days from here. |
+| 2026-03-13 | £18 → £22 | 27.1x | ~75% | Per ramp. Imp share dropping. |
+| 2026-03-20 | £22 → £26 | 26.0x | ~77% | Per ramp. Algorithm absorbed £22 cleanly. |
+| 2026-03-25 | Hold £26 | 24.3x | ~87% | Hold to check Mar 23 Birk price-change impact (conv crashed 24th). |
+| 2026-03-29 | £26 → £32 | 20.6x | ~83% | Conv recovered. Algorithm already overspending £26 cap. |
+
+### Recent
+
 | Date | Change | ROAS (7d) | Imp Share | Avg Daily Spend | Stock (units) | Rationale | Next Review |
 |------|--------|:---------:|:---------:|:---------------:|:-------------:|-----------|:-----------:|
-| 2026-02-16 | Budget £12 → £14 | 13.5x | ~86% | ~£11.50 | ~2,100 | Mid-Feb, impressions rising. Small step before spring. | w/c 24 Feb |
-| 2026-02-20 | tROAS confirmed at 400% | 12.6x | ~90% | ~£13 | ~2,140 | Monitoring only. No change. | w/c 24 Feb |
-| 2026-02-28 | Budget £14 → £16 | — | — | — | — | User-initiated increase. | w/c 2 Mar |
-| 2026-03-03 | Hold at £16 | 18.1x | ~85% | £15.58 | 1,328 (163 key) | All increase criteria met but only 3 days at £16. Algorithm responding well — sales up, impressions up, ROAS strong. Let it settle, then decide. | 7 Mar |
-| 2026-03-08 | Budget £16 → £18 | 19.3x | ~80% | £15.74 | 2,042 | All 5 increase criteria met. ROAS 19.3x (huge headroom), budget constraining (spending to cap daily), imp share ~80% (traffic missed), stock healthy at 2,042 units. March spring ramp. Moving to ~20% increments every 5 days through peak season. | 13 Mar |
-| 2026-03-13 | Budget £18 → £22 | 27.1x | ~75% | £17.72 | 2,060 | Per ramp schedule. ROAS 27x, imp share dropping to ~70-75% (traffic being missed), stock healthy. | 18 Mar |
-| 2026-03-20 | Budget £22 → £26 | 26.0x | ~77% | £22.35 | 2,292 (224 key) | All criteria met. ROAS 26x, budget constraining (spending to cap), imp share ~77% (traffic missed), stock healthy. Algorithm absorbed £22 cleanly — no efficiency loss. Per ramp schedule. | 25 Mar |
-| 2026-03-25 | Hold at £26 | 24.3x | ~87% | £25.37 | 732 (segments), 18 READY | Holding to check price change impact: 7 Birkenstock increases on 23 Mar, conversion crashed to 4.8% on 24th. Need 2-3 days to confirm recovery. | 27-28 Mar |
-| 2026-03-29 | Budget £26 → £32 | 20.6x | ~83% | £26.47 | 2,264 (18 READY) | Conversion recovered to baseline (12%+ on Mar 27-28). Price changes not suppressing. Budget constraining (spending to cap daily), imp share 80-85% (traffic missed). Algorithm already spending £28-30 on overspend days — £32 formalises that with small stretch. Spring peak, ROAS has huge headroom above 7x floor. | 3 Apr |
 | 2026-04-03 | Budget £32 → £38 | 21.6x | ~83% | £30.63 | 2,248 (18 READY) | All 5 criteria met. ROAS 21.6x, budget constraining (3/7 days at cap, overspent to £39.68), imp share 82-85%, stock healthy. Algorithm absorbed £32 with zero efficiency loss. Conversion holding at 11.7% into April. £38 formalises what Google is already trying to spend on high-demand days. Effective midnight 3 Apr. | 8 Apr |
 | 2026-04-10 | Budget £38 → £42 | 16.1x (post-Easter 18.7x) | 62-68% ↓ | £38.35 | 1,352 Birk local (17 READY, 454u) | Conservative +11% step vs schedule's +21%. Easter weekend (Apr 3-6) + 16 Birk price changes on Apr 5 confounded 4 days of conversion. Post-Easter days (Apr 7-9) ROAS 18.7x, conv recovering (Apr 8 = 11.6%). Imp share crashed to 62-68% — Google clearly has room. Smaller step protects algorithm while still riding the wave; gives clean diagnostic for next review. tROAS held at 400%. Effective immediately. | 15 Apr |
 | 2026-04-17 | Budget £42 → £50 | 18.1x (last 7d), 17.0x (14d) | 73.9% avg 7d (67.1% on Apr 15) ↓ | £43.23 | 2,826 live units; ~20 READY Birk styles, 666u in READY across 7 segments | All 5 criteria met. ROAS 18.1x vs 7x floor (huge headroom). Imp share trending down 84→79→74% — budget constraining. Algorithm already overspent to £47.47/£47.66 on Sun 12/Mon 13 at 23.6x/16.0x ROAS — Google signalling it wants more. Behind ramp schedule (was due £55 on Apr 7; held cautious after post-Easter slowdown). Stock abundant: 2,826 live units, Birk burn 10.9/day. Weekly rev ramp confirmed: £5.8k (w/c Feb 9) → £11.3k (w/c Apr 6). +19% step, midnight-effective to give clean Sat (strongest weekday) as first full day. tROAS held at 400%. | ~22-23 Apr (Tue/Wed after full Sat/Sun data) |
 | 2026-04-21 | Budget £50 → £54 | 15.4x (last 7d) | 87.5% (Apr 18, only £50-day with data) | £46.52 | 2,839 live units | Conservative +8% nudge. Google overspent £50 cap on both clean days (£59.10 Apr 18, £55.45 Apr 19) at 15.6x combined ROAS. £54 formalises what Google is already trying to spend — no algorithm re-learn risk. Midnight-effective so Tue 21 Apr is first full day. Per algorithm-stability guidance: smaller step preserves learning while still riding the wave. Leaves room for full +15-20% step to £60-62 in 3-5 days if ROAS holds. tROAS held at 400%. User has paid £7.5k Birk invoice — stock pipeline secured. | ~24-25 Apr |
+| ~2026-04-22 (logged retrospectively 28 Apr) | Budget £54 → £60 | — | — | — | — | **Corrective entry — change made by user, not logged at the time.** User raised cap to £60 a day or two after the £54 step, after a strong Mon 20 Apr (£1,143 sales, 20u). Bigger step than the £54 recommendation; user informed Claude in another session but the log was never updated. Exact date unknown — spend pattern (Apr 22 onwards: £57, £52, £61, £59, £66, £61) fits a £60 cap (typical 0-10% Google flex) better than £54 (would imply 10-22% flex daily). Effective from ~Apr 22. tROAS held at 400%. | 28 Apr |
+| 2026-04-28 | Hold at £60 | 13.4x (last 7d) | 71% avg 7d ↓ | £59.35 | 2,861 live; 20 READY (652u), 9 PARTIAL, 10 THIN | All 5 increase criteria met (ROAS 13.4x, spend at cap, imp share 71% trending down, 20 READY = best yet, peak season). HOLD because: £60 wasn't logged so this is effectively the first proper week at £60; April conv 9.3% vs March 12.1% — needs to confirm baseline; marginal week-on-week ROAS only 2x; 11 THIN-selling styles wasting clicks. Yesterday's good Monday is one data point. Stock action: flag THIN-selling Zermatt/Mayari for restock. | Sun 3 May (re-check vs £72 projection) |
 
 ---
 
@@ -317,4 +354,4 @@ When asked to review the Google Ads budget:
 4. Review impression share trend — is it dropping? (signals budget or tROAS constraint)
 5. Compare against the decision rules above
 6. Make a recommendation: increase / hold / decrease with reasoning
-7. If changing: update the Budget & tROAS Change Log in this doc and the Decision Log in `scale/SCALE_PLAN.md`
+7. If changing: update the Current State block at the top AND add an entry to the Budget & tROAS Change Log in this doc. **Do not log budget changes in `scale/SCALE_PLAN.md`** — single source of truth lives here.

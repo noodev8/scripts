@@ -3,11 +3,20 @@
 **Created:** 2026-03-03
 **Model:** Isolated, delegatable segments. Each is a lego brick. Add more to scale.
 
+## Current State — updated 28 Apr 2026
+
+- **Active segments:** 14 (~£275k revenue, ~£158k GP combined)
+- **Recent absorptions:** Madrid EVA → EVA-SEG, Arizona Patent → ARIZONA-BF-REG/NAR, REMONTE-WIN promoted from investigation
+- **Live tests:** Frisco (Amazon, first sales Mar 2026), RIEKER-SUM (slow start at £55)
+- **Strategic context:** `scale/SCALE_PLAN.md` (current state, levers, brand pipeline)
+- **Manager report template:** `scale/SEGMENT_REPORTS.md`
+- **Weekly routine:** bottom of this doc
+
+> **Update this block whenever you change anything below.**
+
 ### Segment Map
 
-**See `scale/segment-summary.md`** — full segment overview with codes, channels, revenue, GP, and status.
-
-**14 segments | 275k+ revenue | 158k+ GP**
+**See the Segments Google Sheet** — full segment overview with codes, channels, revenue, GP, and status.
 
 **Minimum to qualify as a segment: £5k+ revenue.** Below that, nobody owns it.
 **Keep segments under ~10 styles.** More than that — split it.
@@ -45,7 +54,7 @@
 
 ---
 
-## BIRK-EVA: Birkenstock EVA (Shopify)
+## EVA-SEG: Birkenstock EVA (Shopify)
 
 **Strategy:** Low-cost EVA products across Arizona and Gizeh. Same mindset — maximise price, low cost base means profitable even at discounts. If the segment grows, split by model.
 **Lead time:** 6 months (already ordered for 2026)
@@ -83,68 +92,31 @@ EVA Black is 100% peak season (Mar–Jun). EVA White sells year-round.
 
 ---
 
-## BLAZE: Lunar Blaze (Amazon)
+## BLAZE: Lunar Blaze (Amazon only)
 
-**Strategy:** Restock all 3 colours to get reorder screen showing real data. Then manage like Ives.
-**Lead time:** 4 days (same supplier as Ives)
-**Cost:** £12.99 | **Avg sell price:** ~£34.99 | **GP margin:** ~46% (after Amazon fees)
+**Strategy:** Demand recovery — stock is full but sales have collapsed since May 2025 peak. The lever is Amazon listing health, pricing, and visibility, not restocking.
+**Lead time:** 4 days (same supplier as Ives) — irrelevant right now, stock is fine
+**Cost:** £12.99 | **Avg sell price:** ~£32-35 | **Channel:** Amazon only
 
-### 3 Colours
+### Trajectory
 
-| GroupID | Colour | Units (12m) | Revenue | GP | Last sale |
-|---------|--------|------------:|--------:|---:|-----------|
-| JLH950-BLAZE-NAVY | Navy | 171 | £5,973 | £3,752 | 8 Feb |
-| JLH950-BLAZE-NUDE | Nude | 105 | £3,563 | £2,199 | 3 Dec |
-| JLH950-BLAZE-BLACK | Black | 46 | £1,606 | £1,008 | 20 Nov |
+Peak was May 2025 (81 units). Apr 2026 = 9 units despite peak season starting. 2026 YTD running ~80% below 2025. This is a demand problem, not a supply one.
 
-**Total 12m GP: £6,959** from 3 colours.
+### 3 Colours (12m)
 
-### Size Demand (Amazon, 12m)
-
-**Navy** (171 units — dominant):
-
-| Size | Units |
-|-----:|------:|
-| 06 | 55 |
-| 07 | 40 |
-| 05 | 32 |
-| 08 | 21 |
-| 04 | 15 |
-| 03 | 8 |
-
-**Nude** (105 units):
-
-| Size | Units |
-|-----:|------:|
-| 06 | 35 |
-| 05 | 24 |
-| 07 | 19 |
-| 08 | 10 |
-| 04 | 9 |
-| 03 | 8 |
-
-**Black** (46 units):
-
-| Size | Units |
-|-----:|------:|
-| 04 | 12 |
-| 03 | 11 |
-| 07 | 9 |
-| 08 | 8 |
-| 06 | 4 |
-| 05 | 2 |
-
-### Why the reorder screen shows nothing
-
-The reorder screen marks anything with no sale in the last 30 days as "365". Blaze stock has been running low/out, so no recent FBA sales, so the screen looks dead. The database tells a different story — 322 units at £7k GP in 12 months.
+| GroupID | Colour | Notes |
+|---------|--------|-------|
+| JLH950-BLAZE-NAVY | Navy | Dominant in 2025, slowed sharply 2026 |
+| JLH950-BLAZE-NUDE | Nude | Tail of seasonal demand |
+| JLH950-BLAZE-BLACK | Black | Smallest, struggling |
 
 ### Actions
 
-- [ ] **Immediate:** Order at least 1 of each size, all 3 colours. Send to FBA. Gets the reorder screen working with real 30-day data.
-- [ ] Once restocked and selling, use the reorder screen as normal for ongoing replenishment
-- [ ] Navy is the clear leader (3.7x the GP of Black) — prioritise Navy stock depth
-- [ ] Size 06 is the top seller across all colours — never let 06 run out
-- [ ] Black is smallest but still £1k GP at 63% margin — worth keeping
+- [ ] **Investigate the listing:** buy box %, ranking, reviews, competition — what changed since May 2025?
+- [ ] **Pricing test:** is £32-35 still right? Has a competitor undercut?
+- [ ] **Don't reorder.** Stock is full. Sell through what you have.
+- [ ] If demand doesn't recover by end of peak (Aug 2026), consider clearance pricing
+- [ ] Treat as Amazon-only — no Shopify, no shop floor
 
 ---
 
@@ -319,7 +291,7 @@ White Regular alone (£3.3k GP) outperforms most entire Birkenstock models. Whit
 
 ---
 
-## AZ-BF-REG: Arizona Birko-Flor Regular (Shopify)
+## ARIZONA-BF-REG: Arizona Birko-Flor Regular (Shopify)
 
 **Strategy:** Stock and price all Regular fits. Owner manages this in isolation.
 **Lead time:** 6 months (stock already committed)
@@ -350,7 +322,7 @@ White Regular alone (£3.3k GP) outperforms most entire Birkenstock models. Whit
 
 ---
 
-## AZ-BF-NAR: Arizona Birko-Flor Narrow (Shopify)
+## ARIZONA-BF-NAR: Arizona Birko-Flor Narrow (Shopify)
 
 **Strategy:** Stock and price all Narrow fits. Owner manages this in isolation.
 **Lead time:** 6 months (stock already committed)
@@ -538,72 +510,21 @@ Same as RIEKER-WIN:
 
 ---
 
-## Absorption Actions — Boosting Existing Segments
+## Segments not detailed here
 
-### Madrid EVA — add to BIRK-EVA
+Active segments tracked in the DB but without a detailed section in this doc:
 
-| GroupID | Style | Units (12m) | GP |
-|---------|-------|------------:|---:|
-| 0128183-MADRID | EVA Black Narrow | 32 | £258 |
-| 0128163-MADRID | EVA White Narrow | 29 | £213 |
+- **ARIZONA-PATENT-SEG** (4 groupids) — given its own segment Mar 2026 rather than absorbed into ARIZONA-BF-REG/NAR
+- **FREE-SPIRIT** (3 groupids) — Amazon test, see `scale/SCALE_PLAN.md` §8
+- **LAKE-SEG** (4 groupids) — winter slipper
+- **MAYARI-SEG** (3 groupids)
+- **UKD-SEG** (4 groupids) — see `ukd/README.md`
 
-**Action:** Tag these as BIRK-EVA. Same cost base (£16.67), same pricing logic. Adds ~£400-500 GP to the segment.
+Add detailed playbooks here when active management warrants it.
 
-### Arizona Patent — add to AZ-BF-REG / AZ-BF-NAR
+## Brand pipeline
 
-| GroupID | Style | Units (12m) | GP | Width |
-|---------|-------|------------:|---:|-------|
-| 1005291-ARIZONA | Patent White Reg | 20 | £380 | Regular |
-| 1005294-ARIZONA | Patent Sand Reg | 27 | £360 | Regular |
-| 1005293-ARIZONA | Patent Black Reg | 40 | £225 | Regular |
-| 1005292-ARIZONA | Patent Sand Narrow | 30 | £216 | Narrow |
-
-**Action:** Tag Regular widths into AZ-BF-REG, Narrow into AZ-BF-NAR. Boosts those segments by ~£700-1,000 GP combined.
-
-### Absorption checklist
-
-- [ ] Tag Madrid EVA groupids as BIRK-EVA
-- [ ] Tag Arizona Patent Regular groupids as AZ-BF-REG
-- [ ] Tag Arizona Patent Narrow groupids as AZ-BF-NAR
-- [ ] Add these styles to the relevant segment tables in this doc
-
----
-
-## Investigations — Potential New Segments
-
-Styles or brands being tested. Not yet proven enough for a segment. Low stock, early data, or new to the range.
-
-### Rules
-
-- Small stock commitment only. Test, don't bet.
-- Use short lead time brands where possible (Lunar 4 days, Rieker 2 weeks).
-- Track for one season. If it hits £5k+ revenue potential, promote to a segment.
-- If it doesn't sell, move to CRAP. No second chances without clear data.
-- Birkenstock investigations happen at ordering time (Sep/Oct) — 6-month lead time means you commit early.
-
-### Current Investigations
-
-| Brand/Style | Channel | Status | Notes |
-|-------------|---------|--------|-------|
-| Free Spirit Frisco | Amazon | Contacted supplier | Only Free Spirit style worth testing. 164 reviews, 4.6 stars, 28-37% margin. See SCALE_PLAN section 8. |
-| Lunar new styles (summer) | Amazon | Summer only | 4-day lead time. Test in summer when customer base is active. Never winter. |
-| Rieker range expansion | Amazon | Post-winter review | Review sell-through of current 7 styles. Identify next candidates. |
-| Blue Narrow Arizona BF | Shopify | Seed stock needed | `0051753-ARIZONA` — exists, zero sales. Stock issue or no demand? |
-| Gizeh Patent Black Narrow | Shopify | New arrival | `0043663-GIZEH` — 23 stock, zero sales yet. Monitor first season. |
-| Gizeh Graceful Pearl White Narrow | Shopify | New arrival | `0943873-GIZEH` — 7 stock, zero sales yet. Monitor first season. |
-| | | | |
-
-### Graduated to segment
-
-| Brand/Style | When | Now segment # |
-|-------------|------|:-------------:|
-| *(none yet)* | | |
-
-### Failed — moved to CRAP
-
-| Brand/Style | When | Reason |
-|-------------|------|--------|
-| Lunar winter books | Pre-2026 | Cleared below cost. Total loss. |
+See `scale/SCALE_PLAN.md` §8 for current investigations, graduated segments, and ruled-out options. Don't duplicate here.
 
 ---
 
@@ -675,18 +596,18 @@ ORDER BY COALESCE(s.gp_last, 0) DESC;
 - **local_stock** = warehouse stock. **fba_stock** = live at Amazon FBA.
 - Both at 0 with a dropping trend = about to run out. Act now.
 - Amazon segments (IVES, BLAZE, RIEKER) — fba_stock is what matters. Local stock is what's waiting to be sent.
-- Shopify segments (AZ-EVA, MILANO, BEND, etc.) — local_stock is what matters.
+- Shopify segments (EVA-SEG, MILANO, BEND, etc.) — local_stock is what matters.
 
 ### Seasonal context
 
-Expect Birkenstock segments (AZ-EVA, MILANO, BEND, AZ-BF-REG, AZ-BF-NAR, GIZEH) to surge Mar–Jun and drop Jul–Feb. Rieker Winter is the opposite. Compare like-for-like months for a fair read — don't panic about a -30% trend on RIEKER-WIN in March, that's expected.
+Expect Birkenstock segments (EVA-SEG, MILANO, BEND, ARIZONA-BF-REG, ARIZONA-BF-NAR, GIZEH) to surge Mar–Jun and drop Jul–Feb. Rieker Winter is the opposite. Compare like-for-like months for a fair read — don't panic about a -30% trend on RIEKER-WIN in March, that's expected.
 
 ---
 
 ## Weekly Routine (30 mins)
 
 1. **Ives FBA stock check** — any sizes running low? Reorder. (5 mins)
-2. **Blaze FBA stock check** — same as above once restocked. (5 mins)
+2. **Blaze listing check** — buy box, price vs competitors, recent units sold. Demand-side, not stock. (5 mins)
 3. **Birkenstock EVA Shopify check** — Arizona top 5 + Gizeh EVA: selling at current prices? Adjust if needed. (5 mins)
 4. **Tail Arizona EVA** — selling? If not and it's past April, drop price. (5 mins)
 5. **Rieker Summer FBA check** — monitor sell-through of new arrivals, reorder winners. (5 mins)

@@ -41,8 +41,8 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 - Segments designed to be delegatable to staff
 - Each session: check progress, refine existing segments, add new ones
 - Minimum segment threshold: £5k revenue potential
-- 17 segments + CRAP. 0 NULL remaining (all groupids allocated as of Mar 2026)
-- CRAP: 166 groupids — pricing engine clears stock, revisit periodically
+- 18 segments + CRAP (verified against DB Apr 2026). All groupids allocated.
+- CRAP: 163 groupids — pricing engine clears stock, revisit periodically
 - £500k→£1M needs new bricks (new brands, range expansions)
 - **Don't auto-log** to the Log tab — it has a different purpose (task tracking between user and Claude)
 
@@ -61,7 +61,7 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 ## Segment Naming in DB
 
 DB tags (in `skusummary.segment`) must match sheet codes. Key mappings:
-IVES-COLOUR, BEND-SEG, MILANO-SEG, BLAZE-SEG, GIZEH-SEG, BIRK-EVA-SEG, AZ-PATENT-SEG, AZ-BF-NAR-SEG, LAKE-SEG, ZERMATT-SEG
+IVES-COLOUR, BEND-SEG, MILANO-SEG, BLAZE-SEG, GIZEH-SEG, EVA-SEG, ARIZONA-PATENT-SEG, ARIZONA-BF-NAR, ARIZONA-BF-REG, LAKE-SEG, ZERMATT-SEG
 
 ## Database Query Patterns
 

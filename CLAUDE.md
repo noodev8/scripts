@@ -92,6 +92,27 @@ All scripts use `logging_utils.get_db_config()` for consistent database configur
 ### Error Handling
 Scripts include comprehensive error handling with detailed logging. Check log files in `logs/` directory for troubleshooting.
 
+### Data Quality Caveats
+
+#### NEVER use these fields in analysis queries
+
+- **`skusummary.stockvariants`** — stale, not maintained on any schedule.
+- **`skusummary.variants`** — same problem. Also frequently NULL.
+
+These fields are written by the legacy PowerBuilder app only when a record is touched for other reasons. Verified Apr 2026: White Arizona BF Reg had `stockvariants=1` while localstock showed all 8 sizes in stock; the row hadn't been updated in 14 months. Can be wrong in either direction (stale-low or stale-high), and dividing by them produces nonsense like 114% size coverage or NULL-pushed-to-THIN classifications.
+
+**If you find these fields in an existing SQL block (including in other docs like `google-ads/BUDGET_REVIEW_PROCESS.md`), the block is wrong. Rewrite it before running.**
+
+#### How to get size info correctly
+
+| Need | Use |
+|------|-----|
+| Sizes currently in stock per groupid | `localstock` where `ordernum = '#FREE' AND deleted = 0 AND qty > 0`, `COUNT(DISTINCT code)` |
+| Total size universe per groupid (denominator for coverage %) | `skumap` where `deleted = 0`, `COUNT(DISTINCT code) GROUP BY groupid`. **Do NOT use `localstock` for this** — it does not preserve historical empty sizes, so it under-states the universe (e.g. 14-size style may show only 4 codes if 10 sizes are currently out of stock). |
+| Per-size stock quantities | `localstock` joined to `skumap` for size labels |
+
+Never reach for `skusummary.variants` or `skusummary.stockvariants` in any query, even if a doc tells you to.
+
 ## Shopify Pricing
 When asked to work on pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/README.md` first — it's the short session guide. Don't assume a ritual; ask the user what they want to look at.
 

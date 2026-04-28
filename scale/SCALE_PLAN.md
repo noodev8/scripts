@@ -4,6 +4,16 @@
 **Target:** £1M annual revenue within 3 years (by end of FY 2028/29)
 **Approach:** Momentum-based, cash-flow-protected growth
 
+## Current State — updated 28 Apr 2026
+
+- **12m revenue:** ~£310k (Feb 2026 baseline; refresh due end of May after spring data lands)
+- **Ives share of GP:** ~60% — target sub-50% by end-2026
+- **Active push:** Birkenstock Shopify peak (Apr–Jul) — Google Ads at £60/day, ramping by ~20% every 5 days while criteria hold
+- **Open initiatives:** REMONTE-WIN promotion for next winter, Frisco Amazon scale, Rieker Summer reorder decision (end May)
+- **Recent shifts:** Madrid EVA + Arizona Patent absorbed into existing segments; Frisco live on Amazon FBA
+
+> **Update this block whenever you change anything below.**
+
 ---
 
 ## Established Facts
@@ -198,32 +208,25 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 
 ## 9. Decision Log
 
+**Google Ads budget changes are logged in `google-ads/BUDGET_REVIEW_PROCESS.md` only. Don't duplicate here.** This log is for strategic / non-budget decisions.
+
 | Date | Decision | Rationale | Review |
 |------|----------|-----------|--------|
-| 2026-02-16 | Google Ads daily budget £12 -> £14 | Mid-Feb, impressions rising. Baseline ROAS 13.5x. | Check w/c 24 Feb |
 | 2026-02-16 | Klaviyo email playbook created | See `scale/KLAVIYO_EMAIL_PLAYBOOK.md` | Launch repurchase first |
 | 2026-02-17 | Simplified Klaviyo to one campaign | 90-day Birkenstock non-buyer repurchase only. Prove it first. | Review after 2-3 sends |
-| 2026-02-28 | Google Ads daily budget £14 -> £16 | User-initiated increase. | - |
 | 2026-03-02 | Birkenstock off-season confirmed 0% margin | See Established Facts. | Informs Sep/Oct ordering |
 | 2026-03-02 | Lunar winter books ruled out permanently | See Established Facts. | - |
 | 2026-03-02 | Rieker confirmed Amazon-only | See Established Facts. | Expand when cash allows |
-| 2026-03-03 | Google Ads hold at £16/day | ROAS 18.1x. £12->£14 was seamless (11.7x->19.2x). Letting £16 settle. | 7 Mar |
 | 2026-03-03 | Ives ceiling acknowledged | See Established Facts. | Ongoing |
 | 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. | Contact WMSC |
-| 2026-03-08 | Google Ads daily budget £16 → £18 | ROAS 19.3x, imp share ~80%, budget constraining, 2,042 stock units. Spring ramp. Switching to ~20% increments every 5 days. | Review 13 Mar |
 | 2026-03-25 | Free Spirit Frisco promoted from investigation to active test | First 2 Amazon sales (21 Mar), £27 GP/unit. Stock sent to FBA, partial sizes live. Segment `FREE-SPIRIT` created. | Review end Apr |
-| 2026-03-29 | Google Ads daily budget £26 → £32 | ROAS 20.6x, conversion recovered after Mar 23 price changes (12%+ on Mar 27-28). Budget constraining, imp share ~83%. Algorithm already hitting £28-30 on overspend days. | 3 Apr |
-| 2026-04-03 | Google Ads daily budget £32 → £38 | All 5 criteria met. ROAS 21.6x, budget constraining (spending to cap), imp share 82-85%, stock healthy. Per ramp schedule. | 8 Apr |
-| 2026-04-10 | Google Ads daily budget £38 → £42 | Conservative +11% step (vs schedule's +21%) to protect algorithm. Easter + 16 Birk price changes on Apr 5 confounded conv for 4 days; post-Easter ROAS 18.7x with conv recovering. Imp share crashed to 62-68% — Google clearly has room. tROAS held at 400%. | 15 Apr |
-| 2026-04-17 | Google Ads daily budget £42 → £50 | ROAS 18.1x over last 7d (huge headroom vs 7x floor). Imp share dropping 84→74% (67% on Apr 15) — budget clearly constraining. Algorithm already overspent to £47+ on Sun/Mon at 20x+ ROAS — Google wants more. Behind ramp schedule after cautious hold post-Easter. Stock abundant (2,826 live units). Midnight-effective so first full day is Sat (strongest weekday). Google suggested £130 rejected — stepping in ~20% increments lets us bank incremental ROAS. | 22-23 Apr |
-| 2026-04-21 | Google Ads daily budget £50 → £54 | Conservative +8% nudge, not a full ramp step. Google overspent £50 cap both clean days (£59.10 Apr 18, £55.45 Apr 19) — algorithm clearly wants £55+ at 15.6x ROAS. £54 formalises that without forcing a re-learn. Midnight-effective so Tue 21 Apr is first clean day. Sets up a proper +15-20% step to £60-62 in 3-5 days if ROAS holds. £7.5k Birk invoice paid — stock pipeline secured. | 24-25 Apr |
 
 ---
 
 ## 10. Reference
 
 - **Segments & actions:** `scale/CORE_ACTIONS.md`
-- **Portfolio analysis:** `scale/PORTFOLIO_ANALYSIS.md` — Ives dependency analysis, unsegmented product assessment, portfolio growth plan
+- **Manager report template:** `scale/SEGMENT_REPORTS.md`
 - **Email playbook:** `scale/KLAVIYO_EMAIL_PLAYBOOK.md`
 - **Meeting rules:** `scale/MEETING_RULES.md`
 - **DB schema:** `database/DB-Schema.sql`
