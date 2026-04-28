@@ -41,6 +41,160 @@ For per-style detail (which styles are THIN, which sizes missing) still use the 
 
 ---
 
+## Three-Grid Snapshot
+
+The quick-read framework for "should I bump the budget?" Run these three grids in sequence. Each answers one question; together they decide hold / bump / pull back. Drill deeper using the Weekly Review Checklist below if a grid flags something.
+
+### Order matters
+
+1. **Money first** — is ROAS still healthy, and how is it trending?
+2. **If ROAS is dropping → Demand** — is the cause click cost or conversion?
+3. **If conversion is dropping → Stock** — can the catalogue actually convert what's arriving?
+
+### Stock is a fixed constraint, not a lever
+
+Birkenstock orders are placed **~6 months in advance** and cannot be reactively restocked to fix leaks. What's currently in the warehouse plus what's already on the way is the stock universe for the next several weeks. The job of the ad budget is to **match spend to the catalogue we have**, not to assume stock can be ordered to fit a budget plan.
+
+Implication: if Stock shows persistent leaks (PARTIAL/THIN on top sellers) and they aren't appearing on incoming invoices, the right response is to **trim ad budget to where it stays efficient**, not to wait for restock that isn't coming. If £45/day produces the same revenue as £60/day, the cap should drop.
+
+**Do not recommend "order more X" as an action.** Surface the leak so the user can factor it into the next 6-month buy, but adjust ad budget around current stock reality.
+
+### Grid 1 — Money
+
+Three rolling 7-day windows. Shows ROAS direction across the last 3 weeks.
+
+```sql
+WITH d AS (
+  SELECT snapshot_date,
+         google_ad_spend::numeric AS spend,
+         shopify_sales::numeric AS sales
+  FROM google_stock_track
+  WHERE snapshot_date >= CURRENT_DATE - 22 AND snapshot_date < CURRENT_DATE
+    AND google_ad_spend IS NOT NULL
+)
+SELECT
+  CASE
+    WHEN snapshot_date >= CURRENT_DATE - 7 THEN 3
+    WHEN snapshot_date >= CURRENT_DATE - 14 THEN 2
+    ELSE 1
+  END AS sort_key,
+  CASE
+    WHEN snapshot_date >= CURRENT_DATE - 7  THEN TO_CHAR(CURRENT_DATE - 7,  'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 1, 'Mon DD')
+    WHEN snapshot_date >= CURRENT_DATE - 14 THEN TO_CHAR(CURRENT_DATE - 14, 'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 8, 'Mon DD')
+    ELSE                                         TO_CHAR(CURRENT_DATE - 21, 'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 15,'Mon DD')
+  END AS date_range,
+  ROUND(SUM(sales), 0) AS sales,
+  ROUND(SUM(spend), 0) AS spend,
+  ROUND(SUM(sales) / NULLIF(SUM(spend), 0), 1) AS roas
+FROM d
+GROUP BY 1, 2
+ORDER BY 1;
+```
+
+Output shape: `Date range | Sales | Spend | ROAS`. Healthy ROAS >7x. ROAS trending down ≠ bad on its own, but it's the trigger to look at Grid 2.
+
+### Grid 2 — Demand
+
+Same three windows. Tells you whether a falling ROAS is a click-cost problem (Google getting more expensive) or a conversion problem (clicks not buying).
+
+```sql
+WITH d AS (
+  SELECT snapshot_date,
+         google_ad_spend::numeric AS spend,
+         google_clicks AS clicks,
+         shopify_units AS units
+  FROM google_stock_track
+  WHERE snapshot_date >= CURRENT_DATE - 22 AND snapshot_date < CURRENT_DATE
+    AND google_clicks IS NOT NULL
+)
+SELECT
+  CASE
+    WHEN snapshot_date >= CURRENT_DATE - 7 THEN 3
+    WHEN snapshot_date >= CURRENT_DATE - 14 THEN 2
+    ELSE 1
+  END AS sort_key,
+  CASE
+    WHEN snapshot_date >= CURRENT_DATE - 7  THEN TO_CHAR(CURRENT_DATE - 7,  'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 1, 'Mon DD')
+    WHEN snapshot_date >= CURRENT_DATE - 14 THEN TO_CHAR(CURRENT_DATE - 14, 'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 8, 'Mon DD')
+    ELSE                                         TO_CHAR(CURRENT_DATE - 21, 'Mon DD') || '–' || TO_CHAR(CURRENT_DATE - 15,'Mon DD')
+  END AS date_range,
+  SUM(clicks) AS clicks,
+  SUM(units) AS units,
+  ROUND(SUM(units)::numeric / NULLIF(SUM(clicks), 0) * 100, 1) AS conv_pct,
+  ROUND(SUM(spend) / NULLIF(SUM(clicks), 0), 2) AS cost_per_click
+FROM d
+GROUP BY 1, 2
+ORDER BY 1;
+```
+
+Output shape: `Date range | Clicks | Units | Conv % | Cost/click`. If clicks rising and conv % falling = conversion problem → Grid 3. If CPC rising sharply = click-cost problem → check Google Ads UI for auction pressure.
+
+### Grid 3 — Stock
+
+Per-segment readiness today (single snapshot). Tells you whether the conversion drop has a stock cause and which segments are leaking.
+
+```sql
+WITH size_universe AS (
+  SELECT groupid, COUNT(DISTINCT code) AS total_sizes
+  FROM skumap WHERE deleted = 0 GROUP BY groupid
+),
+current_stock AS (
+  SELECT groupid, SUM(qty) AS units, COUNT(DISTINCT code) AS sizes_in_stock
+  FROM localstock WHERE ordernum = '#FREE' AND deleted = 0 AND qty > 0
+  GROUP BY groupid
+),
+recent_sales AS (
+  SELECT groupid,
+    SUM(CASE WHEN solddate >= CURRENT_DATE - 30 THEN qty ELSE 0 END) AS sold_30d
+  FROM sales WHERE channel = 'SHP' GROUP BY groupid
+),
+readiness AS (
+  SELECT
+    ss.segment, ss.groupid,
+    COALESCE(rs.sold_30d, 0) AS sold_30d,
+    CASE
+      WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.7
+           AND COALESCE(cs.units, 0) >= 15 THEN 'READY'
+      WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.4
+           AND COALESCE(cs.units, 0) >= 5 THEN 'PARTIAL'
+      ELSE 'THIN'
+    END AS status
+  FROM skusummary ss
+  LEFT JOIN size_universe su ON ss.groupid = su.groupid
+  LEFT JOIN current_stock cs ON ss.groupid = cs.groupid
+  LEFT JOIN recent_sales rs ON ss.groupid = rs.groupid
+  WHERE ss.brand = 'Birkenstock' AND ss.segment IS NOT NULL AND ss.segment != 'CRAP'
+    AND ss.shopify = 1 AND ss.googlestatus = 1
+)
+SELECT
+  segment,
+  COUNT(*) AS styles,
+  SUM(CASE WHEN status='READY' THEN 1 ELSE 0 END) AS ready,
+  SUM(CASE WHEN status='PARTIAL' THEN 1 ELSE 0 END) AS partial,
+  SUM(CASE WHEN status='THIN' THEN 1 ELSE 0 END) AS thin,
+  SUM(CASE WHEN status='THIN' AND sold_30d > 0 THEN 1 ELSE 0 END) AS thin_selling,
+  SUM(sold_30d) AS sold_30d
+FROM readiness
+GROUP BY segment
+ORDER BY sold_30d DESC;
+```
+
+Output shape: `Segment | Styles | READY | PARTIAL | THIN | THIN-selling | Sold 30d`. PARTIAL on a high-volume segment = clicks landing on broken size grids. THIN-selling = clicks being burned on near-empty pages.
+
+**Once `birk_ready_styles` history accrues (~2 weeks from 2026-04-27)**, replace Grid 3 with the same 3-week trend shape as Money/Demand using the `google_stock_track` columns.
+
+### Reading the three together
+
+| Money | Demand | Stock | Read |
+|---|---|---|---|
+| ROAS healthy & flat/rising | — | — | Bump candidate |
+| ROAS dropping | CPC stable, conv falling | High-volume segments PARTIAL/THIN | Hold — fix stock first |
+| ROAS dropping | CPC rising | — | Click-cost issue, check tROAS / auction pressure |
+| ROAS dropping | Conv stable, clicks falling | — | Demand softening — seasonal or competitive |
+| ROAS approaching 5x | — | — | Pull back |
+
+---
+
 ## Key Metrics
 
 | Metric | Floor | Target | Ceiling | Source |
