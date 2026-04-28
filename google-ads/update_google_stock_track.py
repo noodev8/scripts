@@ -7,6 +7,10 @@ Creates daily snapshots dated for YESTERDAY with:
 1. Live Stock: Products active on both Shopify and Google Merchant Centre
 2. Total Stock: All products in inventory (localstock + Amazon)
 3. Shopify Sales: Sales from the snapshot date (yesterday)
+4. Birk Ad-Readiness: counts of READY styles, READY units, and THIN-selling styles
+   (Birkenstock-only — definition matches BUDGET_REVIEW_PROCESS.md, single source of truth).
+   Reflects current stock at script run-time (yesterday's row gets today's stock —
+   same convention as live_stock_units).
 
 Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
 The CSV data matches snapshot dates, ensuring no nulls in the database.
@@ -378,30 +382,155 @@ def calculate_shopify_sales_yesterday(cursor):
         log(f"ERROR: Failed to calculate sales: {str(e)}")
         raise
 
-def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_value, sales_units, sales_revenue):
+def calculate_birk_ad_readiness(cursor):
+    """
+    Calculate Birkenstock ad-readiness counts.
+
+    Definition matches BUDGET_REVIEW_PROCESS.md (single source of truth).
+    If the rule changes there, change it here too.
+
+    - Universe: skusummary where brand='Birkenstock', segment NOT NULL/CRAP,
+      shopify=1, googlestatus=1
+    - Size universe: skumap where deleted=0 (DO NOT use skusummary.stockvariants
+      or localstock for the denominator — both under-state the universe)
+    - READY: sizes_in_stock/total_sizes >= 0.7 AND units >= 15
+    - PARTIAL: sizes_in_stock/total_sizes >= 0.4 AND units >= 5 (and not READY)
+    - THIN-selling: not READY/PARTIAL and sold_30d > 0 (the waste signal)
+
+    Returns:
+        dict: {birk_ready_styles, birk_ready_units, birk_thin_selling_styles}
+    """
+    query = """
+    WITH size_universe AS (
+        SELECT groupid, COUNT(DISTINCT code) AS total_sizes
+        FROM skumap WHERE deleted = 0 GROUP BY groupid
+    ),
+    current_stock AS (
+        SELECT groupid,
+               SUM(qty) as units,
+               COUNT(DISTINCT code) as sizes_in_stock
+        FROM localstock
+        WHERE ordernum = '#FREE' AND deleted = 0 AND qty > 0
+        GROUP BY groupid
+    ),
+    recent_sales AS (
+        SELECT groupid,
+               SUM(CASE WHEN solddate >= CURRENT_DATE - 30 THEN qty ELSE 0 END) as sold_30d
+        FROM sales
+        WHERE channel = 'SHP' AND qty > 0
+        GROUP BY groupid
+    ),
+    classified AS (
+        SELECT
+            ss.groupid,
+            COALESCE(cs.units, 0) AS stock_now,
+            COALESCE(rs.sold_30d, 0) AS sold_30d,
+            CASE
+                WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.7
+                     AND COALESCE(cs.units, 0) >= 15 THEN 'READY'
+                WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.4
+                     AND COALESCE(cs.units, 0) >= 5 THEN 'PARTIAL'
+                ELSE 'THIN'
+            END AS ad_readiness
+        FROM skusummary ss
+        LEFT JOIN size_universe su ON ss.groupid = su.groupid
+        LEFT JOIN current_stock cs ON ss.groupid = cs.groupid
+        LEFT JOIN recent_sales rs ON ss.groupid = rs.groupid
+        WHERE ss.brand = 'Birkenstock'
+          AND ss.segment IS NOT NULL
+          AND ss.segment != 'CRAP'
+          AND ss.shopify = 1
+          AND ss.googlestatus = 1
+    )
+    SELECT
+        COUNT(*) FILTER (WHERE ad_readiness = 'READY') AS ready_styles,
+        COALESCE(SUM(stock_now) FILTER (WHERE ad_readiness = 'READY'), 0) AS ready_units,
+        COUNT(*) FILTER (WHERE ad_readiness = 'THIN' AND sold_30d > 0) AS thin_selling_styles
+    FROM classified
+    """
+
+    try:
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            metrics = {
+                'birk_ready_styles': int(result[0] or 0),
+                'birk_ready_units': int(result[1] or 0),
+                'birk_thin_selling_styles': int(result[2] or 0),
+            }
+            log(f"Birk ad-readiness: {metrics['birk_ready_styles']} READY "
+                f"({metrics['birk_ready_units']} units), "
+                f"{metrics['birk_thin_selling_styles']} THIN-selling")
+            return metrics
+        else:
+            log("WARNING: No ad-readiness data returned")
+            return {'birk_ready_styles': 0, 'birk_ready_units': 0, 'birk_thin_selling_styles': 0}
+
+    except Exception as e:
+        log(f"ERROR: Failed to calculate Birk ad-readiness: {str(e)}")
+        raise
+
+def backfill_birk_readiness_if_null(cursor, readiness):
+    """
+    If yesterday's snapshot exists with NULL readiness fields, populate them.
+
+    Handles the deployment case (first script run after columns added) and
+    any future case where a row was inserted before readiness tracking existed.
+    Idempotent — only fires when fields are NULL.
+
+    Returns:
+        bool: True if a row was backfilled, False otherwise
+    """
+    query = """
+    UPDATE google_stock_track
+    SET birk_ready_styles = %(birk_ready_styles)s,
+        birk_ready_units = %(birk_ready_units)s,
+        birk_thin_selling_styles = %(birk_thin_selling_styles)s
+    WHERE DATE(snapshot_date) = CURRENT_DATE - 1
+      AND birk_ready_styles IS NULL
+    RETURNING id
+    """
+    try:
+        cursor.execute(query, readiness)
+        result = cursor.fetchone()
+        if result:
+            log(f"Backfilled Birk ad-readiness on existing snapshot id {result[0]}")
+            return True
+        return False
+    except Exception as e:
+        log(f"ERROR: Failed to backfill Birk ad-readiness: {str(e)}")
+        raise
+
+def insert_stock_snapshot(cursor, metrics):
     """
     Insert stock snapshot into google_stock_track table for yesterday.
 
     Args:
         cursor: Database cursor
-        live_units: Live stock unit count
-        live_value: Live stock value
-        total_units: Total stock unit count
-        total_value: Total stock value
-        sales_units: Sales units from day before snapshot
-        sales_revenue: Sales revenue from day before snapshot
+        metrics: dict with required keys —
+            live_stock_units, live_stock_value,
+            total_stock_units, total_stock_value,
+            shopify_units, shopify_sales,
+            birk_ready_styles, birk_ready_units, birk_thin_selling_styles
     """
     query = """
     INSERT INTO google_stock_track
         (live_stock_units, live_stock_value, total_stock_units, total_stock_value,
-         shopify_units, shopify_sales, snapshot_date, troas)
+         shopify_units, shopify_sales, snapshot_date, troas,
+         birk_ready_styles, birk_ready_units, birk_thin_selling_styles)
     VALUES
-        (%s, %s, %s, %s, %s, %s, CURRENT_DATE - 1, %s)
+        (%(live_stock_units)s, %(live_stock_value)s,
+         %(total_stock_units)s, %(total_stock_value)s,
+         %(shopify_units)s, %(shopify_sales)s, CURRENT_DATE - 1, %(troas)s,
+         %(birk_ready_styles)s, %(birk_ready_units)s, %(birk_thin_selling_styles)s)
     RETURNING id, snapshot_date
     """
 
+    params = {**metrics, 'troas': CURRENT_TROAS}
+
     try:
-        cursor.execute(query, (live_units, live_value, total_units, total_value, sales_units, sales_revenue, CURRENT_TROAS))
+        cursor.execute(query, params)
         result = cursor.fetchone()
 
         if result:
@@ -409,7 +538,10 @@ def insert_stock_snapshot(cursor, live_units, live_value, total_units, total_val
             snapshot_date = result[1]
             log(f"Stock snapshot inserted - ID: {snapshot_id}, Date: {snapshot_date}")
 
-            # Calculate variance
+            live_units = metrics['live_stock_units']
+            live_value = metrics['live_stock_value']
+            total_units = metrics['total_stock_units']
+            total_value = metrics['total_stock_value']
             variance_units = total_units - live_units
             variance_value = total_value - live_value
             variance_pct = (live_units / total_units * 100) if total_units > 0 else 0
@@ -470,9 +602,15 @@ def main():
         cursor = conn.cursor()
         log("Database connection established")
 
+        # Always compute Birk readiness — used for both insert and backfill paths
+        log("--- Calculating Birk Ad-Readiness ---")
+        readiness = calculate_birk_ad_readiness(cursor)
+
         # Step 1: Check if yesterday's snapshot exists, create if needed
         if check_already_run_today(cursor):
             log("Snapshot for yesterday already exists - skipping stock calculation")
+            if backfill_birk_readiness_if_null(cursor, readiness):
+                log("Birk readiness fields backfilled on existing snapshot")
         else:
             log("--- Creating Snapshot for Yesterday ---")
             log("--- Calculating Live Stock (Shopify + Google) ---")
@@ -485,15 +623,16 @@ def main():
             sales_units, sales_revenue = calculate_shopify_sales_yesterday(cursor)
 
             log("--- Inserting Stock Snapshot for Yesterday ---")
-            snapshot_id = insert_stock_snapshot(
-                cursor,
-                live_units,
-                live_value,
-                total_units,
-                total_value,
-                sales_units,
-                sales_revenue
-            )
+            metrics = {
+                'live_stock_units': live_units,
+                'live_stock_value': live_value,
+                'total_stock_units': total_units,
+                'total_stock_value': total_value,
+                'shopify_units': sales_units,
+                'shopify_sales': sales_revenue,
+                **readiness,
+            }
+            snapshot_id = insert_stock_snapshot(cursor, metrics)
 
             if snapshot_id:
                 snapshot_created = True

@@ -20,9 +20,22 @@
 
 | Source | What it tells us | How to check |
 |--------|-----------------|--------------|
-| `google_stock_track` table | Daily spend, clicks, impressions, Shopify sales, stock levels | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
+| `google_stock_track` table | Daily spend, clicks, impressions, Shopify sales, stock levels, Birk ad-readiness counts | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
 | `localstock` table | Current warehouse stock by SKU (source of truth) | `SELECT groupid, SUM(qty) as units FROM localstock WHERE deleted = 0 AND brand = 'Birkenstock' GROUP BY groupid ORDER BY units DESC;` |
 | `adcost_summary_30.csv` | Raw Google Ads export (30-day daily breakdown) | Export from Google Ads, save to `google-ads/` folder |
+
+**Birk ad-readiness columns in `google_stock_track`** (populated nightly from `update_google_stock_track.py`, definition matches step 3 below):
+- `birk_ready_styles` — count of READY styles (≥70% size coverage AND ≥15 units). The convertible-catalogue headline. Watch for it ticking up when deliveries land.
+- `birk_ready_units` — total stock units across READY styles. Depth check.
+- `birk_thin_selling_styles` — count of THIN styles that sold ≥1 in last 30d. The waste signal — clicks paid for, sale missed.
+
+For trend analysis, query the columns directly:
+```sql
+SELECT snapshot_date, birk_ready_styles, birk_ready_units, birk_thin_selling_styles
+FROM google_stock_track
+ORDER BY snapshot_date DESC LIMIT 14;
+```
+For per-style detail (which styles are THIN, which sizes missing) still use the standalone query in step 3.
 
 **Note:** `localstock` is the source of truth for Birkenstock stock. Birkenstock is Shopify-only (not on Amazon), so no need to check `amzfeed`.
 
