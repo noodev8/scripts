@@ -47,6 +47,9 @@ logs/
 *.txt
 *.csv
 
+# Discussion folder — always tracked (overrides *.txt/*.csv above)
+!discussion/**
+
 # Shopify price session data (staged CSVs, not tracked)
 shopify-price/staging/
 

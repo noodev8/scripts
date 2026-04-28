@@ -1,0 +1,75 @@
+Great. Ive git pulled on the VPS server so we should see that data updating as we go. Good session actually today as we identified that the increase in
+  budget wasnt actually doing enough for us. Run that through with me again please. Are we sure the budget increase just isnt icreasing revenue and that
+  the only issue is to get more Birkenstock stock in? Thats the cash flow issue I have, I need to pay for the stock so I want to sell it quick. Maybe a
+  smaller ROAS is ok to get things moving. Something is niggling at my mind but its right to be disciplined.
+
+● Good question to push back on — let me genuinely re-examine, not just repeat.
+
+  Re-examining the marginal-ROAS read
+
+  Comparing 6 days at £42 cap (Apr 7-12) vs 6 days at £60 cap (Apr 22-27):
+
+  ┌──────────────────┬───────┬─────────────┬────────────┬─────────┐
+  │      Period      │ Spend │   Clicks    │   Units    │ Revenue │
+  ├──────────────────┼───────┼─────────────┼────────────┼─────────┤
+  │ £42 cap (6 days) │ £247  │ 752         │ 81         │ £5,125  │
+  ├──────────────────┼───────┼─────────────┼────────────┼─────────┤
+  │ £60 cap (6 days) │ £356  │ 995         │ 91         │ £5,270  │
+  ├──────────────────┼───────┼─────────────┼────────────┼─────────┤
+  │ Delta            │ +£109 │ +243 (+32%) │ +10 (+12%) │ +£145   │
+  └──────────────────┴───────┴─────────────┴────────────┴─────────┘
+
+  The cap raise did buy 32% more clicks — so the budget genuinely was constraining. But those extra clicks converted poorly: only 10 extra units, £145 extra
+   revenue. Marginal ROAS on the £109 of extra spend is ~1.3x. That's the discipline.
+
+  So we know two things hard:
+  1. The cap was a real constraint (more spend = more clicks)
+  2. The extra clicks didn't convert at the base rate
+
+  What's the niggle pointing at?
+
+  Your instinct is right to keep poking. Two genuine alternatives I want to acknowledge:
+
+  Possibility A (cap-by-noon distortion): if Google front-loads spend in the morning when conversion is naturally higher, then a £60 cap that empties by 1pm
+   tests "morning conversion" not "all-day £60 conversion". The marginal-ROAS number could be artificially low because we're cutting off the
+  afternoon/evening, which on £42 days never got to start. We don't know what £80 looks like all day.
+
+  Possibility B (catalogue ceiling): the extra clicks land on THIN-selling styles → no stock to convert them → wasted. This is what the readiness data
+  points to and what the incoming Birk delivery would fix.
+
+  The honest truth: we cannot fully separate A from B with the data we have. But the actions for both converge: holding budget at £60 until stock lands
+  tests possibility B cleanly, because once stock fills the THIN styles, if conversion lifts AND clicks-per-£ holds, we'll know the catalogue was the issue.
+   If conversion stays low even with full stock, it's possibility A and we test £66/£72 to find out.
+
+  On lowering ROAS for cash flow — this is the trap
+
+  Don't. Lowering tROAS (400% → 300%) tells Google to bid on more auctions at lower efficiency. The marginal-ROAS test already says the additional clicks at
+   the current tROAS aren't converting. Lowering it adds even more low-quality clicks on top. You'd burn cash faster, not move stock faster.
+
+  The mistake the lever invites: "lower ROAS = more sales because more clicks." The reality at the current configuration: "lower ROAS = more clicks landing
+  on the same constrained catalogue = same units sold but worse efficiency."
+
+  If anything, the data argues for raising tROAS to 450% to tighten quality. But that's not necessary either — better to just hold and wait.
+
+  On cash flow specifically
+
+  The £7.7k stock cost vs current ~£2-2.5k/wk gross profit run rate = roughly 3-4 weeks of normal trading to recover the cash outlay. That's the actual
+  timeline. Trying to compress it through the Google budget knob fights the data.
+
+  Levers that could genuinely accelerate cash without burning ad spend:
+
+  1. Klaviyo repurchase flow — when stock lands, fire the 90-day Birk repurchase to existing customers. Zero acquisition cost, hits a warm audience.
+  2. Amazon side — Lunar/Rieker/Blaze are a separate demand pool with different cash dynamics.
+  3. Pricing review on slow-movers — if any PARTIAL stock could move at slightly lower price, Steady mode in the pricing engine should already be picking
+  that up. Worth a session if you want to dig.
+  4. Hold £60 — saves £40-80/wk vs going to £72. Real cash kept rather than spent on weak marginal.
+
+  What we agreed, sharpened
+
+  - Hold £60 today. Discipline, not capitulation.
+  - 1-2 weeks: incoming Birk lands, READY count moves up, marginal ROAS test gets a fair retry.
+  - New criterion (marginal ROAS ≥ 5x) means a future session can't accidentally push you up while it's leaking. That's the structural protection.
+  - Cash flow tension is real. The right valve is non-Google demand (Klaviyo/Amazon), not the Google knob.
+
+  The niggle is worth honouring — it should keep us watching daily once the delivery lands, ready to step up the moment marginal ROAS confirms recovery. But
+   the discipline is right today.
