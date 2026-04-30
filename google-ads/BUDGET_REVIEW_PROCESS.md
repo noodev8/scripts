@@ -23,6 +23,17 @@
 
 > **Update this block whenever you change anything below — including the change log.** It is the single source of truth for "what's true today".
 
+### custom_label_0 conventions
+
+`skusummary.googlecampaign` populates `custom_label_0` in the merchant feed. Used to scope which styles a campaign targets.
+
+| Label | Meaning |
+|---|---|
+| `BIRK-WINNER` | READY Birk styles — manually curated, seeded 28 Apr 2026 from the readiness query (24 styles) |
+| `NULL` | Everything else |
+
+**Maintenance is manual and ad-hoc.** Add or remove individual styles with one-off SQL as needed (e.g. when a style thins out or a delivery lands). No automated refresh, no full rebuild rule yet — keep it deliberate while the campaign is finding its feet.
+
 ---
 
 ## Data Sources
