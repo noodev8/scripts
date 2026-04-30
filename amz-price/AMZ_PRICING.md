@@ -6,6 +6,65 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 ## Status
 
+**Session (2026-04-30) — IVES-COLOUR batch (19 changes: 11 creeps / 6 drops / 2 reverts):**
+
+Followed the WHITE supply-defensive session in the same sitting. No supplier squeeze on COLOUR — standard rules. Batch-apply mode (option 2): inline-autopilot with all 19 calls stated as decisions, user approved as a batch.
+
+**Changes by colour:**
+
+| Colour | # | Changes |
+|---------|---|---------|
+| BEIGE | 3 | 03 £39.00→£38.00 ↓ (£1 aggressive, 14d+ dead), 06 £39.30→£39.60 ↑, 07 £39.49→£38.99 ↓ |
+| BLACK | 1 | 05 £39.29→£39.59 ↑ |
+| BLACKSOLE | 3 | 03 £36.99→£36.49 ↓, 04 £37.49→£37.99 ↑, **05 £40.09→£39.79 ↓ (£40 BREACH REVERT — Apr 21 watch fired: 9d, 1 sold, 60% returns)** |
+| GREY | 3 | 04 £37.99→£38.49 ↑, 05 £37.49→£37.99 ↑, 06 £36.99→£37.49 ↑ — drops worked, surge wc 4/27 (~24/wk pace) |
+| KHAKI | 1 | 05 £38.99→£39.29 ↑ |
+| MIDBLUE | 3 | 05 £38.29→£38.59 ↑, 06 £38.50→£38.80 ↑ (7 in 7d strongest signal), **07 £37.79→£37.49 ↓ (stalling-creep revert — 2 in 13d post-creep)** |
+| NAVY-BLUE | 2 | 04 £36.99→£37.49 ↑, 07 £36.99→£37.49 ↑ |
+| RED | 1 | 04 £36.99→£36.49 ↓ |
+| STONE | 2 | 04 £36.99→£35.99 ↓ (to floor), 05 £36.99→£36.49 ↓ |
+
+**🟡 Held this session (9 SKUs — judgment-call holds):**
+- **Don't-cross-£40:** BLACK-06 (£39.79), NAVY-06 (£39.79), MIDBLUE-04 (£39.99) — all working at sub-£40 levels, no need to test ceiling
+- **Above-£40 already working:** BLACKSOLE-06 at £40.99 (27d, 8 sold post-creep) — 50% returns is small-sample noise, leave it
+- **At floor:** BLACK-07, NAVY-09 — drops would breach £35.99
+- **Returns small-sample noise:** BEIGE-04, KHAKI-07, STONE-07 — all 50-100% returns on 1-2 events, just settle
+
+**Priority watches for next review (~3-5 days):**
+- **GREY-04/05/06 at £38.49/£37.99/£37.49** — three-way creep test on the surging colour. If all hold, GREY is finding its new range.
+- **MIDBLUE-06 at £38.80** — strongest creep signal of the batch (7 in 7d). Confirm holds.
+- **BLACKSOLE-05 at £39.79** — post-revert recovery test. Should restore £39.79 velocity.
+- **MIDBLUE-07 at £37.49** — revert recovery. Should restore prior 5/7d velocity.
+- **NAVY-04/07 at £37.49** — matched-pair recovery test (both crept by 50p from £36.99).
+
+**Observation:** Batch-apply with inline decisions for IVES-COLOUR worked smoothly even outside the formal "full ives review" trigger — supports the broader inline-autopilot pattern.
+
+---
+
+**Session (2026-04-30) — IVES-WHITE only, supply-defensive push (6 changes, all creeps / 1 hold):**
+
+**Trigger:** Lunar tightening on White only — 92 backorder delayed 2 weeks, more coming after but pipeline uncertain. User wants creeps biased larger to slow demand without killing momentum.
+
+**Demand context:** 14d units +202% YoY (43 → 130). 7d run-rate 12.5/day vs 14d 9.29/day — still accelerating. Apr 21 creeps every size sold post-creep, including £39+ barrier on size 05.
+
+**Changes (push-harder posture, 50–70p creeps where data supported it, 30p where flagged):**
+- WHITE-03 £39.29→£39.79 ↑ (+50p, tail size, 0% returns)
+- **WHITE-04 £38.59→£39.29 ↑ (+70p)** — 0 local backup, 16 in 9d. Stock-pressure size, match 06 level
+- **WHITE-05 £39.49→£39.99 ↑ (+50p)** — round-number test, **stops short of £40** per user's prior-stall history
+- **WHITE-06 £38.59→£39.29 ↑ (+70p)** — the lever. 30 in 9d, 88 FBA, 3% returns
+- WHITE-07 £38.80→£39.10 ↑ (+30p, held back due to 23% returns on small sample)
+- WHITE-08 £38.49→£38.99 ↑ (+50p, FBA thin)
+- WHITE-09 HOLD — 40% returns = fit issue, tail size
+
+**Priority watches for next review (~4-5 days, user wants sooner than 13d):**
+- **WHITE-04 and WHITE-06 at £39.29** — matched-pair test on the volume sizes. Both holding = new floor. Split = colour/size demand differential.
+- **WHITE-05 at £39.99** — round-number gate. If dead 3-4d, revert to £39.79 (still above prior).
+- **WHITE-07 at £39.10** — confirm 23% returns is small-sample noise.
+
+**Observation to carry forward:** When supply tightens on a single SKU/colour, creep posture should bias larger on the volume sizes (they move the burn-rate needle most), not uniform across the size range.
+
+---
+
 **Session (2026-04-21) — FULL IVES REVIEW — inline-autopilot experiment (16 changes, 9 creeps / 6 drops / 1 revert):**
 
 **Experiment:** Ran full review with Claude's 🟡 decisions stated inline as firm calls (not "over to you"). User reviewed independently. **100% agreement — all 16 Claude decisions approved as-is, no adjustments.** First calibration data point.

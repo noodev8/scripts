@@ -3,13 +3,22 @@
 **Created:** 2026-02-20
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule.
 
-## Current State — updated 28 Apr 2026
+## Current State — updated 30 Apr 2026
 
-- **Cap:** £60/day (since ~22 Apr, user-initiated, retro-logged)
-- **tROAS:** 400%
-- **Last review:** 28 Apr 2026 — held at £60
-- **Next planned step (projection only):** £72 on Sun 3 May if criteria hold
-- **Open flags:** April conversion median 9.3% vs March 12.1% — watch through end of week
+- **Campaign structure (new — restructured ~28-29 Apr 2026):**
+  - **Standard Shopping** — core campaign, holds the full catalogue including the winning Birks (which are also in PMAX). £60/day.
+  - **PMAX (winning Birks)** — own campaign, duplicates the Birk SKUs that were performing in standard. £20/day. In learning phase from launch.
+  - **IVES Shopping** — own campaign, IVES SKUs only, removed from standard. £5/day.
+  - **Combined daily cap: £85**
+- **tROAS:** 400% (all campaigns)
+- **Last review:** 30 Apr 2026 — held all caps; restructure too fresh to evaluate
+- **Next planned step:** none — re-evaluate ~Mon 5 May once PMAX has 5–7 days of learning data
+- **Open flags:**
+  - April conversion median 9.3% vs March 12.1% — still watching
+  - Marginal ROAS 5.67x last week vs prior — above floor but tight; spend +57% over 3 weeks bought only +13% daily revenue (diminishing returns curve)
+  - Search impression share on standard will drop materially post-restructure (PMAX wins internal auctions on duplicated Birks; IVES gone from standard) — the metric is now reading a smaller competitive pool, not weakening demand. Don't compare standard's imp share pre/post-restructure.
+- **Tracking gap:** `google_stock_track` and the CSV import treat ad spend as one number. Per-campaign data not yet captured. Until it is, ROAS attribution between standard / PMAX / IVES is opaque. Decision: don't extend schema yet — wait until the structure proves itself. User will paste raw Google Ads campaign reports in chat for analysis sessions.
+- **Snapshot-sales-lag caveat:** `google_stock_track.shopify_sales` captures the day's sales at script-run time and can lag actual end-of-day total when late orders file after the snapshot. For trend reads, prefer joining `google_stock_track` to `sales` on `solddate` rather than using `shopify_sales` directly. (Discovered 30 Apr — Apr 29 stored £544 vs actual £920.)
 - **Capture-before-act rule:** when the budget is changed in the UI, add a line to the change log the same day, even if rationale is filled in later. The £54→£60 ghost change happened because this didn't.
 
 > **Update this block whenever you change anything below — including the change log.** It is the single source of truth for "what's true today".
@@ -58,6 +67,17 @@ Birkenstock orders are placed **~6 months in advance** and cannot be reactively 
 Implication: if Stock shows persistent leaks (PARTIAL/THIN on top sellers) and they aren't appearing on incoming invoices, the right response is to **trim ad budget to where it stays efficient**, not to wait for restock that isn't coming. If £45/day produces the same revenue as £60/day, the cap should drop.
 
 **Do not recommend "order more X" as an action.** Surface the leak so the user can factor it into the next 6-month buy, but adjust ad budget around current stock reality.
+
+### Restructure context (post 28-29 Apr 2026)
+
+The grids below aggregate across all three campaigns (Standard + PMAX + IVES). The CSV import gives a single daily spend/clicks/sales number — there is no per-campaign breakdown in the database. Per-campaign analysis comes from raw Google Ads exports pasted into chat sessions, not from `google_stock_track`.
+
+Two reading rules while the new structure is bedding in:
+
+1. **Don't use standard's `google_search_imp_share` as a constraint signal until it stabilises.** PMAX wins internal auctions on the duplicated Birk SKUs and IVES has left standard's catalogue, so standard's denominator (auctions it competes in) shrank by design. A drop to <10% on standard reflects scope, not weakening demand. Re-baseline the metric after 2-3 clean weeks.
+2. **For sales totals, prefer `sales` table over `google_stock_track.shopify_sales`.** The stored column captures sales at script-run time and can lag end-of-day total — significant on days when the snapshot runs before all orders file. Join on `solddate = snapshot_date` for accurate ROAS reads.
+
+The "Decrease budget" rule about THIN-selling styles applies catalogue-wide regardless of which campaign carries those SKUs.
 
 ### Grid 1 — Money
 
@@ -506,6 +526,8 @@ Recent entries (last ~6 weeks) keep full rationale. Older entries collapsed to o
 | 2026-04-21 | Budget £50 → £54 | 15.4x (last 7d) | 87.5% (Apr 18, only £50-day with data) | £46.52 | 2,839 live units | Conservative +8% nudge. Google overspent £50 cap on both clean days (£59.10 Apr 18, £55.45 Apr 19) at 15.6x combined ROAS. £54 formalises what Google is already trying to spend — no algorithm re-learn risk. Midnight-effective so Tue 21 Apr is first full day. Per algorithm-stability guidance: smaller step preserves learning while still riding the wave. Leaves room for full +15-20% step to £60-62 in 3-5 days if ROAS holds. tROAS held at 400%. User has paid £7.5k Birk invoice — stock pipeline secured. | ~24-25 Apr |
 | ~2026-04-22 (logged retrospectively 28 Apr) | Budget £54 → £60 | — | — | — | — | **Corrective entry — change made by user, not logged at the time.** User raised cap to £60 a day or two after the £54 step, after a strong Mon 20 Apr (£1,143 sales, 20u). Bigger step than the £54 recommendation; user informed Claude in another session but the log was never updated. Exact date unknown — spend pattern (Apr 22 onwards: £57, £52, £61, £59, £66, £61) fits a £60 cap (typical 0-10% Google flex) better than £54 (would imply 10-22% flex daily). Effective from ~Apr 22. tROAS held at 400%. | 28 Apr |
 | 2026-04-28 | Hold at £60 | 13.4x (last 7d) | 71% avg 7d ↓ | £59.35 | 2,861 live; 20 READY (652u), 9 PARTIAL, 10 THIN | All 5 increase criteria met (ROAS 13.4x, spend at cap, imp share 71% trending down, 20 READY = best yet, peak season). HOLD because: £60 wasn't logged so this is effectively the first proper week at £60; April conv 9.3% vs March 12.1% — needs to confirm baseline; marginal week-on-week ROAS only 2x; 11 THIN-selling styles wasting clicks. Yesterday's good Monday is one data point. Stock action: flag THIN-selling Zermatt/Mayari for restock. | Sun 3 May (re-check vs £72 projection) |
+| ~2026-04-28/29 | Campaign restructure: split into Standard £60 + PMAX £20 (winning Birks, duplicated) + IVES £5 = £85 combined | 13.7x (last 7d, actuals) | 71% (standard, last clean day Apr 28) | £66 (Apr 23-29 avg) | 2,861 live; 24 READY (759u, best yet), 6 THIN-selling | Hypothesis: split lets each lever optimise where intent is strongest rather than averaging across catalogue. PMAX captures branded/discovery on winners; IVES gets its own bidding logic; standard remains the core safety net. Spend +57% over 3 weeks delivered only +13% daily revenue (diminishing returns curve at single-cap level) — restructure aims to lift the conversion floor without raising overall cap. Effective ~28-29 Apr (exact date logged retrospectively — Apr 29 was the first day showing post-restructure spend pattern: £101.73 vs £60 standard cap, imp share collapsed to <10% on standard, both expected). tROAS held at 400% across all three. Per-campaign tracking deferred — will reassess after 7-10 days. | ~Mon 5 May |
+| 2026-04-30 | Hold all three caps (£60/£20/£5 = £85) | 13.7x (last 7d, actuals from sales table) | n/a — metric unstable post-restructure | £66 avg 7d | 2,861 live; 24 READY, 6 THIN-selling | Restructure 1-2 days old. Apr 29 alone (first post-restructure day) ran £101.73 spend / £919.50 actual sales = 9x ROAS — within normal PMAX-launch flex against £85 cap. Revenue trend across 3 weeks is up (£800→£822→£903 daily) but spend +57% bought only +13% revenue → diminishing returns at single-cap level was the reason to restructure. Marginal ROAS 5.67x — above 5x floor but tight. Too early to read the new structure. Hold to give PMAX 5-7 days of learning. | Mon 5 May |
 
 ---
 
