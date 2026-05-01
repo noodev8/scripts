@@ -118,3 +118,6 @@ When asked to work on pricing ("pricing review", "let's do prices", "shopify pri
 
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
+
+## Two machines — memory does not sync
+The user runs Claude Code on two machines (`C:\Users\aandr\` and `C:\Users\UserPC\`). Auto-memory lives under each machine's local `.claude/projects/C--scripts/memory/` and is **not** synced between them — a memory written on one machine is invisible on the other. Treat memory as machine-local context, not global truth. When something is important enough to follow the user across machines, put it in a tracked doc (CLAUDE.md, scale/CLAUDE_CONTEXT.md, amz-price/AMZ_PRICING.md, etc.) — those are in the repo and shared.
