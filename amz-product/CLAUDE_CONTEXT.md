@@ -35,7 +35,7 @@ to use.
 | J | 9 | Product Id | From skumap.ean (B suffix stripped) |
 | FL | 167 | Item Condition | Always `New` |
 | FN | 169 | List Price with Tax | From skusummary.rrp |
-| GK | 192 | Fulfillment Channel Code (UK) | Always `AMAZON_EU` |
+| GK | 192 | Fulfillment Channel Code (UK) | Always `Fulfilment by Merchant (Default)` |
 | GP | 197 | Your Price GBP (Sell on Amazon, UK) | Set to RRP |
 
 Data rows start at **row 7** in the Template sheet (rows 1-6 are settings/headers/examples).
@@ -58,9 +58,10 @@ creation but cannot set `brand`. The SHOES category template (.xlsm) with `parti
 listing action successfully sets brand and price on existing ASINs (tested 5/5 success,
 zero errors).
 
-## FBA vs FBM — important (April 2026)
-This script DOES NOT create FBA offers, even though col GK is set to `AMAZON_EU`.
-Spreadsheet upload can only create the listing — the offer always lands as FBM.
+## FBA vs FBM — important (April 2026, value updated May 2026)
+This script writes `Fulfilment by Merchant (Default)` for col GK. Even when previously
+set to `AMAZON_EU`, the offer always landed as FBM — spreadsheet upload can only create
+the listing.
 
 Why: Amazon's listings parser ignores `fulfillment_channel_code` when *creating* a new
 offer via flat-file/spreadsheet. To exist as FBA, a SKU has to be known to FBA inventory
@@ -68,8 +69,16 @@ first (i.e. have a Send-to-Amazon shipment plan), and that can only be done afte
 listing exists. Chicken-and-egg — there is no one-step path.
 
 Also: `partial_update` cannot flip an existing FBM offer to FBA. The
-`fulfillment_channel_code` field is set-at-create-time. Re-uploading with `AMAZON_EU`
+`fulfillment_channel_code` field is set-at-create-time. Re-uploading the FBM value
 silently no-ops on that field (other fields like brand/price still update).
+
+**Why the value changed (May 2026):** Amazon's server-side validator stopped accepting
+`AMAZON_EU` (the warning surfaced as "Fields with invalid values or formatting:
+Fulfillment Channel Code (UK)"). The new ListingLoader.xlsm template's valid-values
+list shows `AMAZON_EU` removed; the FBM equivalent is now `Fulfilment by Merchant
+(Default)`. SHOES.xlsm's own Excel-side validator still lists the old vocabulary, but
+Amazon's ingest uses the new one. We use the FBM value because it matches what actually
+happens (offer lands FBM). We are not on AMAZON_EU_VCS (UK seller, no VCS).
 
 Workflow for new products:
 1. Run `amz_upload.py` — creates the listing (lands as FBM, that's expected)

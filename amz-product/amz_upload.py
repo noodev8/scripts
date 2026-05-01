@@ -24,7 +24,7 @@ Template columns populated (SHOES.xlsm):
     Col J   (9)   Product Id            from skumap.ean (stripped of B suffix)
     Col FL  (167) Item Condition        = New
     Col FN  (169) List Price with Tax   from skusummary.rrp
-    Col GK  (192) Fulfillment Channel   = AMAZON_EU
+    Col GK  (192) Fulfillment Channel   = Fulfilment by Merchant (Default)
     Col GP  (197) Your Price GBP        = RRP (same as list price)
 
 SKU logic:
@@ -225,7 +225,7 @@ def generate_upload(rows):
         ws.cell(row=r, column=COL_PROD_ID, value=row["ean"])
         ws.cell(row=r, column=COL_CONDITION, value="New")
         ws.cell(row=r, column=COL_LIST_PRICE, value=row["rrp"])
-        ws.cell(row=r, column=COL_FULFILLMENT, value="AMAZON_EU")
+        ws.cell(row=r, column=COL_FULFILLMENT, value="Fulfilment by Merchant (Default)")
         ws.cell(row=r, column=COL_PRICE, value=row["rrp"])
         ws.cell(row=r, column=COL_BATTERIES_REQ, value="No")
 
