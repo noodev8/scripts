@@ -6,7 +6,7 @@ SHOPIFY TRANSACTION REPORT GENERATOR
 Generates a CSV matching the Shopify Admin "Analytics > Reports > Shopify Transaction"
 export format, using the Shopify Orders API.
 
-Output: Shopify Transaction.csv (in script directory)
+Output: Shopify Transaction.csv (in user's Downloads folder)
 
 Usage:
   python shopify_transaction_report.py              # Last month
@@ -348,7 +348,8 @@ def write_csv(rows, start_date, end_date):
     # Sort by date, then order name
     rows.sort(key=lambda r: (r["Day"], r["Order name"]))
 
-    output_path = os.path.join(SCRIPT_DIR, "Shopify Transaction.csv")
+    downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+    output_path = os.path.join(downloads_dir, "Shopify Transaction.csv")
     fieldnames = [
         "Day", "Order name", "Product title at time of sale",
         "Product variant SKU", "Gross sales", "Discounts", "Returns",
