@@ -5,7 +5,7 @@
 -- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 17.4
 
--- Started on 2026-04-28 19:22:08
+-- Started on 2026-05-04 21:12:25
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +20,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 268 (class 1255 OID 16390)
+-- TOC entry 269 (class 1255 OID 16390)
 -- Name: get_price_detail(character varying, character varying); Type: FUNCTION; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -56,7 +56,7 @@ $$;
 ALTER FUNCTION public.get_price_detail(group_id_param character varying, channel_param character varying) OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 269 (class 1255 OID 16391)
+-- TOC entry 270 (class 1255 OID 16391)
 -- Name: get_recent_incoming_stock(); Type: FUNCTION; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -79,7 +79,7 @@ $$;
 ALTER FUNCTION public.get_recent_incoming_stock() OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 281 (class 1255 OID 16392)
+-- TOC entry 282 (class 1255 OID 16392)
 -- Name: groupid_summary_performance(); Type: FUNCTION; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -122,7 +122,7 @@ $$;
 ALTER FUNCTION public.groupid_summary_performance() OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 282 (class 1255 OID 16393)
+-- TOC entry 283 (class 1255 OID 16393)
 -- Name: groupid_summary_performance_90(); Type: FUNCTION; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -203,7 +203,7 @@ CREATE SEQUENCE public.amz_price_log_id_seq
 ALTER SEQUENCE public.amz_price_log_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3703 (class 0 OID 0)
+-- TOC entry 3712 (class 0 OID 0)
 -- Dependencies: 264
 -- Name: amz_price_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -470,6 +470,42 @@ CREATE TABLE public.colour (
 ALTER TABLE public.colour OWNER TO brookfield_prod_user;
 
 --
+-- TOC entry 268 (class 1259 OID 24581)
+-- Name: google_campaign_daily; Type: TABLE; Schema: public; Owner: brookfield_prod_user
+--
+
+CREATE TABLE public.google_campaign_daily (
+    snapshot_date date NOT NULL,
+    campaign character varying(50) NOT NULL,
+    clicks integer DEFAULT 0 NOT NULL,
+    impressions integer DEFAULT 0 NOT NULL,
+    cost numeric(10,2) DEFAULT 0 NOT NULL,
+    search_imp_share numeric(5,2)
+);
+
+
+ALTER TABLE public.google_campaign_daily OWNER TO brookfield_prod_user;
+
+--
+-- TOC entry 3713 (class 0 OID 0)
+-- Dependencies: 268
+-- Name: TABLE google_campaign_daily; Type: COMMENT; Schema: public; Owner: brookfield_prod_user
+--
+
+COMMENT ON TABLE public.google_campaign_daily IS 'Per-campaign daily Google Ads metrics from adcost_summary_30.csv (with Campaign column). google_stock_track ad columns are populated by SUM across
+  campaigns for each snapshot_date.';
+
+
+--
+-- TOC entry 3714 (class 0 OID 0)
+-- Dependencies: 268
+-- Name: COLUMN google_campaign_daily.search_imp_share; Type: COMMENT; Schema: public; Owner: brookfield_prod_user
+--
+
+COMMENT ON COLUMN public.google_campaign_daily.search_imp_share IS 'Search impression share as percentage. NULL when Google reports "< 10%" (campaign losing most auctions) or "--" (reporting lag).';
+
+
+--
 -- TOC entry 263 (class 1259 OID 21978)
 -- Name: google_stock_track; Type: TABLE; Schema: public; Owner: brookfield_prod_user
 --
@@ -513,7 +549,7 @@ CREATE SEQUENCE public.google_stock_track_id_seq
 ALTER SEQUENCE public.google_stock_track_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3704 (class 0 OID 0)
+-- TOC entry 3715 (class 0 OID 0)
 -- Dependencies: 262
 -- Name: google_stock_track_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -621,7 +657,7 @@ CREATE SEQUENCE public.incoming_stock_id_seq
 ALTER SEQUENCE public.incoming_stock_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3705 (class 0 OID 0)
+-- TOC entry 3716 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: incoming_stock_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -873,7 +909,7 @@ CREATE SEQUENCE public.pickpin_pin_seq
 ALTER SEQUENCE public.pickpin_pin_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3706 (class 0 OID 0)
+-- TOC entry 3717 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: pickpin_pin_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -918,7 +954,7 @@ CREATE SEQUENCE public.price_change_log_id_seq
 ALTER SEQUENCE public.price_change_log_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3707 (class 0 OID 0)
+-- TOC entry 3718 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: price_change_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -956,7 +992,7 @@ CREATE SEQUENCE public.price_change_reasons_id_seq
 ALTER SEQUENCE public.price_change_reasons_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3708 (class 0 OID 0)
+-- TOC entry 3719 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: price_change_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -1054,7 +1090,7 @@ CREATE SEQUENCE public.sales_id_seq
 ALTER SEQUENCE public.sales_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3709 (class 0 OID 0)
+-- TOC entry 3720 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -1096,7 +1132,7 @@ CREATE SEQUENCE public.segment_notes_id_seq
 ALTER SEQUENCE public.segment_notes_id_seq OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3710 (class 0 OID 0)
+-- TOC entry 3721 (class 0 OID 0)
 -- Dependencies: 266
 -- Name: segment_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: brookfield_prod_user
 --
@@ -1514,7 +1550,7 @@ CREATE TABLE public.taglist (
 ALTER TABLE public.taglist OWNER TO brookfield_prod_user;
 
 --
--- TOC entry 3452 (class 2604 OID 24435)
+-- TOC entry 3456 (class 2604 OID 24435)
 -- Name: amz_price_log id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1522,7 +1558,7 @@ ALTER TABLE ONLY public.amz_price_log ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 3450 (class 2604 OID 21981)
+-- TOC entry 3454 (class 2604 OID 21981)
 -- Name: google_stock_track id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1530,7 +1566,7 @@ ALTER TABLE ONLY public.google_stock_track ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3435 (class 2604 OID 16565)
+-- TOC entry 3439 (class 2604 OID 16565)
 -- Name: incoming_stock id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1538,7 +1574,7 @@ ALTER TABLE ONLY public.incoming_stock ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3441 (class 2604 OID 16566)
+-- TOC entry 3445 (class 2604 OID 16566)
 -- Name: pickpin pin; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1546,7 +1582,7 @@ ALTER TABLE ONLY public.pickpin ALTER COLUMN pin SET DEFAULT nextval('public.pic
 
 
 --
--- TOC entry 3443 (class 2604 OID 16567)
+-- TOC entry 3447 (class 2604 OID 16567)
 -- Name: price_change_log id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1554,7 +1590,7 @@ ALTER TABLE ONLY public.price_change_log ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3449 (class 2604 OID 16758)
+-- TOC entry 3453 (class 2604 OID 16758)
 -- Name: price_change_reasons id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1562,7 +1598,7 @@ ALTER TABLE ONLY public.price_change_reasons ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 3446 (class 2604 OID 16568)
+-- TOC entry 3450 (class 2604 OID 16568)
 -- Name: sales id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1570,7 +1606,7 @@ ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_
 
 
 --
--- TOC entry 3454 (class 2604 OID 24550)
+-- TOC entry 3458 (class 2604 OID 24550)
 -- Name: segment_notes id; Type: DEFAULT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1578,7 +1614,7 @@ ALTER TABLE ONLY public.segment_notes ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 3549 (class 2606 OID 24440)
+-- TOC entry 3556 (class 2606 OID 24440)
 -- Name: amz_price_log amz_price_log_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1587,7 +1623,7 @@ ALTER TABLE ONLY public.amz_price_log
 
 
 --
--- TOC entry 3458 (class 2606 OID 16578)
+-- TOC entry 3465 (class 2606 OID 16578)
 -- Name: amzfeed amzfeed_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1596,7 +1632,7 @@ ALTER TABLE ONLY public.amzfeed
 
 
 --
--- TOC entry 3460 (class 2606 OID 16580)
+-- TOC entry 3467 (class 2606 OID 16580)
 -- Name: amzshipment amzshipment_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1605,7 +1641,7 @@ ALTER TABLE ONLY public.amzshipment
 
 
 --
--- TOC entry 3462 (class 2606 OID 16582)
+-- TOC entry 3469 (class 2606 OID 16582)
 -- Name: attributes attributes_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1614,7 +1650,7 @@ ALTER TABLE ONLY public.attributes
 
 
 --
--- TOC entry 3464 (class 2606 OID 16584)
+-- TOC entry 3471 (class 2606 OID 16584)
 -- Name: bclog bclog_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1623,7 +1659,7 @@ ALTER TABLE ONLY public.bclog
 
 
 --
--- TOC entry 3466 (class 2606 OID 16586)
+-- TOC entry 3473 (class 2606 OID 16586)
 -- Name: birkstock birkstock_primary; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1632,7 +1668,7 @@ ALTER TABLE ONLY public.birkstock
 
 
 --
--- TOC entry 3468 (class 2606 OID 16588)
+-- TOC entry 3475 (class 2606 OID 16588)
 -- Name: birktracker birktracker_primary; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1641,7 +1677,7 @@ ALTER TABLE ONLY public.birktracker
 
 
 --
--- TOC entry 3470 (class 2606 OID 16590)
+-- TOC entry 3477 (class 2606 OID 16590)
 -- Name: brand brand_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1650,7 +1686,7 @@ ALTER TABLE ONLY public.brand
 
 
 --
--- TOC entry 3472 (class 2606 OID 16592)
+-- TOC entry 3479 (class 2606 OID 16592)
 -- Name: campaign campaign_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1659,7 +1695,7 @@ ALTER TABLE ONLY public.campaign
 
 
 --
--- TOC entry 3474 (class 2606 OID 16594)
+-- TOC entry 3481 (class 2606 OID 16594)
 -- Name: category category_primary; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1668,7 +1704,7 @@ ALTER TABLE ONLY public.category
 
 
 --
--- TOC entry 3476 (class 2606 OID 16596)
+-- TOC entry 3483 (class 2606 OID 16596)
 -- Name: colour colour_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1677,7 +1713,16 @@ ALTER TABLE ONLY public.colour
 
 
 --
--- TOC entry 3546 (class 2606 OID 21984)
+-- TOC entry 3561 (class 2606 OID 24588)
+-- Name: google_campaign_daily google_campaign_daily_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
+--
+
+ALTER TABLE ONLY public.google_campaign_daily
+    ADD CONSTRAINT google_campaign_daily_pkey PRIMARY KEY (snapshot_date, campaign);
+
+
+--
+-- TOC entry 3553 (class 2606 OID 21984)
 -- Name: google_stock_track google_stock_track_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1686,7 +1731,7 @@ ALTER TABLE ONLY public.google_stock_track
 
 
 --
--- TOC entry 3478 (class 2606 OID 16598)
+-- TOC entry 3485 (class 2606 OID 16598)
 -- Name: groupid_performance groupid_performance_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1695,7 +1740,7 @@ ALTER TABLE ONLY public.groupid_performance
 
 
 --
--- TOC entry 3480 (class 2606 OID 16600)
+-- TOC entry 3487 (class 2606 OID 16600)
 -- Name: groupid_performance_week groupid_performance_week_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1704,7 +1749,7 @@ ALTER TABLE ONLY public.groupid_performance_week
 
 
 --
--- TOC entry 3482 (class 2606 OID 16602)
+-- TOC entry 3489 (class 2606 OID 16602)
 -- Name: grouplabel grouplabel_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1713,7 +1758,7 @@ ALTER TABLE ONLY public.grouplabel
 
 
 --
--- TOC entry 3488 (class 2606 OID 16604)
+-- TOC entry 3495 (class 2606 OID 16604)
 -- Name: localstock id_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1722,7 +1767,7 @@ ALTER TABLE ONLY public.localstock
 
 
 --
--- TOC entry 3484 (class 2606 OID 16606)
+-- TOC entry 3491 (class 2606 OID 16606)
 -- Name: incoming_stock incoming_stock_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1731,7 +1776,7 @@ ALTER TABLE ONLY public.incoming_stock
 
 
 --
--- TOC entry 3486 (class 2606 OID 16608)
+-- TOC entry 3493 (class 2606 OID 16608)
 -- Name: inivalues inivalues_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1740,7 +1785,7 @@ ALTER TABLE ONLY public.inivalues
 
 
 --
--- TOC entry 3493 (class 2606 OID 16610)
+-- TOC entry 3500 (class 2606 OID 16610)
 -- Name: location location_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1749,7 +1794,7 @@ ALTER TABLE ONLY public.location
 
 
 --
--- TOC entry 3495 (class 2606 OID 16612)
+-- TOC entry 3502 (class 2606 OID 16612)
 -- Name: offlinesold offlinesold_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1758,7 +1803,7 @@ ALTER TABLE ONLY public.offlinesold
 
 
 --
--- TOC entry 3499 (class 2606 OID 16614)
+-- TOC entry 3506 (class 2606 OID 16614)
 -- Name: orderstatus_archive orderstatus_archive_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1767,7 +1812,7 @@ ALTER TABLE ONLY public.orderstatus_archive
 
 
 --
--- TOC entry 3497 (class 2606 OID 16616)
+-- TOC entry 3504 (class 2606 OID 16616)
 -- Name: orderstatus orderstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1776,7 +1821,7 @@ ALTER TABLE ONLY public.orderstatus
 
 
 --
--- TOC entry 3501 (class 2606 OID 16618)
+-- TOC entry 3508 (class 2606 OID 16618)
 -- Name: performance performance_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1785,7 +1830,7 @@ ALTER TABLE ONLY public.performance
 
 
 --
--- TOC entry 3503 (class 2606 OID 16620)
+-- TOC entry 3510 (class 2606 OID 16620)
 -- Name: pickpin pickpin_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1794,7 +1839,7 @@ ALTER TABLE ONLY public.pickpin
 
 
 --
--- TOC entry 3505 (class 2606 OID 16622)
+-- TOC entry 3512 (class 2606 OID 16622)
 -- Name: price_change_log price_change_log_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1803,7 +1848,7 @@ ALTER TABLE ONLY public.price_change_log
 
 
 --
--- TOC entry 3544 (class 2606 OID 16762)
+-- TOC entry 3551 (class 2606 OID 16762)
 -- Name: price_change_reasons price_change_reasons_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1812,7 +1857,7 @@ ALTER TABLE ONLY public.price_change_reasons
 
 
 --
--- TOC entry 3507 (class 2606 OID 16624)
+-- TOC entry 3514 (class 2606 OID 16624)
 -- Name: price_track price_track_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1821,7 +1866,7 @@ ALTER TABLE ONLY public.price_track
 
 
 --
--- TOC entry 3509 (class 2606 OID 16626)
+-- TOC entry 3516 (class 2606 OID 16626)
 -- Name: productlink productlink_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1830,7 +1875,7 @@ ALTER TABLE ONLY public.productlink
 
 
 --
--- TOC entry 3511 (class 2606 OID 16628)
+-- TOC entry 3518 (class 2606 OID 16628)
 -- Name: producttype producttype_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1839,7 +1884,7 @@ ALTER TABLE ONLY public.producttype
 
 
 --
--- TOC entry 3518 (class 2606 OID 16630)
+-- TOC entry 3525 (class 2606 OID 16630)
 -- Name: sales sales_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1848,7 +1893,7 @@ ALTER TABLE ONLY public.sales
 
 
 --
--- TOC entry 3552 (class 2606 OID 24556)
+-- TOC entry 3559 (class 2606 OID 24556)
 -- Name: segment_notes segment_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1857,7 +1902,7 @@ ALTER TABLE ONLY public.segment_notes
 
 
 --
--- TOC entry 3527 (class 2606 OID 16632)
+-- TOC entry 3534 (class 2606 OID 16632)
 -- Name: shopifyimages shopifyimages_primary; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1866,7 +1911,7 @@ ALTER TABLE ONLY public.shopifyimages
 
 
 --
--- TOC entry 3529 (class 2606 OID 16634)
+-- TOC entry 3536 (class 2606 OID 16634)
 -- Name: shopifysnapshot shopifysnapshot_primary; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1875,7 +1920,7 @@ ALTER TABLE ONLY public.shopifysnapshot
 
 
 --
--- TOC entry 3531 (class 2606 OID 16636)
+-- TOC entry 3538 (class 2606 OID 16636)
 -- Name: shopifysold shopifysold_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1884,7 +1929,7 @@ ALTER TABLE ONLY public.shopifysold
 
 
 --
--- TOC entry 3533 (class 2606 OID 16638)
+-- TOC entry 3540 (class 2606 OID 16638)
 -- Name: shopprices shopprices_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1893,7 +1938,7 @@ ALTER TABLE ONLY public.shopprices
 
 
 --
--- TOC entry 3538 (class 2606 OID 16640)
+-- TOC entry 3545 (class 2606 OID 16640)
 -- Name: skumap skumap_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1902,7 +1947,7 @@ ALTER TABLE ONLY public.skumap
 
 
 --
--- TOC entry 3521 (class 2606 OID 16642)
+-- TOC entry 3528 (class 2606 OID 16642)
 -- Name: skusummary skusummary_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1911,7 +1956,7 @@ ALTER TABLE ONLY public.skusummary
 
 
 --
--- TOC entry 3540 (class 2606 OID 16644)
+-- TOC entry 3547 (class 2606 OID 16644)
 -- Name: stockorder stockorder_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1920,7 +1965,7 @@ ALTER TABLE ONLY public.stockorder
 
 
 --
--- TOC entry 3542 (class 2606 OID 16646)
+-- TOC entry 3549 (class 2606 OID 16646)
 -- Name: taglist taglist_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1929,7 +1974,7 @@ ALTER TABLE ONLY public.taglist
 
 
 --
--- TOC entry 3523 (class 2606 OID 16648)
+-- TOC entry 3530 (class 2606 OID 16648)
 -- Name: title title_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1938,7 +1983,7 @@ ALTER TABLE ONLY public.title
 
 
 --
--- TOC entry 3525 (class 2606 OID 16650)
+-- TOC entry 3532 (class 2606 OID 16650)
 -- Name: ukdstock ukdstock_pkey; Type: CONSTRAINT; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1947,7 +1992,7 @@ ALTER TABLE ONLY public.ukdstock
 
 
 --
--- TOC entry 3547 (class 1259 OID 21987)
+-- TOC entry 3554 (class 1259 OID 21987)
 -- Name: idx_google_stock_track_snapshot_date; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1955,7 +2000,7 @@ CREATE INDEX idx_google_stock_track_snapshot_date ON public.google_stock_track U
 
 
 --
--- TOC entry 3489 (class 1259 OID 16651)
+-- TOC entry 3496 (class 1259 OID 16651)
 -- Name: idx_localstock_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1963,7 +2008,7 @@ CREATE INDEX idx_localstock_code ON public.localstock USING btree (code);
 
 
 --
--- TOC entry 3490 (class 1259 OID 16652)
+-- TOC entry 3497 (class 1259 OID 16652)
 -- Name: idx_localstock_groupid; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1971,7 +2016,7 @@ CREATE INDEX idx_localstock_groupid ON public.localstock USING btree (groupid);
 
 
 --
--- TOC entry 3491 (class 1259 OID 16653)
+-- TOC entry 3498 (class 1259 OID 16653)
 -- Name: idx_localstock_location_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1979,7 +2024,7 @@ CREATE INDEX idx_localstock_location_code ON public.localstock USING btree (loca
 
 
 --
--- TOC entry 3512 (class 1259 OID 16654)
+-- TOC entry 3519 (class 1259 OID 16654)
 -- Name: idx_sales_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1987,7 +2032,7 @@ CREATE INDEX idx_sales_code ON public.sales USING btree (code);
 
 
 --
--- TOC entry 3513 (class 1259 OID 16655)
+-- TOC entry 3520 (class 1259 OID 16655)
 -- Name: idx_sales_date_channel_group; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -1995,7 +2040,7 @@ CREATE INDEX idx_sales_date_channel_group ON public.sales USING btree (solddate,
 
 
 --
--- TOC entry 3514 (class 1259 OID 16656)
+-- TOC entry 3521 (class 1259 OID 16656)
 -- Name: idx_sales_groupid; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2003,7 +2048,7 @@ CREATE INDEX idx_sales_groupid ON public.sales USING btree (groupid);
 
 
 --
--- TOC entry 3515 (class 1259 OID 16657)
+-- TOC entry 3522 (class 1259 OID 16657)
 -- Name: idx_sales_ordernum; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2011,7 +2056,7 @@ CREATE INDEX idx_sales_ordernum ON public.sales USING btree (ordernum);
 
 
 --
--- TOC entry 3516 (class 1259 OID 16658)
+-- TOC entry 3523 (class 1259 OID 16658)
 -- Name: idx_sales_solddate; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2019,7 +2064,7 @@ CREATE INDEX idx_sales_solddate ON public.sales USING btree (solddate);
 
 
 --
--- TOC entry 3550 (class 1259 OID 24557)
+-- TOC entry 3557 (class 1259 OID 24557)
 -- Name: idx_segment_notes_segment; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2027,7 +2072,7 @@ CREATE INDEX idx_segment_notes_segment ON public.segment_notes USING btree (segm
 
 
 --
--- TOC entry 3534 (class 1259 OID 16659)
+-- TOC entry 3541 (class 1259 OID 16659)
 -- Name: idx_skumap_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2035,7 +2080,7 @@ CREATE INDEX idx_skumap_code ON public.skumap USING btree (code);
 
 
 --
--- TOC entry 3535 (class 1259 OID 16660)
+-- TOC entry 3542 (class 1259 OID 16660)
 -- Name: idx_skumap_groupid; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2043,7 +2088,7 @@ CREATE INDEX idx_skumap_groupid ON public.skumap USING btree (groupid);
 
 
 --
--- TOC entry 3536 (class 1259 OID 16661)
+-- TOC entry 3543 (class 1259 OID 16661)
 -- Name: idx_skumap_groupid_code; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2051,7 +2096,7 @@ CREATE INDEX idx_skumap_groupid_code ON public.skumap USING btree (groupid, code
 
 
 --
--- TOC entry 3519 (class 1259 OID 16662)
+-- TOC entry 3526 (class 1259 OID 16662)
 -- Name: idx_skusummary_groupid; Type: INDEX; Schema: public; Owner: brookfield_prod_user
 --
 
@@ -2059,7 +2104,7 @@ CREATE INDEX idx_skusummary_groupid ON public.skusummary USING btree (groupid);
 
 
 --
--- TOC entry 3702 (class 0 OID 0)
+-- TOC entry 3711 (class 0 OID 0)
 -- Dependencies: 5
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
 --
@@ -2068,7 +2113,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2026-04-28 19:22:11
+-- Completed on 2026-05-04 21:12:27
 
 --
 -- PostgreSQL database dump complete

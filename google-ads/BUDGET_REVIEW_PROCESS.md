@@ -17,7 +17,7 @@
   - April conversion median 9.3% vs March 12.1% — still watching
   - Marginal ROAS 5.67x last week vs prior — above floor but tight; spend +57% over 3 weeks bought only +13% daily revenue (diminishing returns curve)
   - Search impression share on standard will drop materially post-restructure (PMAX wins internal auctions on duplicated Birks; IVES gone from standard) — the metric is now reading a smaller competitive pool, not weakening demand. Don't compare standard's imp share pre/post-restructure.
-- **Tracking gap:** `google_stock_track` and the CSV import treat ad spend as one number. Per-campaign data not yet captured. Until it is, ROAS attribution between standard / PMAX / IVES is opaque. Decision: don't extend schema yet — wait until the structure proves itself. User will paste raw Google Ads campaign reports in chat for analysis sessions.
+- **Per-campaign data captured (added 2026-05-04):** `google_campaign_daily` table stores per-(date, campaign) clicks/impressions/cost/search_imp_share. Populated nightly from `adcost_summary_30.csv` (per-campaign export). `google_stock_track` ad columns continue to hold per-date sums; `google_search_imp_share` is frozen at historical values (no longer populated — aggregated metric ill-defined post-restructure). **Conversion data is still per-day only** — Google Ads conversion-by-campaign export not wired up; for ROAS attribution between standard/PMAX/IVES, paste the conversions report in chat.
 - **Snapshot-sales-lag caveat:** `google_stock_track.shopify_sales` captures the day's sales at script-run time and can lag actual end-of-day total when late orders file after the snapshot. For trend reads, prefer joining `google_stock_track` to `sales` on `solddate` rather than using `shopify_sales` directly. (Discovered 30 Apr — Apr 29 stored £544 vs actual £920.)
 - **Capture-before-act rule:** when the budget is changed in the UI, add a line to the change log the same day, even if rationale is filled in later. The £54→£60 ghost change happened because this didn't.
 
@@ -40,9 +40,10 @@
 
 | Source | What it tells us | How to check |
 |--------|-----------------|--------------|
-| `google_stock_track` table | Daily spend, clicks, impressions, Shopify sales, stock levels, Birk ad-readiness counts | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
+| `google_stock_track` table | Daily snapshot — spend (sum across campaigns), clicks (sum), impressions (sum), Shopify sales, stock levels, Birk ad-readiness counts | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
+| `google_campaign_daily` table | **Per-(date, campaign)** — clicks, impressions, cost, search_imp_share. Source of truth for any per-campaign read since 2026-05-04. | `SELECT * FROM google_campaign_daily WHERE snapshot_date >= CURRENT_DATE - 7 ORDER BY snapshot_date DESC, campaign;` |
 | `localstock` table | Current warehouse stock by SKU (source of truth) | `SELECT groupid, SUM(qty) as units FROM localstock WHERE deleted = 0 AND brand = 'Birkenstock' GROUP BY groupid ORDER BY units DESC;` |
-| `adcost_summary_30.csv` | Raw Google Ads export (30-day daily breakdown) | Export from Google Ads, save to `google-ads/` folder |
+| `adcost_summary_30.csv` | Raw Google Ads export (per-campaign, 30-day daily breakdown). Save to Downloads — script auto-moves and processes. | Export from Google Ads UI with the per-campaign columns: Day, Campaign, Clicks, Impr., Cost, Search impr. share. |
 
 **Birk ad-readiness columns in `google_stock_track`** (populated nightly from `update_google_stock_track.py`, definition matches step 3 below):
 - `birk_ready_styles` — count of READY styles (≥70% size coverage AND ≥15 units). The convertible-catalogue headline. Watch for it ticking up when deliveries land.
@@ -81,11 +82,11 @@ Implication: if Stock shows persistent leaks (PARTIAL/THIN on top sellers) and t
 
 ### Restructure context (post 28-29 Apr 2026)
 
-The grids below aggregate across all three campaigns (Standard + PMAX + IVES). The CSV import gives a single daily spend/clicks/sales number — there is no per-campaign breakdown in the database. Per-campaign analysis comes from raw Google Ads exports pasted into chat sessions, not from `google_stock_track`.
+The grids below aggregate across all three campaigns (Standard + PMAX + IVES). For per-campaign reads, use `google_campaign_daily` (populated nightly since 2026-05-04). Per-campaign **conversion** data is not yet captured — for ROAS attribution between standard / PMAX / IVES, paste the conversions report in chat.
 
 Two reading rules while the new structure is bedding in:
 
-1. **Don't use standard's `google_search_imp_share` as a constraint signal until it stabilises.** PMAX wins internal auctions on the duplicated Birk SKUs and IVES has left standard's catalogue, so standard's denominator (auctions it competes in) shrank by design. A drop to <10% on standard reflects scope, not weakening demand. Re-baseline the metric after 2-3 clean weeks.
+1. **Don't aggregate `search_imp_share` across campaigns.** Read it per campaign from `google_campaign_daily`. The combined-imp-share metric isn't well-defined when each campaign competes in a different eligible-auction pool. `google_stock_track.google_search_imp_share` is frozen at historical (pre-restructure) values — new dates will be NULL.
 2. **For sales totals, prefer `sales` table over `google_stock_track.shopify_sales`.** The stored column captures sales at script-run time and can lag end-of-day total — significant on days when the snapshot runs before all orders file. Join on `solddate = snapshot_date` for accurate ROAS reads.
 
 The "Decrease budget" rule about THIN-selling styles applies catalogue-wide regardless of which campaign carries those SKUs.
@@ -231,8 +232,8 @@ Output shape: `Segment | Styles | READY | PARTIAL | THIN | THIN-selling | Sold 3
 | Metric | Floor | Target | Ceiling | Source |
 |--------|:-----:|:------:|:-------:|--------|
 | ROAS | 5x (minimum profitable) | 7x+ | — | `google_stock_track` (shopify_sales / google_ad_spend) |
-| Search impression share | — | 85%+ | — | `google_stock_track` (google_search_imp_share) |
-| Daily spend vs budget | — | 80%+ of budget | Consistently hitting cap | `adcost_summary_30.csv` |
+| Search impression share (per campaign) | — | 85%+ | — | `google_campaign_daily` (search_imp_share) |
+| Daily spend vs cap (per campaign) | — | 80%+ of cap | Consistently hitting cap | `google_campaign_daily` (cost) |
 | Impressions trend | — | Week-on-week growth in spring | — | `google_stock_track` |
 | Ad-ready styles (READY count) | 10+ styles | 15+ styles | — | Ad-readiness query (step 3) |
 | THIN styles actively selling | 0 ideal | Flag for stock review | — | Ad-readiness query (sold_30d > 0 but THIN) |
@@ -316,19 +317,45 @@ FROM daily WHERE snapshot_date >= CURRENT_DATE - 14 AND snapshot_date < CURRENT_
 
 ### 2. Check search impression share and budget pressure
 
+Per-campaign — read directly from `google_campaign_daily` (source of truth since the per-campaign CSV format went live):
+
 ```sql
-SELECT snapshot_date, google_ad_spend, google_search_imp_share
-FROM google_stock_track
-WHERE google_ad_spend IS NOT NULL
-ORDER BY snapshot_date DESC LIMIT 14;
+SELECT snapshot_date, campaign, cost, clicks, search_imp_share
+FROM google_campaign_daily
+WHERE snapshot_date >= CURRENT_DATE - 14
+ORDER BY snapshot_date DESC, campaign;
 ```
 
-**Reading impression share:**
-- **85%+** — capturing most available traffic, budget is not limiting
-- **70-85%** — missing some traffic, budget may be constraining
-- **Below 70%** — significant traffic being missed, budget or tROAS is limiting
+`search_imp_share` is NULL when Google reports `< 10%` (campaign losing most auctions) or `--` (reporting lag — usually clears within 1-2 days).
 
-Also check `adcost_summary_30.csv` — how many days in the last 7 came close to the daily budget? If 3+ days are within £1 of the cap, the budget is constraining.
+**Reading impression share (per campaign):**
+- **85%+** — capturing most available traffic, that campaign's budget is not limiting
+- **70-85%** — missing some traffic, budget may be constraining
+- **Below 70%** — significant traffic being missed, budget or tROAS is limiting on that campaign
+- **NULL persistently (not lag)** — campaign at `<10%`. Either lift its cap or accept it's a niche role.
+
+**Don't aggregate imp share across campaigns.** The combined-imp-share number isn't well-defined post-restructure (Google computes it per campaign against that campaign's eligible auction pool). `google_stock_track.google_search_imp_share` is frozen at its pre-restructure historical values; new dates will be NULL there. Use the per-campaign table.
+
+**Cap pressure** — combine the spend column with the campaign's known daily cap:
+
+```sql
+SELECT campaign,
+       ROUND(AVG(cost), 2) AS avg_daily_spend,
+       SUM(CASE WHEN cost >= cap_minus_1 THEN 1 ELSE 0 END) AS days_at_cap
+FROM (
+  SELECT campaign, cost,
+         CASE campaign
+           WHEN 'STANDARD'    THEN 60 - 1
+           WHEN 'BIRK-WINNER' THEN 20 - 1
+           WHEN 'IVES'        THEN  5 - 1
+         END AS cap_minus_1
+  FROM google_campaign_daily
+  WHERE snapshot_date >= CURRENT_DATE - 7
+) d
+GROUP BY campaign;
+```
+
+If a campaign shows 3+ of 7 days at/over its cap, that campaign's budget is constraining. Update the CASE arms when you change a daily cap (or move them to a `campaign_caps` table when there are more than three).
 
 ### 3. Check stock readiness (ad-readiness by style)
 
@@ -548,10 +575,11 @@ When asked to review the Google Ads budget:
 
 **Important:** Do not run budget analysis on stale data. Check the latest `snapshot_date` with ad spend data first — if it is more than 2 days old, flag it and wait for user confirmation before proceeding.
 
-1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates — include `google_search_imp_share`
-2. Run the ad-readiness query to check stock by style (READY / PARTIAL / THIN)
-3. Check the latest `adcost_summary_30.csv` for days hitting the budget cap
-4. Review impression share trend — is it dropping? (signals budget or tROAS constraint)
-5. Compare against the decision rules above
-6. Make a recommendation: increase / hold / decrease with reasoning
-7. If changing: update the Current State block at the top AND add an entry to the Budget & tROAS Change Log in this doc. **Do not log budget changes in `scale/SCALE_PLAN.md`** — single source of truth lives here.
+1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates (spend, clicks, impressions, ad-readiness)
+2. Query `google_campaign_daily` for per-campaign cost, clicks and `search_imp_share` (last 14 days). Use this — not `google_stock_track.google_search_imp_share` — for any imp share read.
+3. Run the ad-readiness query to check stock by style (READY / PARTIAL / THIN)
+4. Check per-campaign cap pressure (3+ of 7 days at/over a campaign's cap = constraining)
+5. Review per-campaign impression share trend — is any campaign dropping? (signals budget or tROAS constraint on that specific campaign)
+6. Compare against the decision rules above
+7. Make a recommendation: increase / hold / decrease with reasoning — name the campaign(s) the change applies to
+8. If changing: update the Current State block at the top AND add an entry to the Budget & tROAS Change Log in this doc. **Do not log budget changes in `scale/SCALE_PLAN.md`** — single source of truth lives here.

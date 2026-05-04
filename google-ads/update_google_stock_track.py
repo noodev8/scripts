@@ -13,7 +13,12 @@ Creates daily snapshots dated for YESTERDAY with:
    same convention as live_stock_units).
 
 Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
-The CSV data matches snapshot dates, ensuring no nulls in the database.
+The CSV is the per-campaign export (Day, Campaign, Clicks, Impr., Currency code,
+Cost, Search impr. share). Per-campaign rows are upserted into google_campaign_daily;
+sums by date populate google_stock_track ad columns (google_ad_spend, google_clicks,
+google_impressions). google_search_imp_share is no longer populated by this script —
+the aggregated metric is unreliable post-restructure; per-campaign truth lives in
+google_campaign_daily.
 
 This helps determine appropriate Google Shopping ad budget based on available inventory
 and historical performance.
@@ -56,21 +61,25 @@ def parse_csv_number(value):
         log(f"WARNING: Could not parse number '{value}', using 0")
         return 0
 
+EXPECTED_CSV_HEADERS = ['Day', 'Campaign', 'Clicks', 'Impr.', 'Currency code', 'Cost', 'Search impr. share']
+
 def read_google_ads_csv(csv_path):
     """
-    Read Google Ads CSV file and extract data.
+    Read Google Ads per-campaign CSV file and extract one row per (date, campaign).
 
     Expected format:
     Row 1: Title (skip)
     Row 2: Date range (skip)
-    Row 3: Headers (Day,Clicks,Impr.,Currency code,Cost,Search impr. share)
-    Data rows: dates with metrics
+    Row 3: Headers (Day,Campaign,Clicks,Impr.,Currency code,Cost,Search impr. share)
+    Data rows: one row per (date, campaign)
 
-    Args:
-        csv_path: Path to CSV file
+    Search impression share parsing:
+    - '< 10%' → NULL (Google's below-threshold marker)
+    - '--' → NULL (reporting lag)
+    - 'NN.NN%' → numeric
 
     Returns:
-        list: List of dicts with date, clicks, impressions, cost, search_imp_share
+        list: dicts with date, campaign, clicks, impressions, cost, search_imp_share
     """
     data = []
 
@@ -78,11 +87,9 @@ def read_google_ads_csv(csv_path):
         with open(csv_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
 
-            # Skip first 2 rows (title and date range)
-            next(reader, None)
-            next(reader, None)
+            next(reader, None)  # title
+            next(reader, None)  # date range
 
-            # Read header row (row 3)
             headers = next(reader, None)
             if not headers:
                 log("ERROR: CSV file appears to be empty")
@@ -90,46 +97,46 @@ def read_google_ads_csv(csv_path):
 
             log(f"CSV Headers: {headers}")
 
-            # Read data rows
+            if headers[:len(EXPECTED_CSV_HEADERS)] != EXPECTED_CSV_HEADERS:
+                log(f"ERROR: Unexpected CSV format. Expected {EXPECTED_CSV_HEADERS}, got {headers}")
+                return data
+
             for row in reader:
-                if len(row) < 5:
+                if len(row) < 7:
                     log(f"WARNING: Skipping incomplete row: {row}")
                     continue
 
                 try:
-                    # Parse date (column 0)
                     date_str = row[0].strip()
                     date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                    campaign = row[1].strip()
+                    clicks = parse_csv_number(row[2])
+                    impressions = parse_csv_number(row[3])
+                    # row[4] is currency code
+                    cost = parse_csv_number(row[5])
 
-                    # Parse metrics
-                    clicks = parse_csv_number(row[1])
-                    impressions = parse_csv_number(row[2])
-                    # Skip currency code (row[3])
-                    cost = parse_csv_number(row[4])
-
-                    # Parse search impression share (column 5, optional)
                     search_imp_share = None
-                    if len(row) > 5:
-                        share_str = row[5].strip().replace('%', '')
-                        if share_str and share_str != '--':
-                            try:
-                                search_imp_share = float(share_str)
-                            except ValueError:
-                                log(f"WARNING: Could not parse search imp share '{row[5]}' for {date_str}")
+                    share_str = row[6].strip().replace('%', '')
+                    if share_str and share_str != '--' and not share_str.startswith('<'):
+                        try:
+                            search_imp_share = float(share_str)
+                        except ValueError:
+                            log(f"WARNING: Could not parse search imp share '{row[6]}' for {date_str}/{campaign}")
 
                     data.append({
                         'date': date_obj,
+                        'campaign': campaign,
                         'clicks': clicks,
                         'impressions': impressions,
                         'cost': cost,
-                        'search_imp_share': search_imp_share
+                        'search_imp_share': search_imp_share,
                     })
 
                 except Exception as e:
                     log(f"ERROR: Failed to parse row {row}: {str(e)}")
                     continue
 
-            log(f"Successfully parsed {len(data)} rows from CSV")
+            log(f"Successfully parsed {len(data)} per-campaign rows from CSV")
             return data
 
     except FileNotFoundError:
@@ -139,28 +146,80 @@ def read_google_ads_csv(csv_path):
         log(f"ERROR: Failed to read CSV file: {str(e)}")
         return data
 
-def update_google_ads_data(cursor, csv_data):
+
+def upsert_campaign_daily(cursor, csv_data):
     """
-    Update google_stock_track records with Google Ads data.
-    Only updates records that don't already have Google Ads data.
+    Upsert per-campaign daily rows into google_campaign_daily.
+    Source of truth for per-campaign ad metrics. Idempotent on (snapshot_date, campaign).
+
+    Returns:
+        int: Number of rows upserted
+    """
+    query = """
+    INSERT INTO google_campaign_daily
+        (snapshot_date, campaign, clicks, impressions, cost, search_imp_share)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    ON CONFLICT (snapshot_date, campaign) DO UPDATE SET
+        clicks = EXCLUDED.clicks,
+        impressions = EXCLUDED.impressions,
+        cost = EXCLUDED.cost,
+        search_imp_share = EXCLUDED.search_imp_share
+    """
+
+    count = 0
+    for row in csv_data:
+        try:
+            cursor.execute(query, (
+                row['date'], row['campaign'],
+                row['clicks'], row['impressions'],
+                row['cost'], row['search_imp_share'],
+            ))
+            count += 1
+        except Exception as e:
+            log(f"ERROR: Failed to upsert {row['date']}/{row['campaign']}: {str(e)}")
+            continue
+
+    log(f"Upserted {count} per-campaign rows into google_campaign_daily")
+    return count
+
+
+def aggregate_by_date(csv_data):
+    """
+    Sum per-campaign rows into per-date totals for google_stock_track ad columns.
+    search_imp_share intentionally not aggregated — per-campaign truth lives in
+    google_campaign_daily; aggregated imp share is mathematically ill-defined.
+
+    Returns:
+        list: dicts with date, clicks, impressions, cost
+    """
+    by_date = {}
+    for row in csv_data:
+        d = row['date']
+        if d not in by_date:
+            by_date[d] = {'date': d, 'clicks': 0, 'impressions': 0, 'cost': 0.0}
+        by_date[d]['clicks'] += row['clicks']
+        by_date[d]['impressions'] += row['impressions']
+        by_date[d]['cost'] += row['cost']
+    return list(by_date.values())
+
+def update_google_ads_data(cursor, daily_data):
+    """
+    Update google_stock_track ad columns with per-date sums of campaign data.
+    Only writes ad columns to rows that don't already have spend data.
+    google_search_imp_share is not populated here — see google_campaign_daily.
 
     Args:
         cursor: Database cursor
-        csv_data: List of dicts with Google Ads metrics
+        daily_data: list of dicts with date, clicks, impressions, cost
 
     Returns:
         dict: Statistics (updated, skipped, not_found)
     """
-    stats = {
-        'updated': 0,
-        'skipped': 0,
-        'not_found': 0
-    }
+    stats = {'updated': 0, 'skipped': 0, 'not_found': 0}
 
-    for row in csv_data:
-        # Check if record exists for this date
+    for row in daily_data:
         check_query = """
-        SELECT id, google_ad_spend, google_clicks, google_impressions, google_search_imp_share, troas
+        SELECT id, google_ad_spend, troas
         FROM google_stock_track
         WHERE DATE(snapshot_date) = %s
         """
@@ -176,60 +235,34 @@ def update_google_ads_data(cursor, csv_data):
 
             record_id = result[0]
             existing_spend = result[1]
-            existing_clicks = result[2]
-            existing_impressions = result[3]
-            existing_imp_share = result[4]
-            existing_troas = result[5]
+            existing_troas = result[2]
 
-            # If already has spend data, backfill any missing fields
+            # Already populated: only backfill troas if missing
             if existing_spend is not None:
-                backfill_sets = []
-                backfill_params = []
-
-                if existing_imp_share is None and row.get('search_imp_share') is not None:
-                    backfill_sets.append("google_search_imp_share = %s")
-                    backfill_params.append(row['search_imp_share'])
-
                 if existing_troas is None:
-                    backfill_sets.append("troas = %s")
-                    backfill_params.append(CURRENT_TROAS)
-
-                if backfill_sets:
-                    backfill_query = f"""
-                    UPDATE google_stock_track
-                    SET {', '.join(backfill_sets)}
-                    WHERE id = %s
-                    """
-                    backfill_params.append(record_id)
-                    cursor.execute(backfill_query, backfill_params)
-                    log(f"Backfilled {row['date']}: {', '.join(backfill_sets)}")
+                    cursor.execute(
+                        "UPDATE google_stock_track SET troas = %s WHERE id = %s",
+                        (CURRENT_TROAS, record_id),
+                    )
+                    log(f"Backfilled troas for {row['date']}")
                     stats['updated'] += 1
                 else:
                     stats['skipped'] += 1
                 continue
 
-            # Update the record
             update_query = """
             UPDATE google_stock_track
             SET google_ad_spend = %s,
                 google_clicks = %s,
                 google_impressions = %s,
-                google_search_imp_share = %s,
                 troas = %s
             WHERE id = %s
             """
-
             cursor.execute(update_query, (
-                row['cost'],
-                row['clicks'],
-                row['impressions'],
-                row.get('search_imp_share'),
-                CURRENT_TROAS,
-                record_id
+                row['cost'], row['clicks'], row['impressions'],
+                CURRENT_TROAS, record_id,
             ))
-
-            share_str = f", {row.get('search_imp_share')}% imp share" if row.get('search_imp_share') else ""
-            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions{share_str}")
+            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions (summed across campaigns)")
             stats['updated'] += 1
 
         except Exception as e:
@@ -660,8 +693,12 @@ def main():
             csv_data = read_google_ads_csv(csv_path)
 
             if csv_data:
-                log("--- Updating Google Ads Data ---")
-                stats = update_google_ads_data(cursor, csv_data)
+                log("--- Upserting Per-Campaign Daily Rows ---")
+                upsert_campaign_daily(cursor, csv_data)
+
+                log("--- Updating google_stock_track Aggregate Ad Columns ---")
+                daily_data = aggregate_by_date(csv_data)
+                stats = update_google_ads_data(cursor, daily_data)
                 log(f"Google Ads import summary: {stats['updated']} updated, {stats['skipped']} skipped, {stats['not_found']} not found")
             else:
                 log("WARNING: No data extracted from CSV file")
