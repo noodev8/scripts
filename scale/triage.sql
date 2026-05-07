@@ -9,6 +9,7 @@
 --   COOLING      14d rate < 50% of 30d rate (and 30d ≥5)                    => watch
 --   OK           none of the above
 --
+-- Stock = local #FREE + FBA (amzfeed.amzlive). OOS check uses combined per-size stock.
 -- Excludes off-season segments (RIEKER-WIN, REMONTE-WIN) and CRAP.
 -- Adjust the in_season_segments CTE seasonally.
 
@@ -55,13 +56,23 @@ sales_yoy_30 AS (
     AND groupid IN (SELECT groupid FROM gids)
   GROUP BY groupid
 ),
-stock_now AS (
-  SELECT m.groupid, SUM(ls.qty)::int AS stock
+stock_by_code AS (
+  -- Per-code total: local #FREE + FBA amzlive. Used for both totals and OOS check.
+  SELECT m.groupid, m.code,
+         COALESCE(ls.qty,0) + COALESCE(af.amzlive,0) AS qty
   FROM skumap m
-  JOIN localstock ls ON ls.code=m.code
-  WHERE ls.deleted=0 AND ls.ordernum='#FREE'
+  LEFT JOIN (
+    SELECT code, SUM(qty)::int AS qty FROM localstock
+    WHERE deleted=0 AND ordernum='#FREE' GROUP BY code
+  ) ls ON ls.code=m.code
+  LEFT JOIN amzfeed af ON af.code=m.code
+  WHERE m.deleted=0
     AND m.groupid IN (SELECT groupid FROM gids)
-  GROUP BY m.groupid
+),
+stock_now AS (
+  SELECT groupid, SUM(qty)::int AS stock
+  FROM stock_by_code
+  GROUP BY groupid
 ),
 inbound AS (
   SELECT m.groupid,
@@ -81,14 +92,11 @@ running_sizes AS (
     AND m.groupid IN (SELECT groupid FROM gids)
 ),
 running_oos AS (
-  -- How many running sizes are now stocked at zero
+  -- How many running sizes are now stocked at zero (local + FBA combined)
   SELECT rs.groupid,
-         COUNT(*) FILTER (WHERE COALESCE(ls.qty,0) = 0) AS oos_running
+         COUNT(*) FILTER (WHERE COALESCE(sbc.qty,0) = 0) AS oos_running
   FROM running_sizes rs
-  LEFT JOIN (
-    SELECT code, SUM(qty)::int AS qty FROM localstock
-    WHERE deleted=0 AND ordernum='#FREE' GROUP BY code
-  ) ls ON ls.code=rs.code
+  LEFT JOIN stock_by_code sbc ON sbc.code=rs.code
   GROUP BY rs.groupid
 ),
 notes AS (
