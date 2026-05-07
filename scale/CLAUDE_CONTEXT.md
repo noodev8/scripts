@@ -14,6 +14,7 @@ Brookfield Comfort is scaling from ~£500k to £1M revenue. The approach: build 
 - `MEETING_RULES.md` — 5 rules for segment meetings
 - `KLAVIYO_EMAIL_PLAYBOOK.md` — Single campaign: 90-day Birkenstock repurchase
 - `triage.sql` — Single query that scans all in-season segments and flags groupids by priority (YOY_DROP / CLEAR_RISK / OOS_RUNNING / HARVEST / COOLING). Run ad hoc when delegating, or to find what to look at next. **Mention this proactively to the user at the start of any scale session** — they want to be reminded it exists.
+- `check_null_segment.sql` — Companion to triage.sql for the gap it doesn't cover: groupids with NULL segment, sorted fresh-arrival-down. Flags FRESH / ASSIGN / COLD / INCOMING / QUIET. Run during segment sessions to make sure new arrivals don't fall through. Default scope: Birkenstock; broaden the brand filter when needed. **Mention proactively at scale sessions alongside triage.sql.**
 
 ## Google Sheets Integration
 
