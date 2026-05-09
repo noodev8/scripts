@@ -6,6 +6,47 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 ## Status
 
+> **🗑️ DELETE-WHEN-RESOLVED** — the 2026-05-09 section below is verbose investigation context. Once the reverts confirm and we've moved past this episode (next 1-2 sessions), delete the entire 2026-05-09 entry to keep this file readable. Keep only the takeaways that generalise (compound-creep-collapse pattern is already in the heuristics if needed elsewhere).
+
+**Session (2026-05-09) — IVES recovery batch (18 reverts across all 8 segments):**
+
+**Trigger:** User flagged AMZ velocity dropping after Shopify IVES prices were briefly cut to £28.99 (May 5–7), then raised to £41.10 today. Theory: Amazon's external-pricing algorithm penalised us for Shopify being too low.
+
+**Investigation pushback:** The Shopify-poison theory didn't fit cleanly:
+- IVES Amazon Apr 26 – May 8 = **+38% units / +25% profit YoY** (293 vs 212 units, £3,957 vs £3,159 profit). Not actually in trouble vs last year — off our own peak.
+- The slowdown started May 4, *before* the £28.99 Shopify drop went live. The £28.99 was only live 3 days.
+- BLAZE Shopify hadn't moved in 60+ days, so the same theory couldn't apply — that's an Amazon-side demand problem (already in memory).
+
+**Real driver:** Compound creeps in 5 days. The Apr 30 supply-defensive batch + the May 4 follow-on batch stacked. On WHITE volume sizes: WHITE-04 went £38.59 → £39.79 (+£1.20, +3.1%) and WHITE-06 went £38.59 → £39.59 (+£1.00, +2.6%) inside 5 days. Several non-WHITE colours had the same compound effect.
+
+**Pattern observed (worth carrying forward):** First creep often *accelerated* velocity, second creep within ~5 days *killed* it. WHITE-06, MIDBLUE-05, NAVY-04 all show this shape — the first-creep level is the sweet spot, the second-creep level breaks. If a creep holds, **wait longer than 5 days before stacking another on top**.
+
+**Reverts applied (18 total):**
+
+| Segment | Reverts |
+|---------|---------|
+| WHITE | 04 £39.79→£38.59 (full revert −£1.20, profit-max test), 05 £39.99→£39.49 (£40 fail), 06 £39.59→£39.29 (May 4 only — sweet spot), 07 £39.30→£39.10 (May 4 only), 08 £38.99→£38.49 (full revert) |
+| BLACKSOLE | 04 £37.69→£37.49 (full revert), 05 £39.79→£39.49 (slow at £39.79), 06 £40.49→£39.79 (full revert of £40 breach, was dead) |
+| GREY | 04 £38.49→£37.99, 05 £37.99→£37.49, 06 £37.49→£36.99 (whole band cooling) |
+| KHAKI | 05 £39.29→£38.99 (dead post-creep) |
+| MIDBLUE | 05 £38.89→£38.59 (May 4 only — sweet spot), 06 £38.80→£38.50 (full revert) |
+| NAVY-BLUE | 04 £37.79→£37.49 (May 4 only — sweet spot), 05 £38.79→£38.49, 07 £37.49→£36.99 (returns spiking) |
+| BEIGE | 06 £39.90→£39.60 (profit-max test, was 1.00/d at this level) |
+
+**Held with confidence:** BLACK-05 (already at baseline £39.39), MIDBLUE-03 (tail size, 3 stock — burn-rate management).
+
+**Priority watches for next review (~3-5 days):**
+- **WHITE-04 at £38.59** — full-revert test on the volume size with 80 FBA. Expect ~2/d. If it doesn't restore, the slowdown was something other than our creeps.
+- **Sweet-spot triple: WHITE-06 £39.29, MIDBLUE-05 £38.59, NAVY-04 £37.49** — confirm these hold the first-creep accelerated velocity without the second-creep break.
+- **WHITE-05 at £39.49** — is the £40-barrier really a hard ceiling for this size, or was it a creep-stacking artefact?
+- **BEIGE-06 at £39.60** — profit-max test (1.00/d expected). If it holds, BEIGE is finding its range higher than NAVY/MIDBLUE.
+- **BLACKSOLE-06 at £39.79** — does the colour wake up off £40+ pricing.
+- **BLAZE** — separate problem, on Amazon side. Stay on Davisons buy box question. Don't read the BLAZE Shopify reset to RRP as part of this experiment.
+
+**Manual to-do for user:** Check Seller Central for any "Pricing Health" / "Featured Offer suppressed — lower price elsewhere" alerts on IVES SKUs. If those flagged during the May 5–7 Shopify £28.99 window, the external-pricing theory firms up and we may need to think about how Shopify and AMZ interact going forward.
+
+---
+
 **Session (2026-04-30) — IVES-COLOUR batch (19 changes: 11 creeps / 6 drops / 2 reverts):**
 
 Followed the WHITE supply-defensive session in the same sitting. No supplier squeeze on COLOUR — standard rules. Batch-apply mode (option 2): inline-autopilot with all 19 calls stated as decisions, user approved as a batch.
