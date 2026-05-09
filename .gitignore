@@ -50,6 +50,9 @@ logs/
 # Discussion folder — always tracked (overrides *.txt/*.csv above)
 !discussion/**
 
+# Crontab snapshot — always tracked (overrides *.txt above)
+!crontab.txt
+
 # Shopify price session data (staged CSVs, not tracked)
 shopify-price/staging/
 

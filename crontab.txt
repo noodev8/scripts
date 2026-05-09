@@ -1,0 +1,49 @@
+# ===== OVERNIGHT PROCESSING (Logical order) =====
+
+# TIMES are BST - Go up 1hr for GMT
+
+# 2:00 AM - Database backup (first, when DB is stable)
+0 1 * * * /apps/scripts/pg_backup.sh
+
+# 2:15 AM - Price tracking (capture current prices before any changes)
+15 1 * * * /apps/scripts/venv/bin/python /apps/scripts/price_track.py
+
+# 2:30 AM daily - Changed prices only (uses shopifychange flag)
+30 1 * * 0-5 /apps/scripts/venv/bin/python /apps/scripts/price_update.py --no-google
+
+# 2:30 AM Saturday - Full sweep (catches drift, refreshes variant links + RRP)
+30 1 * * 6 /apps/scripts/venv/bin/python /apps/scripts/price_update.py full --no-google
+
+# 2:45 AM - Stock tracking (after prices updated, snapshot for yesterday)
+45 1 * * * /apps/scripts/venv/bin/python /apps/scripts/google-ads/update_google_stock_track.py
+
+# 3:00 AM - Shopify inventory sync (update stock levels)
+0 2 * * * /apps/scripts/venv/bin/python /apps/scripts/update_shopify_inventory.py
+
+# 3:15 AM - Shopify titles update (update product titles)
+15 2 * * * /apps/scripts/venv/bin/python /apps/scripts/update_shopify_titles.py
+
+# 3:30 AM - Google Merchant feed (after prices/inventory updated)
+30 2 * * * /apps/scripts/venv/bin/python /apps/scripts/merchant-feed/merchant_feed.py --upload
+
+# 3:45 AM - Nightly Shopify tag sync
+45 2 * * * /apps/scripts/venv/bin/python /apps/scripts/update_shopify_tags.py
+
+# 4:00 AM - Weekly sales cleanup (Mondays only) - purge >900 days, fix return prices
+0 3 * * 1 /apps/scripts/venv/bin/python /apps/scripts/clean_sales.py
+
+
+# ===== DAYTIME PROCESSING =====
+
+# Order sync targets: 10:00, 14:00, 14:30, 14:45, 15:00, 15:10, 22:00
+# Note: These values are -1 hour to account for GMT server time.
+
+# 10:00 BST & 22:00 BST
+0 9,21 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
+
+# 14:00, 14:30, 14:45 BST
+0,30,45 13 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
+
+# 15:00, 15:10 BST
+0,10 14 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
+
