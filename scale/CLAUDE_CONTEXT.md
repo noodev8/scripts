@@ -43,8 +43,8 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 - Segments designed to be delegatable to staff
 - Each session: check progress, refine existing segments, add new ones
 - Minimum segment threshold: £5k revenue potential
-- 18 segments + CRAP (verified against DB Apr 2026). All groupids allocated.
-- CRAP: 163 groupids — pricing engine clears stock, revisit periodically
+- 25 segments, no CRAP, no NULL (verified against DB May 2026). Every groupid allocated to a managed segment.
+- "Everything in a segment, even if rubbish" — losers exit naturally via sell-through, not by living in CRAP
 - £500k→£1M needs new bricks (new brands, range expansions)
 - **Don't auto-log** to the Log tab — it has a different purpose (task tracking between user and Claude)
 
@@ -62,8 +62,13 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 
 ## Segment Naming in DB
 
-DB tags (in `skusummary.segment`) must match sheet codes. Key mappings:
-IVES-COLOUR, BEND-SEG, MILANO-SEG, BLAZE-SEG, GIZEH-SEG, EVA-SEG, ARIZONA-PATENT-SEG, ARIZONA-BF-NAR, ARIZONA-BF-REG, LAKE-SEG, ZERMATT-SEG, UKD-SEG
+DB tags (in `skusummary.segment`) must match sheet codes. Full list (25 segments, May 2026):
+
+Birkenstock: ARIZONA-BF-NAR, ARIZONA-BF-REG, ARIZONA-PATENT-SEG, ARIZONA-LEATHER, GIZEH-SEG, MAYARI-SEG, MADRID-SEG, MILANO-SEG, BEND-SEG, ZERMATT-SEG, EVA-SEG, BIRK-OTHER (Florida/Pasadena/Uppsala oddballs)
+Lunar: IVES-COLOUR, IVES-WHITE, BLAZE-SEG, LUNAR-GENERAL (everything non-Ives/non-Blaze)
+Rieker / Remonte: RIEKER-WIN, RIEKER-SUM, REMONTE-WIN
+Other brands: FREE-SPIRIT, LAKE-SEG, BLOCH-SEG, SKECHERS-SEG, STRIVE-SEG, UKD-SEG (low-cost supplier — Goor, Roamers, R21, Grafters, Scimitar, Cipriata)
+Accessories: ACCESSORY (Birkenstock socks, Bloch bags)
 
 ## Segment Definition Principle — Category Boundary, Not Curated Shortlist
 

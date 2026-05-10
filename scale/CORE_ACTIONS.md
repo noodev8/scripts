@@ -154,14 +154,13 @@ Rieker rotates its catalogue each season. The groupids change year to year. This
 
 1. **Sep:** Winter order arrives → add to system, tag `RIEKER-WIN`, price, send to FBA
 2. **Oct–Feb:** Sell. Monitor reorder screen. Best sellers → reorder mid-season (2-week lead time). Introduce new styles if performing well.
-3. **Mar:** Season ends. Clear remaining stock — drop prices monthly until gone.
-4. **~Jun:** Pre-order next winter range from Rieker catalogue, using this season's sales data.
+3. **Mar:** Season ends. Clear remaining stock — drop prices monthly until gone. Pre-order next winter range from Rieker catalogue, using this season's sales data. (Pre-order timing was historically ~Jun but 2026/27 batch was placed in Mar 2026.)
 
 ### Actions (current — season ending)
 
 - [ ] Clear remaining winter stock at reduced prices
-- [ ] Use 2025/26 sales data to inform 2026/27 winter pre-order (~Jun)
-- [ ] Top 4 (Navy Boots, Blue Boots, Black Shoes, Red Trainer) = proven winners. Reorder these for next winter.
+- [x] 2026/27 winter pre-order placed Mar 2026 — arriving ~Aug
+- [ ] On arrival: tag, price, send proven winners to FBA. Pick further FBA candidates as Amazon ranking signals appear through the season
 - [ ] Amazon only. No Shopify.
 
 ---
@@ -442,30 +441,11 @@ Narrow fits, Navy (high return rates), and low-volume shearling tail — all sta
 
 ---
 
-## CRAP — Can't Realise A Profit
+## CRAP — Retired (May 2026)
 
-Styles that fall below the segment threshold or sit in the tail of a segment. Nobody actively manages these. One task: **clear them.**
-**DB flag:** `segment = 'CRAP'`
+CRAP was a clearance bucket for tail styles. As of May 2026 it has been retired: every groupid lives in a managed segment, regardless of winner/loser status. The rationale is in `CLAUDE_CONTEXT.md` (Segment Definition Principle — Category Boundary, Not Curated Shortlist): per-style action (defend / scale / clear / salvage) is carried by **state inside a segment**, not by in/out membership. Losers exit naturally by selling through and not being reordered.
 
-### Rules
-
-- No reordering. Ever. Once it's gone, it's gone.
-- Price to sell, not to hold. Drop monthly if not moving.
-- If something in CRAP starts selling unexpectedly, promote it into the relevant segment.
-- Review CRAP quarterly — anything sitting for 6+ months gets an aggressive price cut.
-
-### What goes in CRAP
-
-- Tail styles from Arizona EVA (Gold, Rose Reptile, Eggshell, Popcorn)
-- Tail styles from Arizona BF Regular (New Beige, Pearl White, Light Rose, Eggshell)
-- Tail styles from Arizona BF Narrow (Pearl White, Pecan, Light Rose, Eggshell, Metallic Black)
-- Zermatt tail: all Narrow fits + Navy (`1014932`, `1014934`, `1016571`, `1015086`, `1015084`, `1017519`, `1017523`)
-- Gizeh Narrow tail: Birko-Flor Black (`0043693`), Birko-Flor Blue (`0143623`), Patent White (`1005300`), Patent Sand Brown (`1013076`), Vegan Pecan Brown (`1025049`)
-- Gizeh Graceful Pearl White Regular (`0943871`) — 1 sale, £43 GP
-- Mayari, Florida, and other unallocated Birkenstock
-- Any future tail from new segments
-
-This is not a segment. It has no owner. It's a clearance list.
+If you find a `segment = 'CRAP'` filter in older queries it's now a no-op (no rows match) and can be removed.
 
 ---
 
@@ -497,14 +477,14 @@ This is not a segment. It has no owner. It's a clearance list.
 Same as RIEKER-WIN:
 1. **Sep:** Winter order arrives — tag `REMONTE-WIN`, price, send to FBA
 2. **Oct-Feb:** Sell. Monitor. Reorder winners (2-week lead time).
-3. **Mar:** Clear remaining stock at reduced prices.
-4. **~Jun:** Pre-order next winter range alongside Rieker.
+3. **Mar:** Clear remaining stock at reduced prices. Pre-order next winter range alongside Rieker. (2026/27 batch was placed in Mar 2026 — historically the timing varied.)
 
 ### Actions
 
 - [x] Tag all 4 groupids as `REMONTE-WIN` in database
+- [x] 2026/27 winter pre-order placed Mar 2026 — arriving ~Aug (alongside Rieker)
 - [ ] 13 units remain at FBA (7x D0700-22, 6x R1402-16) — leave in place for next season
-- [ ] Use 2025/26 data to inform 2026/27 pre-order (~Jun) — expand range to 6-8 styles
+- [ ] On arrival: tag, price, send proven winners to FBA. Pick further FBA candidates as Amazon ranking signals appear through the season
 - [ ] Target: £5k GP for winter 2026/27 season
 - [ ] Amazon only. Same owner as RIEKER-WIN.
 
