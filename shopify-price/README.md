@@ -8,7 +8,6 @@ There's no ritual. A session starts with the user saying what they want to look 
 
 **Standing defaults** (unless the user says otherwise):
 - Local stock only — FBA is handled separately in `amz-price/`
-- Skip anything with a Shopify price change in the last 7 days (check `price_change_log` where `channel='SHP'`) — don't re-churn recent decisions
 - **Birkenstock never goes to Amazon FBA** — it's not allowed. Don't suggest FBA as a remedy for slow-moving Birkenstock lines.
 
 > The `ignore_auto_price` flag on `skusummary` is **legacy and no longer used anywhere**. Do not filter on it in any session.
