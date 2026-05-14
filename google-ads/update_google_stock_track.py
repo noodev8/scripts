@@ -16,8 +16,11 @@ Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
 The CSV is the per-campaign export (Day, Campaign, Clicks, Impr., Currency code,
 Cost, Search impr. share). Per-campaign rows are upserted into google_campaign_daily;
 sums by date populate google_stock_track ad columns (google_ad_spend, google_clicks,
-google_impressions). google_search_imp_share is no longer populated by this script —
-the aggregated metric is unreliable post-restructure; per-campaign truth lives in
+google_impressions). google_search_imp_share is populated when a date has exactly one
+campaign reporting (well-defined). When multiple campaigns report for a date, it stays
+NULL — aggregated imp share is mathematically ill-defined and per-campaign truth lives
+in google_campaign_daily. Historical multi-campaign window (28 Apr – 13 May 2026)
+already has frozen NULL imp share in google_stock_track and per-campaign values in
 google_campaign_daily.
 
 This helps determine appropriate Google Shopping ad budget based on available inventory
@@ -186,31 +189,43 @@ def upsert_campaign_daily(cursor, csv_data):
 def aggregate_by_date(csv_data):
     """
     Sum per-campaign rows into per-date totals for google_stock_track ad columns.
-    search_imp_share intentionally not aggregated — per-campaign truth lives in
-    google_campaign_daily; aggregated imp share is mathematically ill-defined.
+    search_imp_share is carried through only when exactly one campaign reports for
+    a date (well-defined). When multiple campaigns report, it stays NULL — aggregated
+    imp share is mathematically ill-defined and per-campaign truth lives in
+    google_campaign_daily.
 
     Returns:
-        list: dicts with date, clicks, impressions, cost
+        list: dicts with date, clicks, impressions, cost, search_imp_share
     """
     by_date = {}
     for row in csv_data:
         d = row['date']
         if d not in by_date:
-            by_date[d] = {'date': d, 'clicks': 0, 'impressions': 0, 'cost': 0.0}
+            by_date[d] = {'date': d, 'clicks': 0, 'impressions': 0, 'cost': 0.0,
+                          '_shares': []}
         by_date[d]['clicks'] += row['clicks']
         by_date[d]['impressions'] += row['impressions']
         by_date[d]['cost'] += row['cost']
-    return list(by_date.values())
+        by_date[d]['_shares'].append(row['search_imp_share'])
+
+    result = []
+    for agg in by_date.values():
+        shares = agg.pop('_shares')
+        agg['search_imp_share'] = shares[0] if len(shares) == 1 else None
+        result.append(agg)
+    return result
 
 def update_google_ads_data(cursor, daily_data):
     """
     Update google_stock_track ad columns with per-date sums of campaign data.
     Only writes ad columns to rows that don't already have spend data.
-    google_search_imp_share is not populated here — see google_campaign_daily.
+    google_search_imp_share is written when the CSV had exactly one campaign for
+    the date (well-defined); NULL otherwise — see aggregate_by_date and
+    google_campaign_daily.
 
     Args:
         cursor: Database cursor
-        daily_data: list of dicts with date, clicks, impressions, cost
+        daily_data: list of dicts with date, clicks, impressions, cost, search_imp_share
 
     Returns:
         dict: Statistics (updated, skipped, not_found)
@@ -255,14 +270,16 @@ def update_google_ads_data(cursor, daily_data):
             SET google_ad_spend = %s,
                 google_clicks = %s,
                 google_impressions = %s,
+                google_search_imp_share = %s,
                 troas = %s
             WHERE id = %s
             """
             cursor.execute(update_query, (
                 row['cost'], row['clicks'], row['impressions'],
-                CURRENT_TROAS, record_id,
+                row['search_imp_share'], CURRENT_TROAS, record_id,
             ))
-            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions (summed across campaigns)")
+            imp_str = f"{row['search_imp_share']:.1f}%" if row['search_imp_share'] is not None else "NULL (multi-campaign)"
+            log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions, imp share {imp_str}")
             stats['updated'] += 1
 
         except Exception as e:

@@ -3,21 +3,21 @@
 **Created:** 2026-02-20
 **Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule.
 
-## Current State — updated 8 May 2026
+## Current State — updated 14 May 2026
 
-- **Campaign structure (new — restructured ~28-29 Apr 2026):**
-  - **Standard Shopping** — core campaign, holds the full catalogue including the winning Birks (which are also in PMAX). £72/day (raised from £60 — decided 8 May, midnight-effective so first full day at £72 is 9 May).
-  - **PMAX (winning Birks)** — own campaign, duplicates the Birk SKUs that were performing in standard. £40/day (doubled — decided 8 May, midnight-effective so first full day at £40 is 9 May). Will re-enter learning phase.
-  - **IVES Shopping** — own campaign, IVES SKUs only, removed from standard. £5/day.
-  - **Combined daily cap: £117**
-- **tROAS:** 400% on STANDARD. PMAX and IVES have no tROAS set — leaving the algorithm uncapped on those for now (Google's recommendation of 620% on PMAX is below historical 12–17x performance; setting it now would loosen efficiency).
-- **Last review:** 8 May 2026 — STANDARD £60→£72; PMAX £20→£40; IVES held at £5; reverted IVES Shopify list prices (see IVES note below)
-- **Next planned step:** re-evaluate STANDARD and PMAX ~Thu 15 May after 5–7 days at the new caps
+- **Campaign structure (consolidated back to single campaign on 2026-05-14):**
+  - **Standard Shopping** — core campaign, full catalogue including the BIRK-WINNER styles. **£105/day** (raised from £72 — decided 14 May, midnight-effective so first full day at £105 is 15 May).
+  - **PMAX (BIRK-WINNER)** — **paused 14 May** after a 16-day test (28 Apr – 13 May). Google attributed 7.28x ROAS to PMAX (matched STANDARD), but cannibalization test (BIRK-WINNER styles +42% units post-launch vs OTHER Birks +30%) implied most PMAX revenue was duplicated from STANDARD. Operational simplicity outweighed the marginal incremental ROAS. The 24 BIRK-WINNER SKUs still carry the `custom_label_0 = BIRK-WINNER` label — STANDARD's Smart Bidding can use it as a signal without a separate campaign. Reactivate PMAX only for a specific reason (e.g. new product launch needing Display/YouTube reach for awareness).
+  - **IVES Shopping** — **paused 9 May** for Amazon fair-pricing test. Independent finding (14 May): IVES ran at 3.27x ROAS over 30 days — below the 5x profit floor. When the AMZ test concludes, fold IVES SKUs back into STANDARD's catalogue rather than relaunching the standalone campaign.
+  - **Active daily cap: £105 (STANDARD only)**
+- **tROAS:** 400% on STANDARD.
+- **Last review:** 14 May 2026 — Consolidated to single STANDARD campaign. STANDARD £72→£105 (+46%, absorbs roughly the freed PMAX £40 cap). Decision driven by Google conversions-by-campaign data (PMAX matched STANDARD at 7.28x ROAS but cannibalization test implied true incremental PMAX ROAS likely 2–4x) plus stated user preference for a single clean lever to ramp from.
+- **Next planned step:** re-evaluate ~Mon 19 May after 5 days of single-campaign data. Watch three numbers: (1) daily Shopify Birk sales (was ~£1,180–1,230/day combined), (2) ROAS (was ~10x), (3) STANDARD imp share (was 90–93%). If STANDARD absorbs the cap cleanly and ROAS holds 7x+, next step is to ramp STANDARD further. If imp share climbs to 93%+ and ROAS holds, demand still exceeds capacity. If sales drop materially, PMAX was incremental — reactivate it.
 - **Open flags:**
-  - April conversion median 9.3% vs March 12.1% — still watching
-  - **IVES Fair-Pricing concern (8 May):** Shopify list dropped to £28.99 ~5/6 May; AMZ daily IVES units dropped from ~28/day (late Apr) to ~14/day (4–7 May). Pattern fits Amazon's Marketplace Fair Pricing detection (Buy Box suppression on big external-price gaps). Reverted all 10 IVES groupids to pre-drop list prices on 8 May, with WHITE pushed up to £38.99 (236 AMZ units; protect Amazon channel). Watch AMZ recovery over 3–7 days.
-  - Search impression share on standard will drop materially post-restructure (PMAX wins internal auctions on duplicated Birks; IVES gone from standard) — the metric is now reading a smaller competitive pool, not weakening demand. Don't compare standard's imp share pre/post-restructure.
-- **Per-campaign data captured (added 2026-05-04):** `google_campaign_daily` table stores per-(date, campaign) clicks/impressions/cost/search_imp_share. Populated nightly from `adcost_summary_30.csv` (per-campaign export). `google_stock_track` ad columns continue to hold per-date sums; `google_search_imp_share` is frozen at historical values (no longer populated — aggregated metric ill-defined post-restructure). **Conversion data is still per-day only** — Google Ads conversion-by-campaign export not wired up; for ROAS attribution between standard/PMAX/IVES, paste the conversions report in chat.
+  - **Conversion baseline drifting down:** Mar 12.1% → Apr 8.7% → May 7.1% (13 days). Real, not noise. Plausible cause: CRAP-retirement (commit `33121ae`, ~10 May) added 161 NULL/CRAP groupids into segments and into STANDARD's feed, diluting impression quality while Smart Bidding learns to deprioritise the weaker stuff. Watch whether May 7.1% is the new baseline or continues falling.
+  - **THIN-selling style count at record high:** 30 styles selling with poor stock. **ZERMATT-SEG** worst offender (6 of 12 styles THIN-selling, 3 with 0 units). Burns clicks on near-empty pages. Flag for the next 6-month Birk buy — can't fix with budget.
+  - **Marginal returns weakening:** weekly marginal ROAS recently single-digit positive (9–12x), but the week of 4 May ran −3x. Expected as we scale, but means smaller, more disciplined steps from here. Set a marginal-ROAS-5x-minimum mental floor for sizing future bumps.
+- **Per-campaign data captured (added 2026-05-04):** `google_campaign_daily` table stores per-(date, campaign) clicks/impressions/cost/search_imp_share. Populated nightly from `adcost_summary_30.csv`. Post-consolidation only STANDARD has active rows; PMAX/IVES historical rows remain for reference. **Conversion-by-campaign data:** paste Google Ads Campaign report in chat when an attribution-specific question comes up (used 14 May session to settle the PMAX question — see Change Log).
 - **Snapshot-sales-lag caveat:** `google_stock_track.shopify_sales` captures the day's sales at script-run time and can lag actual end-of-day total when late orders file after the snapshot. For trend reads, prefer joining `google_stock_track` to `sales` on `solddate` rather than using `shopify_sales` directly. (Discovered 30 Apr — Apr 29 stored £544 vs actual £920.)
 - **Capture-before-act rule:** when the budget is changed in the UI, add a line to the change log the same day, even if rationale is filled in later. The £54→£60 ghost change happened because this didn't.
 
@@ -80,16 +80,14 @@ Implication: if Stock shows persistent leaks (PARTIAL/THIN on top sellers) and t
 
 **Do not recommend "order more X" as an action.** Surface the leak so the user can factor it into the next 6-month buy, but adjust ad budget around current stock reality.
 
-### Restructure context (post 28-29 Apr 2026)
+### Campaign structure note (consolidated 14 May 2026)
 
-The grids below aggregate across all three campaigns (Standard + PMAX + IVES). For per-campaign reads, use `google_campaign_daily` (populated nightly since 2026-05-04). Per-campaign **conversion** data is not yet captured — for ROAS attribution between standard / PMAX / IVES, paste the conversions report in chat.
+Single STANDARD campaign active — see Current State. The Three-Grid framework reads back to its simplest form: combined totals come from STANDARD alone. Two rules to retain from the brief multi-campaign experiment (28 Apr – 14 May):
 
-Two reading rules while the new structure is bedding in:
-
-1. **Don't aggregate `search_imp_share` across campaigns.** Read it per campaign from `google_campaign_daily`. The combined-imp-share metric isn't well-defined when each campaign competes in a different eligible-auction pool. `google_stock_track.google_search_imp_share` is frozen at historical (pre-restructure) values — new dates will be NULL.
+1. **`search_imp_share` source:** With a single campaign active, `google_stock_track.google_search_imp_share` is again populated by `update_google_stock_track.py` for any date where the CSV has only one campaign (well-defined). Multi-campaign dates 28 Apr – 13 May remain frozen NULL in `google_stock_track`; per-campaign values for that window live in `google_campaign_daily`. Either source works for STANDARD-only days from 14 May onwards.
 2. **For sales totals, prefer `sales` table over `google_stock_track.shopify_sales`.** The stored column captures sales at script-run time and can lag end-of-day total — significant on days when the snapshot runs before all orders file. Join on `solddate = snapshot_date` for accurate ROAS reads.
 
-The "Decrease budget" rule about THIN-selling styles applies catalogue-wide regardless of which campaign carries those SKUs.
+The "Decrease budget" rule about THIN-selling styles applies catalogue-wide.
 
 ### Grid 1 — Money
 
@@ -334,28 +332,22 @@ ORDER BY snapshot_date DESC, campaign;
 - **Below 70%** — significant traffic being missed, budget or tROAS is limiting on that campaign
 - **NULL persistently (not lag)** — campaign at `<10%`. Either lift its cap or accept it's a niche role.
 
-**Don't aggregate imp share across campaigns.** The combined-imp-share number isn't well-defined post-restructure (Google computes it per campaign against that campaign's eligible auction pool). `google_stock_track.google_search_imp_share` is frozen at its pre-restructure historical values; new dates will be NULL there. Use the per-campaign table.
+**Don't aggregate imp share across campaigns.** When multiple campaigns are active, the combined-imp-share number isn't well-defined (Google computes it per campaign against that campaign's eligible auction pool). Under single-campaign mode (current state, from 14 May), `google_stock_track.google_search_imp_share` matches STANDARD's per-campaign value and is populated again by `update_google_stock_track.py`. Multi-campaign dates 28 Apr – 13 May stay NULL there — use `google_campaign_daily` for those.
 
-**Cap pressure** — combine the spend column with the campaign's known daily cap:
+**Cap pressure** — combine the spend column with STANDARD's known daily cap (currently £105):
 
 ```sql
 SELECT campaign,
        ROUND(AVG(cost), 2) AS avg_daily_spend,
-       SUM(CASE WHEN cost >= cap_minus_1 THEN 1 ELSE 0 END) AS days_at_cap
-FROM (
-  SELECT campaign, cost,
-         CASE campaign
-           WHEN 'STANDARD'    THEN 60 - 1
-           WHEN 'BIRK-WINNER' THEN 20 - 1
-           WHEN 'IVES'        THEN  5 - 1
-         END AS cap_minus_1
-  FROM google_campaign_daily
-  WHERE snapshot_date >= CURRENT_DATE - 7
-) d
+       ROUND(MAX(cost), 2) AS max_daily_spend,
+       SUM(CASE WHEN cost >= 105 - 1 THEN 1 ELSE 0 END) AS days_at_cap
+FROM google_campaign_daily
+WHERE snapshot_date >= CURRENT_DATE - 7
+  AND campaign = 'STANDARD'
 GROUP BY campaign;
 ```
 
-If a campaign shows 3+ of 7 days at/over its cap, that campaign's budget is constraining. Update the CASE arms when you change a daily cap (or move them to a `campaign_caps` table when there are more than three).
+If STANDARD shows 3+ of 7 days at/over its cap, budget is constraining. Update the literal `105` when the cap changes.
 
 ### 3. Check stock readiness (ad-readiness by style)
 
@@ -568,6 +560,7 @@ Recent entries (last ~6 weeks) keep full rationale. Older entries collapsed to o
 | 2026-04-30 | Hold all three caps (£60/£20/£5 = £85) | 13.7x (last 7d, actuals from sales table) | n/a — metric unstable post-restructure | £66 avg 7d | 2,861 live; 24 READY, 6 THIN-selling | Restructure 1-2 days old. Apr 29 alone (first post-restructure day) ran £101.73 spend / £919.50 actual sales = 9x ROAS — within normal PMAX-launch flex against £85 cap. Revenue trend across 3 weeks is up (£800→£822→£903 daily) but spend +57% bought only +13% revenue → diminishing returns at single-cap level was the reason to restructure. Marginal ROAS 5.67x — above 5x floor but tight. Too early to read the new structure. Hold to give PMAX 5-7 days of learning. | Mon 5 May |
 | 2026-05-09 (decided 8 May, midnight-effective) | PMAX (BIRK-WINNER) £20 → £40; STANDARD held £60; IVES held £5. Combined £85 → £105. | 11.8x (last 7d, sales-table joined) | STANDARD ~83% / PMAX ~41% / IVES ~23% | £88 avg 7d combined | 2,861 live; 23 READY (751u), 7 THIN-selling | All five increase criteria met. PMAX is the loudest constraint: imp share 41%, Google overspent to £33.59 on a single £20-cap day, 4/7 days at cap. 19/24 BIRK-WINNER styles converting on Shopify since 28 Apr launch (61 units / £3,785 revenue vs £196 spend — naive ROAS 19x). User-led aggressive step: doubling PMAX during peak season with stock at strongest-yet level (23 READY); accepting learning-phase re-entry. STANDARD held — already at ~83% imp share (close to target) and at £60 marginal headroom is smaller. IVES held at £5 budget; price action taken instead (see IVES Fair-Pricing flag in Current State). tROAS held at 400% on STANDARD; PMAX and IVES remain uncapped — not setting Google's 620% suggestion since historical ROAS 12–17x sits well above it. | ~Thu 15 May (after 5–7 days of PMAX learning at £40, first full day 9 May) |
 | 2026-05-09 (decided 8 May, midnight-effective) | STANDARD £60 → £72 (+20%) — same session as PMAX bump above. Combined £105 → £117. | 9.7x–16.7x bounds (last 7d; STANDARD spend £435.14 vs non-IVES revenue £7,256 / non-PMAX-non-IVES revenue £4,218 — true ROAS likely 12–15x given PMAX only spent £196 over 10 days) | Daily series shows imp share collapsing inside last 7d: 91.6 / 86.0 / 86.4 / 88.8 / **70.0 / 73.4** / -- — last 3 days fell ~18 points, classic budget-constrained signal | £62.16 avg 7d, max £70.21 (Google overspent £60 cap by 17% on May 3) | 2,861 live; 23 READY (751u) — strongest yet | All five increase criteria met independent of PMAX context. ROAS deeply above 7x floor; Google demonstrated £70.21 day at £60 cap; imp share crash from 88% → 70% over May 4–6 is the budget-constraint signal; catalogue strength at peak. 20% step matches the standard ramp shape; £72 stays inside what Google has already shown it can spend. tROAS held at 400%. | ~Thu 15 May (alongside PMAX re-eval) |
+| 2026-05-15 (decided 14 May, midnight-effective) | **Consolidated back to single STANDARD campaign.** PMAX paused, IVES kept paused. STANDARD £72 → £105 (+46%). Active cap £105 (single). | 10.2x (last 7d, sales-table joined) | STANDARD 90–93% (last 4 reported days); PMAX 62% avg | £119 combined avg 7d (STD £74 + PMAX £39 + IVES £0 paused) | 3,288 live units; 41 READY (1,124u), 30 THIN-selling (record high) | Triggered by Google Conversions-by-Campaign report (14 Apr – 13 May): PMAX £442 → £3,223 conv value → 7.28x ROAS, matched STANDARD's 7.28x. Cannibalization test (BIRK-WINNER +42% units post-launch vs OTHER Birks +30%, but −6.6pp revenue growth) implied most PMAX revenue was duplicated from STANDARD's eligible auctions. True incremental PMAX ROAS estimated 2–4x — well below Google's attributed 7.28x. IVES separately revealed 3.27x ROAS over 30 days (below floor) — confirms pausing was correct independent of the AMZ test. STANDARD-only at £105 absorbs roughly the freed PMAX budget while testing whether STANDARD's Smart Bidding can scale alone. +46% is large vs the 20% ramp shape, but total daily spend roughly unchanged from the £117 combined cap — it's a consolidation, not a true ramp step. PMAX's BIRK-WINNER `custom_label_0` retained as Smart Bidding signal inside STANDARD. tROAS held at 400%. Operational case: one ROAS, one imp share, one cap = clean ramp lever from here. | Mon 19 May |
 
 ---
 
@@ -578,7 +571,7 @@ When asked to review the Google Ads budget:
 **Important:** Do not run budget analysis on stale data. Check the latest `snapshot_date` with ad spend data first — if it is more than 2 days old, flag it and wait for user confirmation before proceeding.
 
 1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates (spend, clicks, impressions, ad-readiness)
-2. Query `google_campaign_daily` for per-campaign cost, clicks and `search_imp_share` (last 14 days). Use this — not `google_stock_track.google_search_imp_share` — for any imp share read.
+2. For imp share: read `google_stock_track.google_search_imp_share` for headline trend (populated from 14 May onwards under single-campaign mode; frozen NULL for multi-campaign window 28 Apr – 13 May). Use `google_campaign_daily` for per-campaign reads if multiple campaigns are active or for the multi-campaign historical window.
 3. Run the ad-readiness query to check stock by style (READY / PARTIAL / THIN)
 4. Check per-campaign cap pressure (3+ of 7 days at/over a campaign's cap = constraining)
 5. Review per-campaign impression share trend — is any campaign dropping? (signals budget or tROAS constraint on that specific campaign)
