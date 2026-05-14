@@ -1,27 +1,26 @@
 # Google Ads Budget Review Process
 
-**Created:** 2026-02-20
-**Review cadence:** As needed — review whenever there's enough new data to act on. No fixed schedule.
+**Created:** 2026-02-20. **Cadence:** as needed — no fixed schedule.
 
-## Current State — updated 14 May 2026
+## Current State — updated 14 May 2026 (evening)
 
-- **Campaign structure (consolidated back to single campaign on 2026-05-14):**
-  - **Standard Shopping** — core campaign, full catalogue including the BIRK-WINNER styles. **£105/day** (raised from £72 — decided 14 May, midnight-effective so first full day at £105 is 15 May).
+- **Campaign structure (single campaign since 2026-05-14):**
+  - **Standard Shopping** — core campaign, full catalogue including the BIRK-WINNER styles. **£72/day** (reverted same-day from the brief £105 set earlier on 14 May — see change log).
   - **PMAX (BIRK-WINNER)** — **paused 14 May** after a 16-day test (28 Apr – 13 May). Google attributed 7.28x ROAS to PMAX (matched STANDARD), but cannibalization test (BIRK-WINNER styles +42% units post-launch vs OTHER Birks +30%) implied most PMAX revenue was duplicated from STANDARD. Operational simplicity outweighed the marginal incremental ROAS. The 24 BIRK-WINNER SKUs still carry the `custom_label_0 = BIRK-WINNER` label — STANDARD's Smart Bidding can use it as a signal without a separate campaign. Reactivate PMAX only for a specific reason (e.g. new product launch needing Display/YouTube reach for awareness).
   - **IVES Shopping** — **paused 9 May** for Amazon fair-pricing test. Independent finding (14 May): IVES ran at 3.27x ROAS over 30 days — below the 5x profit floor. When the AMZ test concludes, fold IVES SKUs back into STANDARD's catalogue rather than relaunching the standalone campaign.
-  - **Active daily cap: £105 (STANDARD only)**
-- **tROAS:** 400% on STANDARD.
-- **Last review:** 14 May 2026 — Consolidated to single STANDARD campaign. STANDARD £72→£105 (+46%, absorbs roughly the freed PMAX £40 cap). Decision driven by Google conversions-by-campaign data (PMAX matched STANDARD at 7.28x ROAS but cannibalization test implied true incremental PMAX ROAS likely 2–4x) plus stated user preference for a single clean lever to ramp from.
-- **Next planned step:** re-evaluate ~Mon 19 May after 5 days of single-campaign data. Watch three numbers: (1) daily Shopify Birk sales (was ~£1,180–1,230/day combined), (2) ROAS (was ~10x), (3) STANDARD imp share (was 90–93%). If STANDARD absorbs the cap cleanly and ROAS holds 7x+, next step is to ramp STANDARD further. If imp share climbs to 93%+ and ROAS holds, demand still exceeds capacity. If sales drop materially, PMAX was incremental — reactivate it.
+  - **Active daily cap: £72 (STANDARD only)**
+- **tROAS:** 400% on STANDARD. Held there since Feb. See decision flow for when to move it.
+- **Last review:** 14 May 2026 (evening) — Reverted £105 consolidation back to £72 after diagnostic re-read against the rewritten doc framework. STANDARD imp share had been 86–93% during the prior 7 days — that's the "Hold, capturing demand cleanly" row, not the "raise budget" row. £105 was reverted before midnight so no full day was paced against the higher cap; no algorithm learning wasted. tROAS held at 400% as the conservative single-lever revert — tROAS 500% remains available as the next experiment if drift persists.
+- **Next planned step:** Mon 19 May — run the full diagnostic on STANDARD-only at £72. Watch (1) STANDARD imp share (was 86–93% pre-revert; expect it to stay there or climb), (2) daily Shopify Birk sales (recent baseline ~£1,000–1,200/day), (3) marginal ROAS week-on-week vs the May 9–13 window. If imp share holds 85%+ and marginal ROAS recovers above 5x, hold £72 and consider tROAS 500% as the next move. If marginal ROAS still weak, tROAS 500% becomes the action regardless.
 - **Open flags:**
+  - **May drift signal (flagged 14 May evening):** Apr 14–30 £57/d spend, 14.4x ROAS → May 1–8 £89/d, 11.8x → May 9–13 £123/d, 9.9x (using `sales`-table read, not the lagging `shopify_sales` column). Diminishing returns are real but ROAS still well above 7x target. The 14 May revert removes the latest +46% step; £72 is the last cleanly-absorbed STANDARD level (May 9–13 STANDARD ran £74 avg at 86–93% imp share). Doc rewrite added the missing "ramp drift with high imp share → raise tROAS" rule to the diagnostic.
   - **Conversion baseline drifting down:** Mar 12.1% → Apr 8.7% → May 7.1% (13 days). Real, not noise. Plausible cause: CRAP-retirement (commit `33121ae`, ~10 May) added 161 NULL/CRAP groupids into segments and into STANDARD's feed, diluting impression quality while Smart Bidding learns to deprioritise the weaker stuff. Watch whether May 7.1% is the new baseline or continues falling.
   - **THIN-selling style count at record high:** 30 styles selling with poor stock. **ZERMATT-SEG** worst offender (6 of 12 styles THIN-selling, 3 with 0 units). Burns clicks on near-empty pages. Flag for the next 6-month Birk buy — can't fix with budget.
-  - **Marginal returns weakening:** weekly marginal ROAS recently single-digit positive (9–12x), but the week of 4 May ran −3x. Expected as we scale, but means smaller, more disciplined steps from here. Set a marginal-ROAS-5x-minimum mental floor for sizing future bumps.
-- **Per-campaign data captured (added 2026-05-04):** `google_campaign_daily` table stores per-(date, campaign) clicks/impressions/cost/search_imp_share. Populated nightly from `adcost_summary_30.csv`. Post-consolidation only STANDARD has active rows; PMAX/IVES historical rows remain for reference. **Conversion-by-campaign data:** paste Google Ads Campaign report in chat when an attribution-specific question comes up (used 14 May session to settle the PMAX question — see Change Log).
+- **Per-campaign data captured (added 2026-05-04):** `google_campaign_daily` table stores per-(date, campaign) clicks/impressions/cost/search_imp_share. Populated nightly from `adcost_summary_30.csv`. Post-consolidation only STANDARD has active rows; PMAX/IVES historical rows remain for reference.
 - **Snapshot-sales-lag caveat:** `google_stock_track.shopify_sales` captures the day's sales at script-run time and can lag actual end-of-day total when late orders file after the snapshot. For trend reads, prefer joining `google_stock_track` to `sales` on `solddate` rather than using `shopify_sales` directly. (Discovered 30 Apr — Apr 29 stored £544 vs actual £920.)
 - **Capture-before-act rule:** when the budget is changed in the UI, add a line to the change log the same day, even if rationale is filled in later. The £54→£60 ghost change happened because this didn't.
 
-> **Update this block whenever you change anything below — including the change log.** It is the single source of truth for "what's true today".
+> **Update this block whenever you change anything below — including the change log.** Single source of truth for "what's true today".
 
 ### custom_label_0 conventions
 
@@ -45,53 +44,77 @@
 | `localstock` table | Current warehouse stock by SKU (source of truth) | `SELECT groupid, SUM(qty) as units FROM localstock WHERE deleted = 0 AND brand = 'Birkenstock' GROUP BY groupid ORDER BY units DESC;` |
 | `adcost_summary_30.csv` | Raw Google Ads export (per-campaign, 30-day daily breakdown). Save to Downloads — script auto-moves and processes. | Export from Google Ads UI with the per-campaign columns: Day, Campaign, Clicks, Impr., Cost, Search impr. share. |
 
-**Birk ad-readiness columns in `google_stock_track`** (populated nightly from `update_google_stock_track.py`, definition matches step 3 below):
-- `birk_ready_styles` — count of READY styles (≥70% size coverage AND ≥15 units). The convertible-catalogue headline. Watch for it ticking up when deliveries land.
+**Birk ad-readiness columns in `google_stock_track`** (populated nightly):
+- `birk_ready_styles` — count of READY styles (≥70% size coverage AND ≥15 units). The convertible-catalogue headline.
 - `birk_ready_units` — total stock units across READY styles. Depth check.
-- `birk_thin_selling_styles` — count of THIN styles that sold ≥1 in last 30d. The waste signal — clicks paid for, sale missed.
+- `birk_thin_selling_styles` — count of THIN styles that sold ≥1 in last 30d. The waste signal.
 
-For trend analysis, query the columns directly:
-```sql
-SELECT snapshot_date, birk_ready_styles, birk_ready_units, birk_thin_selling_styles
-FROM google_stock_track
-ORDER BY snapshot_date DESC LIMIT 14;
-```
-For per-style detail (which styles are THIN, which sizes missing) still use the standalone query in step 3.
+**Imp share source after consolidation:** under single-campaign mode (from 14 May), `google_stock_track.google_search_imp_share` is the headline read again. Multi-campaign dates 28 Apr – 13 May are frozen NULL there — use `google_campaign_daily` for that window.
 
-**Note:** `localstock` is the source of truth for Birkenstock stock. Birkenstock is Shopify-only (not on Amazon), so no need to check `amzfeed`.
+**`localstock` is source of truth for Birkenstock stock.** Birkenstock is Shopify-only (not on Amazon), so no need to check `amzfeed`.
+
+---
+
+## The Decision Flow
+
+Two levers move the campaign: **daily budget** (how much Google can spend) and **tROAS** (how aggressively it bids). Pick the lever first, then size the move. Historical bias to push against: every change-log entry since Feb says *"tROAS held at 400%"* — the budget lever has been doing all the work, often where tROAS was the right tool.
+
+### Read the constraint first
+
+Three numbers tell you which lever is the constraint:
+
+1. **Search impression share** — capturing demand, or missing it?
+2. **Spend vs cap** — is Google trying to spend more than allowed?
+3. **Marginal ROAS** — is the last bit of spend still returning above the 5x floor?
+
+### Diagnostic table
+
+| 7d ROAS | Imp share | Spend vs cap | Marginal ROAS | Constraint | Action |
+|---------|-----------|--------------|---------------|------------|--------|
+| ≥7x | **<85%** | At cap | ≥5x | **Budget** | Raise budget (~20% step) |
+| ≥7x | **<85%** | **Below cap** | — | **tROAS** | **Lower tROAS** — Google can't find auctions at current bar |
+| ≥7x | **85%+** | At cap | ≥5x | Neither | Hold — capturing demand cleanly |
+| ≥7x | **85%+** | At cap | **<5x** | **tROAS** | **Raise tROAS** — ramp drift; force Google pickier |
+| 5x–7x | — | — | — | Watch | Hold, run the Three-Grid to find what's dragging |
+| **<5x** for 2 weeks | — | — | — | — | Decrease budget OR raise tROAS |
+
+**The fourth row is the recovery move we missed in early May.** When STANDARD's imp share was 90–93% and we still pushed budget from £72 toward £105, the doc had no clear rule for "ramp drift while imp share is already maxed." That row is it.
+
+### Budget — increment sizing
+
+- Default **~20% step** when criteria are met. Round to nearest £1.
+- **Smaller steps** (£2–4) when the algorithm is on a good trajectory — don't disrupt learning.
+- **No fixed schedule.** A 20%-every-5-days *cadence* used to live in this doc; it was deleted in May 2026 because it encouraged chasing dates rather than reading signals.
+- **Hold or slow** if ROAS drops below 7x, stock thins, or algorithm shows instability after an increase.
+
+### tROAS — when to move it
+
+Currently **400%**. Adjust when the diagnostic table points to tROAS:
+
+- **Lower tROAS** (400→300%): imp share <85% AND spend below cap. Tells Google to bid in more auctions at lower efficiency. Volume play.
+- **Raise tROAS** (400→500%): imp share 85%+ AND marginal ROAS <5x, OR 7d ROAS sliding on a ramp. Forces Google pickier inside its current auction pool. Efficiency play.
+- **One lever at a time.** Give a tROAS change 5–7 days before judging — algorithm re-learns.
+- Don't change tROAS just because you can. If the algorithm is outperforming the target and budget is the clear constraint, leave it alone.
+
+### Stock is a fixed constraint, not a lever
+
+Birkenstock orders are placed ~6 months in advance. Stock cannot be reactively pulled to fix ad leaks. If high-volume segments are PARTIAL/THIN, **trim ad budget to where it stays efficient** rather than waiting for restock. Surface the leak for the next 6-month buy, but adjust budget around current stock reality.
+
+**Do not recommend "order more X" as an action.**
 
 ---
 
 ## Three-Grid Snapshot
 
-The quick-read framework for "should I bump the budget?" Run these three grids in sequence. Each answers one question; together they decide hold / bump / pull back. Drill deeper using the Weekly Review Checklist below if a grid flags something.
+Quick trend read across the last 3 weeks. Three rolling 7-day windows; together they answer "what changed."
 
 ### Order matters
 
-1. **Money first** — is ROAS still healthy, and how is it trending?
-2. **If ROAS is dropping → Demand** — is the cause click cost or conversion?
-3. **If conversion is dropping → Stock** — can the catalogue actually convert what's arriving?
-
-### Stock is a fixed constraint, not a lever
-
-Birkenstock orders are placed **~6 months in advance** and cannot be reactively restocked to fix leaks. What's currently in the warehouse plus what's already on the way is the stock universe for the next several weeks. The job of the ad budget is to **match spend to the catalogue we have**, not to assume stock can be ordered to fit a budget plan.
-
-Implication: if Stock shows persistent leaks (PARTIAL/THIN on top sellers) and they aren't appearing on incoming invoices, the right response is to **trim ad budget to where it stays efficient**, not to wait for restock that isn't coming. If £45/day produces the same revenue as £60/day, the cap should drop.
-
-**Do not recommend "order more X" as an action.** Surface the leak so the user can factor it into the next 6-month buy, but adjust ad budget around current stock reality.
-
-### Campaign structure note (consolidated 14 May 2026)
-
-Single STANDARD campaign active — see Current State. The Three-Grid framework reads back to its simplest form: combined totals come from STANDARD alone. Two rules to retain from the brief multi-campaign experiment (28 Apr – 14 May):
-
-1. **`search_imp_share` source:** With a single campaign active, `google_stock_track.google_search_imp_share` is again populated by `update_google_stock_track.py` for any date where the CSV has only one campaign (well-defined). Multi-campaign dates 28 Apr – 13 May remain frozen NULL in `google_stock_track`; per-campaign values for that window live in `google_campaign_daily`. Either source works for STANDARD-only days from 14 May onwards.
-2. **For sales totals, prefer `sales` table over `google_stock_track.shopify_sales`.** The stored column captures sales at script-run time and can lag end-of-day total — significant on days when the snapshot runs before all orders file. Join on `solddate = snapshot_date` for accurate ROAS reads.
-
-The "Decrease budget" rule about THIN-selling styles applies catalogue-wide.
+1. **Money** — is ROAS healthy and how is it trending?
+2. **If ROAS dropping → Demand** — click cost or conversion?
+3. **If conversion dropping → Stock** — can the catalogue convert what's arriving?
 
 ### Grid 1 — Money
-
-Three rolling 7-day windows. Shows ROAS direction across the last 3 weeks.
 
 ```sql
 WITH d AS (
@@ -121,11 +144,11 @@ GROUP BY 1, 2
 ORDER BY 1;
 ```
 
-Output shape: `Date range | Sales | Spend | ROAS`. Healthy ROAS >7x. ROAS trending down ≠ bad on its own, but it's the trigger to look at Grid 2.
+Output: `Date range | Sales | Spend | ROAS`. Healthy ROAS ≥7x. Falling ROAS isn't bad on its own — it's the trigger to look at Grid 2.
+
+**For more accurate sales:** join `google_stock_track` to the `sales` table on `solddate` instead of using `shopify_sales` directly (snapshot lag caveat above).
 
 ### Grid 2 — Demand
-
-Same three windows. Tells you whether a falling ROAS is a click-cost problem (Google getting more expensive) or a conversion problem (clicks not buying).
 
 ```sql
 WITH d AS (
@@ -157,11 +180,11 @@ GROUP BY 1, 2
 ORDER BY 1;
 ```
 
-Output shape: `Date range | Clicks | Units | Conv % | Cost/click`. If clicks rising and conv % falling = conversion problem → Grid 3. If CPC rising sharply = click-cost problem → check Google Ads UI for auction pressure.
+Output: `Date range | Clicks | Units | Conv % | Cost/click`. Clicks rising and conv % falling = conversion problem → Grid 3. CPC rising sharply = click-cost problem → likely raise tROAS to tighten.
 
 ### Grid 3 — Stock
 
-Per-segment readiness today (single snapshot). Tells you whether the conversion drop has a stock cause and which segments are leaking.
+Per-segment readiness today. **Do not use `skusummary.variants` or `skusummary.stockvariants`** — both stale (see CLAUDE.md). Size universe comes from `skumap`; live stock from `localstock`.
 
 ```sql
 WITH size_universe AS (
@@ -209,17 +232,18 @@ GROUP BY segment
 ORDER BY sold_30d DESC;
 ```
 
-Output shape: `Segment | Styles | READY | PARTIAL | THIN | THIN-selling | Sold 30d`. PARTIAL on a high-volume segment = clicks landing on broken size grids. THIN-selling = clicks being burned on near-empty pages.
+Output: `Segment | Styles | READY | PARTIAL | THIN | THIN-selling | Sold 30d`. PARTIAL on a high-volume segment = clicks landing on broken size grids. THIN-selling = clicks burned on near-empty pages.
 
-**Once `birk_ready_styles` history accrues (~2 weeks from 2026-04-27)**, replace Grid 3 with the same 3-week trend shape as Money/Demand using the `google_stock_track` columns.
+For per-style detail (which sizes missing), drop the segment grouping and select `groupid, colour, sizes_in_stock, total_sizes` from the `readiness` CTE.
 
 ### Reading the three together
 
 | Money | Demand | Stock | Read |
 |---|---|---|---|
-| ROAS healthy & flat/rising | — | — | Bump candidate |
+| ROAS healthy, imp share <85% | — | — | **Raise budget** |
+| ROAS healthy, imp share 85%+ | Marginal ROAS <5x | — | **Raise tROAS** |
 | ROAS dropping | CPC stable, conv falling | High-volume segments PARTIAL/THIN | Hold — fix stock first |
-| ROAS dropping | CPC rising | — | Click-cost issue, check tROAS / auction pressure |
+| ROAS dropping | CPC rising | — | Click-cost issue — **raise tROAS** |
 | ROAS dropping | Conv stable, clicks falling | — | Demand softening — seasonal or competitive |
 | ROAS approaching 5x | — | — | Pull back |
 
@@ -229,28 +253,20 @@ Output shape: `Segment | Styles | READY | PARTIAL | THIN | THIN-selling | Sold 3
 
 | Metric | Floor | Target | Ceiling | Source |
 |--------|:-----:|:------:|:-------:|--------|
-| ROAS | 5x (minimum profitable) | 7x+ | — | `google_stock_track` (shopify_sales / google_ad_spend) |
-| Search impression share (per campaign) | — | 85%+ | — | `google_campaign_daily` (search_imp_share) |
-| Daily spend vs cap (per campaign) | — | 80%+ of cap | Consistently hitting cap | `google_campaign_daily` (cost) |
-| Impressions trend | — | Week-on-week growth in spring | — | `google_stock_track` |
-| Ad-ready styles (READY count) | 10+ styles | 15+ styles | — | Ad-readiness query (step 3) |
-| THIN styles actively selling | 0 ideal | Flag for stock review | — | Ad-readiness query (sold_30d > 0 but THIN) |
+| 7d ROAS | 5x (minimum profitable) | 7x+ | — | `google_stock_track` (or `sales` join) |
+| Marginal ROAS (incremental new-spend) | 5x | 8x+ | — | week-on-week delta from change log |
+| Search impression share | — | 85%+ | — | `google_campaign_daily` / `google_stock_track` |
+| Daily spend vs cap | — | 80%+ of cap | Consistently at cap | `google_campaign_daily` |
+| Ad-ready styles (READY count) | 10+ | 15+ | — | Grid 3 |
+| THIN styles actively selling | 0 ideal | Flag for stock review | — | Grid 3 (sold_30d > 0 but THIN) |
 
 ---
 
-## Baseline Conversion Rate (Monthly Health Check)
+## Baseline conversion rate (monthly health check)
 
-Daily conversion rates are noisy — at our volume (~76 clicks/day, ~9 units/day), a single multi-buy customer or a quiet afternoon can swing the day by 10 percentage points. Don't react to individual days. Instead, track the **baseline conversion rate** monthly.
-
-### How to calculate it
-
-1. Pull all daily conversion rates for the month (clicks → Shopify units)
-2. Sort them lowest to highest
-3. The **median** (middle value) is the baseline — half your days are above, half below. Unlike an average, one 22% spike day or one 3% crash day can't distort it.
-4. The **baseline band** is the interquartile range (IQR) — the middle 50% of days. This is the range where "normal" days land.
+Daily conversion is noisy at our volume (~76 clicks/day). Don't react to individual days. Track the **monthly median** — half your days above, half below, immune to single-day spikes/crashes.
 
 ```sql
--- Monthly baseline conversion rate (median + IQR)
 SELECT
   TO_CHAR(snapshot_date, 'YYYY-MM') AS month,
   COUNT(*) AS days,
@@ -270,248 +286,9 @@ GROUP BY TO_CHAR(snapshot_date, 'YYYY-MM')
 ORDER BY 1;
 ```
 
-### How to read it
+**How to read:** median rising month-over-month = fundamentals improving (supports budget moves); median dropping = something structural changed, investigate before raising budget. The IQR (Q1–Q3) is the band where normal days land.
 
-- **Median rising month-over-month** (e.g. Feb 8% → Mar 12%) = business fundamentals improving, supports budget increases
-- **Median stable** = steady state, budget decisions based on other factors (ROAS, impression share)
-- **Median dropping** (e.g. 12% → 7%) = something structural has changed — investigate before increasing budget. Could be: price changes suppressing conversion, stock gaps, seasonal shift, or competitive pressure.
-
-### March 2026 reference
-
-- Median: **12.3%**
-- Baseline band (IQR): **9.8% – 16.3%** (14 of 24 days)
-- Outlier bad days (under 6%): 3 days — normal, always bounce back within 1-2 days
-- Outlier great days (over 17%): 5 days — don't use these to justify decisions
-
-At current volume, expect this pattern every month: ~3 bad days, ~3 great days, ~20 steady days in the baseline band. As budget scales and daily clicks increase, variance reduces naturally.
-
----
-
-## Weekly Review Checklist
-
-### 1. Check ROAS (last 7 days vs prior 7 days)
-
-```sql
-WITH daily AS (
-  SELECT snapshot_date, google_ad_spend::numeric as spend, shopify_sales::numeric as sales
-  FROM google_stock_track WHERE google_ad_spend IS NOT NULL
-)
-SELECT
-  'Last 7 days' as period,
-  ROUND(SUM(spend), 2) as total_spend,
-  ROUND(SUM(sales), 2) as total_sales,
-  ROUND(SUM(sales) / NULLIF(SUM(spend), 0), 1) as roas,
-  ROUND(AVG(spend), 2) as avg_daily_spend
-FROM daily WHERE snapshot_date >= CURRENT_DATE - 7
-UNION ALL
-SELECT
-  'Prior 7 days',
-  ROUND(SUM(spend), 2),
-  ROUND(SUM(sales), 2),
-  ROUND(SUM(sales) / NULLIF(SUM(spend), 0), 1),
-  ROUND(AVG(spend), 2)
-FROM daily WHERE snapshot_date >= CURRENT_DATE - 14 AND snapshot_date < CURRENT_DATE - 7;
-```
-
-### 2. Check search impression share and budget pressure
-
-Per-campaign — read directly from `google_campaign_daily` (source of truth since the per-campaign CSV format went live):
-
-```sql
-SELECT snapshot_date, campaign, cost, clicks, search_imp_share
-FROM google_campaign_daily
-WHERE snapshot_date >= CURRENT_DATE - 14
-ORDER BY snapshot_date DESC, campaign;
-```
-
-`search_imp_share` is NULL when Google reports `< 10%` (campaign losing most auctions) or `--` (reporting lag — usually clears within 1-2 days).
-
-**Reading impression share (per campaign):**
-- **85%+** — capturing most available traffic, that campaign's budget is not limiting
-- **70-85%** — missing some traffic, budget may be constraining
-- **Below 70%** — significant traffic being missed, budget or tROAS is limiting on that campaign
-- **NULL persistently (not lag)** — campaign at `<10%`. Either lift its cap or accept it's a niche role.
-
-**Don't aggregate imp share across campaigns.** When multiple campaigns are active, the combined-imp-share number isn't well-defined (Google computes it per campaign against that campaign's eligible auction pool). Under single-campaign mode (current state, from 14 May), `google_stock_track.google_search_imp_share` matches STANDARD's per-campaign value and is populated again by `update_google_stock_track.py`. Multi-campaign dates 28 Apr – 13 May stay NULL there — use `google_campaign_daily` for those.
-
-**Cap pressure** — combine the spend column with STANDARD's known daily cap (currently £105):
-
-```sql
-SELECT campaign,
-       ROUND(AVG(cost), 2) AS avg_daily_spend,
-       ROUND(MAX(cost), 2) AS max_daily_spend,
-       SUM(CASE WHEN cost >= 105 - 1 THEN 1 ELSE 0 END) AS days_at_cap
-FROM google_campaign_daily
-WHERE snapshot_date >= CURRENT_DATE - 7
-  AND campaign = 'STANDARD'
-GROUP BY campaign;
-```
-
-If STANDARD shows 3+ of 7 days at/over its cap, budget is constraining. Update the literal `105` when the cap changes.
-
-### 3. Check stock readiness (ad-readiness by style)
-
-The question isn't "how many units do we have" but "how many styles can actually convert Google clicks right now?" A style with 50 units across all sizes will convert; a style with 5 units in odd sizes wastes ad spend.
-
-Stock is checked via Birkenstock segments defined in `skusummary.segment`. Segments are the source of truth for core lines — see the Segments Google Sheet and `scale/CLAUDE_CONTEXT.md` for full context.
-
-**Readiness levels:**
-- **READY** — 70%+ size coverage AND 15+ units. Can fully convert traffic.
-- **PARTIAL** — 40%+ coverage AND 5+ units. Some conversions but size gaps lose sales.
-- **THIN** — Below thresholds. Mostly wasted clicks.
-
-**IMPORTANT — do not use `skusummary.variants` or `skusummary.stockvariants`** as the size-universe denominator. Both fields are stale (see CLAUDE.md). The size universe comes from `skumap` (the master (groupid, code) catalogue, one row per size). Do NOT use `localstock` for the denominator either — it does not preserve historical empty sizes (e.g. a style with 14 sizes in skumap may only have 4 codes in localstock if 10 sizes are currently empty), so it under-states the universe.
-
-```sql
-WITH size_universe AS (
-  -- Total sizes per groupid from skumap (master catalogue, deleted=0 excludes retired sizes).
-  -- Source of truth for "how many sizes does this style have".
-  SELECT groupid, COUNT(DISTINCT code) AS total_sizes
-  FROM skumap
-  WHERE deleted = 0
-  GROUP BY groupid
-),
-current_stock AS (
-  -- Live stock: sizes currently sellable (#FREE, not deleted, qty > 0).
-  SELECT groupid,
-    SUM(qty) as units,
-    COUNT(DISTINCT code) as sizes_in_stock
-  FROM localstock
-  WHERE ordernum = '#FREE' AND deleted = 0 AND qty > 0
-  GROUP BY groupid
-),
-recent_sales AS (
-  SELECT groupid,
-    SUM(CASE WHEN solddate >= CURRENT_DATE - 30 THEN qty ELSE 0 END) as sold_30d
-  FROM sales WHERE channel = 'SHP'
-  GROUP BY groupid
-)
-SELECT
-  ss.segment, ss.groupid, ss.colour,
-  COALESCE(cs.units, 0) as stock_now,
-  COALESCE(cs.sizes_in_stock, 0) as sizes_in_stock,
-  COALESCE(su.total_sizes, 0) as total_sizes,
-  ROUND(COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) * 100, 0) as size_coverage_pct,
-  COALESCE(rs.sold_30d, 0) as sold_30d,
-  CASE
-    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.7
-         AND COALESCE(cs.units, 0) >= 15 THEN 'READY'
-    WHEN COALESCE(cs.sizes_in_stock, 0)::numeric / NULLIF(su.total_sizes, 0) >= 0.4
-         AND COALESCE(cs.units, 0) >= 5 THEN 'PARTIAL'
-    ELSE 'THIN'
-  END as ad_readiness
-FROM skusummary ss
-LEFT JOIN size_universe su ON ss.groupid = su.groupid
-LEFT JOIN current_stock cs ON ss.groupid = cs.groupid
-LEFT JOIN recent_sales rs ON ss.groupid = rs.groupid
-WHERE ss.brand = 'Birkenstock' AND ss.segment IS NOT NULL AND ss.segment != 'CRAP'
-  AND ss.shopify = 1 AND ss.googlestatus = 1
-ORDER BY ad_readiness, sold_30d DESC;
-```
-
-**How to read the results for budget decisions:**
-- Count the READY styles and their total units — this is your "convertible catalogue"
-- THIN styles that are actively selling (sold_30d > 0) are wasting clicks — flag for stock review
-- When a THIN style moves to READY (e.g. delivery arrives), that strengthens the case for a budget increase
-
-### 4. Check stock trend
-
-```sql
-SELECT snapshot_date, live_stock_units, live_stock_value
-FROM google_stock_track
-ORDER BY snapshot_date DESC LIMIT 14;
-```
-
----
-
-## The Two Levers
-
-### 1. Daily Budget
-Controls **how much** Google can spend per day. Raising it allows more spend; lowering it caps spend.
-
-### 2. Target ROAS (tROAS)
-Controls **how aggressively** Google bids. Currently 400%.
-- **Lowering tROAS** (e.g. 400% → 300%) = Google bids on more auctions, more volume, potentially lower efficiency
-- **Raising tROAS** (e.g. 400% → 500%) = Google is pickier, less volume, higher efficiency
-
-**Budget is the primary lever.** Only adjust one lever at a time so you can isolate what's driving the result.
-
-### When to consider adjusting tROAS
-
-tROAS should rarely need changing. The following are signals to look for, not rigid triggers — always use judgement based on the full picture.
-
-- **Consider lowering tROAS** (e.g. 400% → 300%): Impression share is low, but spend isn't hitting the budget cap. This means Google can't find enough auctions at the current tROAS bar — lowering it unlocks more volume at slightly lower efficiency.
-- **Consider raising tROAS** (e.g. 400% → 500%): ROAS is trending toward the 5x floor and you want to tighten efficiency, or stock is running low and you want to slow volume without cutting budget.
-- **Leave it alone**: The algorithm is outperforming the target and budget is the clear constraint. Changing tROAS forces a new learning phase, so don't adjust it just because you can.
-
-**Diagnosing which lever is the constraint:**
-
-| Impression share | Spend vs budget | Constraint | Action |
-|-----------------|----------------|------------|--------|
-| Low (< 85%) | Hitting cap | Budget | Increase budget |
-| Low (< 85%) | Below cap | tROAS | Consider lowering tROAS |
-| High (85%+) | Below cap | Neither | Hold — capturing most demand |
-
----
-
-## Decision Rules
-
-**Important:** These are guidelines, not rigid rules. Each review should use judgement based on what the data is actually showing. Context matters — consider the ROAS trajectory, seasonal timing, and algorithm stability rather than applying thresholds mechanically.
-
-### Increment sizing
-
-- **Default: ~20% increases every 5 days** — percentage-based keeps steps proportional as budget grows. Review every 5 days during peak ramp (Mar–Jul). Round to nearest £1.
-- **Hold or slow down** if ROAS drops below 7x, stock runs low, or the algorithm shows instability after an increase.
-- **Speed up** (shorten to 4-day reviews) only if ROAS stays well above 10x and impression share is clearly constrained.
-
-### 20%-every-5-days projection (guide, not a plan)
-
-This is what 20% steps look like if criteria hold every time. **Each session decides on the day** against decision rules and current data — these dates and amounts are not a commitment. Tick `[x]` when a step is taken; leave `[ ]` for future projections.
-
-Projection from the current £60 cap (28 Apr 2026):
-
-| Target date | Budget | +20% from | Status |
-|-------------|:------:|:---------:|:------:|
-| Sun 3 May | £72 | £60 | [ ] |
-| Fri 8 May | £86 | £72 | [ ] |
-| Wed 13 May | £103 | £86 | [ ] |
-| Mon 18 May | £124 | £103 | [ ] |
-| Sat 23 May | £149 | £124 | [ ] |
-| Thu 28 May | £179 | £149 | [ ] |
-| Tue 2 Jun | £215 | £179 | [ ] |
-| Sun 7 Jun | £258 | £215 | [ ] |
-| Fri 12 Jun | £310 | £258 | [ ] |
-
-If ROAS dips, conversion stalls, or stock thins, the next-step decision skips or holds. Don't chase the dates.
-
-### Increase budget
-
-ALL of the following must be true:
-- ROAS >= 7x for the last 7 days
-- Average daily spend is within £1.50 of current budget (budget is constraining)
-- Search impression share dropping below 85% (traffic being missed)
-- Majority of Birkenstock segment styles are READY (70%+ size coverage, 15+ units) — check ad-readiness query
-- We are in or approaching peak season (Mar-Jul) OR demand is clearly rising (impressions up week-on-week)
-
-### Hold budget
-
-Any of the following:
-- ROAS is between 5x and 7x (profitable but not confidently so)
-- Average daily spend is well below budget (Google isn't spending it — no point raising)
-- Search impression share is 85%+ (already capturing most traffic)
-- Many segment styles are PARTIAL or THIN (poor size coverage — clicks won't convert)
-- Recently changed budget and not yet enough data to assess the impact — let it settle
-
-### Decrease budget
-
-Any of the following:
-- ROAS < 5x for 2 consecutive weeks
-- Most segment styles are THIN — not enough convertible catalogue to justify spend
-- Off-season (Nov-Jan) with low impressions and poor conversion
-
-### Algorithm stability note
-
-When the algorithm is on a good trajectory (ROAS improving week-on-week), favour smaller increments to avoid disrupting its learning. A steady upward path with £2 steps is better than a larger jump that causes the algorithm to re-learn and potentially lose days of efficiency.
+**Mar 2026 reference:** median 12.3%, IQR 9.8–16.3%. Expect ~3 bad days, ~3 great days, ~20 baseline days per month at current volume.
 
 ---
 
@@ -528,9 +305,24 @@ When the algorithm is on a good trajectory (ROAS improving week-on-week), favour
 
 ---
 
+## Process for Claude Code Review
+
+When asked to review the Google Ads budget:
+
+**Don't run analysis on stale data.** If the latest `snapshot_date` with ad spend is >2 days old, flag it and wait for user confirmation before proceeding.
+
+1. Run the **Three-Grid Snapshot** for the trend read.
+2. Read the **three constraint numbers** (imp share, spend vs cap, marginal ROAS) for current state.
+3. Run **Grid 3 readiness** if conversion is dragging.
+4. Cross-reference against the **diagnostic table** — which lever is the constraint?
+5. Recommend: which lever, which direction, what size — with reasoning. Name the campaign.
+6. If changing: update **Current State** at the top AND add a row to the **Change Log** below. Single source of truth lives here — do **not** log budget changes in `scale/SCALE_PLAN.md` or elsewhere.
+
+---
+
 ## Budget & tROAS Change Log
 
-Recent entries (last ~6 weeks) keep full rationale. Older entries collapsed to one-liners for scan speed — full rationale lives in git history.
+Recent entries keep full rationale. Older entries collapsed to one-liners for scan speed — full rationale lives in git history.
 
 ### Archive: Feb–Mar 2026
 
@@ -561,20 +353,4 @@ Recent entries (last ~6 weeks) keep full rationale. Older entries collapsed to o
 | 2026-05-09 (decided 8 May, midnight-effective) | PMAX (BIRK-WINNER) £20 → £40; STANDARD held £60; IVES held £5. Combined £85 → £105. | 11.8x (last 7d, sales-table joined) | STANDARD ~83% / PMAX ~41% / IVES ~23% | £88 avg 7d combined | 2,861 live; 23 READY (751u), 7 THIN-selling | All five increase criteria met. PMAX is the loudest constraint: imp share 41%, Google overspent to £33.59 on a single £20-cap day, 4/7 days at cap. 19/24 BIRK-WINNER styles converting on Shopify since 28 Apr launch (61 units / £3,785 revenue vs £196 spend — naive ROAS 19x). User-led aggressive step: doubling PMAX during peak season with stock at strongest-yet level (23 READY); accepting learning-phase re-entry. STANDARD held — already at ~83% imp share (close to target) and at £60 marginal headroom is smaller. IVES held at £5 budget; price action taken instead (see IVES Fair-Pricing flag in Current State). tROAS held at 400% on STANDARD; PMAX and IVES remain uncapped — not setting Google's 620% suggestion since historical ROAS 12–17x sits well above it. | ~Thu 15 May (after 5–7 days of PMAX learning at £40, first full day 9 May) |
 | 2026-05-09 (decided 8 May, midnight-effective) | STANDARD £60 → £72 (+20%) — same session as PMAX bump above. Combined £105 → £117. | 9.7x–16.7x bounds (last 7d; STANDARD spend £435.14 vs non-IVES revenue £7,256 / non-PMAX-non-IVES revenue £4,218 — true ROAS likely 12–15x given PMAX only spent £196 over 10 days) | Daily series shows imp share collapsing inside last 7d: 91.6 / 86.0 / 86.4 / 88.8 / **70.0 / 73.4** / -- — last 3 days fell ~18 points, classic budget-constrained signal | £62.16 avg 7d, max £70.21 (Google overspent £60 cap by 17% on May 3) | 2,861 live; 23 READY (751u) — strongest yet | All five increase criteria met independent of PMAX context. ROAS deeply above 7x floor; Google demonstrated £70.21 day at £60 cap; imp share crash from 88% → 70% over May 4–6 is the budget-constraint signal; catalogue strength at peak. 20% step matches the standard ramp shape; £72 stays inside what Google has already shown it can spend. tROAS held at 400%. | ~Thu 15 May (alongside PMAX re-eval) |
 | 2026-05-15 (decided 14 May, midnight-effective) | **Consolidated back to single STANDARD campaign.** PMAX paused, IVES kept paused. STANDARD £72 → £105 (+46%). Active cap £105 (single). | 10.2x (last 7d, sales-table joined) | STANDARD 90–93% (last 4 reported days); PMAX 62% avg | £119 combined avg 7d (STD £74 + PMAX £39 + IVES £0 paused) | 3,288 live units; 41 READY (1,124u), 30 THIN-selling (record high) | Triggered by Google Conversions-by-Campaign report (14 Apr – 13 May): PMAX £442 → £3,223 conv value → 7.28x ROAS, matched STANDARD's 7.28x. Cannibalization test (BIRK-WINNER +42% units post-launch vs OTHER Birks +30%, but −6.6pp revenue growth) implied most PMAX revenue was duplicated from STANDARD's eligible auctions. True incremental PMAX ROAS estimated 2–4x — well below Google's attributed 7.28x. IVES separately revealed 3.27x ROAS over 30 days (below floor) — confirms pausing was correct independent of the AMZ test. STANDARD-only at £105 absorbs roughly the freed PMAX budget while testing whether STANDARD's Smart Bidding can scale alone. +46% is large vs the 20% ramp shape, but total daily spend roughly unchanged from the £117 combined cap — it's a consolidation, not a true ramp step. PMAX's BIRK-WINNER `custom_label_0` retained as Smart Bidding signal inside STANDARD. tROAS held at 400%. Operational case: one ROAS, one imp share, one cap = clean ramp lever from here. | Mon 19 May |
-
----
-
-## Process for Claude Code Review
-
-When asked to review the Google Ads budget:
-
-**Important:** Do not run budget analysis on stale data. Check the latest `snapshot_date` with ad spend data first — if it is more than 2 days old, flag it and wait for user confirmation before proceeding.
-
-1. Query `google_stock_track` for last 14 days (daily) and weekly aggregates (spend, clicks, impressions, ad-readiness)
-2. For imp share: read `google_stock_track.google_search_imp_share` for headline trend (populated from 14 May onwards under single-campaign mode; frozen NULL for multi-campaign window 28 Apr – 13 May). Use `google_campaign_daily` for per-campaign reads if multiple campaigns are active or for the multi-campaign historical window.
-3. Run the ad-readiness query to check stock by style (READY / PARTIAL / THIN)
-4. Check per-campaign cap pressure (3+ of 7 days at/over a campaign's cap = constraining)
-5. Review per-campaign impression share trend — is any campaign dropping? (signals budget or tROAS constraint on that specific campaign)
-6. Compare against the decision rules above
-7. Make a recommendation: increase / hold / decrease with reasoning — name the campaign(s) the change applies to
-8. If changing: update the Current State block at the top AND add an entry to the Budget & tROAS Change Log in this doc. **Do not log budget changes in `scale/SCALE_PLAN.md`** — single source of truth lives here.
+| 2026-05-14 (evening, same-day revert) | **Reverted STANDARD £105 → £72.** PMAX kept paused, IVES kept paused. tROAS held at 400%. Active cap £72 (single). | 9.9x (May 9–13, sales-table read) | STANDARD 86–93% (May 1–10 reported days) | Recent STANDARD: £74/d May 9–13 | 3,288 live units; 41 READY, 30 THIN-selling | Reverted same day after diagnostic re-read against rewritten doc framework. The earlier £72→£105 step (logged just above) went against the doc's "Hold when imp share 85%+" rule — STANDARD was already at 86–93% imp share, which is the "capturing demand cleanly" row of the new diagnostic table, not "raise budget." Today's weak sales feel reinforced the gut check but the rules-based reason was sufficient on its own. Reverted *before* midnight so no full day was paced against £105 — Google never started learning a new cap, no churn cost. £72 is the last STANDARD level cleanly absorbed (May 9–13 STANDARD spent £74/d at 86–93% imp share). tROAS held at 400% as conservative single-lever revert; tROAS 400→500% available as the next experiment if marginal ROAS stays weak. Doc-rewrite note: this revert is the framework working as intended — the new diagnostic table surfaced a misread that the old multi-framework doc obscured. | Mon 19 May |
