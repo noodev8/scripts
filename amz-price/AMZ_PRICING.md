@@ -6,7 +6,40 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 ## Status
 
-> **🗑️ DELETE-WHEN-RESOLVED** — the 2026-05-09 section below is verbose investigation context. Once the reverts confirm and we've moved past this episode (next 1-2 sessions), delete the entire 2026-05-09 entry to keep this file readable. Keep only the takeaways that generalise (compound-creep-collapse pattern is already in the heuristics if needed elsewhere).
+**Session (2026-05-17) — WHITE suppression-recovery nudge + full IVES-COLOUR colour-by-colour review (16 changes: 7 creeps / 9 drops):**
+
+**Suppression episode RESOLVED.** The May fair-pricing suppression was real (buy box genuinely lost on WHITE); the May 14 −50p across-band recompute trick worked. By May 15–16 WHITE-06 ran ~4.7/d (faster than pre-stack 3.8/d). Recovery is WHITE-only — IVES-COLOUR independently sagged in parallel (not a portfolio-wide suspension; colours didn't fall in sync). The verbose 2026-05-09 investigation block below can be deleted next cleanup pass — episode is closed.
+
+**WHITE:** 04 & 06 +10p (£38.09→£38.19) — small partial recovery of the May 14 suppression-escape token drop on the two confirmed-strong sizes only; stays well below pre-episode prices to avoid re-tripping fair-pricing.
+
+**IVES-COLOUR (colour-by-colour, full pass):**
+| Colour | Changes |
+|---|---|
+| GREY | 07 £37.19→£36.69 (clear heavy laggard; "collapse" was just the 4/26 spike ending — true baseline ~5/wk) |
+| MIDBLUE | 06 £38.50→£38.80, 07 £37.49→£37.79 (restore pre-May-8-calibration levels on strong sizes) |
+| BLACK | 03 £36.99→£35.99 (30d+ dead) |
+| BLACKSOLE | 08 £39.19→£38.69 (May 4 drop failed, 12d dead) |
+| BEIGE | 04 £37.49→£36.99 (stalled), 05 £39.49→£39.79 (never-touched strong seller, nearly OOS — harvest) |
+| KHAKI | 04/05/07 all → £34.99 (aggressive clear, dead tail sizes) |
+| RED | 04 £36.49→£36.99 (supply-constrained harvest creep) |
+| STONE | 04 & 06 → £33.99 (clear dead piles), 05 £36.49→£36.99 (scarce+selling harvest) |
+
+**Rule refinements agreed this session (carry forward):**
+1. **The £35.99 "floor" is a soft convention, NOT economic.** Actual profit ≈ £14/unit at £35.99, still ≈ £12/unit at £33.99 (cost £15.99 + FBA ~£3, breakeven is low-£20s). For genuinely **dead stock sitting on a pile**, clear aggressively to £33.99–£34.99 to get movement. Don't sit on dead stock to protect a tidy number.
+2. **Clear dead piles, harvest scarce sellers — even within one colour.** Dead size + stock pile → aggressive clear. Scarce-but-still-selling size → creep UP (harvest margin / slow burn), never dump. STONE this session split both ways.
+3. **Supplier default: assume IVES colours are out at supplier now but replenishable later.** Don't ask the supplier-status question every colour. Don't fire-sale scarce *sellers* (harvest them); DO clear genuinely dead piles. User flags individual exceptions.
+4. **Don't round-trip.** Don't creep a working size back to the exact price we deliberately dropped it from (NAVY-04 lesson — held, no change). "Strong at price" ≠ "under-priced"; a creep needs a distinct justification (supply scarcity, never-touched default, near-OOS harvest), not just "it's selling."
+
+**Priority watches next session:**
+- **MIDBLUE-05 (£37.99, 32 FBA) & NAVY-05 (£37.99, 22 FBA, 14d dead)** — both dropped 5/13, ~3-day re-check: if still dead, deeper cut or accept demand problem.
+- **KHAKI-04/05/07 @ £34.99, STONE-04/06 @ £33.99** — did the aggressive clears actually move stock? Validates (or not) the lower-floor policy.
+- **WHITE-04/06 @ £38.19** — did the +10p hold post-recompute velocity.
+- **MIDBLUE-06/07, BEIGE-05, RED-04, STONE-05** — confirm creeps held.
+- **BLACK lifecycle** — historically strong, faded, low FBA from no reorders. Keep as a managed pricing colour, or harvest-and-exit? Separate from pricing — raise with user.
+
+---
+
+> **🗑️ DELETE-WHEN-RESOLVED** — the 2026-05-09 section below is verbose investigation context. Episode is now RESOLVED (see 2026-05-17 entry above) — safe to delete this whole block on the next cleanup pass.
 
 **Session (2026-05-09) — IVES recovery batch (18 reverts across all 8 segments):**
 
