@@ -1,6 +1,5 @@
 -- NULL-segment review: lists groupids without a segment, sorted fresh-down.
--- Companion to triage.sql — triage scans segmented in-season groupids,
--- this scans the gap (NULL segment) so newly-arrived stock doesn't fall
+-- Scans the gap of unsegmented stock so newly-arrived product doesn't fall
 -- through. Walk newest-arrival first during segment sessions and decide
 -- per row: assign to a segment, mark CRAP, or leave NULL (dead long-tail).
 --

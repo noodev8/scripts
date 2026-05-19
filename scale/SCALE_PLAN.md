@@ -8,8 +8,8 @@
 
 - **12m revenue:** ~£310k (Feb 2026 baseline; refresh due end of May after spring data lands)
 - **Ives share of GP:** ~60% — target sub-50% by end-2026
-- **Active push:** Birkenstock Shopify peak (Apr–Jul) — Google Ads at £60/day, ramping by ~20% every 5 days while criteria hold
-- **Open initiatives:** REMONTE-WIN promotion for next winter, Frisco Amazon scale, Rieker Summer reorder decision (end May)
+- **Active push:** Birkenstock Shopify peak (Apr–Jul) — Google Ads scaling. **Current cap & rationale live in `google-ads/BUDGET_REVIEW_PROCESS.md`** (don't restate the number here — it goes stale).
+- **Open initiatives:** REMONTE-WIN promotion for next winter; Frisco Amazon scale. (Rieker Summer reorder decision closed — M1655 retired 18 May.)
 - **Recent shifts:** Madrid EVA + Arizona Patent absorbed into existing segments; Frisco live on Amazon FBA
 
 > **Update this block whenever you change anything below.**
@@ -210,16 +210,12 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 
 **Google Ads budget changes are logged in `google-ads/BUDGET_REVIEW_PROCESS.md` only. Don't duplicate here.** This log is for strategic / non-budget decisions.
 
-| Date | Decision | Rationale | Review |
-|------|----------|-----------|--------|
-| 2026-02-16 | Klaviyo email playbook created | See `scale/KLAVIYO_EMAIL_PLAYBOOK.md` | Launch repurchase first |
-| 2026-02-17 | Simplified Klaviyo to one campaign | 90-day Birkenstock non-buyer repurchase only. Prove it first. | Review after 2-3 sends |
-| 2026-03-02 | Birkenstock off-season confirmed 0% margin | See Established Facts. | Informs Sep/Oct ordering |
-| 2026-03-02 | Lunar winter books ruled out permanently | See Established Facts. | - |
-| 2026-03-02 | Rieker confirmed Amazon-only | See Established Facts. | Expand when cash allows |
-| 2026-03-03 | Ives ceiling acknowledged | See Established Facts. | Ongoing |
-| 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. | Contact WMSC |
-| 2026-03-25 | Free Spirit Frisco promoted from investigation to active test | First 2 Amazon sales (21 Mar), £27 GP/unit. Stock sent to FBA, partial sizes live. Segment `FREE-SPIRIT` created. | Review end Apr |
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-02-16/17 | Klaviyo: created playbook, then simplified to one campaign | 90-day Birkenstock non-buyer repurchase only. Prove it first. See `scale/KLAVIYO_EMAIL_PLAYBOOK.md`. |
+| 2026-03-02/03 | Established Facts confirmed | Birk off-season 0% margin; Lunar winter books ruled out; Rieker AMZ-only; Ives ceiling. All stated in Established Facts above. |
+| 2026-03-03 | Free Spirit narrowed to Frisco only | See section 8. |
+| 2026-03-25 | Frisco promoted to active test | First 2 Amazon sales (21 Mar), £27 GP/unit, FBA, segment `FREE-SPIRIT` created. |
 
 ---
 
