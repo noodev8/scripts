@@ -244,9 +244,9 @@ def run_pick_allocation(cursor):
             log(f"Order {order_name}, SKU {shopifysku} already fully allocated: {already_allocated}/{order_qty} picks")
             # Set orderdate to mark as picked and localstock to the number of picks allocated
             cursor.execute("""
-                UPDATE orderstatus SET orderdate = %s, localstock = %s
+                UPDATE orderstatus SET orderdate = created, localstock = %s
                 WHERE ordernum = %s AND shopifysku = %s
-            """, (get_current_datetime(), already_allocated, order_name, shopifysku))
+            """, (already_allocated, order_name, shopifysku))
             continue
 
         picks_needed = order_qty - already_allocated
@@ -406,9 +406,9 @@ def run_pick_allocation(cursor):
         # Set orderdate and localstock for ANY picks found to prevent double picking
         if picks_allocated > 0:
             cursor.execute("""
-                UPDATE orderstatus SET orderdate = %s, localstock = %s
+                UPDATE orderstatus SET orderdate = created, localstock = %s
                 WHERE ordernum = %s AND shopifysku = %s
-            """, (get_current_datetime(), total_allocated, order_name, shopifysku))
+            """, (total_allocated, order_name, shopifysku))
 
             if total_allocated == order_qty:
                 log(f"Order {order_name}, SKU {shopifysku} fully allocated: {total_allocated}/{order_qty} picks")
