@@ -707,15 +707,20 @@ def main():
         if batch_deleted > 0:
             log(f"Deleted {batch_deleted} orderstatus records with batch = '-1'")
 
-        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND createddate < NOW() - INTERVAL '30 days'")
+        # 60-day window must match clean_sales.sql. This delete ignores `arrived`,
+        # so a shorter window would undercut that purge and delete in-transit
+        # stock at the worst-case 30-day lead time. Keep both at 60.
+        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND createddate < NOW() - INTERVAL '60 days'")
         old_deleted = cursor.rowcount
         if old_deleted > 0:
-            log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 30 days)")
+            log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 60 days)")
 
-        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND arrived = 1")
-        arrived_deleted = cursor.rowcount
-        if arrived_deleted > 0:
-            log(f"Deleted {arrived_deleted} arrived orderstatus records (ordertype <> 1)")
+        # DISABLED (2026-05-19): keep arrived=1 orderstatus rows so we can
+        # inspect the order flow. Left off deliberately — not assumed to come back.
+        # cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND arrived = 1")
+        # arrived_deleted = cursor.rowcount
+        # if arrived_deleted > 0:
+        #     log(f"Deleted {arrived_deleted} arrived orderstatus records (ordertype <> 1)")
 
         # Clean up localstock table
         log("Cleaning up localstock records...")

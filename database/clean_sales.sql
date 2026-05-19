@@ -32,10 +32,15 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
 
+-- 60-day window = worst-case supplier lead time (30d) + buffer.
+-- PB goods-in sorts orderstatus by createddate DESC (LIFO): real arrivals
+-- consume the newest rows, so anything still arrived=0 at 60d is genuine
+-- surplus/never-coming and safe to purge. Do NOT shorten this — a window
+-- under the lead time strands in-transit stock into #FREE.
 DELETE FROM orderstatus
 WHERE ordertype = 3
   AND arrived = 0
-  AND createddate < CURRENT_DATE - INTERVAL '9 days';
+  AND createddate < CURRENT_DATE - INTERVAL '60 days';
 
 
 -- ----------------------------------------------------------------
