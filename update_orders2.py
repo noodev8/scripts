@@ -715,12 +715,16 @@ def main():
         if old_deleted > 0:
             log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 60 days)")
 
-        # DISABLED (2026-05-19): keep arrived=1 orderstatus rows so we can
-        # inspect the order flow. Left off deliberately — not assumed to come back.
-        # cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND arrived = 1")
-        # arrived_deleted = cursor.rowcount
-        # if arrived_deleted > 0:
-        #     log(f"Deleted {arrived_deleted} arrived orderstatus records (ordertype <> 1)")
+        # Purge received Amazon order rows after a 7-day reconciliation window.
+        # Replaces the old INSTANT arrived=1 delete that erased the order trail
+        # the moment stock was received (root cause of the #FREE-leak incident).
+        # 7 days covers a delivery + reconciliation; scoped to ordertype=3 only
+        # (customer/local rows untouched). The 60-day line-710 purge is the
+        # backstop for any arrived=1 row with a NULL arriveddate.
+        cursor.execute("DELETE FROM orderstatus WHERE ordertype = 3 AND arrived = 1 AND arriveddate < CURRENT_DATE - INTERVAL '7 days'")
+        arrived_deleted = cursor.rowcount
+        if arrived_deleted > 0:
+            log(f"Deleted {arrived_deleted} received Amazon orderstatus records (arrived=1, >7 days)")
 
         # Clean up localstock table
         log("Cleaning up localstock records...")
