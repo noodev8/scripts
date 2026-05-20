@@ -707,19 +707,21 @@ def main():
         if batch_deleted > 0:
             log(f"Deleted {batch_deleted} orderstatus records with batch = '-1'")
 
-        # 60-day window must match clean_sales.sql. This delete ignores `arrived`,
-        # so a shorter window would undercut that purge and delete in-transit
-        # stock at the worst-case 30-day lead time. Keep both at 60.
-        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND createddate < NOW() - INTERVAL '60 days'")
+        # 30-day window must match clean_sales.sql. Real-world supplier lead is
+        # ~10 days typical, 20 days longest legitimate arrival observed — 30d
+        # is the ceiling + buffer. This delete ignores `arrived`, acting as a
+        # backstop that also clears arrived=1 rows with NULL arriveddate the
+        # 7-day Amazon purge below would miss.
+        cursor.execute("DELETE FROM orderstatus WHERE ordertype <> 1 AND createddate < NOW() - INTERVAL '30 days'")
         old_deleted = cursor.rowcount
         if old_deleted > 0:
-            log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 60 days)")
+            log(f"Deleted {old_deleted} old orderstatus records (ordertype <> 1, older than 30 days)")
 
         # Purge received Amazon order rows after a 7-day reconciliation window.
         # Replaces the old INSTANT arrived=1 delete that erased the order trail
         # the moment stock was received (root cause of the #FREE-leak incident).
         # 7 days covers a delivery + reconciliation; scoped to ordertype=3 only
-        # (customer/local rows untouched). The 60-day line-710 purge is the
+        # (customer/local rows untouched). The 30-day line-710 purge is the
         # backstop for any arrived=1 row with a NULL arriveddate.
         cursor.execute("DELETE FROM orderstatus WHERE ordertype = 3 AND arrived = 1 AND arriveddate < CURRENT_DATE - INTERVAL '7 days'")
         arrived_deleted = cursor.rowcount

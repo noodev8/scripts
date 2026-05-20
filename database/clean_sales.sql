@@ -32,15 +32,26 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
 
--- 60-day window = worst-case supplier lead time (30d) + buffer.
+-- 30-day window = real-world ceiling (20d longest legitimate arrival
+-- observed) + 10d buffer. Typical supplier check-in is ~10 days, so
+-- 30d is 3x typical / 1.5x worst-seen.
+--
 -- PB goods-in sorts orderstatus by createddate DESC (LIFO): real arrivals
--- consume the newest rows, so anything still arrived=0 at 60d is genuine
--- surplus/never-coming and safe to purge. Do NOT shorten this — a window
--- under the lead time strands in-transit stock into #FREE.
+-- consume the newest rows, so anything still arrived=0 at 30d is genuine
+-- surplus/never-coming and safe to purge.
+--
+-- Edge case: if stock arrives after this purge, it has no orderstatus
+-- row to consume, so PB sends it straight to localstock #FREE. Order
+-- trail is lost but stock isn't — factored into future reorders via
+-- normal stock-aware logic. Acceptable trade vs. keeping ghosts in
+-- the PB Amazon Total report that would suppress legitimate reorders.
+--
+-- See database/stuck_supplier_orders.sql for the 21-day early-warning
+-- report that surfaces candidates before this auto-purge fires.
 DELETE FROM orderstatus
 WHERE ordertype = 3
   AND arrived = 0
-  AND createddate < CURRENT_DATE - INTERVAL '60 days';
+  AND createddate < CURRENT_DATE - INTERVAL '30 days';
 
 
 -- ----------------------------------------------------------------
