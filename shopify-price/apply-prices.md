@@ -8,24 +8,24 @@ How to apply a batch of Shopify price changes via `apply_prices.py`.
 
 ```
 groupid,new_price,description,change
-1017721-BEND,95.00,"Existing note. Your new note here",1
-0040791-MADRID,59.50,"Existing note. Your new note here",1
+1017721-BEND,95.00,"Pushed back up after stock landed",1
+0040791-MADRID,59.50,"Clearing tail — small sizes only left",1
 ```
 
 - **groupid**: product groupid from `skusummary`
 - **new_price**: the new Shopify price
-- **description**: keep the existing note from `price_change_log` and append your reason for the change
+- **description**: the reason for *this* change only. Do **not** copy the previous note in — `price_change_log` already preserves the full history as separate rows. Keep the note short and standalone (it'll be read as-is on triage reports).
 - **change**: `1` to apply, `0` to skip (rows with `0` can still carry a description forward as a note-only entry)
 
-### 2. Check existing notes first
+### 2. Optional — read previous notes for context
 
-So you can preserve them:
+Previous notes are kept as their own rows in `price_change_log`; you don't need to copy them forward. Read them if you want context for the decision:
 
 ```sql
-SELECT DISTINCT ON (groupid) groupid, reason_notes, new_price, change_date
+SELECT change_date, old_price, new_price, reason_notes
 FROM price_change_log
 WHERE groupid IN ('your-groupid-here')
-ORDER BY groupid, change_date DESC, id DESC;
+ORDER BY change_date DESC, id DESC;
 ```
 
 ### 3. Dry run
