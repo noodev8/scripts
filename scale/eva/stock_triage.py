@@ -5,7 +5,7 @@ Sorted by total stock DESC so high-stock decisions sit at the top
 (decide: drop further or wait for incoming).
 """
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import psycopg2
 from datetime import date, timedelta
 from logging_utils import get_db_config

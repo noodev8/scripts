@@ -1,6 +1,6 @@
 """Compare EVA-SEG prices vs Google's sale-price suggestions."""
 import sys, os, csv
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import psycopg2
 from datetime import date, timedelta
 from logging_utils import get_db_config

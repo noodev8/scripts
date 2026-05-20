@@ -128,9 +128,11 @@ For peak segments, the off-season contributes near-zero, so the peak-season proj
 
 Most segments use the defaults in this doc. Where a segment needs different rules (different SKU rollup, different windows, special commentary, etc.) they live in their own file under `segment_rules/<SEGMENT>.md`. Always check that folder before running a report — if a file exists for the segment, follow it; the defaults apply for anything it doesn't override.
 
+If a segment grows bespoke scripts as well as rules (rare), it gets its own folder at `scale/<segment>/` containing both the rules file and the scripts — see EVA below.
+
 Current files:
 - `segment_rules/IVES-COLOUR.md` — multi-colour Amazon segment, SKU report rolls up by colour rather than per-code
-- `segment_rules/EVA-SEG.md` — Birkenstock EVA, standard Summary first; if it shows an issue, drill via the stock-availability triage (`_eva_stock_triage.py`) instead of the standard per-SKU view
+- `eva/EVA-SEG.md` — Birkenstock EVA, standard Summary first; if it shows an issue, drill via the stock-availability triage (`eva/stock_triage.py`) instead of the standard per-SKU view
 
 Segment quirks not yet promoted to their own file (light overrides only):
 - **RIEKER-SUM** — no comparable history (didn't sell last year). Compare against current 12m baseline only, not YoY.

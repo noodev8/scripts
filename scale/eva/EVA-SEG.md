@@ -15,7 +15,7 @@ The standard per-SKU drill from `../SEGMENT_REPORTS.md` is **not** the default d
 
 ## Stock-availability triage (drill)
 
-Script: `scale/_eva_stock_triage.py`. Output shape:
+Script: `scale/eva/stock_triage.py`. Output shape:
 
 ```
  #  GroupID                Colour/Fit             Px     Cov Stock  u30  u14  Inc
@@ -52,7 +52,7 @@ The high-stock end of the list is where price/listing work pays off. The low-sto
 The triage is the entry point. From it, drill on request:
 
 - **Per-size view of a groupid** — sizes in stock, OOS-but-sold, recent units. Useful when the question is "is this row a price problem or a stock-coverage problem?".
-- **Google sale-price comparison** — `scale/_eva_google_compare.py`. Match EVA codes against the latest "Sale price suggestions" CSV in Downloads. Google often pushes lower than is correct; cross-check against actual sold avg before acting.
+- **Google sale-price comparison** — `scale/eva/google_compare.py`. Match EVA codes against the latest "Sale price suggestions" CSV in Downloads. Google often pushes lower than is correct; cross-check against actual sold avg before acting.
 - **Listed-vs-actual sold price** — `sales` over the relevant window. Big gaps usually indicate a Shopify discount/sale flag — investigate the source, not the symptom.
 - **Daily detail** — per-day units / incoming / running stock. See default template in `../SEGMENT_REPORTS.md`.
 
