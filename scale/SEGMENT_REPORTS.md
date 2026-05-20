@@ -36,13 +36,30 @@ Used for any segment that has at least 12 months of history and is in season.
 
 The **Units/day** column makes the two windows directly comparable — a higher 14-day rate vs the 30-day rate means recent acceleration; a lower one means cooling.
 
-**2026 pace:** rate × season-days = £X. Use the season-length appropriate to the segment family (see table below). Don't naively annualise — peak segments overstate dramatically when projected across 12 months.
+### What goes below the table
 
-**Price trend (14d vs 30d):** climbing / holding / slipping (+/-£X) — visibility on whether active price work is happening within the recent window
+**The table is the report.** Below it, print at most one line: a drill offer if a `segment_rules/` file defines a drill for this segment. Otherwise nothing.
 
-**Owner note (optional):** one line if there's something to flag. Skip if nothing.
+Example: `If you want to drill, the next step for EVA-SEG is the stock-availability triage.`
 
-Decisions (push harder, hold, intervene) are not part of the report — they come out of the conversation between the user and Claude after reviewing the data.
+### What does NOT go below the table
+
+- **No pace projection, price-trend line, or shape line.** All derivable from the table — restating is noise.
+- **No interpretive paragraph.** Do not write "the 14d is worse than the 30d", "cooling not recovering", "YoY is in -70% territory", etc.
+- **No decisions or recommendations.** Push / hold / intervene calls come out of conversation, not the report.
+- **No comparisons not already in the report** (e.g. last year's avg price, competitor prices, Google reco).
+- **No recent owner note.** Available on request as a drill — do not pre-load it. If you think the note is critical to interpretation, you are wrong: the manager reads the table, decides whether to dig, then asks for whatever they need.
+
+### Drill options
+
+These are available on request after the Summary — do not pre-run them:
+
+- **Recent owner notes** — last 3 from `segment_notes` for this segment.
+- **Pace / price-trend / shape** — the lines that used to sit under the table, on request.
+- **Segment-specific drill** — defined in `segment_rules/<SEGMENT>.md` if one exists.
+- **Standard per-SKU view** — from the Drill-downs section below.
+
+This report will be read by managers reviewing staff progress — staff own the interpretation, the report is just the data.
 
 ### What the user is looking for in this report
 
@@ -113,6 +130,7 @@ Most segments use the defaults in this doc. Where a segment needs different rule
 
 Current files:
 - `segment_rules/IVES-COLOUR.md` — multi-colour Amazon segment, SKU report rolls up by colour rather than per-code
+- `segment_rules/EVA-SEG.md` — Birkenstock EVA, standard Summary first; if it shows an issue, drill via the stock-availability triage (`_eva_stock_triage.py`) instead of the standard per-SKU view
 
 Segment quirks not yet promoted to their own file (light overrides only):
 - **RIEKER-SUM** — no comparable history (didn't sell last year). Compare against current 12m baseline only, not YoY.

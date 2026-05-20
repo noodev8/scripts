@@ -13,6 +13,8 @@ Brookfield Comfort is scaling from ~£500k to £1M revenue. The approach: build 
 - `PORTFOLIO_ANALYSIS.md` — Ives dependency analysis, unsegmented product assessment, portfolio growth plan
 - `MEETING_RULES.md` — 5 rules for segment meetings
 - `KLAVIYO_EMAIL_PLAYBOOK.md` — Single campaign: 90-day Birkenstock repurchase
+- `SEGMENT_REPORTS.md` — Report templates (Summary, SKU progress, Daily detail) per segment. Defaults apply unless a per-segment override exists.
+- `segment_rules/` — Per-segment overrides to the defaults in `SEGMENT_REPORTS.md`. **Always check this folder first before running a report for any segment.**
 - `check_null_segment.sql` — Lists groupids with NULL segment, sorted fresh-arrival-down. Flags FRESH / ASSIGN / COLD / INCOMING / QUIET. Run during segment sessions to make sure newly-arrived stock doesn't fall through unsegmented. Default scope: Birkenstock; broaden the brand filter when needed.
 
 ## Google Sheets Integration
