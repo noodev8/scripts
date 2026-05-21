@@ -28,7 +28,7 @@ When the user names a specific groupid and wants to decide a price, produce all 
 4. **Price change log** — every `price_change_log` row for the groupid where `channel='SHP'`, with `change_date`, `old_price`, `new_price`, `reason_code`, `reason_notes`. The notes explain past reasoning and are usually the most informative block on this page.
 5. **Stock by size** — pivot from `localstock` (`COALESCE(deleted,0)=0`, `qty>0`), grouped by the size suffix of `code`. Shows whether a size curve gap is secretly blocking sales.
 6. **Incoming history** — `incoming_stock` rows for the groupid, newest first: `arrival_date`, `code`, `quantity_added`. Tells us when the current pile actually landed — fresh stock behaves differently to stock that's been sitting through the season.
-7. **Google opinion** — at the start of every deep-dive, check `C:\Users\UserPC\Downloads\` for the two Google CSVs (`Your most popular products with price benchmarks_*.csv` and `Sale price suggestions with highest performance impact_*.csv`). If either is present and contains rows for the groupid (keyed by per-size Product IDs like `GROUPID-SIZE`), include them as a block: per-size benchmark vs our price and click count from the benchmark file, and per-size suggested price with effectiveness / click uplift / conversion uplift from the sale-price file. If neither file is present, just say so and skip this block — it's a signal, not a blocker.
+7. **Google opinion** — at the start of every deep-dive, run `python shopify-price/refresh_google_csvs.py` to pull any fresh Google Merchant CSVs out of Downloads into this folder (it keeps only the latest of each type). Then read the two CSVs from `shopify-price/`: `Your most popular products with price benchmarks_*.csv` and `Sale price suggestions with highest performance impact_*.csv`. If either contains rows for the groupid (keyed by per-size Product IDs like `GROUPID-SIZE`), include them as a block: per-size benchmark vs our price and click count from the benchmark file, and per-size suggested price with effectiveness / click uplift / conversion uplift from the sale-price file. If neither file has matches, just say so and skip this block — it's a signal, not a blocker. Note the file date when citing — a benchmark from 8 weeks ago is weaker evidence than one from yesterday.
 
 After these blocks, summarise the read in 3–5 lines and propose a single price move. Don't split into multiple options unless the picture is genuinely ambiguous.
 
@@ -36,8 +36,9 @@ After these blocks, summarise the read in 3–5 lines and propose a single price
 
 | File | Purpose |
 |---|---|
-| `apply_prices.py` | The only script. Reads a CSV of price changes and writes them to the database. Dry-run by default. |
+| `apply_prices.py` | Reads a CSV of price changes and writes them to the database. Dry-run by default. |
 | `apply-prices.md` | How to use `apply_prices.py` — CSV format, commands, verification SQL. |
+| `refresh_google_csvs.py` | Pulls fresh Google Merchant CSVs from Downloads into this folder; keeps only the latest of each type. |
 | `staging/` | Where CSVs of pending changes live before they're applied. Delete them once applied. |
 | `README.md` | This file. |
 
@@ -55,12 +56,14 @@ After these blocks, summarise the read in 3–5 lines and propose a single price
 
 ## Google reports (optional context)
 
-Two CSVs can be downloaded from Google Merchant Center and dropped in the Downloads folder:
+Two CSVs can be downloaded from Google Merchant Center:
 
 - **Price benchmark** — where our prices sit vs competitors
 - **Sale price suggestions (performance)** — Google's view on prices that would drive more volume
 
-They're optional. If they're there, Claude will read them when relevant. If they're not, the session continues using Shopify data only. Neither report is needed to make a decision — they're just one more signal.
+Workflow: download whenever you want fresh data (lands in Downloads). At the start of any deep-dive Claude runs `refresh_google_csvs.py`, which moves the newest copy of each type into `shopify-price/` and deletes older same-type files so we keep only the latest. The CSVs are `.gitignore`d so they never enter the repo.
+
+They're optional. If neither file has matches for the groupid, the session continues using Shopify data only.
 
 ## Cost constants (for net profit calculations)
 
