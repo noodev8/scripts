@@ -28,23 +28,17 @@ WHERE groupid IN ('your-groupid-here')
 ORDER BY change_date DESC, id DESC;
 ```
 
-### 3. Dry run
-
-```bash
-python shopify-price/apply_prices.py shopify-price/staging/your_file.csv
-```
-
-Shows what would change without touching the database.
-
-### 4. Apply
+### 3. Apply
 
 ```bash
 python shopify-price/apply_prices.py shopify-price/staging/your_file.csv --confirm
 ```
 
-Updates `skusummary.shopifyprice`, sets `shopifychange=1`, and logs to `price_change_log`. The nightly Shopify sync (`price_update2.py`) pushes changes live.
+Always run with `--confirm` — no dry-run-then-wait step. The CSV has already been agreed in conversation; running it is the apply. Updates `skusummary.shopifyprice`, sets `shopifychange=1`, and logs to `price_change_log`. The nightly Shopify sync (`price_update2.py`) pushes changes live.
 
-### 5. Clean up
+Only run without `--confirm` if you explicitly want to sanity-check a CSV you didn't build in this session.
+
+### 4. Clean up
 
 Delete the CSV from `staging/` once applied — the database holds the record now.
 

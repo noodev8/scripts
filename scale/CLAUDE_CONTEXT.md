@@ -133,6 +133,16 @@ ORDER BY s.groupid;
 - Shopify is effectively a Birkenstock shop. Non-Birk brands do ~£160/week combined on Shopify.
 - Amazon is for Lunar, Rieker, Blaze. No Rieker on Shopify.
 
+## Google Merchant CSVs
+
+When you need a Google benchmark or sale-price view for any segment, the CSVs live in `shopify-price/` (not Downloads). Flow:
+
+1. If a fresh export is in either user's Downloads, run `python shopify-price/refresh_google_csvs.py` — it moves the newest of each type into `shopify-price/` and deletes older same-type files (only the latest is kept).
+2. If nothing fresh, use whatever is already in `shopify-price/` — note the file date when citing.
+3. For segment-level comparison, use `python scale/eva/google_compare.py [SEGMENT]` (defaults to EVA-SEG). It reads the latest sale-price CSV from `shopify-price/` automatically.
+
+The CSVs are `.gitignore`d so they never enter the repo.
+
 ## Reorder Screen (PowerBuilder legacy)
 - Only shows last 30 days of sales data
 - Anything older than 30 days shows as "LAST SOLD: 365"

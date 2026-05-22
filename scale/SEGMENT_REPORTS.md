@@ -115,8 +115,7 @@ LIMIT 3;
 |---|---|---|---|
 | Lunar (IVES, BLAZE) | Year-round, summer-leaning | 365 | rate × 365 |
 | Birkenstock (Arizona, Bend, Milano, Gizeh, Eva, Mayari) | Mar–Jul peak | 150 | rate × 150 ≈ annual revenue |
-| Zermatt cork | Mar–Jun peak | 150 | rate × 150 |
-| Zermatt shearling | Jul–Feb peak | 210 | rate × 210 |
+| Zermatt (cork + shearling) | Year-round | 365 | rate × 365 |
 | Rieker / Remonte Winter | Oct–Feb | 150 | rate × 150 |
 | Rieker Summer | Mar–Sep | 210 | rate × 210 |
 | Lake (winter slipper) | Sep–Feb | 180 | rate × 180 |

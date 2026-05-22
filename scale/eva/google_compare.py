@@ -1,26 +1,40 @@
-"""Compare EVA-SEG prices vs Google's sale-price suggestions."""
-import sys, os, csv
+"""Compare a segment's prices vs Google's sale-price suggestions.
+
+Usage: python google_compare.py [SEGMENT]   (default: EVA-SEG)
+
+Reads the latest "Sale price suggestions ..." CSV from shopify-price/.
+Run `python shopify-price/refresh_google_csvs.py` first if you've just
+downloaded a fresh export.
+"""
+import sys, os, csv, glob
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import psycopg2
 from datetime import date, timedelta
 from logging_utils import get_db_config
 from collections import defaultdict
 
-CSV = r"C:\Users\aandr\Downloads\Sale price suggestions with highest performance impact_2026-05-20_13-39-04.csv"
-TODAY = date(2026, 5, 20)
+SEGMENT = sys.argv[1] if len(sys.argv) > 1 else 'EVA-SEG'
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CSV_DIR = os.path.join(REPO_ROOT, 'shopify-price')
+matches = glob.glob(os.path.join(CSV_DIR, 'Sale price suggestions with highest performance impact_*.csv'))
+if not matches:
+    sys.exit(f"No Sale price suggestions CSV in {CSV_DIR}. Run shopify-price/refresh_google_csvs.py first.")
+CSV = max(matches, key=os.path.getmtime)
+TODAY = date.today()
 d30 = TODAY - timedelta(days=30)
 d90 = TODAY - timedelta(days=90)
 
 conn = psycopg2.connect(**get_db_config())
 cur = conn.cursor()
 
-# All EVA-SEG codes
+# All segment codes
 cur.execute("""
     SELECT sm.code, sm.groupid, ss.colour, ss.width
     FROM skumap sm
     JOIN skusummary ss ON ss.groupid = sm.groupid
-    WHERE ss.segment='EVA-SEG' AND sm.deleted=0
-""")
+    WHERE ss.segment=%s AND sm.deleted=0
+""", (SEGMENT,))
 eva_codes = {r[0]: (r[1], r[2], r[3]) for r in cur.fetchall()}
 
 # Load Google CSV — skip 2 header lines
@@ -39,7 +53,8 @@ with open(CSV, encoding='utf-8') as f:
                 'conv_uplift': float(row['Conversion uplift']),
             }
 
-print(f"Google CSV has {sum(1 for _ in open(CSV))-2} suggestions total; {len(google)} match EVA-SEG codes.\n")
+print(f"Source: {os.path.basename(CSV)}")
+print(f"Google CSV has {sum(1 for _ in open(CSV))-2} suggestions total; {len(google)} match {SEGMENT} codes.\n")
 
 # Per-groupid rollup of Google suggestions
 by_group = defaultdict(list)
@@ -60,8 +75,8 @@ def avg_sold(gid, since):
 # Current shopifyprice and groupid meta
 cur.execute("""
     SELECT groupid, colour, width, shopifyprice
-    FROM skusummary WHERE segment='EVA-SEG'
-""")
+    FROM skusummary WHERE segment=%s
+""", (SEGMENT,))
 meta = {r[0]: r for r in cur.fetchall()}
 
 # Build rollup rows
@@ -92,7 +107,7 @@ covered_gids = set(by_group.keys())
 not_in_g = sorted(g for g in {eva_codes[c][0] for c in eva_codes} if g not in covered_gids)
 
 # Print
-print(f"=== EVA-SEG vs Google sale-price suggestions ({TODAY}) ===\n")
+print(f"=== {SEGMENT} vs Google sale-price suggestions ({TODAY}) ===\n")
 print(f"{'GroupID':<22} {'Colour/Width':<22} {'Listed':>7} {'YourAvg':>8} {'Goog':>7} {'Gap%':>6} {'Sold30':>7} {'u30':>4} {'Sold90':>7} {'u90':>4}")
 print("-" * 110)
 for r in sorted(rows_out, key=lambda x: -x['u30'] if x['u30'] else 0):
@@ -100,7 +115,7 @@ for r in sorted(rows_out, key=lambda x: -x['u30'] if x['u30'] else 0):
     a90 = f"£{r['avg90']:.0f}" if r['avg90'] else '   -  '
     print(f"{r['gid']:<22} {r['cw']:<22} £{r['listed']:>5.0f} £{r['avg_your']:>6.2f} £{r['avg_sugg']:>5.2f} {r['gap_pct']:>5.1f}% {a30:>7} {r['u30']:>4} {a90:>7} {r['u90']:>4}")
 
-print(f"\n--- {len(not_in_g)} EVA groupids with NO Google suggestion (Google sees price as fine or not enough data) ---")
+print(f"\n--- {len(not_in_g)} {SEGMENT} groupids with NO Google suggestion (Google sees price as fine or not enough data) ---")
 for gid in not_in_g:
     m = meta.get(gid, (gid,'?','?',0))
     try:

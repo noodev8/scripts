@@ -52,7 +52,7 @@ The high-stock end of the list is where price/listing work pays off. The low-sto
 The triage is the entry point. From it, drill on request:
 
 - **Per-size view of a groupid** — sizes in stock, OOS-but-sold, recent units. Useful when the question is "is this row a price problem or a stock-coverage problem?".
-- **Google sale-price comparison** — `scale/eva/google_compare.py`. Match EVA codes against the latest "Sale price suggestions" CSV in Downloads. Google often pushes lower than is correct; cross-check against actual sold avg before acting.
+- **Google sale-price comparison** — `scale/eva/google_compare.py [SEGMENT]`. Reads the latest "Sale price suggestions" CSV from `shopify-price/` (run `shopify-price/refresh_google_csvs.py` first if a fresh export is sitting in Downloads). Google often pushes lower than is correct; cross-check against actual sold avg before acting.
 - **Listed-vs-actual sold price** — `sales` over the relevant window. Big gaps usually indicate a Shopify discount/sale flag — investigate the source, not the symptom.
 - **Daily detail** — per-day units / incoming / running stock. See default template in `../SEGMENT_REPORTS.md`.
 
