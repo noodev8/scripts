@@ -65,6 +65,35 @@ Values and the `curve_for(size_universe)` helper live in `size_weights.py`.
 
 Ad-hoc, on user request. No materialisation, no dashboard tile.
 
+## Reading the output
+
+The script prints four blocks; read them together:
+
+1. **Headline** — demand-weighted availability across all selling styles.
+2. **Status breakdown** — how 28d demand splits across READY / PARTIAL / THIN. The **READY-share of demand** is the most actionable headline-level number alongside (1).
+3. **Top drags** — styles eating the most "lost demand units". Long-tail THIN (u28 < 5) is noise — ignore. **These are not a restock list** — Birkenstock ordering is a 6-month cycle. They inform: (a) whether to pay a held supplier invoice now to release allocated stock, and (b) the pattern that feeds the next 6-month order.
+4. **Sensitivity** — what the headline becomes if qty=1 counts as full credit. <10pt difference means qty=1 isn't the driver.
+
+### Push / hold / pull (suggested, not a rule)
+
+| Headline | READY-share | Default |
+|---|---|---|
+| ≥55% | ≥40% | Push |
+| 40–55% | 20–40% | Hold |
+| <40% | <20% | Pull |
+
+**External signals override.** Strong ROAS in particular keeps ads profitable well below 55% headline — at 10x ROAS the safety margin is wide. The table is for catching the moment supply problems start eating ROAS, not for gating the decision before that.
+
+### Between snapshots — what to monitor
+
+- **Direction of READY-share** (rising = supply catching up; falling = engine wearing)
+- **Top-5 drag persistence** — same styles dominating run after run means supply isn't being fixed
+- **ROAS in parallel** (separate dashboard) — the lagging indicator
+
+Each run gets one block appended to `snapshots.md` for trend comparison.
+
 ## Files
 
 - `size_weights.py` — women's & men's size-weight curves + assignment helper.
+- `availability.py` — ad-hoc snapshot script. Run with `python birk-stock/availability.py`.
+- `snapshots.md` — append-only log of past snapshots for trend comparison.
