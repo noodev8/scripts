@@ -4,19 +4,25 @@
 
 The whole process is four reads — **sales, cost, stock, budget** — plus a record of recent changes. Everything below serves that. Keep it lean; if a section stops earning its place, cut it.
 
-## Current State — updated 23 May 2026
+## Current State — updated 26 May 2026
 
 - **Structure (single campaign since 14 May):** STANDARD Shopping, full catalogue incl. the 24 BIRK-WINNER styles. PMAX paused 14 May. IVES paused 9 May for the Amazon fair-pricing test; fold IVES SKUs back into STANDARD when that test ends, don't relaunch the standalone.
 - **Active cap: £150/day, STANDARD only.** tROAS **400%**, held since Feb.
-- **Last change — 23 May ~13:00, £120 → £150 (+25%):** Continued heatwave ride. Same-day second step after the £100→£120 move earlier; signals still green, riding the wave per the no-fixed-learning-window rule. Read pending — watch fill, CPC, blended ROAS, and weather.
-- **Prior change — 23 May, £100 → £120 (+20%):** Heatwave demand event. 4-day read at £100 cap: blended ROAS ~13x (May 19 12.6x / May 20 8.2x / May 21 16.0x / May 22 ~17x), imp share **91%** (vs the 78% pre-£100 baseline — pool itself expanded with heat), Google overspending £100→£104 every day. 91% imp share means the doc's prior "£105 ceiling" was on the *old* auction pool; heatwave pool is bigger so the cap is still binding on a growing denominator. Marginal headroom massive — even £20 extra at 5x barely moves blended.
+- **Latest read — 26 May, holding at £150:** 3 full days at £150 cap delivered weekly ROAS 11.7x on real sales (May 19–25 £913 spend / £10.6k sales). Marginal vs £100 cap = 6.8x — above the 5x floor, well below earlier steps. Imp share 88–90% (same as £100 cap) = auction pool is captured at this tROAS. Conv% recovered to 9%, CPC stable at £0.46. Decision: **hold** — signals don't justify another step *today*, but the next push is ROAS-gated, not stock-gated (see Next step).
+- **Last change — 23 May ~13:00, £120 → £150 (+25%):** Continued heatwave ride. Same-day second step after the £100→£120 move earlier; signals still green, riding the wave per the no-fixed-learning-window rule.
+- **Prior change — 23 May, £100 → £120 (+20%):** Heatwave demand event. 4-day read at £100 cap: blended ROAS ~13x, imp share 91% on an expanding pool, Google overspending £100→£104 every day. Marginal headroom massive.
 - **No fixed learning window during a demand event.** Rationale: 5–7 day waits guard against compounding losses, not against responding to live demand. Cadence follows signal, not calendar — keep stepping budget up while signals stay green.
-- **Google's own recommendations (noted 23 May, not actioned):** £300/day for +140 conv/wk; tROAS 710%. Not taking either — both are too aggressive to step into mid-wave without round-tripping. Plan is to ride budget up signal-by-signal while heat holds, then **drop budget sharply** once weather/sales settle. The few transition-day losses should be more than absorbed by the gains banked riding the wave.
-- **Next step — daily read, no fixed date:** at £120 watch (1) **fill** — Google overspends to ~£125+ → pool still expanding, push to ~£140; under-fills £105–115 → ceiling reached on this pool, next lever is tROAS; (2) **CPC** — sharp jump = paying more for same clicks, tROAS signal; (3) **blended ROAS holds >7x**; (4) **heat continues** — break in weather → cut cap sharply.
+- **Google's own recommendations (noted 23 May, not actioned):** £300/day for +140 conv/wk; tROAS 710%. Not taking either — both are too aggressive to step into mid-wave without round-tripping.
+- **Current bias (point-in-time, not a plan):**
+  - Push-ready while ROAS stays strong; no fixed waiting window. Five days in this market can be too long — if a single read or two says push, push.
+  - Stock recovery isn't a prerequisite. Google's feed may rotate clicks to in-stock alternatives as Arizona/Zermatt/Mayari thin out; headline ROAS is the truth-teller on whether that rotation is working.
+  - Cut signals (any): ROAS slipping, weather breaking, conv% dropping. Don't pre-commit to a number — re-read and decide.
+  - Don't gate a budget push on "wait for stock to return". Stock matters via ROAS, not as a separate veto. The summer window is finite (see step 7).
 - **Open flags:**
-  - **Diminishing returns curve to revisit post-event:** Apr 14–30 £57/d 14.4x → May 1–8 £89/d 11.8x → May 9–13 £123/d 9.9x → May 19–22 £105/d ~13x (heat-lifted). The May rebound is demand-event, not a structural shift; re-read curve when heat breaks.
-  - **Conversion baseline drifting:** Mar 12.1% → Apr 8.7% → May ~7–8% (stabilising). Watch as £120 scales clicks.
-  - **THIN-selling at record high (~32 styles, 19 May), ZERMATT-SEG worst (9/12 THIN).** Burns clicks on near-empty pages. 6-month-buy problem, not a budget fix.
+  - **Feed-rotation hypothesis to validate:** as ARIZONA-BF-REG/ZERMATT/MAYARI THIN-selling counts climb, Google should naturally rotate clicks to MILANO/GIZEH/PATENT which are healthier. If ROAS holds through the supply degradation, the rotation is working. Watch for per-segment unit-share shifts in next reads.
+  - **Diminishing returns curve to revisit post-event:** Apr 14–30 £57/d 14.4x → May 1–8 £89/d 11.8x → May 9–13 £123/d 9.9x → May 19–22 £105/d ~13x → May 23–25 £164/d 11.0x. The May rebound is demand-event, not a structural shift; re-read curve when heat breaks.
+  - **Conversion baseline:** Mar 12.1% → Apr 8.7% → May 7.4% median (recovered to 9% in the May 19–25 window). Watch as £150 scales clicks.
+  - **Birk stock degrading through the demand event:** 9 May 44 READY styles / 1,180 units → 25 May 31 styles / 850 units. -13 styles, -330 units in 16 days. THIN-selling 32→39. £15k Birk payment 26 May should release allocated stock — watch next snapshot. Not a budget veto (see Next step), but a quality-of-spend concern.
 
 ### Recent changes (replaces the old change log — keep last ~6, one line each)
 
@@ -271,6 +277,8 @@ Median rising m-o-m = fundamentals improving (supports budget moves); dropping =
 ---
 
 ## Process for Claude Code Review
+
+**Recommendations are point-in-time, not plans.** Each review is fresh. Don't bake future-step triggers into Current State ("push to £180 if X over 5 days"); write today's bias and the signals that would change it, then let the next review decide on the next review's data. The "no fixed learning window" rule applies to your own cadence too — if tomorrow's read says push, push; don't gate on a self-imposed N-day wait.
 
 **Don't analyse stale data** — if the latest `snapshot_date` with ad spend is >2 days old, flag it and wait for confirmation.
 
