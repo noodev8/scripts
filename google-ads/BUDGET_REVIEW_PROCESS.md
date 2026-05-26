@@ -22,7 +22,7 @@ The whole process is four reads — **sales, cost, stock, budget** — plus a re
   - **Feed-rotation hypothesis to validate:** as ARIZONA-BF-REG/ZERMATT/MAYARI THIN-selling counts climb, Google should naturally rotate clicks to MILANO/GIZEH/PATENT which are healthier. If ROAS holds through the supply degradation, the rotation is working. Watch for per-segment unit-share shifts in next reads.
   - **Diminishing returns curve to revisit post-event:** Apr 14–30 £57/d 14.4x → May 1–8 £89/d 11.8x → May 9–13 £123/d 9.9x → May 19–22 £105/d ~13x → May 23–25 £164/d 11.0x. The May rebound is demand-event, not a structural shift; re-read curve when heat breaks.
   - **Conversion baseline:** Mar 12.1% → Apr 8.7% → May 7.4% median (recovered to 9% in the May 19–25 window). Watch as £150 scales clicks.
-  - **Birk stock degrading through the demand event:** 9 May 44 READY styles / 1,180 units → 25 May 31 styles / 850 units. -13 styles, -330 units in 16 days. THIN-selling 32→39. £15k Birk payment 26 May should release allocated stock — watch next snapshot. Not a budget veto (see Next step), but a quality-of-spend concern.
+  - **Birk stock degrading through the demand event:** 9 May 44 READY styles / 1,180 units → 25 May 31 styles / 850 units. -13 styles, -330 units in 16 days. £15k Birk payment 26 May should release allocated stock — watch next snapshot. **Less of a quality-of-spend problem than the headline suggests:** 26 May evening spot-check showed ~5/13 latest sales came from THIN-classified styles, and the engine still ROAS'd 15x for the day. Scarcity/FOMO on a customer's specific size appears to drive conversion, and full-price liquidation of near-dead stock inside the summer window is exactly what we want. Don't disregard THIN-selling as waste in analysis.
 
 ### Recent changes (replaces the old change log — keep last ~6, one line each)
 
@@ -69,6 +69,8 @@ Maintenance is manual and ad-hoc — add/remove individual styles with one-off S
 - **Stock-units sanity:** before treating any stock delta as real, divide by burn (~15 Birk units/day). If burn can't explain it, the number is suspect — verify. Trend reads use `birk_ready_units`/`birk_ready_styles`; current total = `SUM(qty) FROM localstock WHERE deleted=0 AND brand='Birkenstock'`.
 - **Capture-before-act:** when the cap changes in the UI, add the Recent-changes row the same day even if reasoning is filled in later. (The £54→£60 ghost change came from skipping this.)
 - **Never** use `skusummary.variants` / `skusummary.stockvariants` — stale (see CLAUDE.md). Size universe from `skumap`, live stock from `localstock`.
+- **THIN-status sales aren't waste.** Spot-checks of last-sales status mix repeatedly show THIN styles converting at full price — scarcity drives conversion when a customer lands on their size. Before reading a falling READY count as "engine drowning in broken pages", spot-check the actual recent-sales status mix. The doc's earlier "burns clicks on near-empty pages" framing was wrong.
+- **Multi-line single-customer orders, same style different sizes = likely try-and-return.** Net them down when reading a big AOV day. Example: 26 May £325 Bend order, sizes 40 + 41 + 41 of two similar styles — customer testing fit.
 
 ---
 
