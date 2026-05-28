@@ -4,13 +4,14 @@
 
 The whole process is four reads — **sales, cost, stock, budget** — plus a record of recent changes. Everything below serves that. Keep it lean; if a section stops earning its place, cut it.
 
-## Current State — updated 26 May 2026
+## Current State — updated 28 May 2026
 
 - **Structure (single campaign since 14 May):** STANDARD Shopping, full catalogue incl. the 24 BIRK-WINNER styles. PMAX paused 14 May. IVES paused 9 May for the Amazon fair-pricing test; fold IVES SKUs back into STANDARD when that test ends, don't relaunch the standalone.
-- **Active cap: £150/day, STANDARD only.** tROAS **400%**, held since Feb.
-- **Latest read — 26 May, holding at £150:** 3 full days at £150 cap delivered weekly ROAS 11.7x on real sales (May 19–25 £913 spend / £10.6k sales). Marginal vs £100 cap = 6.8x — above the 5x floor, well below earlier steps. Imp share 88–90% (same as £100 cap) = auction pool is captured at this tROAS. Conv% recovered to 9%, CPC stable at £0.46. Decision: **hold** — signals don't justify another step *today*, but the next push is ROAS-gated, not stock-gated (see Next step).
-- **Last change — 23 May ~13:00, £120 → £150 (+25%):** Continued heatwave ride. Same-day second step after the £100→£120 move earlier; signals still green, riding the wave per the no-fixed-learning-window rule.
-- **Prior change — 23 May, £100 → £120 (+20%):** Heatwave demand event. 4-day read at £100 cap: blended ROAS ~13x, imp share 91% on an expanding pool, Google overspending £100→£104 every day. Marginal headroom massive.
+- **Active cap: £180/day, STANDARD only.** tROAS **400%**, held since Feb.
+- **Last change — 28 May ~23:00, £150 → £180 (+20%):** Re-read of the 26 May "hold" reversed it. Impression pool grew 9k → 14k/day on £100 → £150 while imp share held 88% and CPC *fell* £0.47 → £0.42 — i.e., expanding pool we're tracking, not a captured pool at this tROAS. Marginal ROAS at £150 firmed up to ~10x with 5 days of data (vs 6.8x on 3 days). 7d ROAS 12.9x, conv% recovered to 9.4%. Stock has 28 READY / 774 units + working feed-rotation onto MILANO/ARIZONA-PATENT — enough ammunition for a £30 step, not £200+. Summer-window framing: convert stock to cash at 12x now > preserve for August at 6x.
+- **Today (28 May, partial) underspend caveat:** Google ran £145 on the £150 cap (first non-overspend day in 6). Most plausibly Google's monthly smoothing pulling the rolling average back toward £150 after 5 days of +£10/day overspend — not a demand-thinning signal. Read pending on £180.
+- **Prior change — 23 May ~13:00, £120 → £150 (+25%):** Second step same day; heatwave still running, signals green, riding the wave.
+- **Prior change — 23 May, £100 → £120 (+20%):** Heatwave demand event. 4-day read at £100 cap: blended ROAS ~13x, imp share 91% on an expanding pool, Google overspending £100→£104 every day.
 - **No fixed learning window during a demand event.** Rationale: 5–7 day waits guard against compounding losses, not against responding to live demand. Cadence follows signal, not calendar — keep stepping budget up while signals stay green.
 - **Google's own recommendations (noted 23 May, not actioned):** £300/day for +140 conv/wk; tROAS 710%. Not taking either — both are too aggressive to step into mid-wave without round-tripping.
 - **Current bias (point-in-time, not a plan):**
@@ -28,7 +29,8 @@ The whole process is four reads — **sales, cost, stock, budget** — plus a re
 
 | Date | Move | Why |
 |------|------|-----|
-| 2026-05-23 ~13:00 | STANDARD £120 → £150 (tROAS 400%) | Second step same day — heatwave still running, signals green, riding the wave. Read pending. |
+| 2026-05-28 ~23:00 | STANDARD £150 → £180 (tROAS 400%) | Impression pool expanding 9k→14k/day, CPC falling £0.47→£0.42 through £100→£150, marginal ROAS firmed to ~10x with 5 days of data. Today's £145 underspend most likely Google smoothing the rolling average after 5 days of +£10 overspend, not demand thinning. Summer-window cash-flow loop into next Birk allocation payment. |
+| 2026-05-23 ~13:00 | STANDARD £120 → £150 (tROAS 400%) | Second step same day — heatwave still running, signals green, riding the wave. Held 26 May: 5-day weekly ROAS 12.9x, conv% recovered to 9.4%, stock degraded as expected but rotation working. |
 | 2026-05-23 | STANDARD £100 → £120 (tROAS 400%) | Heatwave. 4-day blended ROAS 13x at £100, imp share 91% on an *expanding* pool, Google overspending to £104/day. Ride the wave; cut sharply when heat breaks. |
 | 2026-05-19 | STANDARD £72 → £100 (tROAS 400%) | True imp share ~78% not 86–93% (PMAX-inflated); ROAS ~12x; Google overspending £72. Ceiling ~£100. |
 | 2026-05-14 (eve) | STANDARD £105 → £72 (same-day revert) | £105 step had violated "hold at 85%+ imp share"; reverted before midnight, no learning cost. |
