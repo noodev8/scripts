@@ -90,10 +90,12 @@ The script prints four blocks; read them together:
 - **Top-5 drag persistence** — same styles dominating run after run means supply isn't being fixed
 - **ROAS in parallel** (separate dashboard) — the lagging indicator
 
-Each run gets one block appended to `snapshots.md` for trend comparison.
+`availability.py` auto-writes one metrics block per day to `snapshots.md` (latest run of
+the day overwrites earlier same-day runs). Judgment/context lines are added by hand
+in-session; the script only writes/overwrites the measured metrics.
 
 ## Files
 
 - `size_weights.py` — women's & men's size-weight curves + assignment helper.
 - `availability.py` — ad-hoc snapshot script. Run with `python birk-stock/availability.py`.
-- `snapshots.md` — append-only log of past snapshots for trend comparison.
+- `snapshots.md` — daily metrics log (auto-written, one block per day) for trend comparison.

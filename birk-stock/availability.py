@@ -15,6 +15,72 @@ MOMENTUM_WINDOW_DAYS = 7
 CHANNEL = 'SHP'
 BRAND = 'Birkenstock'
 TOP_N = 25
+SNAPSHOT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'snapshots.md')
+
+
+def _pace_word(daily_recent, daily_28d):
+    if daily_28d <= 0:
+        return 'flat'
+    r = daily_recent / daily_28d
+    return 'accelerating' if r >= 1.25 else ('slowing' if r <= 0.75 else 'steady')
+
+
+def write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenient, colour):
+    """Append today's metrics block to snapshots.md, or overwrite an existing
+    same-day block (one entry per day, latest run wins). Metrics only —
+    judgment/context lines are not auto-written."""
+    today = str(date.today())
+    d28 = total_u28 / DEMAND_WINDOW_DAYS
+    d7 = total_u7 / MOMENTUM_WINDOW_DAYS
+    pace = _pace_word(d7, d28)
+
+    def pct(b):
+        return round(counts[b][0] / total_u28 * 100) if total_u28 else 0
+
+    drag_parts = []
+    for gid, u28, avail, lost in drags[:5]:
+        style = gid.split('-', 1)[1].title() if '-' in gid else gid
+        code = gid.split('-', 1)[0]
+        col = colour.get(gid) or '-'
+        drag_parts.append(f"{col} {style} {code} ({lost:.1f})")
+
+    block = (
+        f"## {today}\n\n"
+        f"- **Headline:** {headline:.1f}%\n"
+        f"- **READY-share of demand:** {pct('READY')}% ({counts['READY'][0]}u / {total_u28}u)\n"
+        f"- **Status breakdown:** READY {pct('READY')}% / PARTIAL {pct('PARTIAL')}% / "
+        f"THIN {pct('THIN')}% (by {DEMAND_WINDOW_DAYS}d units)\n"
+        f"- **Volume:** {DEMAND_WINDOW_DAYS}d {total_u28}u (~{round(d28)}/d) -> "
+        f"{MOMENTUM_WINDOW_DAYS}d {total_u7}u (~{round(d7)}/d) -> {pace}\n"
+        f"- **Top 5 drags:** " + ", ".join(drag_parts) + "\n"
+        f"- **Sensitivity (qty=1 full credit):** {headline_lenient:.1f}%"
+    ).strip()
+
+    with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+    idx = text.find('\n## ')
+    if idx == -1:
+        preamble = text.rstrip()
+        blocks = []
+    else:
+        preamble = text[:idx].rstrip()
+        blocks = ['## ' + b.strip() for b in text[idx:].split('\n## ') if b.strip()]
+
+    replaced = False
+    for i, b in enumerate(blocks):
+        if b.startswith(f"## {today}"):
+            blocks[i] = block
+            replaced = True
+            break
+    if not replaced:
+        blocks.append(block)
+
+    out = preamble + '\n\n' + '\n\n'.join(blocks) + '\n'
+    with open(SNAPSHOT_FILE, 'w', encoding='utf-8') as f:
+        f.write(out)
+
+    print(f"\n[snapshot {'updated' if replaced else 'appended'}: {today}]")
 
 
 def qty_credit(qty):
@@ -181,6 +247,8 @@ def main():
         if total_u28 else 0
     )
     print(f"\nSensitivity (qty=1 as full credit, not half): headline -> {headline_lenient:.1f}%")
+
+    write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenient, colour)
 
 
 if __name__ == '__main__':
