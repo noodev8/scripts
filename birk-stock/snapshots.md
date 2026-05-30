@@ -28,3 +28,16 @@ and are never touched by the script. Compare against previous day to read direct
 - **Volume:** 28d 579u (~21/d) -> 7d 239u (~34/d) -> accelerating
 - **Top 5 drags:** Blue Arizona 0051751 (22.5), White Arizona 0552681 (15.5), Black Arizona 0051793 (13.9), Brown Arizona 0051701 (13.3), Brown Arizona 0051703 (12.6)
 - **Sensitivity (qty=1 full credit):** 53.2%
+
+## 2026-05-30
+
+- **Headline:** 44.2%
+- **READY-share of demand:** 24% (140u / 586u)
+- **Status breakdown:** READY 24% / PARTIAL 23% / THIN 53% (by 28d units)
+- **Volume:** 28d 586u (~21/d) -> 7d 233u (~33/d) -> accelerating
+- **Top 5 drags:** Blue Arizona 0051751 (23.5), White Arizona 0552681 (16.3), Brown Arizona 0051703 (14.2), Brown Arizona 0051701 (13.3), Black Arizona 0051793 (13.0)
+- **Sensitivity (qty=1 full credit):** 51.9%
+- **Drag pattern:** unchanged — same Arizona colours (Blue/White/Brown/Black), mid-sizes (38–40) OOS, shoulders over-stocked. Persistent run-after-run = supply not being fixed in the selling sizes.
+- **Context:** Headline falling across all 3 reads (49.6 → 44.8 → 44.2) while 7d demand stays elevated (~33/d) — thin grids biting real demand. ~700u arrived across May but landed in shoulders, so the headline didn't lift (raw arrivals ≠ position lift). This run *called* the £180 ad failure (28–29 May).
+- **Action:** Availability **promoted to a first-class budget gate** in `google-ads/BUDGET_REVIEW_PROCESS.md` today. Ads pulled £180 → £100 (30 May); the 44% headline backs "don't scale" independent of ROAS. No order action (6-month cycle).
+- **Watch:** whether the next landed batch lifts the headline (esp. Arizona 38–40) — that, not a unit count, is the green light to raise budget.

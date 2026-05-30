@@ -12,7 +12,8 @@ The whole process is four reads — **sales, cost, stock, budget** — plus a re
 - **Bias now (point-in-time, not a plan):** Let £100 run and re-read. If today closes 10x+, that's earned evidence to step toward £120–150 *tomorrow* — don't pre-buy on a strong Saturday morning (that's the £180 over-read). If it comes back soft, hold or trim. tROAS holds 400% — budget did the work; don't stack a second lever. Cut/step signals: ROAS, weather, conv% — re-read and decide, don't pre-commit to a number.
 - **Ceiling is auction, not shelf (confirmed 29 May):** at 88–90% imp share, the wall is ~£150 — above it you own nearly all the demand Google can show, so budget buys impressions not clicks (£180: +£45 → +1 click). Stock is the *softer* constraint: READY 27 styles / 740 units is still weeks of depth, but pushing volume onto a thinning catalogue erodes conversion as clicks hit broken size grids. Not "out of stock" — out of auction first. The Apr–May expansion (£57/d 14.4x → £123/d 9.9x → £164/d 11x) was a demand event, now breaking.
 - **Open flags:**
-  - **READY stock degrading:** 9 May 44 styles / 1,180 units → 29 May 27 / 740. 26 May £15k Birk payment should release allocated stock — watch the snapshot. THIN-selling is **not** waste: scarcity/FOMO converts near-dead stock at full price (repeated spot-checks). Don't read a falling READY count as "drowning in broken pages" without checking the recent-sales status mix first.
+  - **tROAS has never moved — review it post-event.** Held 400% since Feb; every change for 6 weeks has been budget-only. Two things the constant hides: (1) the 400% target lets Google buy down to **4x marginal — one notch below our stated 5x floor**, which is exactly where the £180 junk spend lived; (2) in a *thinning* market a budget cap forces spend down the quality curve, whereas tROAS throttles on quality automatically — it's the lever built for the season we're entering. **Not a same-day move** (we just changed budget; tROAS needs a 5–7 day re-learn, and one lever at a time). Test signal: once budget settles, if average ROAS still runs 2–3x the target on a stable cap, raise 400% → 500% to align the bid target with the 5x floor.
+  - **Stock-availability gate (first-class as of 30 May — see Sizing & rules):** `birk-stock` headline **44% / 24% READY-share, falling across all 3 reads** (49.6 → 44.8 → 44.2). Demand still elevated (7d ~32/d vs 28d ~21/d), so thin grids are biting *real* demand — a hard "don't scale budget" until a landed batch lifts the number. Drags are the Arizona mid-sizes (38–40); ~700u arrived across May but landed in shoulders, so the headline kept falling — **raw arrivals ≠ position lift; only the demand-weighted number counts.** THIN-selling is **not** waste: scarcity converts the last units at full price; low availability caps the *ceiling*, not today's spend.
   - **Conversion baseline:** Mar 12.1% → Apr 8.7% → May 7.4% median (recovered to ~9% in the 19–25 May window). Watch as the cap drops.
 
 ### Recent changes (replaces the old change log — keep last ~6, one line each)
@@ -84,11 +85,17 @@ Three numbers tell you which lever is the constraint:
 | 5x–7x | — | — | — | Hold; run the Three-Grid to find the drag |
 | **<5x** for 2 weeks | — | — | — | Decrease budget OR raise tROAS |
 
+**Stock gate overrides this table for budget *increases*.** Every "raise budget" action above assumes stock can fulfil the extra clicks. Before any raise, check the `birk-stock` availability headline — low or falling holds budget regardless of the row (see Sizing & rules).
+
 ### Sizing & rules
 
 - **Budget:** default ~20% step when criteria met, round to £1. Smaller (£2–4) when the algorithm is on a good trajectory. Hold/slow if ROAS <7x, stock thins, or instability after an increase. No fixed schedule — read signals, not dates.
 - **tROAS (currently 400%):** *Lower* (→300%) when imp share <85% AND spend below cap (volume play). *Raise* (→500%) when imp share 85%+ AND marginal ROAS <5x, or 7d ROAS sliding on a ramp (efficiency play). One lever at a time; give it 5–7 days to re-learn. Don't move it just because you can.
-- **Stock is a fixed constraint, not a lever.** Birk orders are ~6 months ahead and can't be reactively pulled. If high-volume segments are PARTIAL/THIN, trim budget to where it stays efficient and surface the leak for the next buy. **Do not recommend "order more X".**
+- **Stock availability is a budget *gate*, not a lever (promoted 30 May).** The `birk-stock` demand-weighted availability headline sets the **budget ceiling**; ROAS sets profitability *up to* that ceiling. Apply it as a gate on budget *increases*:
+  - Availability **low or falling** → **hold or cut, regardless of ROAS or imp share.** Extra clicks land on broken size grids and conversion erodes — this is what cratered the £180 day (headline was already falling 49.6 → 44.8 across that push).
+  - Availability **risen on a landed batch** → ceiling can rise; size the step on ROAS/imp-share as usual.
+  - Scarcity still converts the *last* units at full price at the current cap (THIN-selling isn't waste), so a low headline caps the **ceiling** — it does *not* force a cut below where you already sit profitably. Don't pull good spend; just don't *scale* into stock you can't fulfil.
+  - **The ceiling only moves when a batch physically lands and the report confirms a healthier number.** Do **not** forecast incoming stock into the decision — Birkenstock may not ship it, or we may not expedite it. Run `python birk-stock/availability.py` after arrivals and read the new position. Birk orders are ~6 months ahead and can't be reactively pulled; **do not recommend "order more X".**
 
 ---
 
@@ -277,7 +284,7 @@ Median rising m-o-m = fundamentals improving (supports budget moves); dropping =
 1. Run the **Three-Grid Snapshot** for the trend.
 2. Read the **three constraint numbers** (imp share, spend vs cap, marginal ROAS).
 3. Run **Grid 3** if conversion is dragging.
-4. Read the latest entry in `birk-stock/snapshots.md` **and compare to the previous entry** — direction of headline / READY-share, and whether the top drags are the same styles run-after-run. **Learning phase: surface the read, don't gate decisions on it yet.** Treat it as context alongside the three constraint numbers, not as a fourth constraint.
+4. **Run the `birk-stock` position report** (`python birk-stock/availability.py`) — or read the latest `snapshots.md` block and compare to the previous. The demand-weighted **availability headline is a gate, not just context** (see Sizing & rules): it sets the budget ceiling. Read direction of headline / READY-share and whether the top drags are the same styles run-after-run. **A low or falling headline holds/caps budget even if ROAS and imp share say push.** Run it again after any stock batch lands and expect a healthier number before lifting the ceiling — we read landed stock, we don't forecast incoming.
 5. Cross-reference the **Diagnostic table** — which lever is the constraint?
 6. Recommend lever, direction, size, with reasoning. Name the campaign.
 7. **Frame the recommendation against the summer window, not just ROAS.** Birk is a 6-month buy with a finite peak (May–Jul). Stock that doesn't move in the window sits for 2–3 months. Pushing volume to convert stock → cash while ROAS is comfortably profitable is a valid trade even when pure marginal-ROAS math says "hold". Cash released also funds the next allocation payment (see [Birk ordering cycle](../README) — payment timing is the short-term stock lever).

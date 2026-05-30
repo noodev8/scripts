@@ -2,7 +2,7 @@
 
 See birk-stock/README.md for the full design.
 """
-import sys, os
+import sys, os, re
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import psycopg2
 from collections import defaultdict
@@ -70,7 +70,15 @@ def write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenien
     replaced = False
     for i, b in enumerate(blocks):
         if b.startswith(f"## {today}"):
-            blocks[i] = block
+            # Preserve any hand-added judgment lines (everything after the
+            # Sensitivity metric line) — the script only refreshes metrics.
+            lines = b.split('\n')
+            tail = []
+            for j, ln in enumerate(lines):
+                if 'Sensitivity (qty=1' in ln:
+                    tail = [t for t in lines[j + 1:] if t.strip()]
+                    break
+            blocks[i] = block + ('\n' + '\n'.join(tail) if tail else '')
             replaced = True
             break
     if not replaced:
@@ -81,6 +89,42 @@ def write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenien
         f.write(out)
 
     print(f"\n[snapshot {'updated' if replaced else 'appended'}: {today}]")
+
+
+def print_trend(n=7):
+    """Read snapshots.md and print the last n daily headlines as a compact trend,
+    so direction (supply catching up / wearing) is readable at a glance."""
+    try:
+        with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+            text = f.read()
+    except FileNotFoundError:
+        return
+
+    entries = []
+    for m in re.finditer(r'^## (\d{4}-\d{2}-\d{2})', text, re.M):
+        seg = text[m.end():m.end() + 500]
+        hm = re.search(r'Headline:\**\s*([\d.]+)%', seg)
+        rm = re.search(r'READY-share of demand:\**\s*(\d+)%', seg)
+        if hm:
+            entries.append((m.group(1), float(hm.group(1)),
+                            int(rm.group(1)) if rm else None))
+    if len(entries) < 2:
+        return
+
+    entries = entries[-n:]
+    vals = [h for _, h, _ in entries]
+    lo, hi = min(vals), max(vals)
+    bars = '.:-=+*#@'  # ASCII ramp (Windows console is cp1252; block glyphs fail to encode)
+    spark = ''.join(
+        bars[3] if hi == lo else bars[round((v - lo) / (hi - lo) * (len(bars) - 1))]
+        for v in vals
+    )
+    arrow = ('rising' if vals[-1] - vals[0] > 1 else
+             'falling' if vals[0] - vals[-1] > 1 else 'flat')
+    print(f"\nTrend (last {len(entries)} snapshots, headline): {spark}  {arrow}")
+    for d, h, r in entries:
+        rs = f"   READY-share {r}%" if r is not None else ""
+        print(f"  {d}: {h:5.1f}%{rs}")
 
 
 def qty_credit(qty):
@@ -249,6 +293,7 @@ def main():
     print(f"\nSensitivity (qty=1 as full credit, not half): headline -> {headline_lenient:.1f}%")
 
     write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenient, colour)
+    print_trend()
 
 
 if __name__ == '__main__':

@@ -67,12 +67,13 @@ Ad-hoc, on user request. No materialisation, no dashboard tile.
 
 ## Reading the output
 
-The script prints four blocks; read them together:
+The script prints five blocks; read them together:
 
 1. **Headline** — demand-weighted availability across all selling styles.
 2. **Status breakdown** — how 28d demand splits across READY / PARTIAL / THIN. The **READY-share of demand** is the most actionable headline-level number alongside (1).
 3. **Top drags** — styles eating the most "lost demand units". Long-tail THIN (u28 < 5) is noise — ignore. **These are not a restock list** — Birkenstock ordering is a 6-month cycle. They inform: (a) whether to pay a held supplier invoice now to release allocated stock, and (b) the pattern that feeds the next 6-month order.
 4. **Sensitivity** — what the headline becomes if qty=1 counts as full credit. <10pt difference means qty=1 isn't the driver.
+5. **Trend** — last ~7 daily headlines + READY-share with an ASCII sparkline and rising/falling/flat arrow, read straight from `snapshots.md`. Direction is the signal: rising = supply catching up (ceiling can lift); falling = engine wearing.
 
 ### Push / hold / pull (suggested, not a rule)
 
@@ -82,7 +83,9 @@ The script prints four blocks; read them together:
 | 40–55% | 20–40% | Hold |
 | <40% | <20% | Pull |
 
-**External signals override.** Strong ROAS in particular keeps ads profitable well below 55% headline — at 10x ROAS the safety margin is wide. The table is for catching the moment supply problems start eating ROAS, not for gating the decision before that.
+**Headline gates budget *increases*; ROAS governs *holding*.** This is now a first-class gate in `google-ads/BUDGET_REVIEW_PROCESS.md` (promoted 30 May), not advisory. A low/falling headline caps the **ceiling** — don't scale budget onto grids you can't fulfil (a falling headline 49.6 → 44.8 ran straight through the failed £180 push). But it does **not** force a cut: strong ROAS keeps current spend profitable well below 55% headline because scarcity still converts the last units at full price. So — low/falling headline → don't raise; healthy ROAS at the current cap → don't cut.
+
+**The ceiling only rises when a *landed* batch lifts the headline.** We read landed stock, never forecast incoming — Birkenstock may not ship it, or we may not expedite it (this is why pipeline is out of scope above). Run the report after a batch lands and expect a healthier number before lifting budget. Note: **raw arrivals ≠ position lift** — ~700u landed across May 2026 while the headline *fell*, because they went to the shoulders, not the selling mid-sizes. Only the demand-weighted number counts.
 
 ### Between snapshots — what to monitor
 
