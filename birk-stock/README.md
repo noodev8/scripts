@@ -85,7 +85,7 @@ The script prints five blocks; read them together:
 
 **Headline gates budget *increases*; ROAS governs *holding*.** This is now a first-class gate in `google-ads/BUDGET_REVIEW_PROCESS.md` (promoted 30 May), not advisory. A low/falling headline caps the **ceiling** — don't scale budget onto grids you can't fulfil (a falling headline 49.6 → 44.8 ran straight through the failed £180 push). But it does **not** force a cut: strong ROAS keeps current spend profitable well below 55% headline because scarcity still converts the last units at full price. So — low/falling headline → don't raise; healthy ROAS at the current cap → don't cut.
 
-**The ceiling only rises when a *landed* batch lifts the headline.** We read landed stock, never forecast incoming — Birkenstock may not ship it, or we may not expedite it (this is why pipeline is out of scope above). Run the report after a batch lands and expect a healthier number before lifting budget. Note: **raw arrivals ≠ position lift** — ~700u landed across May 2026 while the headline *fell*, because they went to the shoulders, not the selling mid-sizes. Only the demand-weighted number counts.
+**The ceiling only rises when the headline *actually* rises.** Run the report whenever — it's ad-hoc and run often, not triggered by deliveries. The point is the live number: read it, and raise budget only once it has genuinely lifted. We read landed stock, never forecast incoming — Birkenstock may not ship it, or we may not expedite it (this is why pipeline is out of scope above). Note: **raw arrivals ≠ position lift** — ~700u landed across May 2026 while the headline *fell*, because they went to the shoulders, not the selling mid-sizes. Only the demand-weighted number counts.
 
 ### Between snapshots — what to monitor
 
