@@ -4,9 +4,18 @@ Scans both machines' Downloads folders, moves any matching CSV into
 shopify-price/, and deletes any older same-type CSV already there so we
 only keep the latest of each kind.
 
-Two file types are recognised:
+Three file types are recognised:
 - "Your most popular products with price benchmarks_*.csv"  (benchmark)
 - "Sale price suggestions with highest performance impact_*.csv"  (sale price)
+- "adcost30.csv"  (Google Ads 30-day per-item performance: impr/clicks/cost/conv)
+
+The first two are timestamped Merchant Center exports — the newest of each is
+kept. adcost30.csv is a fixed-name Google Ads export and is OPTIONAL: the user
+drops a fresh copy in Downloads only sometimes. When present it overwrites the
+existing copy; when absent the script just skips it (no error). Its `Item ID`
+column joins to `skumap.googleid` (lowercase, leading zeros stripped) — NOT to
+groupid. A SKU/size absent from the report had zero ad activity in the window:
+treat as zero, not as missing data.
 """
 import os
 import shutil
@@ -21,6 +30,11 @@ DEST = os.path.dirname(os.path.abspath(__file__))
 PREFIXES = [
     "Your most popular products with price benchmarks_",
     "Sale price suggestions with highest performance impact_",
+]
+
+# Fixed-name exports (not timestamped). Optional — skipped silently if absent.
+EXACT_FILES = [
+    "adcost30.csv",
 ]
 
 
@@ -61,6 +75,23 @@ def main():
 
         shutil.move(src, dest_path)
         moved.append((src, dest_path))
+
+    # Fixed-name exports: move newest match across Downloads, overwriting dest.
+    for name in EXACT_FILES:
+        candidates = [os.path.join(d, name) for d in DOWNLOAD_DIRS
+                      if os.path.isfile(os.path.join(d, name))]
+        if not candidates:
+            continue
+        src = max(candidates, key=os.path.getmtime)
+
+        existing = os.path.join(DEST, name)
+        # Skip if the dest copy is already as new as the Download.
+        if os.path.isfile(existing) and os.path.getmtime(existing) >= os.path.getmtime(src):
+            continue
+        if os.path.isfile(existing):
+            os.remove(existing)
+        shutil.move(src, existing)
+        moved.append((src, existing))
 
     if not moved:
         print("Nothing fresh in Downloads.")
