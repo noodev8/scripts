@@ -8,6 +8,12 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 > Session-by-session journals are **not** kept here — every price change is in the `amz_price_log` DB table with rationale in `notes` (query at the bottom of Database). This section holds only the **current state** and the **durable rules/observations** distilled from past sessions.
 
+### WHITE step-up (2026-05-31)
+
+WHITE printed a **record week** (May 24 wk: 122 units, £1,794 profit — nearly double the prior week; recovery has overshot pre-episode). The 29th creeps all held on the 30th (05 sold 3 @ 39.49, 06 sold 4 @ 38.69, 04 sold 3 @ 38.69). Under the new **step-on-signal** policy (the old >5-day wait was retired this session), stacked another **+20p** on every deep-stocked size that's proving the higher price sells: **04→38.89, 05→39.69, 06→38.89, 08→38.69, 09→38.70**. Held **07** (£39.00 — returns 16%, fit not price, so the back-off signal would be returns, not a creep) and **03** (£39.29 — slowest size, no stock pressure, not chasing its old £39.79). All under Shopify £41.10.
+
+**COLOUR step-on-signal check (2026-05-31):** broad demand surge — 8 of 9 colours up WoW. Checked the 29th creeps for "did it sell at the *new* price?": only **MIDBLUE-05** cleared cleanly (sold at £38.49 on 3 consecutive days, 31 live) → stepped again **+20p to £38.69**. **BEIGE-05 £40 test CLOSED as a win** (2 sold at £40.09 — demand confirmed above £40) → **stepped again +20p to £40.29.** BEIGE-05 is **supplier-constrained**; we happen to hold stock early, which is likely *why* it sustains a price above £40 (less competition on this size). That's real pricing power — harvest it: keep creeping while it sells, pull straight back if it stalls. Stock thin (12 live), so it's a margin-harvest play, not a volume one. The other five 29th creeps (NAVY-05/08, GREY-05/06, BLACKSOLE-05) have **not yet printed a sale at the raised price** — right kind of size (deep stock, were selling) but no green light to stack; re-check in 2–3 days. BLACK winding down as planned (6→3 WoW, ~£0 profit) — leave running.
+
 ### Current state (full IVES review — WHITE + COLOUR — 2026-05-29)
 
 - **WHITE suppression episode RESOLVED — and fully recovered.** The May fair-pricing suppression was real (buy box genuinely lost on WHITE); the May 14 −50p across-band recompute trick worked. By the wks of May 18 & May 25 WHITE was at its strongest of the run (71 then 74 units, ~£1,050–1,090 profit/wk, returns back to 6–8%). Recovery is **WHITE-only**; IVES-COLOUR sagged independently in parallel (colours didn't fall in sync — not a portfolio-wide suspension).
@@ -21,7 +27,7 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 **From WHITE review 2026-05-29:**
 - **WHITE-05 (£39.29, 27 live +18 inbound, doing 40/7d)** — hottest size, thinnest live cover. Watch the creep didn't slow it AND that stock doesn't run out before inbound lands.
 - **WHITE-07 (£38.90)** — returns running 16% (sub-threshold but elevated, size-7 fit pattern). If returns climb past ~20% post-creep, it's fit not price — drop back.
-- **WHITE-04/06 (both £38.49)** — second creep within ~12d of the May 17 nudge. Per compound-creep timing, give these >5d before any further step; confirm the second nudge held.
+- **WHITE-04/06 (now £38.89 after 2026-05-31 +20p)** — stepped again on the price-held signal. Confirm the new price keeps selling; back off only if sales at £38.89 stall.
 - **WHITE-08/09 (£38.49 / £38.50)** — +50p back to prior working levels; confirm velocity held at the reclaimed price.
 
 **From COLOUR review 2026-05-29:**
@@ -30,7 +36,7 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 - **GREY-07 (£35.49 sub-floor) & KHAKI-08 (£36.49)** — did the dead-stock clears shift the pile?
 - **BLACKSOLE-05 (£39.99)** — next step crosses £40; treat as a judgment call, don't auto-creep.
 - **BLACKSOLE-07 (100% ret, 14d) & KHAKI-06 (100% ret, small sample)** — fit/defect watch, NOT price. Eyeball return reasons.
-- **Crept this round — confirm they held (>5d before stacking):** MIDBLUE-05/07, NAVY-05/08, GREY-05/06.
+- **Crept this round — confirm the new price is selling before stacking again:** MIDBLUE-05/07, NAVY-05/08, GREY-05/06.
 
 **From 2026-05-17, still open:**
 - **KHAKI-04/05/07 @ £34.99, STONE-04/06 @ £33.99** — did the aggressive sub-floor clears actually move stock? Validates the lower-floor policy.
@@ -46,7 +52,7 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 ### Observations to carry forward
 
-- **Compound-creep timing:** the first creep often *accelerates* velocity, a second creep within ~5 days often *kills* it (WHITE-06, MIDBLUE-05, NAVY-04 all showed this). If a creep holds, wait **longer than 5 days** before stacking another on top.
+- **Step up on the price-held signal, not a clock (the gate is "did it sell at the higher price?").** Amazon is a fast market — competing engines reprice hourly. On a **winning, well-stocked** product, the confirmation to creep again is simply that the *current* (just-raised) price is selling: multiple units sold at the new price within ~24h = step up again, same day if you like. Do **not** impose a multi-day cooling wait. The back-off signal is the *absence* of sales at the new price (a day or two of stall after a creep), not elapsed time. Retired the old ">5-day wait between stacked creeps" rule on 2026-05-31 — it was Shopify-brain caution that left margin on the table on a deep-stocked winner that had already sold 3 units at the higher price inside a day. (Still applies in the other direction: if a creep clearly *stalls* velocity, back it off — that's a price signal, the clock isn't.)
 - **Supply-tighten posture:** when supply tightens on a single SKU/colour, bias creeps **larger on the volume sizes** (they move the burn-rate needle most), not uniform across the size range.
 - **"£X.49 previously bombed" needs an OOS check.** If a prior price failure coincided with a stockout, it's not a clean price signal — retest that price once stock normalises (WHITE-05 £39.49 lesson).
 - **Inline-autopilot batch-apply works** for IVES reviews (Claude states all 🟡 calls as firm decisions, user approves as a batch). Calibrated 2026-04-21 at 100% agreement; smoother and faster than per-🟡 dialogue.
