@@ -1,16 +1,16 @@
-+# MADRID-SEG — segment rules
+# MADRID-SEG — segment rules
 
-Overrides to the defaults in `../SEGMENT_REPORTS.md`. Anything not listed here follows the default.
+Overrides to the defaults in `../SEGMENT_REPORTS.md`. Anything not listed here follows the default. This folder is self-contained — `stock_triage.py` is MADRID-SEG's own copy; edit it freely without worrying about other segments.
 
 ## Why this segment is different
 
 10 groupids (Black / Brown / White × Regular / Narrow, plus EVA Black variants). Small enough that the standard per-SKU drill produces a 40-row size table where the signal gets lost — the questions are almost always at the style level, not the size level.
 
-So MADRID-SEG borrows EVA's triage shape verbatim: one row per groupid, sorted to surface the styles where decisions are actually available.
+So MADRID-SEG uses a one-row-per-groupid stock-availability triage, sorted to surface the styles where decisions are actually available. (Same shape the other Birk segments use — EVA, Mayari, Patent — but its own copy.)
 
 ## Stock-availability triage (drill)
 
-Same shape as `../eva/EVA-SEG.md`. Output:
+Script: `scale/madrid/stock_triage.py`. Output:
 
 ```
  #  GroupID                Colour/Fit             Px     Cov Stock  u30  u14  Inc

@@ -1,6 +1,6 @@
-+# ZERMATT-SEG — segment rules
+# ZERMATT-SEG — segment rules
 
-Overrides to the defaults in `../SEGMENT_REPORTS.md`. Anything not listed here follows the default.
+Overrides to the defaults in `../SEGMENT_REPORTS.md`. Anything not listed here follows the default. This folder is self-contained — `stock_triage.py` is ZERMATT-SEG's own copy (it adds the material column); edit it freely without worrying about other segments.
 
 ## Why this segment is different
 
@@ -15,11 +15,11 @@ Both materials live in one segment because the manager view of "is Zermatt worki
 
 Per-SKU view at this scale produces a ~60-row size table that buries the signal. The questions are at the style level — which colour/width is moving, which is stocked-but-dead, which is OOS-and-incoming.
 
-So ZERMATT-SEG uses EVA's triage shape: one row per groupid, sorted to surface the styles where decisions are actually available.
+So ZERMATT-SEG uses a one-row-per-groupid stock-availability triage, sorted to surface the styles where decisions are actually available. (Same shape the other Birk segments use, with material added — its own copy.)
 
 ## Stock-availability triage (drill)
 
-Same shape as `../eva/EVA-SEG.md`. Output:
+Script: `scale/zermatt/stock_triage.py`. Output:
 
 ```
  #  GroupID                Colour/Fit             Px     Cov Stock  u30  u14  Inc

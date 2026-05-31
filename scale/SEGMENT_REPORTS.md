@@ -38,7 +38,7 @@ The **Units/day** column makes the two windows directly comparable — a higher 
 
 ### What goes below the table
 
-**The table is the report.** Below it, print at most one line: a drill offer if a `segment_rules/` file defines a drill for this segment. Otherwise nothing.
+**The table is the report.** Below it, print at most one line: a drill offer if the segment's own folder (`scale/<slug>/`) defines a drill. Otherwise nothing.
 
 Example: `If you want to drill, the next step for EVA-SEG is the stock-availability triage.`
 
@@ -56,7 +56,7 @@ These are available on request after the Summary — do not pre-run them:
 
 - **Recent owner notes** — last 3 from `segment_notes` for this segment.
 - **Pace / price-trend / shape** — the lines that used to sit under the table, on request.
-- **Segment-specific drill** — defined in `segment_rules/<SEGMENT>.md` if one exists.
+- **Segment-specific drill** — defined in the segment's own folder `scale/<slug>/<SEGMENT>.md` if one exists.
 - **Standard per-SKU view** — from the Drill-downs section below.
 
 This report will be read by managers reviewing staff progress — staff own the interpretation, the report is just the data.
@@ -125,33 +125,34 @@ For peak segments, the off-season contributes near-zero, so the peak-season proj
 
 ## Segment-specific rules
 
-Most segments use the defaults in this doc. Where a segment needs different rules (different SKU rollup, different windows, special commentary, etc.) they live in their own file under `segment_rules/<SEGMENT>.md`. Always check that folder before running a report — if a file exists for the segment, follow it; the defaults apply for anything it doesn't override.
+A segment either uses the defaults in this doc, **or** it has its own self-contained folder. There is no middle tier.
 
-If a segment grows bespoke scripts as well as rules (rare), it gets its own folder at `scale/<segment>/` containing both the rules file and the scripts — see EVA below.
+- **Default segments:** no folder. They follow this doc entirely.
+- **Override segments:** one flat folder per segment at `scale/<slug>/`, containing its `<SEGMENT>.md` (rules) plus any scripts it uses. **Each folder is self-contained — its scripts are its own copies, even where similar to another segment's.** Edit a segment's script freely; the blast radius is that one segment. The trade-off (accepted deliberately): fixes don't propagate — we fix the segment we're working on, and if a structural fix is ever needed it's a manual sweep across folders, never an assumed ripple. Scripts in other folders are a *library to crib from*, not shared dependencies — look in them, copy what's useful.
 
-Current files:
-- `segment_rules/IVES-COLOUR.md` — multi-colour Amazon segment, SKU report rolls up by colour rather than per-code
-- `eva/EVA-SEG.md` — Birkenstock EVA, standard Summary first; if it shows an issue, drill via the stock-availability triage (`eva/stock_triage.py`) instead of the standard per-SKU view
-- `arizona-patent/ARIZONA-PATENT-SEG.md` — Birkenstock Patent Arizona, same two-step flow as EVA (`arizona-patent/stock_triage.py`)
-- `mayari/MAYARI-SEG.md` — Birkenstock Mayari, same two-step flow as EVA (`mayari/stock_triage.py`)
+**Always check for `scale/<slug>/<SEGMENT>.md` before running a report.** If it exists, follow it; the defaults apply for anything it doesn't override.
 
-Segment quirks not yet promoted to their own file (light overrides only):
-- **RIEKER-SUM** — no comparable history (didn't sell last year). Compare against current 12m baseline only, not YoY.
-- **RIEKER-WIN, REMONTE-WIN** — off-season Apr–Aug. Skip until stock arrives in August. Reports resume in autumn.
-- **BLAZE-SEG** — demand-recovery segment. Add buy box / listing visibility commentary in the owner note when relevant. Manager view stays simple: are units recovering or not?
-- **FREE-SPIRIT** — investigation segment, very small numbers. Use absolute numbers not YoY (no history). Promote-or-cull check at 90 days.
-
-Promote a quirk to its own file once it grows beyond a one-line override.
+Current override folders:
+- `eva/` — Birkenstock EVA. Summary first; drill via stock-availability triage (`eva/stock_triage.py`) + `eva/google_compare.py`.
+- `mayari/` — Birkenstock Mayari. Same two-step flow (`mayari/stock_triage.py`).
+- `arizona-patent/` — Birkenstock Patent Arizona. Same two-step flow (`arizona-patent/stock_triage.py`).
+- `madrid/` — Birkenstock Madrid. Style-level triage (`madrid/stock_triage.py`).
+- `zermatt/` — Birkenstock Zermatt (cork + shearling). Triage with material column (`zermatt/stock_triage.py`).
+- `ives-colour/` — multi-colour Amazon Ives. SKU report rolls up by colour (SQL inline in the md).
+- `blaze/` — Amazon Blaze, demand-recovery. Amazon-flavoured stock triage (`blaze/stock_triage.py`).
+- `rieker-sum/` — no YoY (no history); 12m baseline only.
+- `rieker-win/`, `remonte-win/` — off-season Apr–Aug; reports resume in autumn.
+- `free-spirit/` — investigation segment; absolute numbers, promote-or-cull at 90 days.
 
 ---
 
 ## Segments using the default template
 
-All except those listed above:
-- IVES-WHITE, IVES-COLOUR
-- ARIZONA-BF-REG, ARIZONA-BF-NAR, ARIZONA-PATENT-SEG
-- BEND-SEG, MILANO-SEG, GIZEH-SEG, EVA-SEG, ZERMATT-SEG, MAYARI-SEG
-- LAKE-SEG, UKD-SEG
+Every segment NOT in the override-folder list above, i.e.:
+- IVES-WHITE
+- ARIZONA-BF-REG, ARIZONA-BF-NAR, ARIZONA-LEATHER
+- BEND-SEG, MILANO-SEG, GIZEH-SEG, BIRK-OTHER
+- LUNAR-GENERAL, LAKE-SEG, BLOCH-SEG, SKECHERS-SEG, STRIVE-SEG, UKD-SEG, ACCESSORY
 
 ---
 

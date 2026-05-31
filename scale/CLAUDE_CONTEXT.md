@@ -14,8 +14,7 @@ Brookfield Comfort is scaling from ~£500k to £1M revenue. The approach: build 
 - `MEETING_RULES.md` — 5 rules for segment meetings
 - `KLAVIYO_EMAIL_PLAYBOOK.md` — Single campaign: 90-day Birkenstock repurchase
 - `SEGMENT_REPORTS.md` — Report templates (Summary, SKU progress, Daily detail) per segment. Defaults apply unless a per-segment override exists.
-- `segment_rules/` — Per-segment overrides to the defaults in `SEGMENT_REPORTS.md`. **Always check this folder first before running a report for any segment.** If a segment grows bespoke scripts as well as rules, it gets its own folder instead (e.g. `scale/eva/`) — see EVA below.
-- `eva/` — EVA-SEG has its own folder because it has bespoke scripts (`stock_triage.py`, `google_compare.py`) alongside its rules (`EVA-SEG.md`). Other segments adopt this pattern only when they need scripts of their own; most stay in `segment_rules/`.
+- `scale/<slug>/` — Per-segment override folders. A segment either uses the `SEGMENT_REPORTS.md` defaults (no folder) **or** has its own self-contained flat folder holding its `<SEGMENT>.md` plus any scripts. **Always check for `scale/<slug>/<SEGMENT>.md` before running a report.** Each folder is self-contained: scripts are that segment's own copies even where similar to another's, so you can edit one without breaking others. Fixes don't propagate — fix the segment you're on; treat other folders as a library to crib from, not shared code. Current override folders: `eva/`, `mayari/`, `arizona-patent/`, `madrid/`, `zermatt/`, `ives-colour/`, `blaze/`, `rieker-sum/`, `rieker-win/`, `remonte-win/`, `free-spirit/`.
 - `check_null_segment.sql` — Lists groupids with NULL segment, sorted fresh-arrival-down. Flags FRESH / ASSIGN / COLD / INCOMING / QUIET. Run during segment sessions to make sure newly-arrived stock doesn't fall through unsegmented. Default scope: Birkenstock; broaden the brand filter when needed.
 
 ## Google Sheets Integration
@@ -80,7 +79,7 @@ A segment is the **smallest container in which "what's going on?" can be answere
 - **Out (CRAP):** only items not part of any category we manage.
 - **Per-style action** (defend / scale / clear / salvage) is carried by state, not by membership. Don't use in/out as a winner/loser flag — losers exit naturally by selling through and not being reordered.
 - **Why this matters:** curated-shortlist segments force constant re-litigation of the boundary as new arrivals come in, and you end up doing whole-category analysis anyway just to make the in/out call. Category-boundary segments stop that thrash.
-- **Precondition before bulk-adding losers:** confirm `scale/segment_rules/` for that segment are reporting/advisory, not auto-driving price or ad spend on membership alone. If active, add the per-style state mechanism first.
+- **Precondition before bulk-adding losers:** confirm the segment's own folder rules (`scale/<slug>/<SEGMENT>.md`) are reporting/advisory, not auto-driving price or ad spend on membership alone. If active, add the per-style state mechanism first.
 
 Example: EVA-SEG holds all 29 EVA styles (Arizona + Gizeh + Barbados + Madrid), set 2026-05-10. Previously held only the 10 winners; the other 19 sat in CRAP and were re-evaluated every session. Its bespoke rules + scripts live in `scale/eva/`.
 

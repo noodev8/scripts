@@ -1,8 +1,9 @@
-"""EVA-SEG stock-availability triage list.
+"""ZERMATT-SEG stock-availability triage list.
 
-Sorted by total stock DESC so high-stock decisions sit at the top
-(deal with price/listing) and stock-outs sit at the bottom
-(decide: drop further or wait for incoming).
+Self-contained copy of the Birk/Shopify triage shape (localstock + birktracker),
+with material (Cork / Shearling) shown inline in Colour/Fit — the cork/shearling
+split matters at decision time. See scale/zermatt/ZERMATT-SEG.md for philosophy.
+Sorted by total stock DESC so high-stock decisions sit at the top.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -10,7 +11,7 @@ import psycopg2
 from datetime import date, timedelta
 from logging_utils import get_db_config
 
-SEG = 'EVA-SEG'
+SEG = 'ZERMATT-SEG'
 TODAY = date.today()
 d14 = TODAY - timedelta(days=14)
 d30 = TODAY - timedelta(days=30)
@@ -20,10 +21,10 @@ cur = conn.cursor()
 
 cur.execute("""
     WITH seg AS (
-        SELECT groupid, colour, width, shopifyprice
+        SELECT groupid, colour, width, material, shopifyprice
         FROM skusummary WHERE segment = %s
     ),
-    universe AS (  -- total sizes per groupid (NEVER use skusummary.variants)
+    universe AS (
         SELECT sm.groupid, COUNT(DISTINCT sm.code) AS sizes_total
         FROM skumap sm JOIN seg ON seg.groupid = sm.groupid
         WHERE sm.deleted = 0
@@ -58,7 +59,7 @@ cur.execute("""
           AND bt.placedate IS NOT NULL
         GROUP BY 1
     ),
-    latest_note AS (  -- most recent price_change_log note per groupid, last 180d
+    latest_note AS (
         SELECT DISTINCT ON (pcl.groupid)
                pcl.groupid, pcl.change_date, pcl.reason_notes
         FROM price_change_log pcl
@@ -67,7 +68,7 @@ cur.execute("""
           AND pcl.change_date >= %s
         ORDER BY pcl.groupid, pcl.change_date DESC, pcl.id DESC
     )
-    SELECT seg.groupid, seg.colour, seg.width, seg.shopifyprice,
+    SELECT seg.groupid, seg.colour, seg.width, seg.material, seg.shopifyprice,
            u.sizes_total,
            i.sizes_in_stock,
            i.units AS stock_units,
@@ -88,16 +89,16 @@ cur.execute("""
 rows = cur.fetchall()
 conn.close()
 
-print(f"=== EVA-SEG stock-availability triage  ({TODAY}) ===\n")
-print(f"{'#':>2}  {'GroupID':<22} {'Colour/Fit':<20} {'Px':>4} {'Cov':>7} {'Stock':>5} {'u30':>4} {'u14':>4} {'Inc':>4}  {'Latest price note (<=180d)':<60}")
-print("-" * 150)
+print(f"=== {SEG} stock-availability triage  ({TODAY}) ===\n")
+print(f"{'#':>2}  {'GroupID':<22} {'Colour/Fit · Material':<30} {'Px':>4} {'Cov':>7} {'Stock':>5} {'u30':>4} {'u14':>4} {'Inc':>4}  {'Latest price note (<=180d)':<60}")
+print("-" * 160)
 for i, r in enumerate(rows, 1):
-    gid, col, wid, px, sizes_t, sizes_in, stock, u30, a30, u14, a14, inc, ndate, note = r
+    gid, col, wid, mat, px, sizes_t, sizes_in, stock, u30, a30, u14, a14, inc, ndate, note = r
     try:
         pxn = float(px) if px not in (None,'') else 0
     except (TypeError, ValueError):
         pxn = 0
-    cw = f"{col or '-'} / {wid or '-'}"[:20]
+    cw = f"{col or '-'} / {wid or '-'} · {mat or '-'}"[:30]
     cov = f"{sizes_in or 0}/{sizes_t or 0}"
     inc_str = str(inc) if inc else "-"
     if note:
@@ -105,4 +106,4 @@ for i, r in enumerate(rows, 1):
         note_str = f"{ndate} {note_trim}"
     else:
         note_str = "-"
-    print(f"{i:>2}  {gid:<22} {cw:<20} £{pxn:>3.0f} {cov:>7} {stock or 0:>5} {u30:>4} {u14:>4} {inc_str:>4}  {note_str}")
+    print(f"{i:>2}  {gid:<22} {cw:<30} £{pxn:>3.0f} {cov:>7} {stock or 0:>5} {u30:>4} {u14:>4} {inc_str:>4}  {note_str}")
