@@ -172,32 +172,46 @@ White Regular alone outperforms most entire Birk models; White + Black Regular =
 
 ---
 
-## ARIZONA-BF-REG: Arizona Birko-Flor Regular (Shopify)
+## ARIZONA colour bricks + GENERAL (Shopify)
 
-**Strategy:** Stock and price all Regular fits. Owner manages in isolation.
-**Lead time:** 6 months (committed) | **Cost:** £35.42 | **RRP:** £80–85 | **Margin:** ~46%
-Core colours: Dark Brown, Blue, Black, White, Graceful Taupe, Stone Coin. Dark Brown sells at the highest avg price — price accordingly. Tail: New Beige, Pearl White, Light Rose, Eggshell.
+Birko-Flor Arizona, **re-cut May 2026** from the old width buckets (BF-REG/BF-NAR)
+into performance **colour bricks** + a GENERAL monitor bucket. Each brick = the
+canonical **Regular + Narrow pair only**. Seasonal dupes, material variants
+(Vegan/Synthetics/Leopard), shade experiments (e.g. eggshell, new buckle colours)
+and fresh arrivals live in **ARIZONA-GENERAL** and earn a brick by clearing **£5k
+trailing revenue** — promotion unit = the **shade-pair**. New codes always land in
+GENERAL first. Patent and Leather stay their own segments.
+**Lead time:** 6 months (committed) | **Cost:** £35.42 (some £37.50) | **RRP:** £80–90 | **Margin:** ~46%
+Each brick has its own folder `scale/arizona-<colour>/` with the **size-availability**
+report (`size_availability.py`) — per EU size, Reg+Nar, with the **Inv** (invoiced,
+releasable now by paying the invoice) vs **Wsh** (future-order wishlist) split that
+is the only in-season stock lever ([[feedback_birk_ordering_cycle]]).
+
+### ARIZONA-BLACK — `0051791` Reg, `0051793` Nar
+Volume leader (~92 u/yr Reg). No invoiced stock to release right now; lever is the future order.
+
+### ARIZONA-BLUE — `0051751` Reg, `0051753` Nar
+Fastest riser — split out because it was surging unseen in the old bucket. Narrow is a fresh £85 restock not moving (pricing question first); its `width` is null so fit resolves from the title.
+
+### ARIZONA-BROWN — `0051701` Reg, `0051703` Nar
+Premium price leader, sells year-round. Reg core stock-gutted but ~14 units invoiced/releasable for peak (invoice 5290099202, raised 27.05.2026).
+
+### ARIZONA-WHITE — `0552681` Reg, `0552683` Nar
+Most code-fragmented colour. Off-white shades (White Eggshell, Graceful Pearl) sit in GENERAL with real residual demand that should flow here as they deplete — keep brick depth up. ~19 units invoiced/releasable.
+
+### ARIZONA-TAUPE — `1029470` Reg, `1029439` Nar
+First promotion out of GENERAL (May 2026) on trajectory (~£4.4k, just under bar). Watch trailing revenue: a fade below ~£4k is the relegation signal.
+
+### ARIZONA-GENERAL — the monitor bucket (25 styles)
+Scan, don't action. Report: `scale/arizona-general/shade_breakdown.py` (shade-pairs ranked by demand). Nearest promotion candidates: Stone Coin (~£2.8k), then the Eggshell/Pearl off-whites — all well short of £5k.
 
 ### Actions
 
-- [ ] Top 6 colours: keep fully stocked, optimise prices
-- [ ] Tail 4: sell what's there, don't restock unless they surprise
-- [ ] Dark Brown is the price leader — price accordingly
-- [ ] Watch White for stock gaps before spring
-
----
-
-## ARIZONA-BF-NAR: Arizona Birko-Flor Narrow (Shopify)
-
-**Strategy:** Stock and price all Narrow fits. Owner manages in isolation. Good junior training segment — low cost of mistakes (£35.42/unit), clear data, simple decisions.
-**Lead time:** 6 months (committed) | **Cost:** £35.42 | **RRP:** £80–85 | **Margin:** ~46%
-Core: Dark Brown, White, Graceful Taupe, Black, Stone Coin. Tail: Pearl White, Pecan, Light Rose, Eggshell, Metallic Black. Blue Narrow (`0051753-ARIZONA`) exists with zero sales — a test for the owner.
-
-### Actions
-
-- [ ] Top 5: stock and monitor
-- [ ] Bottom 5: sell through, reorder only if selling
-- [ ] Blue Narrow has no sales — seed light stock to test? Owner's call.
+- [ ] Brown: decide on releasing the invoiced core sizes for peak (the "6 weeks not 6 months" lever)
+- [ ] Blue: price the £85 Narrow to move; protect the surging Regular's stock
+- [ ] White: keep brick depth to absorb Eggshell/Pearl demand as the dupes deplete
+- [ ] Taupe: confirm it holds above the relegation line
+- [ ] GENERAL: occasional riser-sweep via `shade_breakdown.py` — promote a shade-pair at £5k
 
 ---
 

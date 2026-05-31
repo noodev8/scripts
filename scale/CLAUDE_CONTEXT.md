@@ -14,8 +14,9 @@ Brookfield Comfort is scaling from ~£500k to £1M revenue. The approach: build 
 - `MEETING_RULES.md` — 5 rules for segment meetings
 - `KLAVIYO_EMAIL_PLAYBOOK.md` — Single campaign: 90-day Birkenstock repurchase
 - `SEGMENT_REPORTS.md` — Report templates (Summary, SKU progress, Daily detail) per segment. Defaults apply unless a per-segment override exists.
-- `scale/<slug>/` — Per-segment override folders. A segment either uses the `SEGMENT_REPORTS.md` defaults (no folder) **or** has its own self-contained flat folder holding its `<SEGMENT>.md` plus any scripts. **Always check for `scale/<slug>/<SEGMENT>.md` before running a report.** Each folder is self-contained: scripts are that segment's own copies even where similar to another's, so you can edit one without breaking others. Fixes don't propagate — fix the segment you're on; treat other folders as a library to crib from, not shared code. Current override folders: `eva/`, `mayari/`, `arizona-patent/`, `madrid/`, `zermatt/`, `ives-colour/`, `blaze/`, `rieker-sum/`, `rieker-win/`, `remonte-win/`, `free-spirit/`.
+- `scale/<slug>/` — Per-segment override folders. A segment either uses the `SEGMENT_REPORTS.md` defaults (no folder) **or** has its own self-contained flat folder holding its `<SEGMENT>.md` plus any scripts. **Always check for `scale/<slug>/<SEGMENT>.md` before running a report.** Each folder is self-contained: scripts are that segment's own copies even where similar to another's, so you can edit one without breaking others. Fixes don't propagate — fix the segment you're on; treat other folders as a library to crib from, not shared code. Current override folders: `eva/`, `mayari/`, `arizona-patent/`, `arizona-black/`, `arizona-blue/`, `arizona-brown/`, `arizona-white/`, `arizona-taupe/`, `arizona-general/`, `madrid/`, `zermatt/`, `ives-colour/`, `blaze/`, `rieker-sum/`, `rieker-win/`, `remonte-win/`, `free-spirit/`.
 - `check_null_segment.sql` — Lists groupids with NULL segment, sorted fresh-arrival-down. Flags FRESH / ASSIGN / COLD / INCOMING / QUIET. Run during segment sessions to make sure newly-arrived stock doesn't fall through unsegmented. Default scope: Birkenstock; broaden the brand filter when needed.
+- `refresh_segment_data.py` + `REFRESH_SEGMENT_DATA.md` — one-shot refresh of the Segments-sheet `Styles/Revenue/GP/GP%` columns from the DB. Segment list is read **from the sheet** (never hardcoded); one run does all segments. Trigger: *"recalculate segment data"*. Never touches name/owner/reviewed/notes.
 
 ## Google Sheets Integration
 
@@ -44,7 +45,7 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 - Segments designed to be delegatable to staff
 - Each session: check progress, refine existing segments, add new ones
 - Minimum segment threshold: £5k revenue potential
-- 25 segments, no CRAP, no NULL (verified against DB May 2026). Every groupid allocated to a managed segment.
+- 29 segments, no CRAP, no NULL (verified against DB May 2026). Every groupid allocated to a managed segment.
 - "Everything in a segment, even if rubbish" — losers exit naturally via sell-through, not by living in CRAP
 - £500k→£1M needs new bricks (new brands, range expansions)
 - **Don't auto-log** to the Log tab — it has a different purpose (task tracking between user and Claude)
@@ -63,9 +64,9 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 
 ## Segment Naming in DB
 
-DB tags (in `skusummary.segment`) must match sheet codes. Full list (25 segments, May 2026):
+DB tags (in `skusummary.segment`) must match sheet codes. Full list (29 segments, May 2026):
 
-Birkenstock: ARIZONA-BF-NAR, ARIZONA-BF-REG, ARIZONA-PATENT-SEG, ARIZONA-LEATHER, GIZEH-SEG, MAYARI-SEG, MADRID-SEG, MILANO-SEG, BEND-SEG, ZERMATT-SEG, EVA-SEG, BIRK-OTHER (Florida/Pasadena/Uppsala oddballs)
+Birkenstock: ARIZONA-BLACK, ARIZONA-BLUE, ARIZONA-BROWN, ARIZONA-WHITE, ARIZONA-TAUPE (colour bricks, Reg+Nar pairs), ARIZONA-GENERAL (Arizona monitor bucket), ARIZONA-PATENT-SEG, ARIZONA-LEATHER, GIZEH-SEG, MAYARI-SEG, MADRID-SEG, MILANO-SEG, BEND-SEG, ZERMATT-SEG, EVA-SEG, BIRK-OTHER (Florida/Pasadena/Uppsala oddballs)
 Lunar: IVES-COLOUR, IVES-WHITE, BLAZE-SEG, LUNAR-GENERAL (everything non-Ives/non-Blaze)
 Rieker / Remonte: RIEKER-WIN, RIEKER-SUM, REMONTE-WIN
 Other brands: FREE-SPIRIT, LAKE-SEG, BLOCH-SEG, SKECHERS-SEG, STRIVE-SEG, UKD-SEG (low-cost supplier — Goor, Roamers, R21, Grafters, Scimitar, Cipriata)
@@ -82,6 +83,16 @@ A segment is the **smallest container in which "what's going on?" can be answere
 - **Precondition before bulk-adding losers:** confirm the segment's own folder rules (`scale/<slug>/<SEGMENT>.md`) are reporting/advisory, not auto-driving price or ad spend on membership alone. If active, add the per-style state mechanism first.
 
 Example: EVA-SEG holds all 29 EVA styles (Arizona + Gizeh + Barbados + Madrid), set 2026-05-10. Previously held only the 10 winners; the other 19 sat in CRAP and were re-evaluated every session. Its bespoke rules + scripts live in `scale/eva/`.
+
+**The curated-winner exception (IVES-WHITE / Arizona colour bricks).** A category can be
+split the *other* way — winners pulled into their own tiny bricks, with a `-GENERAL`
+residual holding everything else — when a winner is dominant/coherent enough to be
+reasoned about alone and you want forced focus on it. IVES-WHITE + LUNAR-GENERAL is the
+original; **Arizona Birko-Flor** (May 2026) follows it: colour bricks ARIZONA-BLACK/
+BLUE/BROWN/WHITE/TAUPE (each just the canonical Reg+Nar pair) + ARIZONA-GENERAL. The
+anti-thrash guard is a **mechanical promotion rule**: new codes always land in GENERAL;
+a shade-pair earns its own brick only on clearing **£5k trailing revenue**; a faded brick
+relegates back. That keeps the boundary rule from being re-litigated per arrival.
 
 ## Database Query Patterns
 
@@ -113,6 +124,7 @@ ORDER BY s.groupid;
 - `sales.groupid` → `skusummary.groupid` → `title.groupid`
 - `skumap.groupid` + `skumap.code` → `localstock.code`
 - Channel codes: SHP = Shopify, AMZ = Amazon, CM3 = other marketplace
+- **EU size = the 2-digit suffix of `skumap.code`** (e.g. `0051701-ARIZONA-37` → `37`), always euro by design. Do **not** use `skumap.uksize` or `skumap.eurosize` (eurosize is frequently NULL).
 
 ### Cost reference (common)
 - Lunar Ives: £15.99
