@@ -30,7 +30,8 @@ The brick drill. **Replaces the default per-SKU drill.**
 python scale/arizona-brown/size_availability.py
 ```
 
-One row per EU size, Regular and Narrow side by side. Columns per fit:
+Two stacked tables — Regular first, then Narrow — one row per EU size each.
+Columns per fit:
 
 | Col | Meaning |
 |---|---|

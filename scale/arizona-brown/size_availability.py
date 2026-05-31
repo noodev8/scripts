@@ -99,32 +99,24 @@ def pxf(p):
         return 0.0
 
 
+FIT_NAME = {'Reg': 'Regular', 'Nar': 'Narrow'}
+
 print(f"=== {SEG} size availability  ({TODAY}) ===")
-print("  ".join(f"{f} £{pxf(px.get(f)):.0f}" for f in FITS))
 print("Stk=in stock  u30/u14=units sold  Inv=invoiced-not-arrived (releasable now)  "
-      "Wsh=on future order (6-month wishlist)\n")
+      "Wsh=on future order (6-month wishlist)")
 
-cell = f"{'Stk':>4}{'u30':>4}{'u14':>4}{'Inv':>4}{'Wsh':>4}"
-top = f"{'EU':>3} | " + " | ".join(f"{f:<20}" for f in FITS)
-sub = f"{'':>3} | " + " | ".join(cell for _ in FITS)
-print(top)
-print(sub)
-print("-" * len(sub))
-
-tot = {f: [0, 0, 0, 0, 0] for f in FITS}
-for eu in sorted(sizes, key=lambda x: int(x)):
-    line = f"{eu:>3} | "
-    parts = []
-    for f in FITS:
+header = f"{'EU':>3} | {'Stk':>4}{'u30':>4}{'u14':>4}{'Inv':>4}{'Wsh':>4}"
+for f in FITS:
+    print(f"\n--- {FIT_NAME.get(f, f)} (£{pxf(px.get(f)):.0f}) ---")
+    print(header)
+    print("-" * len(header))
+    tot = [0, 0, 0, 0, 0]
+    for eu in sorted(sizes, key=lambda x: int(x)):
         m = sizes[eu].get(f)
-        if m:
-            for i, v in enumerate(m):
-                tot[f][i] += v
-            parts.append(f"{m[0]:>4}{m[1]:>4}{m[2]:>4}{m[3]:>4}{m[4]:>4}")
-        else:
-            parts.append(f"{'-':>4}{'-':>4}{'-':>4}{'-':>4}{'-':>4}")
-    print(line + " | ".join(parts))
-
-print("-" * len(sub))
-tline = f"{'Tot':>3} | "
-print(tline + " | ".join(f"{t[0]:>4}{t[1]:>4}{t[2]:>4}{t[3]:>4}{t[4]:>4}" for f, t in tot.items()))
+        if not m:
+            continue
+        for i, v in enumerate(m):
+            tot[i] += v
+        print(f"{eu:>3} | {m[0]:>4}{m[1]:>4}{m[2]:>4}{m[3]:>4}{m[4]:>4}")
+    print("-" * len(header))
+    print(f"{'Tot':>3} | {tot[0]:>4}{tot[1]:>4}{tot[2]:>4}{tot[3]:>4}{tot[4]:>4}")
