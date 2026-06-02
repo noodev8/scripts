@@ -8,40 +8,39 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 > Session-by-session journals are **not** kept here — every price change is in the `amz_price_log` DB table with rationale in `notes` (query at the bottom of Database). This section holds only the **current state** and the **durable rules/observations** distilled from past sessions.
 
-### WHITE step-up (2026-05-31)
+### WHITE step-up (2026-06-02)
 
-WHITE printed a **record week** (May 24 wk: 122 units, £1,794 profit — nearly double the prior week; recovery has overshot pre-episode). The 29th creeps all held on the 30th (05 sold 3 @ 39.49, 06 sold 4 @ 38.69, 04 sold 3 @ 38.69). Under the new **step-on-signal** policy (the old >5-day wait was retired this session), stacked another **+20p** on every deep-stocked size that's proving the higher price sells: **04→38.89, 05→39.69, 06→38.89, 08→38.69, 09→38.70**. Held **07** (£39.00 — returns 16%, fit not price, so the back-off signal would be returns, not a creep) and **03** (£39.29 — slowest size, no stock pressure, not chasing its old £39.79). All under Shopify £41.10.
+WHITE still on a tear — **May 25 wk a fresh record: 132 units, £1,960 profit** (beat the prior ~£1,090 "recovered" peak). Demand is not the constraint; the gate is the price-held signal per size. Stacked another **+20p** on the four sizes that printed sales at their just-raised price: **04→39.09, 05→39.89, 06→39.09, 07→39.20**. Held **03** (£39.29 — slowest, deep stock, don't chase old 39.79) and **08/09** (£38.69 / £38.70 — no sale yet at their 05-31 raised price). All under Shopify £41.10. 07's returns settled to ~7% (14d) so it crept too — but the size-7 fit watch stays open.
 
-**COLOUR step-on-signal check (2026-05-31):** broad demand surge — 8 of 9 colours up WoW. Checked the 29th creeps for "did it sell at the *new* price?": only **MIDBLUE-05** cleared cleanly (sold at £38.49 on 3 consecutive days, 31 live) → stepped again **+20p to £38.69**. **BEIGE-05 £40 test CLOSED as a win** (2 sold at £40.09 — demand confirmed above £40) → **stepped again +20p to £40.29.** BEIGE-05 is **supplier-constrained**; we happen to hold stock early, which is likely *why* it sustains a price above £40 (less competition on this size). That's real pricing power — harvest it: keep creeping while it sells, pull straight back if it stalls. Stock thin (12 live), so it's a margin-harvest play, not a volume one. The other five 29th creeps (NAVY-05/08, GREY-05/06, BLACKSOLE-05) have **not yet printed a sale at the raised price** — right kind of size (deep stock, were selling) but no green light to stack; re-check in 2–3 days. BLACK winding down as planned (6→3 WoW, ~£0 profit) — leave running.
+### COLOUR step-up (2026-06-02)
 
-### Current state (full IVES review — WHITE + COLOUR — 2026-05-29)
+Broad surge held — **8 of 9 colours up** on the May 25 wk (NAVY 21/£322, MIDBLUE 19/£271, BEIGE 17/£246, GREY 16/£236 the standouts). Applied **6 creeps + a BLACK deeper clear**:
+- **Creeps (+20p, price-held signal confirmed):** MIDBLUE-05→38.89, NAVY-05→38.69, GREY-05→38.19, BLACKSOLE-08→38.89 (scarce harvest), NAVY-07→37.19 (scarce harvest), BLACKSOLE-03→36.69 (scarce harvest).
+- **BLACK deeper clear:** 04/05/06/08 **35.99→33.99** — the 05-29 clear to 35.99 wasn't moving the ~125-unit pile (~2u/wk). Still ~£12/unit; liberate it. 03/07 nearly gone, left at 35.99.
+- **Clears confirmed working — left running:** STONE-04/06 @ 33.99 (04 down to 3 live), KHAKI @ 34.99, GREY-07 @ 35.49.
 
-- **WHITE suppression episode RESOLVED — and fully recovered.** The May fair-pricing suppression was real (buy box genuinely lost on WHITE); the May 14 −50p across-band recompute trick worked. By the wks of May 18 & May 25 WHITE was at its strongest of the run (71 then 74 units, ~£1,050–1,090 profit/wk, returns back to 6–8%). Recovery is **WHITE-only**; IVES-COLOUR sagged independently in parallel (colours didn't fall in sync — not a portfolio-wide suspension).
-- **WHITE posture (2026-05-29 review):** measured recovery now under way. 6 sizes crept on 12–14 days of sustained strong velocity — all kept **below pre-episode highs** (reclaiming the deliberate May 15 token drop, not chasing new highs). Changes: 04→£38.49, 05→£39.29, 06→£38.49, 07→£38.90, 08→£38.49, 09→£38.50. **03 held at £39.29** (slowest size, no stock pressure, don't chase its old £39.79 high). Still don't sprint back to pre-episode levels — keep steps small and well under Shopify £41.10.
-- **IVES-COLOUR (2026-05-29 review):** volume engines healthy (MIDBLUE/NAVY/BLACKSOLE ~10–15/wk). 17 changes: 7 creeps (MIDBLUE-05/07, NAVY-05/08, GREY-05/06, BLACKSOLE-05), 2 drops (BLACKSOLE-04, MIDBLUE-03), RED-04 revert, GREY-07 sub-floor clear (£35.49), KHAKI-08 −£1, BEIGE-05 £40-cross test, and the BLACK clearance (below). MIDBLUE-05 & NAVY-05 priority watches **closed** — both recovered.
-- **BLACK = HARVEST-AND-EXIT (decided 2026-05-29).** Velocity collapsed (15→14→9→6→1 units/wk), ~126 units FBA, no reorders. Stopped active management: cleared 04/05/06/08 to floor £35.99 (03 & 07 already there). Let it run down — don't keep fiddling size-by-size. Revisit only to decide a deeper clear if the pile isn't moving.
-- **BEIGE-05 £40 test (2026-05-29):** crept £39.79 → £40.09, a deliberate round-number-barrier test on a clean strong seller (user override of the hold rec). **Watch:** if it stalls within a few days, revert to £39.79.
+### Earlier context (carry-forward)
+
+- **WHITE suppression episode (May) RESOLVED and fully recovered.** The May fair-pricing suppression was real (buy box genuinely lost on WHITE); the May 14 −50p across-band recompute trick worked. Recovery was **WHITE-only**; IVES-COLOUR sagged independently in parallel (not a portfolio-wide suspension).
+- **BLACK = HARVEST-AND-EXIT** (decided 2026-05-29, deepened 2026-06-02). Velocity collapsed, ~125 units FBA, no reorders. Don't reopen active size-by-size management — just decide clear depth.
+- **BEIGE-05 supplier-constrained harvest:** we hold stock early (less competition on this size) → real pricing power above £40. Crept £39.79→40.09→40.29 over late May. Harvest while it sells, pull straight back if it stalls.
 
 ### Priority watches (open)
 
-**From WHITE review 2026-05-29:**
-- **WHITE-05 (£39.29, 27 live +18 inbound, doing 40/7d)** — hottest size, thinnest live cover. Watch the creep didn't slow it AND that stock doesn't run out before inbound lands.
-- **WHITE-07 (£38.90)** — returns running 16% (sub-threshold but elevated, size-7 fit pattern). If returns climb past ~20% post-creep, it's fit not price — drop back.
-- **WHITE-04/06 (now £38.89 after 2026-05-31 +20p)** — stepped again on the price-held signal. Confirm the new price keeps selling; back off only if sales at £38.89 stall.
-- **WHITE-08/09 (£38.49 / £38.50)** — +50p back to prior working levels; confirm velocity held at the reclaimed price.
+**WHITE (from 2026-06-02):**
+- **WHITE-05 (£39.89, ~31 live + 136 total inbound, 64u/14d)** — the engine; hottest size, thinnest *live* cover. Confirm inbound lands before the live pile empties, and that 39.89 keeps selling.
+- **WHITE-07 (£39.20)** — size-7 fit pattern, returns at ~7% now. If returns climb post-creep, it's fit not price — drop back.
+- **WHITE-04/06 (£39.09)** — confirm the new price keeps selling before stacking again.
+- **WHITE-08/09 (£38.69 / £38.70)** — held; step only once they print a sale at the current price.
+- **WHITE-03 (£39.29)** — hold; don't chase the old 39.79.
 
-**From COLOUR review 2026-05-29:**
-- **BEIGE-05 (£40.09)** — £40-cross test. If it stalls within a few days, revert to £39.79.
-- **BLACK clearance (04/05/06/08 @ £35.99)** — is the harvest pile actually moving at floor? If not, decide a deeper clear (£33.99–34.99) — but don't reopen active size-by-size management.
-- **GREY-07 (£35.49 sub-floor) & KHAKI-08 (£36.49)** — did the dead-stock clears shift the pile?
-- **BLACKSOLE-05 (£39.99)** — next step crosses £40; treat as a judgment call, don't auto-creep.
-- **BLACKSOLE-07 (100% ret, 14d) & KHAKI-06 (100% ret, small sample)** — fit/defect watch, NOT price. Eyeball return reasons.
-- **Crept this round — confirm the new price is selling before stacking again:** MIDBLUE-05/07, NAVY-05/08, GREY-05/06.
-
-**From 2026-05-17, still open:**
-- **KHAKI-04/05/07 @ £34.99, STONE-04/06 @ £33.99** — did the aggressive sub-floor clears actually move stock? Validates the lower-floor policy.
-
-**From WHITE review 2026-05-29:** (above)
+**COLOUR (from 2026-06-02):**
+- **Crept this round — confirm the new price sells before stacking:** MIDBLUE-05, NAVY-05, GREY-05, BLACKSOLE-08, NAVY-07, BLACKSOLE-03.
+- **No print at raised price yet — re-check in 2–3 days:** BEIGE-05 (£40.29 — revert toward 40.09 if it stalls), NAVY-08 (£37.79), GREY-06 (£37.49), MIDBLUE-07 (£38.09, fresh return + thin).
+- **BLACKSOLE-05 (£39.99)** — next step crosses £40; judgment call, don't auto-creep.
+- **BLACK deeper clear (04/05/06/08 @ £33.99)** — did 33.99 finally move the pile? If still stuck, decide whether to exit faster / stop restocking entirely.
+- **BLACKSOLE-07 & KHAKI-06** — fit/defect watch, NOT price. Eyeball return reasons.
+- **KHAKI-04/05/07 @ £34.99, GREY-07 @ £35.49** — slow but moving; keep validating the lower-floor policy.
 
 ### Carry-forward rules
 
