@@ -139,6 +139,7 @@ Current override folders:
 - `arizona-black/`, `arizona-blue/`, `arizona-brown/`, `arizona-white/`, `arizona-taupe/` — Arizona Birko-Flor colour bricks (Reg+Nar pairs, May 2026). Drill = per-EU-size availability (`size_availability.py`) with the **Inv** (releasable) / **Wsh** (future) stock split.
 - `arizona-general/` — Arizona monitor bucket. Drill = shade breakdown (`shade_breakdown.py`); shade-pairs ranked by demand, promote at £5k.
 - `madrid/` — Birkenstock Madrid. Style-level triage (`madrid/stock_triage.py`).
+- `milano/` — Birkenstock Milano (4-code brick: Brown + Black, each Reg/Nar). Two-drill chain: `size_availability.py` (one flat row per style/width) → `size_breakdown.py` (size-as-columns, cell = `u30(stk)`). **⭐ Preferred / latest report shape for Birkenstock** — short-named chain (Summary → drill 1 → drill 2) plus a single overwrite-only `## Status` block. Use as the reference when reworking other Birk segments; don't bulk-retrofit, adopt per-segment as each is revisited.
 - `zermatt/` — Birkenstock Zermatt (cork + shearling). Triage with material column (`zermatt/stock_triage.py`).
 - `ives-colour/` — multi-colour Amazon Ives. SKU report rolls up by colour (SQL inline in the md).
 - `blaze/` — Amazon Blaze, demand-recovery. Amazon-flavoured stock triage (`blaze/stock_triage.py`).
@@ -153,7 +154,7 @@ Current override folders:
 Every segment NOT in the override-folder list above, i.e.:
 - IVES-WHITE
 - ARIZONA-LEATHER
-- BEND-SEG, MILANO-SEG, GIZEH-SEG, BIRK-OTHER
+- BEND-SEG, GIZEH-SEG, BIRK-OTHER
 - LUNAR-GENERAL, LAKE-SEG, BLOCH-SEG, SKECHERS-SEG, STRIVE-SEG, UKD-SEG, ACCESSORY
 
 ---
