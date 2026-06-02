@@ -40,6 +40,21 @@ The whole process is four reads — **sales, cost, stock, budget** — plus a re
 
 Maintenance is manual and ad-hoc — add/remove individual styles with one-off SQL when a style thins out or a delivery lands. No automated refresh.
 
+### Adding a second campaign — read before acting (note added 1 Jun 2026)
+
+> **DO NOT make any changes for this until you get explicit go-ahead that a second campaign has *actually* been created in Google Ads.** This is a forward note only. While the account is single-campaign, ignore it. Treating it as a to-do before the campaign exists will desync the doc from reality.
+
+When a second campaign does go live, here's what was verified about the system (1 Jun 2026):
+
+- **Ingestion code needs no change.** `update_google_stock_track.py` is already per-campaign aware. As long as the CSV export keeps the same columns (`Day, Campaign, Clicks, Impr., Currency code, Cost, Search impr. share`) and includes **all** campaigns, a new campaign just appears as new rows. `google_campaign_daily` upserts one row per `(date, campaign)` — the source of truth for per-campaign reads.
+- **Do NOT combine impression share.** Summing/averaging imp share across campaigns is mathematically meaningless (different auction denominators). The code already handles this: `google_stock_track.google_search_imp_share` is written only when exactly one campaign reports that day, and goes **NULL** with 2+ campaigns *by design*. Read per-campaign imp share from `google_campaign_daily` instead. (The historical 28 Apr–13 May multi-campaign window is already frozen NULL there — same behaviour.)
+- **Spend / clicks / impressions still sum fine** in `google_stock_track` — those aggregate correctly. Only imp share doesn't.
+- **Process changes needed (in this doc) once it's live:**
+  - Rewrite **Current State** from "single campaign" to describe both campaigns and which lever applies to which.
+  - In the **Three-Grid / Diagnostic table**, read imp share **per-campaign from `google_campaign_daily`**, not `google_stock_track` (which will be NULL). Grids 1 & 2 (money/demand) still work on summed figures, but ROAS becomes *blended* across campaigns.
+  - Add a new `custom_label_0` value for the new campaign and tag its styles via `skusummary.googlecampaign`.
+- **The one genuine gap: per-campaign ROAS.** Sales aren't attributed by campaign today — `google_stock_track` ties total spend to total Shopify sales. With two campaigns on different style sets, blended ROAS hides which one performs. Attributing sales by `custom_label_0`/campaign would need new work. Only worth it if the second campaign targets a distinct style set you want to judge on its own.
+
 ---
 
 ## Data Sources
