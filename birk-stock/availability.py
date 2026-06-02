@@ -1,172 +1,140 @@
-"""Birkenstock stock-availability snapshot for Google Ads push/scale-back decisions.
+"""Birkenstock core-size availability gauge for Google Ads push/scale-back decisions.
 
+One question: can the core customer buy? Across EVERY Birkenstock style whose grid
+offers the women's core sizes (38/39/40) — no sales filter — we score each style on
+whether it actually holds those sizes, credited gently by stock depth. Target 100%;
+thin stragglers drag it down and are the owner's to prune.
+
+LOCKED OUTPUT — one at-a-glance table, one row per day:
+
+  | Date | 38 | 39 | 40 | Overall | Styles | Full | Partial | Empty |
+
+  - 38 / 39 / 40 : % of in-range styles with that size in FREE stock.
+  - Overall      : depth-weighted core coverage (the headline; target 100%).
+                   Per slot: qty 0->0, 1->0.5, 2->0.8, 3+->1.0; per style = mean of
+                   its 3 core slots; Overall = mean across all styles.
+  - Full / Partial / Empty : styles by how many core sizes are in stock (3 / 1-2 / 0).
+
+Run with --detail to also print the weakest-first per-style grid (the prune list).
 See birk-stock/README.md for the full design.
 """
-import sys, os, re
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import psycopg2
 from collections import defaultdict
 from datetime import date
 from logging_utils import get_db_config
-from size_weights import WOMENS, MENS, curve_for, blend_curve
 
-DEMAND_WINDOW_DAYS = 28
-MOMENTUM_WINDOW_DAYS = 7
-CURVE_WINDOW_DAYS = 90   # window for building per-model size curves (longer = stabler shape)
-RECENCY_ALPHA = 0.5      # demand-weight tilt to recent pace: eff = a*4*u7 + (1-a)*u28 (0=pure 28d)
-CHANNEL = 'SHP'
+CORE_SIZES = (38, 39, 40)   # women's core; men's-only grids are out (no 38)
 BRAND = 'Birkenstock'
-TOP_N = 25
 SNAPSHOT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'snapshots.md')
 
-
-def _pace_word(daily_recent, daily_28d):
-    if daily_28d <= 0:
-        return 'flat'
-    r = daily_recent / daily_28d
-    return 'accelerating' if r >= 1.25 else ('slowing' if r <= 0.75 else 'steady')
+# Snapshot table columns — metrics only.
+COLS = ['Date', '38', '39', '40', 'Overall', 'Styles', 'Full', 'Partial', 'Empty']
 
 
-def write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenient, colour):
-    """Append today's metrics block to snapshots.md, or overwrite an existing
-    same-day block (one entry per day, latest run wins). Metrics only —
-    judgment/context lines are not auto-written."""
-    today = str(date.today())
-    d28 = total_u28 / DEMAND_WINDOW_DAYS
-    d7 = total_u7 / MOMENTUM_WINDOW_DAYS
-    pace = _pace_word(d7, d28)
-
-    def pct(b):
-        return round(counts[b][0] / total_u28 * 100) if total_u28 else 0
-
-    drag_parts = []
-    for gid, u28, avail, lost in drags[:5]:
-        style = gid.split('-', 1)[1].title() if '-' in gid else gid
-        code = gid.split('-', 1)[0]
-        col = colour.get(gid) or '-'
-        drag_parts.append(f"{col} {style} {code} ({lost:.1f})")
-
-    block = (
-        f"## {today}\n\n"
-        f"- **Headline:** {headline:.1f}%\n"
-        f"- **READY-share of demand:** {pct('READY')}% ({counts['READY'][0]}u / {total_u28}u)\n"
-        f"- **Status breakdown:** READY {pct('READY')}% / PARTIAL {pct('PARTIAL')}% / "
-        f"THIN {pct('THIN')}% (by {DEMAND_WINDOW_DAYS}d units)\n"
-        f"- **Volume:** {DEMAND_WINDOW_DAYS}d {total_u28}u (~{round(d28)}/d) -> "
-        f"{MOMENTUM_WINDOW_DAYS}d {total_u7}u (~{round(d7)}/d) -> {pace}\n"
-        f"- **Top 5 drags:** " + ", ".join(drag_parts) + "\n"
-        f"- **Sensitivity (qty=1 full credit):** {headline_lenient:.1f}%"
-    ).strip()
-
-    with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
-        text = f.read()
-
-    idx = text.find('\n## ')
-    if idx == -1:
-        preamble = text.rstrip()
-        blocks = []
-    else:
-        preamble = text[:idx].rstrip()
-        blocks = ['## ' + b.strip() for b in text[idx:].split('\n## ') if b.strip()]
-
-    replaced = False
-    for i, b in enumerate(blocks):
-        if b.startswith(f"## {today}"):
-            # Preserve any hand-added judgment lines (everything after the
-            # Sensitivity metric line) — the script only refreshes metrics.
-            lines = b.split('\n')
-            tail = []
-            for j, ln in enumerate(lines):
-                if 'Sensitivity (qty=1' in ln:
-                    tail = [t for t in lines[j + 1:] if t.strip()]
-                    break
-            blocks[i] = block + ('\n' + '\n'.join(tail) if tail else '')
-            replaced = True
-            break
-    if not replaced:
-        blocks.append(block)
-
-    out = preamble + '\n\n' + '\n\n'.join(blocks) + '\n'
-    with open(SNAPSHOT_FILE, 'w', encoding='utf-8') as f:
-        f.write(out)
-
-    print(f"\n[snapshot {'updated' if replaced else 'appended'}: {today}]")
-
-
-def print_trend(n=7):
-    """Read snapshots.md and print the last n daily headlines as a compact trend,
-    so direction (supply catching up / wearing) is readable at a glance."""
-    try:
-        with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
-            text = f.read()
-    except FileNotFoundError:
-        return
-
-    entries = []
-    for m in re.finditer(r'^## (\d{4}-\d{2}-\d{2})', text, re.M):
-        seg = text[m.end():m.end() + 500]
-        hm = re.search(r'Headline:\**\s*([\d.]+)%', seg)
-        rm = re.search(r'READY-share of demand:\**\s*(\d+)%', seg)
-        if hm:
-            entries.append((m.group(1), float(hm.group(1)),
-                            int(rm.group(1)) if rm else None))
-    if len(entries) < 2:
-        return
-
-    entries = entries[-n:]
-    vals = [h for _, h, _ in entries]
-    lo, hi = min(vals), max(vals)
-    bars = '.:-=+*#@'  # ASCII ramp (Windows console is cp1252; block glyphs fail to encode)
-    spark = ''.join(
-        bars[3] if hi == lo else bars[round((v - lo) / (hi - lo) * (len(bars) - 1))]
-        for v in vals
-    )
-    arrow = ('rising' if vals[-1] - vals[0] > 1 else
-             'falling' if vals[0] - vals[-1] > 1 else 'flat')
-    print(f"\nTrend (last {len(entries)} snapshots, headline): {spark}  {arrow}")
-    for d, h, r in entries:
-        rs = f"   READY-share {r}%" if r is not None else ""
-        print(f"  {d}: {h:5.1f}%{rs}")
-
-
-def qty_credit(qty):
-    if qty >= 2:
+def depth_credit(qty):
+    """Gentle depth tiers: a single unit empties on the next sale (half credit);
+    3+ means we can push into the size (full credit)."""
+    if qty >= 3:
         return 1.0
+    if qty == 2:
+        return 0.8
     if qty == 1:
         return 0.5
     return 0.0
 
 
-def model_of(gid):
-    return gid.split('-', 1)[1] if '-' in gid else gid
+def _split(text):
+    """Return (preamble, rows) for the snapshot table.
+    preamble is the text before the table; rows is a list of dicts keyed by COLS."""
+    pre_lines, rows = [], []
+    seen_table = False
+    for ln in text.splitlines():
+        s = ln.strip()
+        if s.startswith('|'):
+            seen_table = True
+            cells = [c.strip() for c in s.strip('|').split('|')]
+            if cells and (cells[0] == 'Date' or set(cells[0]) <= set('-: ')):
+                continue  # header or separator row
+            rows.append({COLS[i]: (cells[i] if i < len(cells) else '') for i in range(len(COLS))})
+        elif not seen_table:
+            pre_lines.append(ln)
+    return '\n'.join(pre_lines).rstrip(), rows
 
 
-def score_styles(universe, stock, curve_for_gid):
-    """avail score per style = sum(size_weight * qty_credit) over the style's curve."""
-    out = {}
-    for gid, sizes in universe.items():
-        curve = curve_for_gid(gid, sizes)
-        out[gid] = sum(w * qty_credit(stock[gid].get(sz, 0)) for sz, w in curve.items())
-    return out
+def _render_md(rows):
+    header = '| ' + ' | '.join(COLS) + ' |'
+    sep = '|' + '|'.join('---' for _ in COLS) + '|'
+    body = ['| ' + ' | '.join(r.get(c, '') for c in COLS) + ' |' for r in rows]
+    return '\n'.join([header, sep] + body)
 
 
-def main(preview=False):
+def _render_ascii(rows):
+    """Aligned ASCII table for the console."""
+    widths = {c: max(len(c), *(len(r.get(c, '')) for r in rows)) for c in COLS} if rows \
+        else {c: len(c) for c in COLS}
+    line = lambda vals: '  ' + ' | '.join(v.rjust(widths[c]) for c, v in zip(COLS, vals))
+    out = [line(COLS), '  ' + '-+-'.join('-' * widths[c] for c in COLS)]
+    out += [line([r.get(c, '') for c in COLS]) for r in rows]
+    return '\n'.join(out)
+
+
+def write_snapshot(today, pct, overall, n_styles, full, partial, empty):
+    """Upsert today's row into the snapshots.md table (latest run of the day wins)."""
+    with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+        text = f.read()
+    preamble, rows = _split(text)
+
+    existed = today in {r['Date'] for r in rows}
+    by_date = {r['Date']: r for r in rows}
+    by_date[today] = {
+        'Date': today,
+        '38': f"{pct[38]}%", '39': f"{pct[39]}%", '40': f"{pct[40]}%",
+        'Overall': f"{round(overall)}%", 'Styles': str(n_styles),
+        'Full': str(full), 'Partial': str(partial), 'Empty': str(empty),
+    }
+    ordered = [by_date[d] for d in sorted(by_date)]
+
+    out = preamble + '\n\n' + _render_md(ordered) + '\n'
+    with open(SNAPSHOT_FILE, 'w', encoding='utf-8') as f:
+        f.write(out)
+    print(f"\n[snapshot {'updated' if existed else 'appended'}: {today}]")
+
+
+def print_recent(n=7):
+    """Print the last n daily rows as an aligned console table (trend at a glance)."""
+    try:
+        with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+            _, rows = _split(f.read())
+    except FileNotFoundError:
+        return
+    print(_render_ascii(rows[-n:]))
+
+
+def main(detail=False):
     conn = psycopg2.connect(**get_db_config())
     cur = conn.cursor()
 
-    # Per (groupid, size): size universe (from skumap), FREE stock qty, 28d Shopify units
-    cur.execute("""
+    # Every qualifying style + its FREE stock at each core size, in one pass.
+    #   - brand Birkenstock
+    #   - grid (skumap) offers ALL core sizes  -> drops men's-only grids (no 38)
+    # No sales filter: the denominator is the whole Birk core-size range.
+    core_list = ','.join(str(s) for s in CORE_SIZES)
+    cur.execute(f"""
         WITH birk AS (
             SELECT groupid, colour FROM skusummary WHERE brand = %s
         ),
-        universe AS (
-            SELECT sm.groupid,
-                   (REGEXP_REPLACE(sm.code, '^.*-', ''))::int AS size
+        grid AS (
+            SELECT sm.groupid
             FROM skumap sm
             JOIN birk b ON b.groupid = sm.groupid
             WHERE sm.deleted = 0 AND sm.code ~ '-[0-9]+$'
+              AND (REGEXP_REPLACE(sm.code, '^.*-', ''))::int IN ({core_list})
+            GROUP BY sm.groupid
+            HAVING COUNT(DISTINCT (REGEXP_REPLACE(sm.code, '^.*-', ''))::int) = {len(CORE_SIZES)}
         ),
-        stock AS (
+        corestock AS (
             SELECT ls.groupid,
                    (REGEXP_REPLACE(ls.code, '^.*-', ''))::int AS size,
                    SUM(ls.qty) AS qty
@@ -174,194 +142,70 @@ def main(preview=False):
             JOIN birk b ON b.groupid = ls.groupid
             WHERE ls.ordernum = '#FREE' AND ls.deleted = 0 AND ls.qty > 0
               AND ls.code ~ '-[0-9]+$'
-            GROUP BY 1, 2
-        ),
-        s28 AS (
-            SELECT s.groupid,
-                   (REGEXP_REPLACE(s.code, '^.*-', ''))::int AS size,
-                   SUM(s.qty) AS units
-            FROM sales s
-            JOIN birk b ON b.groupid = s.groupid
-            WHERE s.channel = %s AND s.qty > 0
-              AND s.solddate::date >= CURRENT_DATE - %s
-              AND s.code ~ '-[0-9]+$'
+              AND (REGEXP_REPLACE(ls.code, '^.*-', ''))::int IN ({core_list})
             GROUP BY 1, 2
         )
-        SELECT b.groupid, b.colour, u.size,
-               COALESCE(st.qty, 0) AS stock_qty,
-               COALESCE(s28.units, 0) AS units_28d
+        SELECT b.groupid, b.colour, cs.size, COALESCE(cs.qty, 0)
         FROM birk b
-        JOIN universe u ON u.groupid = b.groupid
-        LEFT JOIN stock st ON st.groupid = b.groupid AND st.size = u.size
-        LEFT JOIN s28 ON s28.groupid = b.groupid AND s28.size = u.size
-    """, (BRAND, CHANNEL, DEMAND_WINDOW_DAYS))
+        JOIN grid g ON g.groupid = b.groupid
+        LEFT JOIN corestock cs ON cs.groupid = b.groupid
+        ORDER BY b.groupid
+    """, (BRAND,))
 
     rows = cur.fetchall()
-
-    # Per-groupid 28d & 7d totals (independent: catches sales whose size isn't in current universe)
-    cur.execute("""
-        SELECT s.groupid,
-               SUM(s.qty) AS u28,
-               SUM(CASE WHEN s.solddate::date >= CURRENT_DATE - %s THEN s.qty ELSE 0 END) AS u7
-        FROM sales s
-        JOIN skusummary ss ON ss.groupid = s.groupid
-        WHERE ss.brand = %s AND s.channel = %s AND s.qty > 0
-          AND s.solddate::date >= CURRENT_DATE - %s
-        GROUP BY 1
-    """, (MOMENTUM_WINDOW_DAYS, BRAND, CHANNEL, DEMAND_WINDOW_DAYS))
-
-    totals = {gid: (int(u28), int(u7)) for gid, u28, u7 in cur.fetchall()}
-
-    # Per (groupid, size) units over a longer window, for building per-model size curves
-    cur.execute("""
-        SELECT s.groupid,
-               (REGEXP_REPLACE(s.code, '^.*-', ''))::int AS size,
-               SUM(s.qty) AS units
-        FROM sales s
-        JOIN skusummary ss ON ss.groupid = s.groupid
-        WHERE ss.brand = %s AND s.channel = %s AND s.qty > 0
-          AND s.solddate::date >= CURRENT_DATE - %s
-          AND s.code ~ '-[0-9]+$'
-        GROUP BY 1, 2
-    """, (BRAND, CHANNEL, CURVE_WINDOW_DAYS))
-    curve_rows = cur.fetchall()
-
     conn.close()
 
-    # Build per-groupid structures from the wide query
-    universe = defaultdict(set)
-    stock = defaultdict(dict)
+    qty = defaultdict(dict)
     colour = {}
-
-    for gid, col, size, stock_qty, _u28 in rows:
-        universe[gid].add(size)
-        if stock_qty > 0:
-            stock[gid][size] = int(stock_qty)
+    for gid, col, size, q in rows:
         colour[gid] = col
+        qty.setdefault(gid, {})
+        if size is not None:
+            qty[gid][int(size)] = int(q)
 
-    # Gender per style (from its size grid), then per-(model, gender) size curves,
-    # each blended toward the generic prior so thin models stay sane (see blend_curve).
-    gender = {gid: ('W' if curve_for(s) is WOMENS else 'M') for gid, s in universe.items()}
-    model_units = defaultdict(lambda: defaultdict(int))
-    for gid, size, units in curve_rows:
-        g = gender.get(gid) or ('W' if size <= 37 else 'M')
-        model_units[(model_of(gid), g)][size] += int(units)
-    model_curves = {}
-    for (model, g), su in model_units.items():
-        model_curves[(model, g)] = blend_curve(WOMENS if g == 'W' else MENS, su)
+    styles = sorted(qty)
+    n = len(styles)
 
-    def curve_for_gid(gid, sizes):
-        g = gender.get(gid) or ('W' if curve_for(sizes) is WOMENS else 'M')
-        return model_curves.get((model_of(gid), g)) or curve_for(sizes)
+    # Per-style core credit; Overall = mean across styles.
+    credit = {gid: sum(depth_credit(qty[gid].get(s, 0)) for s in CORE_SIZES) / len(CORE_SIZES)
+              for gid in styles}
+    overall = (sum(credit.values()) / n * 100.0) if n else 0.0
 
-    # Score each style on its per-model curve (sum(weight * qty_credit) over in-curve sizes)
-    score = score_styles(universe, stock, curve_for_gid)
+    # Per-size in-stock share.
+    pct = {}
+    for s in CORE_SIZES:
+        in_stock = sum(1 for gid in styles if qty[gid].get(s, 0) > 0)
+        pct[s] = round(in_stock / n * 100) if n else 0
 
-    # Brand headline: demand-weighted by 28d units
-    total_u28 = sum(t[0] for t in totals.values())
-    total_u7 = sum(t[1] for t in totals.values())
-    weighted = sum(totals[gid][0] * score.get(gid, 0.0) for gid in totals)
-    headline = (weighted / total_u28 * 100.0) if total_u28 else 0.0
-
-    # Preview: show the headline ladder (generic -> per-model -> recency-weighted) and
-    # how recency reweights the top styles. Writes nothing.
-    if preview:
-        score_gen = score_styles(universe, stock, lambda gid, sizes: curve_for(sizes))
-        headline_gen = (sum(totals[gid][0] * score_gen.get(gid, 0.0) for gid in totals)
-                        / total_u28 * 100.0) if total_u28 else 0.0
-        # Recency-weighted demand: blend recent 7d pace with the 28d baseline so the
-        # headline tilts to what's selling NOW (catches a fast-shifting model mix).
-        eff = {gid: RECENCY_ALPHA * 4 * u7 + (1 - RECENCY_ALPHA) * u28
-               for gid, (u28, u7) in totals.items()}
-        total_eff = sum(eff.values()) or 1.0
-        headline_rec = sum(eff[gid] * score.get(gid, 0.0) for gid in totals) / total_eff * 100.0
-        print(f"=== PREVIEW ({date.today()}) ===\n")
-        print("Headline ladder:")
-        print(f"  generic curve, 28d demand     {headline_gen:5.1f}%")
-        print(f"  per-model curve, 28d demand   {headline:5.1f}%   ({headline - headline_gen:+.1f})")
-        print(f"  per-model curve, recency-wt   {headline_rec:5.1f}%   ({headline_rec - headline:+.1f})"
-              f"  [alpha={RECENCY_ALPHA}]\n")
-        hdr = (f"{'GroupID':<22} {'Colour':<12} {'u28':>4} {'u7':>3} {'mdl%':>5} "
-               f"{'28d-wt':>6} {'rec-wt':>6}  status")
-        print(hdr); print('-' * len(hdr))
-        for gid, (u28, u7) in sorted(totals.items(), key=lambda kv: eff.get(kv[0], 0), reverse=True)[:18]:
-            am = score.get(gid, 0.0) * 100
-            st = 'READY' if am >= 70 else ('PARTIAL' if am >= 40 else 'THIN')
-            print(f"{gid:<22} {(colour.get(gid) or '-')[:12]:<12} {u28:>4} {u7:>3} {am:>4.0f}% "
-                  f"{u28 / total_u28 * 100:>5.1f}% {eff[gid] / total_eff * 100:>5.1f}%  {st}")
-        print("\n(preview only - snapshot not written)")
-        return
-
-    # Curve split for context
-    w_styles = sum(1 for gid in universe if curve_for(universe[gid]) is WOMENS)
-    m_styles = sum(1 for gid in universe if curve_for(universe[gid]) is MENS)
-
-    # Output
-    print(f"=== Birkenstock stock availability  ({date.today()}) ===\n")
-    print(f"Headline: {headline:.1f}%  (demand-weighted, units, last {DEMAND_WINDOW_DAYS}d)")
-    print(f"Shopify units  last {DEMAND_WINDOW_DAYS}d: {total_u28:>4}   last {MOMENTUM_WINDOW_DAYS}d: {total_u7:>3}")
-    print(f"Groupids:      {len(universe)} total  ({w_styles} women's-curve, {m_styles} men's-curve)\n")
-
-    top = sorted(totals.items(), key=lambda kv: kv[1][0], reverse=True)[:TOP_N]
-    print(f"Top {len(top)} groupids by {DEMAND_WINDOW_DAYS}d units:")
-    header = f"{'#':>2}  {'GroupID':<24} {'Colour':<16} {'C':<2} {'Avail':>6} {'u28':>4} {'u7':>3} {'pace':>5}  Status"
-    print(header)
-    print("-" * len(header))
-    for i, (gid, (u28, u7)) in enumerate(top, 1):
-        curve_obj = curve_for(universe.get(gid, set()))
-        c = 'W' if curve_obj is WOMENS else 'M'
-        avail = score.get(gid, 0.0) * 100.0
-        if u28 < 4:
-            pace = '.'
+    # Completeness bands: styles by # of core sizes in stock.
+    full = partial = empty = 0
+    for gid in styles:
+        c = sum(1 for s in CORE_SIZES if qty[gid].get(s, 0) > 0)
+        if c == len(CORE_SIZES):
+            full += 1
+        elif c == 0:
+            empty += 1
         else:
-            ratio = u7 / (u28 / 4.0)
-            pace = 'up' if ratio >= 1.25 else ('down' if ratio <= 0.75 else 'flat')
-        status = 'READY' if avail >= 70 else ('PARTIAL' if avail >= 40 else 'THIN')
-        col = (colour.get(gid) or '-')[:16]
-        print(f"{i:>2}  {gid:<24} {col:<16} {c:<2} {avail:>5.0f}% {u28:>4} {u7:>3} {pace:>5}  {status}")
+            partial += 1
 
-    # Demand-weighted status breakdown (selling groupids only)
-    def bucket(s): return 'READY' if s >= 70 else ('PARTIAL' if s >= 40 else 'THIN')
-    counts = defaultdict(lambda: [0, 0])  # bucket -> [units, groupids]
-    for gid, (u28, _) in totals.items():
-        b = bucket(score.get(gid, 0.0) * 100.0)
-        counts[b][0] += u28
-        counts[b][1] += 1
-    print(f"\nDemand by status (last {DEMAND_WINDOW_DAYS}d, selling groupids only):")
-    for b in ('READY', 'PARTIAL', 'THIN'):
-        u, n = counts[b]
-        pct = (u / total_u28 * 100) if total_u28 else 0
-        print(f"  {b:<8}: {u:>4}u ({pct:>4.0f}%)  on {n:>3} groupids")
+    today = str(date.today())
+    write_snapshot(today, pct, overall, n, full, partial, empty)
 
-    # Biggest drags: u28 * (1 - score) = expected lost units
-    drags = sorted(
-        ((gid, u28, score.get(gid, 0.0) * 100, u28 * (1 - score.get(gid, 0.0)))
-         for gid, (u28, _) in totals.items()),
-        key=lambda x: x[3], reverse=True
-    )[:10]
-    print(f"\nTop 10 biggest drags (lost demand units = u28 * (1 - avail)):")
-    print(f"{'#':>2}  {'GroupID':<24} {'Colour':<16} {'Avail':>6} {'u28':>4} {'lost':>5}")
-    for i, (gid, u28, avail, lost) in enumerate(drags, 1):
-        col = (colour.get(gid) or '-')[:16]
-        print(f"{i:>2}  {gid:<24} {col:<16} {avail:>5.0f}% {u28:>4} {lost:>5.1f}")
+    print(f"=== Birkenstock core-size availability ===\n")
+    print_recent()
 
-    # Sensitivity: qty=1 -> full credit (vs. default half)
-    lenient = {}
-    for gid, sizes in universe.items():
-        curve = curve_for_gid(gid, sizes)
-        lenient[gid] = sum(
-            w * (1.0 if stock[gid].get(sz, 0) >= 1 else 0.0)
-            for sz, w in curve.items()
-        )
-    headline_lenient = (
-        sum(totals[gid][0] * lenient.get(gid, 0.0) for gid in totals) / total_u28 * 100
-        if total_u28 else 0
-    )
-    print(f"\nSensitivity (qty=1 as full credit, not half): headline -> {headline_lenient:.1f}%")
-
-    write_snapshot(headline, total_u28, total_u7, counts, drags, headline_lenient, colour)
-    print_trend()
+    if detail:
+        # Weakest coverage first — the prune/restock shortlist.
+        gaps = sorted(styles, key=lambda g: (credit[g], g))
+        hdr = (f"\n{'#':>3}  {'GroupID':<24} {'Colour':<16} "
+               + ' '.join(f"{str(s):>3}" for s in CORE_SIZES) + f" {'Core%':>6}")
+        print(hdr)
+        print("  " + "-" * (len(hdr) - 3))
+        for i, gid in enumerate(gaps, 1):
+            cells = ' '.join(f"{qty[gid].get(s, 0):>3}" for s in CORE_SIZES)
+            col = (colour.get(gid) or '-')[:16]
+            print(f"{i:>3}  {gid:<24} {col:<16} {cells} {credit[gid] * 100:>5.0f}%")
 
 
 if __name__ == '__main__':
-    main(preview='--preview' in sys.argv)
+    main(detail='--detail' in sys.argv)

@@ -6,16 +6,16 @@ Snapshot of Birkenstock stock health to decide whether to push or scale back Goo
 
 One question: **is the stock position strong enough to justify pushing ads right now?**
 
-No point pushing traffic if the top sellers are out, or if the popular sizes are missing on the styles that are actually selling.
+No point pushing traffic if the women's core sizes (38/39/40) are missing across the Birkenstock range. We measure that directly — every style that *should* carry those sizes, scored on whether it actually does.
 
-The metric doesn't need to be 100% correct — we want a position we can be **confident** about, not a perfect number.
+We want a position we can be **confident** about. Target is 100%: every in-range style holding its core sizes. Stragglers that sit empty are a signal to restock or to drop them from the range — not something to filter out of the number.
 
 ## Scope
 
 In scope:
 - **Birkenstock brand only**, strict (`skusummary.brand = 'Birkenstock'` — verify exact string).
 - **Stock = FREE rows in `localstock`**: `ordernum = '#FREE' AND deleted = 0 AND qty > 0`. Nothing else.
-- Recent unit-level demand vs current size-level stock.
+- **Every** style whose grid offers 38/39/40 — no sales/demand filter.
 - A headline metric + breakdowns so the headline can be sanity-checked.
 
 Out of scope (handle outside this process):
@@ -24,81 +24,77 @@ Out of scope (handle outside this process):
 - **Pipeline / Birktracker / in-transit** — not counted. Only what is physically FREE now. (May reintroduce Birktracker later as a separate "what's coming" view; not now.)
 - **Channel split** — single combined view for v1.
 
-## Core metric
+## Core metric (v1 — "can the core customer buy?")
 
-**Demand-weighted availability, weighted by units.** Of the units we'd expect to sell over the recent window, what % can we actually fulfil from current FREE stock?
+**Core-size depth-coverage, equal weight per style. No sales filter.** Across *every* Birkenstock style whose grid offers the women's core sizes (38/39/40), what fraction of those core slots are stocked — credited gently by depth so a single unit (empties on the next sale) counts less than a real cushion?
 
-Roll-up: brand headline → style (groupid) → size within style.
+One number, 0–100%. Roll-up: brand headline ← mean over all core slots ← per-style core grid.
+
+**Target is 100%.** Every style in the range *should* hold its core sizes. A style sitting empty on 38/39/40 isn't noise to be filtered out — it's either a restock gap or a straggler that should be dropped from the range. That's the owner's call; the gauge's job is to surface it, not to hide it behind a demand filter. We deliberately do **not** weight by sales: a demand cut just flatters the number by ignoring the styles we've let go thin.
+
+Designed (2 Jun 2026) to replace the earlier demand-weighted whole-grid metric + per-model size curves — dropped as over-engineered. ~10× simpler, fully explainable in one sentence.
 
 ### Settled parameters
 
-- **Demand window**: 28d trailing for the score. Also compute 7d alongside as a "recent acceleration / deceleration" arrow per top style. Headline = 28d.
-- **Weighting**: units sold.
-- **Low-stock credit (per size)**: qty ≥ 2 = full, qty = 1 = half, qty = 0 = none.
-- **Demand scope**: Shopify-only (`channel = 'SHP'`). Amazon has no Birk sales; CM3 (shop) is minimal — exclude.
-- **Size weight within a style**: rules-based — see [Size weighting](#size-weighting) below.
+- **Denominator (styles in scope)**: every Birkenstock style whose grid (`skumap`, `deleted = 0`) offers all of 38/39/40. **No sales/demand filter.** Requiring 38/39/40 in the grid drops men's-only grids (no 38). ~125 styles today.
+- **Core sizes**: 38, 39, 40 (women's core).
+- **Depth credit (per core size, from FREE stock qty)**: 0 → 0, 1 → 0.5, 2 → 0.8, 3+ → 1.0.
+- **Per-style credit**: mean of its three core-slot credits.
+- **Headline**: mean credit across all core slots (equal weight per style, since each contributes exactly 3 slots). Target 100%.
 
-## Breakdowns
+The honest signal this gives today (~33%): the core is genuinely thin across the range — lots of styles empty on 38/39/40 — so the number says "don't be over-confident pushing" until either stock fills in or the dead stragglers are pruned out of the range.
 
-1. **Style (groupid) traffic light** — top N groupids by recent units, each in-stock / partial / out. Sanity check against the headline.
-2. **Size coverage within style** — score size availability weighted by which sizes actually sell on that style.
+## Output — locked format
+
+One at-a-glance table, **one row per day**:
+
+| Date | 38 | 39 | 40 | Overall | Styles | Full | Partial | Empty |
+|---|---|---|---|---|---|---|---|---|
+| 2026-06-02 | 40% | 36% | 47% | 33% | 125 | 28 | 52 | 45 |
+
+- **38 / 39 / 40** — % of in-range styles with that size in FREE stock (the per-size weak-spot read).
+- **Overall** — the headline: depth-weighted core coverage, target 100% (see [Core metric](#core-metric-v1--can-the-core-customer-buy)).
+- **Styles** — number of in-scope styles (Birk grids offering 38/39/40).
+- **Full / Partial / Empty** — styles by how many core sizes are in stock: **Full** = all 3, **Partial** = 1–2, **Empty** = 0. (`Full + Partial + Empty = Styles`.)
+
+The console prints the last ~7 days of this table (trend at a glance). `availability.py --detail` additionally prints the weakest-first per-style grid — the prune/restock shortlist — but that is off by default; the table is the whole result.
+
+This is the only output. No status buckets, no drag list, no sparkline — locked 2 Jun 2026.
 
 ## Data sources
 
-- **Demand** — `sales` table.
+- **Size grid (denominator)** — `skumap` where `deleted = 0`; a style is in scope if its grid offers all of 38/39/40.
 - **Current stock per size** — `localstock` where `ordernum = '#FREE' AND deleted = 0 AND qty > 0`, joined to `skumap` for size labels.
 - **Brand filter** — `skusummary.brand = 'Birkenstock'`.
+- **No `sales` query** — the gauge is sales-independent by design.
 
 **Do NOT use:** `skusummary.stockvariants`, `skusummary.variants`, `skumap.shopifyprice`, `skusummary.ignore_auto_price`. All stale/legacy — see project CLAUDE.md.
 
 ## Size weighting
 
-Two replacement curves, women's and men's, each summing to 1.0 across its defined sizes.
-
-**Assignment rule (women's priority):** a groupid is classified women's if its size universe (from `skumap`) contains any size ≤ 37; otherwise men's. This correctly classifies pure women's grids (35–43) and unisex grids that include small sizes (e.g. Boston 36–46) as women's, and reserves the men's curve for men's-only grids (39–47).
-
-Sizes present on a style but absent from its assigned curve contribute 0 to availability — accepted as a small distortion, revisit only if it skews real outputs.
-
-Values and the `curve_for(size_universe)` helper live in `size_weights.py`.
+None. The earlier metric weighted each size within a style by a women's/men's replacement curve (`size_weights.py`, since deleted). v1 counts only the three core sizes, each equally.
 
 ## Cadence
 
 Ad-hoc, on user request. No materialisation, no dashboard tile.
 
-## Reading the output
+## Reading the table
 
-The script prints five blocks; read them together:
+- **Overall** is the one number — depth-weighted core coverage, target 100%. Read it as direction over time, not against a fixed cutoff.
+- **38 / 39 / 40** show which size is the weak spot (e.g. today 39 is worst at 36%, 40 best at 47%).
+- **Full / Partial / Empty** is the completeness split. A high Empty count is the prune-or-restock signal: those styles either need core stock or should be dropped from the range. Run `--detail` to see exactly which.
 
-1. **Headline** — demand-weighted availability across all selling styles.
-2. **Status breakdown** — how 28d demand splits across READY / PARTIAL / THIN. The **READY-share of demand** is the most actionable headline-level number alongside (1).
-3. **Top drags** — styles eating the most "lost demand units". Long-tail THIN (u28 < 5) is noise — ignore. **These are not a restock list** — Birkenstock ordering is a 6-month cycle. They inform: (a) whether to pay a held supplier invoice now to release allocated stock, and (b) the pattern that feeds the next 6-month order.
-4. **Sensitivity** — what the headline becomes if qty=1 counts as full credit. <10pt difference means qty=1 isn't the driver.
-5. **Trend** — last ~7 daily headlines + READY-share with an ASCII sparkline and rising/falling/flat arrow, read straight from `snapshots.md`. Direction is the signal: rising = supply catching up (ceiling can lift); falling = engine wearing.
+### How the number is used
 
-### Push / hold / pull (suggested, not a rule)
+No push/hold/pull thresholds. This is a stock-health number, nothing more — it's read separately and weighed by judgment when making budget decisions, not run through a fixed rule. (Thresholds may be reintroduced once there are enough lived readings to calibrate them.)
 
-| Headline | READY-share | Default |
-|---|---|---|
-| ≥55% | ≥40% | Push |
-| 40–55% | 20–40% | Hold |
-| <40% | <20% | Pull |
+### Snapshots
 
-**Headline gates budget *increases*; ROAS governs *holding*.** This is now a first-class gate in `google-ads/BUDGET_REVIEW_PROCESS.md` (promoted 30 May), not advisory. A low/falling headline caps the **ceiling** — don't scale budget onto grids you can't fulfil (a falling headline 49.6 → 44.8 ran straight through the failed £180 push). But it does **not** force a cut: strong ROAS keeps current spend profitable well below 55% headline because scarcity still converts the last units at full price. So — low/falling headline → don't raise; healthy ROAS at the current cap → don't cut.
-
-**The ceiling only rises when the headline *actually* rises.** Run the report whenever — it's ad-hoc and run often, not triggered by deliveries. The point is the live number: read it, and raise budget only once it has genuinely lifted. We read landed stock, never forecast incoming — Birkenstock may not ship it, or we may not expedite it (this is why pipeline is out of scope above). Note: **raw arrivals ≠ position lift** — ~700u landed across May 2026 while the headline *fell*, because they went to the shoulders, not the selling mid-sizes. Only the demand-weighted number counts.
-
-### Between snapshots — what to monitor
-
-- **Direction of READY-share** (rising = supply catching up; falling = engine wearing)
-- **Top-5 drag persistence** — same styles dominating run after run means supply isn't being fixed
-- **ROAS in parallel** (separate dashboard) — the lagging indicator
-
-`availability.py` auto-writes one metrics block per day to `snapshots.md` (latest run of
-the day overwrites earlier same-day runs). Judgment/context lines are added by hand
-in-session; the script only writes/overwrites the measured metrics.
+`availability.py` auto-writes one row per day to the table in `snapshots.md` (latest run of
+the day overwrites that day's row). Metrics only — no commentary. Budget/ad decisions belong
+in `google-ads/BUDGET_REVIEW_PROCESS.md`, not here.
 
 ## Files
 
-- `size_weights.py` — women's & men's size-weight curves + assignment helper.
-- `availability.py` — ad-hoc snapshot script. Run with `python birk-stock/availability.py`.
+- `availability.py` — ad-hoc core-size gauge. Run with `python birk-stock/availability.py`.
 - `snapshots.md` — daily metrics log (auto-written, one block per day) for trend comparison.
