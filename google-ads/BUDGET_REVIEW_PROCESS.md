@@ -15,7 +15,7 @@ The whole process is three reads — **sales, cost, budget** — plus a record o
   - **tROAS has never moved — review it post-event.** Held 400% since Feb; every change for 6 weeks has been budget-only. Two things the constant hides: (1) the 400% target lets Google buy down to **4x marginal — one notch below our stated 5x floor**, which is exactly where the £180 junk spend lived; (2) in a *thinning* market a budget cap forces spend down the quality curve, whereas tROAS throttles on quality automatically — it's the lever built for the season we're entering. **Not a same-day move** (we just changed budget; tROAS needs a 5–7 day re-learn, and one lever at a time). Test signal: once budget settles, if average ROAS still runs 2–3x the target on a stable cap, raise 400% → 500% to align the bid target with the 5x floor.
   - **Conversion baseline:** Mar 12.1% → Apr 8.7% → May 7.4% median (June MTD 7.5%; recovered to ~9% in the 19–25 May window). Watch as the cap rises.
 
-### Recent changes (replaces the old change log — keep last ~6, one line each)
+### Recent changes (replaces the old change log — keep last ~4, one line each)
 
 | Date | Move | Why |
 |------|------|-----|
@@ -23,10 +23,8 @@ The whole process is three reads — **sales, cost, budget** — plus a record o
 | 2026-05-30 | STANDARD £180 → £100 (tROAS 400%) | £180 failed its first full day: 29 May ran £204 for +1 click vs 28 May, CPC +28%, conv 6.8%→5.2%, ROAS 10x→6.7x — marginal ROAS negative. Imp share pinned 88–90% (captured pool, no demand to buy above ~£150). Demand thinning independent of budget (gross £2,972 26 May → £1,367 29 May), heat subsiding + school back. Landed £100 not £80 as 30 May Saturday opened strong — inside the proven 10–13x band. |
 | 2026-05-28 ~23:00 | STANDARD £150 → £180 (tROAS 400%) — **reverted 30 May** | Thesis was expanding pool / firming marginal ROAS. Wrong: at 88–90% imp share the increment bought impressions not clicks. Don't push budget above ~£150 at this tROAS. |
 | 2026-05-23 ~13:00 | STANDARD £120 → £150 (tROAS 400%) | Second step same day — heatwave still running, signals green, riding the wave. Held 26 May: 5-day weekly ROAS 12.9x, conv% recovered to 9.4%. |
-| 2026-05-23 | STANDARD £100 → £120 (tROAS 400%) | Heatwave. 4-day blended ROAS 13x at £100, imp share 91% on an *expanding* pool, Google overspending to £104/day. Ride the wave; cut sharply when heat breaks. |
-| 2026-05-19 | STANDARD £72 → £100 (tROAS 400%) | True imp share ~78% not 86–93% (PMAX-inflated); ROAS ~12x; Google overspending £72. Ceiling ~£100. |
 
-> **Update this block whenever you change anything.** It is the single source of truth for "what's true today" and "what changed recently". There is no separate change log — git history holds anything older than the trail above.
+> **Update this block whenever you change anything.** It is the single source of truth for "what's true today" and "what changed recently". Keep ~4 rows; git history holds anything older.
 
 ### custom_label_0 conventions
 
@@ -99,6 +97,15 @@ Three numbers tell you which lever is the constraint:
 
 - **Budget:** default ~20% step when criteria met, round to £1. Smaller (£2–4) when the algorithm is on a good trajectory. Hold/slow if ROAS <7x or instability after an increase. No fixed schedule — read signals, not dates.
 - **tROAS (currently 400%):** *Lower* (→300%) when imp share <85% AND spend below cap (volume play). *Raise* (→500%) when imp share 85%+ AND marginal ROAS <5x, or 7d ROAS sliding on a ramp (efficiency play). One lever at a time; give it 5–7 days to re-learn. Don't move it just because you can.
+
+### Stock availability (Birk core sizes) — a consideration, not a gate
+
+`birk-stock/availability.py` gives one number: depth-weighted coverage of the women's core sizes (38/39/40) across every Birk style that should carry them (target 100%; today ~33%). It is a **confidence modifier on how hard to push**, never the go/no-go. The go/no-go stays imp share + ROAS.
+
+- **A low number and high ROAS are not a contradiction.** The headline measures *range completeness*, not whether the traffic we buy can be fulfilled. tROAS already steers spend to the in-stock, converting styles; the empty stragglers drag the % but draw almost no spend. So 33% coverage at 11x ROAS → keep pushing; see how far imp share + ROAS let us go.
+- **Rising coverage → more headroom** — add budget *if* imp share is short and ROAS healthy. The gauge only moves on core-size (38/39/40) arrivals, so a lift is a real lift (shoulder dumps don't fake it). **Caveat:** pruning dead styles also raises the number without adding demand — use the Full/Partial/Empty split to tell a *restock*-lift (new demand to buy) from a *prune*-lift (just honesty). Only the restock kind justifies more budget.
+- **Falling coverage → push efficiency, not volume.** As the core drains toward the next 6-month delivery, lean on tROAS (the quality throttle) over budget, and treat each step more cautiously — we're buying into thinning fulfillment.
+- **It also drives pruning.** Empty styles with no demand are drop candidates (`availability.py --detail` lists weakest-first); culling them is the owner's job over the 6-month wait and honestly lifts the number.
 
 ---
 

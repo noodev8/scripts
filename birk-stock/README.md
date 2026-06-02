@@ -86,7 +86,7 @@ Ad-hoc, on user request. No materialisation, no dashboard tile.
 
 ### How the number is used
 
-No push/hold/pull thresholds. This is a stock-health number, nothing more — it's read separately and weighed by judgment when making budget decisions, not run through a fixed rule. (Thresholds may be reintroduced once there are enough lived readings to calibrate them.)
+It feeds Google Ads budget decisions as a **consideration, not a gate** — full principle in `google-ads/BUDGET_REVIEW_PROCESS.md` ("Stock availability (Birk core sizes)"). In short: it's a confidence modifier on *how hard* to push; the go/no-go stays imp share + ROAS. A low number and high ROAS aren't a contradiction — the headline is range completeness, not fulfillability of the traffic we buy, and spend self-steers to the in-stock styles. Rising coverage = more headroom to add budget (if imp share short, ROAS healthy); falling coverage = lean on tROAS and push more cautiously into thinning fulfillment. No fixed push/hold/pull thresholds.
 
 ### Snapshots
 
