@@ -8,10 +8,12 @@ import psycopg2
 from collections import defaultdict
 from datetime import date
 from logging_utils import get_db_config
-from size_weights import WOMENS, MENS, curve_for
+from size_weights import WOMENS, MENS, curve_for, blend_curve
 
 DEMAND_WINDOW_DAYS = 28
 MOMENTUM_WINDOW_DAYS = 7
+CURVE_WINDOW_DAYS = 90   # window for building per-model size curves (longer = stabler shape)
+RECENCY_ALPHA = 0.5      # demand-weight tilt to recent pace: eff = a*4*u7 + (1-a)*u28 (0=pure 28d)
 CHANNEL = 'SHP'
 BRAND = 'Birkenstock'
 TOP_N = 25
@@ -135,7 +137,20 @@ def qty_credit(qty):
     return 0.0
 
 
-def main():
+def model_of(gid):
+    return gid.split('-', 1)[1] if '-' in gid else gid
+
+
+def score_styles(universe, stock, curve_for_gid):
+    """avail score per style = sum(size_weight * qty_credit) over the style's curve."""
+    out = {}
+    for gid, sizes in universe.items():
+        curve = curve_for_gid(gid, sizes)
+        out[gid] = sum(w * qty_credit(stock[gid].get(sz, 0)) for sz, w in curve.items())
+    return out
+
+
+def main(preview=False):
     conn = psycopg2.connect(**get_db_config())
     cur = conn.cursor()
 
@@ -197,6 +212,20 @@ def main():
 
     totals = {gid: (int(u28), int(u7)) for gid, u28, u7 in cur.fetchall()}
 
+    # Per (groupid, size) units over a longer window, for building per-model size curves
+    cur.execute("""
+        SELECT s.groupid,
+               (REGEXP_REPLACE(s.code, '^.*-', ''))::int AS size,
+               SUM(s.qty) AS units
+        FROM sales s
+        JOIN skusummary ss ON ss.groupid = s.groupid
+        WHERE ss.brand = %s AND s.channel = %s AND s.qty > 0
+          AND s.solddate::date >= CURRENT_DATE - %s
+          AND s.code ~ '-[0-9]+$'
+        GROUP BY 1, 2
+    """, (BRAND, CHANNEL, CURVE_WINDOW_DAYS))
+    curve_rows = cur.fetchall()
+
     conn.close()
 
     # Build per-groupid structures from the wide query
@@ -210,20 +239,58 @@ def main():
             stock[gid][size] = int(stock_qty)
         colour[gid] = col
 
-    # Score each style: sum(curve_weight * qty_credit) over in-curve sizes
-    score = {}
-    for gid, sizes in universe.items():
-        curve = curve_for(sizes)
-        s = 0.0
-        for sz, w in curve.items():
-            s += w * qty_credit(stock[gid].get(sz, 0))
-        score[gid] = s
+    # Gender per style (from its size grid), then per-(model, gender) size curves,
+    # each blended toward the generic prior so thin models stay sane (see blend_curve).
+    gender = {gid: ('W' if curve_for(s) is WOMENS else 'M') for gid, s in universe.items()}
+    model_units = defaultdict(lambda: defaultdict(int))
+    for gid, size, units in curve_rows:
+        g = gender.get(gid) or ('W' if size <= 37 else 'M')
+        model_units[(model_of(gid), g)][size] += int(units)
+    model_curves = {}
+    for (model, g), su in model_units.items():
+        model_curves[(model, g)] = blend_curve(WOMENS if g == 'W' else MENS, su)
+
+    def curve_for_gid(gid, sizes):
+        g = gender.get(gid) or ('W' if curve_for(sizes) is WOMENS else 'M')
+        return model_curves.get((model_of(gid), g)) or curve_for(sizes)
+
+    # Score each style on its per-model curve (sum(weight * qty_credit) over in-curve sizes)
+    score = score_styles(universe, stock, curve_for_gid)
 
     # Brand headline: demand-weighted by 28d units
     total_u28 = sum(t[0] for t in totals.values())
     total_u7 = sum(t[1] for t in totals.values())
     weighted = sum(totals[gid][0] * score.get(gid, 0.0) for gid in totals)
     headline = (weighted / total_u28 * 100.0) if total_u28 else 0.0
+
+    # Preview: show the headline ladder (generic -> per-model -> recency-weighted) and
+    # how recency reweights the top styles. Writes nothing.
+    if preview:
+        score_gen = score_styles(universe, stock, lambda gid, sizes: curve_for(sizes))
+        headline_gen = (sum(totals[gid][0] * score_gen.get(gid, 0.0) for gid in totals)
+                        / total_u28 * 100.0) if total_u28 else 0.0
+        # Recency-weighted demand: blend recent 7d pace with the 28d baseline so the
+        # headline tilts to what's selling NOW (catches a fast-shifting model mix).
+        eff = {gid: RECENCY_ALPHA * 4 * u7 + (1 - RECENCY_ALPHA) * u28
+               for gid, (u28, u7) in totals.items()}
+        total_eff = sum(eff.values()) or 1.0
+        headline_rec = sum(eff[gid] * score.get(gid, 0.0) for gid in totals) / total_eff * 100.0
+        print(f"=== PREVIEW ({date.today()}) ===\n")
+        print("Headline ladder:")
+        print(f"  generic curve, 28d demand     {headline_gen:5.1f}%")
+        print(f"  per-model curve, 28d demand   {headline:5.1f}%   ({headline - headline_gen:+.1f})")
+        print(f"  per-model curve, recency-wt   {headline_rec:5.1f}%   ({headline_rec - headline:+.1f})"
+              f"  [alpha={RECENCY_ALPHA}]\n")
+        hdr = (f"{'GroupID':<22} {'Colour':<12} {'u28':>4} {'u7':>3} {'mdl%':>5} "
+               f"{'28d-wt':>6} {'rec-wt':>6}  status")
+        print(hdr); print('-' * len(hdr))
+        for gid, (u28, u7) in sorted(totals.items(), key=lambda kv: eff.get(kv[0], 0), reverse=True)[:18]:
+            am = score.get(gid, 0.0) * 100
+            st = 'READY' if am >= 70 else ('PARTIAL' if am >= 40 else 'THIN')
+            print(f"{gid:<22} {(colour.get(gid) or '-')[:12]:<12} {u28:>4} {u7:>3} {am:>4.0f}% "
+                  f"{u28 / total_u28 * 100:>5.1f}% {eff[gid] / total_eff * 100:>5.1f}%  {st}")
+        print("\n(preview only - snapshot not written)")
+        return
 
     # Curve split for context
     w_styles = sum(1 for gid in universe if curve_for(universe[gid]) is WOMENS)
@@ -281,7 +348,7 @@ def main():
     # Sensitivity: qty=1 -> full credit (vs. default half)
     lenient = {}
     for gid, sizes in universe.items():
-        curve = curve_for(sizes)
+        curve = curve_for_gid(gid, sizes)
         lenient[gid] = sum(
             w * (1.0 if stock[gid].get(sz, 0) >= 1 else 0.0)
             for sz, w in curve.items()
@@ -297,4 +364,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(preview='--preview' in sys.argv)
