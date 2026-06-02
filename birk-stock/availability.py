@@ -1,21 +1,21 @@
 """Birkenstock core-size availability gauge for Google Ads push/scale-back decisions.
 
-One question: can the core customer buy? Across EVERY Birkenstock style whose grid
-offers the women's core sizes (38/39/40) — no sales filter — we score each style on
-whether it actually holds those sizes, credited gently by stock depth. Target 100%;
-thin stragglers drag it down and are the owner's to prune.
+One question: how many styles can the core customer actually buy? Across EVERY
+Birkenstock style whose grid offers the women's core sizes (38/39/40) — no sales
+filter — we count the styles that hold ALL THREE core sizes in FREE stock ("Full").
+Full is the decision number: the breadth of core-complete product ad spend can ride.
 
 LOCKED OUTPUT — one at-a-glance table, one row per day:
 
-  | Date | 38 | 39 | 40 | Overall | Styles | Full | Partial | Empty |
+  | Date | Full | Styles | Full % |
 
-  - 38 / 39 / 40 : % of in-range styles with that size in FREE stock.
-  - Overall      : depth-weighted core coverage (the headline; target 100%).
-                   Per slot: qty 0->0, 1->0.5, 2->0.8, 3+->1.0; per style = mean of
-                   its 3 core slots; Overall = mean across all styles.
-  - Full / Partial / Empty : styles by how many core sizes are in stock (3 / 1-2 / 0).
+  - Full    : styles with all 3 core sizes (38/39/40) in FREE stock. The number you
+              act on — push capacity. Any qty counts (1+1+1 is Full).
+  - Styles  : total in-range styles (Birk grids offering 38/39/40). The ceiling.
+  - Full %  : Full / Styles. Progress toward a fully stocked range; read as trend.
 
-Run with --detail to also print the weakest-first per-style grid (the prune list).
+Partials (1-2 of 3) are a hidden bonus, not tracked here. Run with --detail for the
+per-size breakdown (what's blocking Full) and the weakest-first prune list.
 See birk-stock/README.md for the full design.
 """
 import sys, os
@@ -30,19 +30,7 @@ BRAND = 'Birkenstock'
 SNAPSHOT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'snapshots.md')
 
 # Snapshot table columns — metrics only.
-COLS = ['Date', '38', '39', '40', 'Overall', 'Styles', 'Full', 'Partial', 'Empty']
-
-
-def depth_credit(qty):
-    """Gentle depth tiers: a single unit empties on the next sale (half credit);
-    3+ means we can push into the size (full credit)."""
-    if qty >= 3:
-        return 1.0
-    if qty == 2:
-        return 0.8
-    if qty == 1:
-        return 0.5
-    return 0.0
+COLS = ['Date', 'Full', 'Styles', 'Full %']
 
 
 def _split(text):
@@ -80,20 +68,17 @@ def _render_ascii(rows):
     return '\n'.join(out)
 
 
-def write_snapshot(today, pct, overall, n_styles, full, partial, empty):
+def write_snapshot(today, full, n_styles):
     """Upsert today's row into the snapshots.md table (latest run of the day wins)."""
+    full_pct = round(full / n_styles * 100) if n_styles else 0
     with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
         text = f.read()
     preamble, rows = _split(text)
 
     existed = today in {r['Date'] for r in rows}
     by_date = {r['Date']: r for r in rows}
-    by_date[today] = {
-        'Date': today,
-        '38': f"{pct[38]}%", '39': f"{pct[39]}%", '40': f"{pct[40]}%",
-        'Overall': f"{round(overall)}%", 'Styles': str(n_styles),
-        'Full': str(full), 'Partial': str(partial), 'Empty': str(empty),
-    }
+    by_date[today] = {'Date': today, 'Full': str(full),
+                      'Styles': str(n_styles), 'Full %': f"{full_pct}%"}
     ordered = [by_date[d] for d in sorted(by_date)]
 
     out = preamble + '\n\n' + _render_md(ordered) + '\n'
@@ -166,45 +151,34 @@ def main(detail=False):
     styles = sorted(qty)
     n = len(styles)
 
-    # Per-style core credit; Overall = mean across styles.
-    credit = {gid: sum(depth_credit(qty[gid].get(s, 0)) for s in CORE_SIZES) / len(CORE_SIZES)
-              for gid in styles}
-    overall = (sum(credit.values()) / n * 100.0) if n else 0.0
-
-    # Per-size in-stock share.
-    pct = {}
-    for s in CORE_SIZES:
-        in_stock = sum(1 for gid in styles if qty[gid].get(s, 0) > 0)
-        pct[s] = round(in_stock / n * 100) if n else 0
-
-    # Completeness bands: styles by # of core sizes in stock.
-    full = partial = empty = 0
-    for gid in styles:
-        c = sum(1 for s in CORE_SIZES if qty[gid].get(s, 0) > 0)
-        if c == len(CORE_SIZES):
-            full += 1
-        elif c == 0:
-            empty += 1
-        else:
-            partial += 1
+    # Sizes in stock per style; Full = all 3.
+    in_stock = {gid: sum(1 for s in CORE_SIZES if qty[gid].get(s, 0) > 0) for gid in styles}
+    full = sum(1 for gid in styles if in_stock[gid] == len(CORE_SIZES))
 
     today = str(date.today())
-    write_snapshot(today, pct, overall, n, full, partial, empty)
+    write_snapshot(today, full, n)
 
     print(f"=== Birkenstock core-size availability ===\n")
     print_recent()
 
     if detail:
-        # Weakest coverage first — the prune/restock shortlist.
-        gaps = sorted(styles, key=lambda g: (credit[g], g))
+        # What's blocking Full: per-size in-stock share.
+        print("\nPer-size (what's blocking Full):")
+        for s in CORE_SIZES:
+            cnt = sum(1 for gid in styles if qty[gid].get(s, 0) > 0)
+            print(f"  {s}: {cnt:>3}/{n} in stock ({round(cnt / n * 100) if n else 0:>3}%)")
+
+        # Not-Full styles, weakest first — the prune/restock shortlist.
+        gaps = sorted((g for g in styles if in_stock[g] < len(CORE_SIZES)),
+                      key=lambda g: (in_stock[g], sum(qty[g].values()), g))
         hdr = (f"\n{'#':>3}  {'GroupID':<24} {'Colour':<16} "
-               + ' '.join(f"{str(s):>3}" for s in CORE_SIZES) + f" {'Core%':>6}")
+               + ' '.join(f"{str(s):>3}" for s in CORE_SIZES) + f" {'InStk':>5}")
         print(hdr)
         print("  " + "-" * (len(hdr) - 3))
         for i, gid in enumerate(gaps, 1):
             cells = ' '.join(f"{qty[gid].get(s, 0):>3}" for s in CORE_SIZES)
             col = (colour.get(gid) or '-')[:16]
-            print(f"{i:>3}  {gid:<24} {col:<16} {cells} {credit[gid] * 100:>5.0f}%")
+            print(f"{i:>3}  {gid:<24} {col:<16} {cells}  {in_stock[gid]}/3")
 
 
 if __name__ == '__main__':

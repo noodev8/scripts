@@ -4,11 +4,11 @@ Snapshot of Birkenstock stock health to decide whether to push or scale back Goo
 
 ## Purpose
 
-One question: **is the stock position strong enough to justify pushing ads right now?**
+One question: **how many styles can the core customer actually buy right now?**
 
-No point pushing traffic if the women's core sizes (38/39/40) are missing across the Birkenstock range. We measure that directly — every style that *should* carry those sizes, scored on whether it actually does.
+No point pushing traffic onto styles that are missing the women's core sizes (38/39/40). So we count the styles that hold all three — **Full** — across the whole Birkenstock range. Full is the breadth of core-complete product ad spend can ride; it's the number we push or pull against.
 
-We want a position we can be **confident** about. Target is 100%: every in-range style holding its core sizes. Stragglers that sit empty are a signal to restock or to drop them from the range — not something to filter out of the number.
+We want a position we can be **confident** about. Target: grow Full toward the full range. Styles that aren't Full are a signal to restock or to drop them from the range — not something to filter out of the number.
 
 ## Scope
 
@@ -16,7 +16,7 @@ In scope:
 - **Birkenstock brand only**, strict (`skusummary.brand = 'Birkenstock'` — verify exact string).
 - **Stock = FREE rows in `localstock`**: `ordernum = '#FREE' AND deleted = 0 AND qty > 0`. Nothing else.
 - **Every** style whose grid offers 38/39/40 — no sales/demand filter.
-- A headline metric + breakdowns so the headline can be sanity-checked.
+- The **Full** count + (under `--detail`) breakdowns so it can be sanity-checked.
 
 Out of scope (handle outside this process):
 - **Seasonality** — interpret manually from the breakdowns.
@@ -24,42 +24,39 @@ Out of scope (handle outside this process):
 - **Pipeline / Birktracker / in-transit** — not counted. Only what is physically FREE now. (May reintroduce Birktracker later as a separate "what's coming" view; not now.)
 - **Channel split** — single combined view for v1.
 
-## Core metric (v1 — "can the core customer buy?")
+## Core metric — Full count
 
-**Core-size depth-coverage, equal weight per style. No sales filter.** Across *every* Birkenstock style whose grid offers the women's core sizes (38/39/40), what fraction of those core slots are stocked — credited gently by depth so a single unit (empties on the next sale) counts less than a real cushion?
+**Full = styles with all three core sizes (38/39/40) in FREE stock.** No sales filter, no depth weighting, no partial credit. Any quantity counts — 1+1+1 is Full. It's the breadth of *core-complete* product: how many styles ad spend can confidently ride right now.
 
-One number, 0–100%. Roll-up: brand headline ← mean over all core slots ← per-style core grid.
+Why Full and not a coverage %: a percentage is a ratio, so it hides scale — "33% of 125 styles" and "33% of 10 styles" are wildly different push positions but read the same. Worse, a coverage % is contaminated by the denominator: dumping more dead styles into the range craters the % while real ad capacity is unchanged. **Full is absolute** — it moves only when real sellable breadth moves, and is immune to how aggressively the range has been pruned. (Decided 2 Jun 2026, after trying a demand-weighted whole-grid metric, then a depth-weighted coverage %, then settling here.)
 
-**Target is 100%.** Every style in the range *should* hold its core sizes. A style sitting empty on 38/39/40 isn't noise to be filtered out — it's either a restock gap or a straggler that should be dropped from the range. That's the owner's call; the gauge's job is to surface it, not to hide it behind a demand filter. We deliberately do **not** weight by sales: a demand cut just flatters the number by ignoring the styles we've let go thin.
-
-Designed (2 Jun 2026) to replace the earlier demand-weighted whole-grid metric + per-model size curves — dropped as over-engineered. ~10× simpler, fully explainable in one sentence.
+**Target: grow Full toward Styles** (every in-range style core-complete). A style not Full is either a restock gap or a straggler to drop — the owner's call.
 
 ### Settled parameters
 
-- **Denominator (styles in scope)**: every Birkenstock style whose grid (`skumap`, `deleted = 0`) offers all of 38/39/40. **No sales/demand filter.** Requiring 38/39/40 in the grid drops men's-only grids (no 38). ~125 styles today.
+- **Denominator (`Styles`)**: every Birkenstock style whose grid (`skumap`, `deleted = 0`) offers all of 38/39/40. **No sales/demand filter.** Requiring 38/39/40 in the grid drops men's-only grids (no 38). ~125 styles today.
 - **Core sizes**: 38, 39, 40 (women's core).
-- **Depth credit (per core size, from FREE stock qty)**: 0 → 0, 1 → 0.5, 2 → 0.8, 3+ → 1.0.
-- **Per-style credit**: mean of its three core-slot credits.
-- **Headline**: mean credit across all core slots (equal weight per style, since each contributes exactly 3 slots). Target 100%.
+- **Full**: a style counts if all three core sizes have FREE qty > 0 (any amount).
+- **Full %**: Full ÷ Styles — progress toward a fully stocked range; read as trend, not as the decision number.
+- **Partials (1–2 of 3)**: a hidden bonus — real sellable breadth, but not tracked in the headline. Decisions ride on Full only.
 
-The honest signal this gives today (~33%): the core is genuinely thin across the range — lots of styles empty on 38/39/40 — so the number says "don't be over-confident pushing" until either stock fills in or the dead stragglers are pruned out of the range.
+The honest signal today: **28 Full of 125 (22%)** — core-complete breadth is thin, so don't be over-confident pushing until Full climbs (stock landing in the core, or dead stragglers pruned out of the range).
 
 ## Output — locked format
 
 One at-a-glance table, **one row per day**:
 
-| Date | 38 | 39 | 40 | Overall | Styles | Full | Partial | Empty |
-|---|---|---|---|---|---|---|---|---|
-| 2026-06-02 | 40% | 36% | 47% | 33% | 125 | 28 | 52 | 45 |
+| Date | Full | Styles | Full % |
+|---|---|---|---|
+| 2026-06-02 | 28 | 125 | 22% |
 
-- **38 / 39 / 40** — % of in-range styles with that size in FREE stock (the per-size weak-spot read).
-- **Overall** — the headline: depth-weighted core coverage, target 100% (see [Core metric](#core-metric-v1--can-the-core-customer-buy)).
-- **Styles** — number of in-scope styles (Birk grids offering 38/39/40).
-- **Full / Partial / Empty** — styles by how many core sizes are in stock: **Full** = all 3, **Partial** = 1–2, **Empty** = 0. (`Full + Partial + Empty = Styles`.)
+- **Full** — the decision number: styles with all 3 core sizes in stock (push capacity).
+- **Styles** — total in-range styles (Birk grids offering 38/39/40); the ceiling.
+- **Full %** — Full ÷ Styles; progress toward a fully stocked range, read as trend.
 
-The console prints the last ~7 days of this table (trend at a glance). `availability.py --detail` additionally prints the weakest-first per-style grid — the prune/restock shortlist — but that is off by default; the table is the whole result.
+The console prints the last ~7 days of this table (trend at a glance). `availability.py --detail` additionally prints the per-size breakdown (what's blocking Full) and the not-Full styles weakest-first (the prune/restock shortlist) — off by default; the table is the whole result.
 
-This is the only output. No status buckets, no drag list, no sparkline — locked 2 Jun 2026.
+This is the only output. No depth weighting, no status buckets, no per-size in the headline — locked 2 Jun 2026.
 
 ## Data sources
 
@@ -70,9 +67,9 @@ This is the only output. No status buckets, no drag list, no sparkline — locke
 
 **Do NOT use:** `skusummary.stockvariants`, `skusummary.variants`, `skumap.shopifyprice`, `skusummary.ignore_auto_price`. All stale/legacy — see project CLAUDE.md.
 
-## Size weighting
+## Size / depth weighting
 
-None. The earlier metric weighted each size within a style by a women's/men's replacement curve (`size_weights.py`, since deleted). v1 counts only the three core sizes, each equally.
+None. Full is a plain count — all three core sizes present, any quantity. No per-size curves, no depth tiers. (Both were tried and dropped; an earlier `size_weights.py` is deleted.) The depth nuance — a 1+1+1 style empties fast — is accepted as a known limitation: it still counts as Full, and partials below it are an untracked bonus.
 
 ## Cadence
 
@@ -80,13 +77,13 @@ Ad-hoc, on user request. No materialisation, no dashboard tile.
 
 ## Reading the table
 
-- **Overall** is the one number — depth-weighted core coverage, target 100%. Read it as direction over time, not against a fixed cutoff.
-- **38 / 39 / 40** show which size is the weak spot (e.g. today 39 is worst at 36%, 40 best at 47%).
-- **Full / Partial / Empty** is the completeness split. A high Empty count is the prune-or-restock signal: those styles either need core stock or should be dropped from the range. Run `--detail` to see exactly which.
+- **Full** is the decision number. Read it as a level *and* a direction: a high/rising Full means more core-complete breadth to push spend into; low/falling means less. Read it together with **Styles** — Full's ceiling.
+- **Full %** is the trend gauge (progress toward a fully stocked range), not the decision driver. Don't read it alone: scale lives in Full, not the ratio.
+- To improve Full, run `--detail`: the per-size lines show which size is most often the blocker, and the not-Full list (weakest first) is the prune/restock shortlist.
 
 ### How the number is used
 
-It feeds Google Ads budget decisions as a **consideration, not a gate** — full principle in `google-ads/BUDGET_REVIEW_PROCESS.md` ("Stock availability (Birk core sizes)"). In short: it's a confidence modifier on *how hard* to push; the go/no-go stays imp share + ROAS. A low number and high ROAS aren't a contradiction — the headline is range completeness, not fulfillability of the traffic we buy, and spend self-steers to the in-stock styles. Rising coverage = more headroom to add budget (if imp share short, ROAS healthy); falling coverage = lean on tROAS and push more cautiously into thinning fulfillment. No fixed push/hold/pull thresholds.
+It feeds Google Ads budget decisions as a **consideration, not a gate** — full principle in `google-ads/BUDGET_REVIEW_PROCESS.md` ("Stock availability (Birk core sizes)"). In short: Full is a confidence modifier on *how hard* to push; the go/no-go stays imp share + ROAS. A low Full and high ROAS aren't a contradiction — Full is range breadth, not fulfillability of the traffic we buy, and spend self-steers to the in-stock styles. Rising Full = more headroom to add budget (if imp share short, ROAS healthy); falling Full = lean on tROAS and push more cautiously into thinning fulfillment. No fixed push/hold/pull thresholds.
 
 ### Snapshots
 
@@ -96,5 +93,5 @@ in `google-ads/BUDGET_REVIEW_PROCESS.md`, not here.
 
 ## Files
 
-- `availability.py` — ad-hoc core-size gauge. Run with `python birk-stock/availability.py`.
-- `snapshots.md` — daily metrics log (auto-written, one block per day) for trend comparison.
+- `availability.py` — ad-hoc Full-count gauge. Run with `python birk-stock/availability.py` (`--detail` for per-size + prune list).
+- `snapshots.md` — daily metrics log (auto-written, one row per day) for trend comparison.

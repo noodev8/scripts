@@ -100,12 +100,13 @@ Three numbers tell you which lever is the constraint:
 
 ### Stock availability (Birk core sizes) — a consideration, not a gate
 
-`birk-stock/availability.py` gives one number: depth-weighted coverage of the women's core sizes (38/39/40) across every Birk style that should carry them (target 100%; today ~33%). It is a **confidence modifier on how hard to push**, never the go/no-go. The go/no-go stays imp share + ROAS.
+`birk-stock/availability.py` gives one number: **Full** = Birk styles holding all three women's core sizes (38/39/40) in stock (today **28 of 125**). Full is the breadth of core-complete product ad spend can ride. It is a **confidence modifier on how hard to push**, never the go/no-go. The go/no-go stays imp share + ROAS.
 
-- **A low number and high ROAS are not a contradiction.** The headline measures *range completeness*, not whether the traffic we buy can be fulfilled. tROAS already steers spend to the in-stock, converting styles; the empty stragglers drag the % but draw almost no spend. So 33% coverage at 11x ROAS → keep pushing; see how far imp share + ROAS let us go.
-- **Rising coverage → more headroom** — add budget *if* imp share is short and ROAS healthy. The gauge only moves on core-size (38/39/40) arrivals, so a lift is a real lift (shoulder dumps don't fake it). **Caveat:** pruning dead styles also raises the number without adding demand — use the Full/Partial/Empty split to tell a *restock*-lift (new demand to buy) from a *prune*-lift (just honesty). Only the restock kind justifies more budget.
-- **Falling coverage → push efficiency, not volume.** As the core drains toward the next 6-month delivery, lean on tROAS (the quality throttle) over budget, and treat each step more cautiously — we're buying into thinning fulfillment.
-- **It also drives pruning.** Empty styles with no demand are drop candidates (`availability.py --detail` lists weakest-first); culling them is the owner's job over the 6-month wait and honestly lifts the number.
+- **A low Full and high ROAS are not a contradiction.** Full measures *range breadth*, not whether the traffic we buy can be fulfilled. tROAS already steers spend to the in-stock, converting styles; the not-Full stragglers don't draw spend. So 28 Full at 11x ROAS → keep pushing; see how far imp share + ROAS let us go.
+- **Why Full, not a coverage %.** A % hides scale and is contaminated by how many losers sit unpruned in the range. Full is absolute — it moves only when real sellable breadth moves. Read Full as the level; `Full %` (Full ÷ Styles) is just the trend.
+- **Rising Full → more headroom** — add budget *if* imp share is short and ROAS healthy. Full only rises when a style gains its *last missing* core size, so a lift is real breadth (shoulder dumps don't fake it). One subtlety: Full also rises if a dead style is pruned out of the range — that's honest, but it's not new demand to buy, so don't read a prune-driven lift as room for more budget.
+- **Falling Full → push efficiency, not volume.** As the core drains toward the next 6-month delivery, lean on tROAS (the quality throttle) over budget, and treat each step more cautiously — we're buying into thinning fulfillment.
+- **It also drives pruning.** Not-Full styles with no demand are drop candidates (`availability.py --detail` lists them weakest-first); culling them is the owner's job over the 6-month wait.
 
 ---
 

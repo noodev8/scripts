@@ -4,10 +4,13 @@ Auto-written by `availability.py`: one row per day (latest run of the day overwr
 that day's row). Metrics only — no commentary; budget/ad decisions live in
 `google-ads/BUDGET_REVIEW_PROCESS.md`, not here.
 
-Columns — **38 / 39 / 40**: % of in-range styles with that size in FREE stock.
-**Overall**: depth-weighted core 38/39/40 coverage (the headline; target 100%).
-**Full / Partial / Empty**: styles by how many core sizes are in stock (3 / 1–2 / 0).
+Columns — **Full**: styles with all three core sizes (38/39/40) in FREE stock (any qty;
+1+1+1 counts) — the decision number, the breadth of core-complete product ad spend can
+ride. **Styles**: total Birk styles whose grid offers 38/39/40 (the range / ceiling).
+**Full %**: Full ÷ Styles — progress toward a fully stocked range; read as trend.
+Partials (1–2 of 3) are a bonus, not tracked here — run `availability.py --detail` for
+per-size and the prune list.
 
-| Date | 38 | 39 | 40 | Overall | Styles | Full | Partial | Empty |
-|---|---|---|---|---|---|---|---|---|
-| 2026-06-02 | 40% | 36% | 47% | 33% | 125 | 28 | 52 | 45 |
+| Date | Full | Styles | Full % |
+|---|---|---|---|
+| 2026-06-02 | 28 | 125 | 22% |
