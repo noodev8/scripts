@@ -14,3 +14,4 @@ per-size and the prune list.
 | Date | Full | Styles | Full % |
 |---|---|---|---|
 | 2026-06-02 | 28 | 125 | 22% |
+| 2026-06-03 | 28 | 125 | 22% |

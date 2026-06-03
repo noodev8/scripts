@@ -16,6 +16,10 @@ LOCKED OUTPUT — one at-a-glance table, one row per day:
 
 Partials (1-2 of 3) are a hidden bonus, not tracked here. Run with --detail for the
 per-size breakdown (what's blocking Full) and the weakest-first prune list.
+
+Run with --velocity to attach sales velocity to the Full styles (units 30d/90d/365d,
+units/day, weeks of cover) — the pricing focus list: which core-complete styles are
+actually selling and which are dead weight on full grids. All-channel sales.
 See birk-stock/README.md for the full design.
 """
 import sys, os
@@ -27,6 +31,7 @@ from logging_utils import get_db_config
 
 CORE_SIZES = (38, 39, 40)   # women's core; men's-only grids are out (no 38)
 BRAND = 'Birkenstock'
+VELOCITY_WINDOWS = (30, 90, 365)   # trailing-day sales windows for --velocity
 SNAPSHOT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'snapshots.md')
 
 # Snapshot table columns — metrics only.
@@ -97,7 +102,57 @@ def print_recent(n=7):
     print(_render_ascii(rows[-n:]))
 
 
-def main(detail=False):
+def print_velocity(cur, full, qty, colour):
+    """Attach sales velocity to the Full styles — the pricing focus list.
+
+    For every core-complete (Full) style: trailing units sold over each
+    VELOCITY_WINDOWS span, 90-day units/day, and weeks of cover (total FREE
+    stock / weekly rate). All-channel sales. Sorted fastest-first so the styles
+    worth pricing attention sit at the top and the dead weight sinks.
+    """
+    if not full:
+        print("\nNo Full styles to report velocity for.")
+        return
+
+    # Total FREE stock (all sizes, not just core) — the cover denominator.
+    cur.execute("""SELECT groupid, SUM(qty) FROM localstock
+        WHERE ordernum = '#FREE' AND deleted = 0 AND qty > 0 AND groupid = ANY(%s)
+        GROUP BY groupid""", (full,))
+    freestock = {g: int(q) for g, q in cur.fetchall()}
+
+    units = {}  # window -> {groupid: units}
+    for days in VELOCITY_WINDOWS:
+        cur.execute("""SELECT groupid, SUM(qty) FROM sales
+            WHERE groupid = ANY(%s) AND solddate >= CURRENT_DATE - (%s || ' days')::interval
+            GROUP BY groupid""", (full, days))
+        units[days] = {g: int(q or 0) for g, q in cur.fetchall()}
+
+    rows = []
+    for g in full:
+        core = sum(qty[g].get(s, 0) for s in CORE_SIZES)
+        free = freestock.get(g, 0)
+        wins = [units[d].get(g, 0) for d in VELOCITY_WINDOWS]
+        vel = units[90].get(g, 0) / 90.0 if 90 in units else 0.0
+        wks = (free / (vel * 7)) if vel > 0 else None
+        rows.append((g, colour.get(g) or '-', core, free, wins, vel, wks))
+    rows.sort(key=lambda r: -r[5])  # velocity desc
+
+    win_hdr = ' '.join(f"{str(d)+'d':>5}" for d in VELOCITY_WINDOWS)
+    hdr = (f"\n{'#':>3}  {'GroupID':<22} {'Colour':<8} {'core':>4} {'free':>4} "
+           f"{win_hdr} {'u/day':>6} {'wks':>4}")
+    print("\nSales velocity for the Full styles (all-channel) - pricing focus list:")
+    print(hdr)
+    print("  " + "-" * (len(hdr) - 3))
+    for i, (g, col, core, free, wins, vel, wks) in enumerate(rows, 1):
+        ws = 'inf' if wks is None else f"{wks:.0f}"
+        cells = ' '.join(f"{w:>5}" for w in wins)
+        print(f"{i:>3}  {g:<22} {col[:8]:<8} {core:>4} {free:>4} "
+              f"{cells} {vel:>6.2f} {ws:>4}")
+    print("\n  u/day = 90d units / 90.  wks = total FREE stock / weekly rate "
+          "(inf = no 90d sales).")
+
+
+def main(detail=False, velocity=False):
     conn = psycopg2.connect(**get_db_config())
     cur = conn.cursor()
 
@@ -138,7 +193,6 @@ def main(detail=False):
     """, (BRAND,))
 
     rows = cur.fetchall()
-    conn.close()
 
     qty = defaultdict(dict)
     colour = {}
@@ -153,7 +207,8 @@ def main(detail=False):
 
     # Sizes in stock per style; Full = all 3.
     in_stock = {gid: sum(1 for s in CORE_SIZES if qty[gid].get(s, 0) > 0) for gid in styles}
-    full = sum(1 for gid in styles if in_stock[gid] == len(CORE_SIZES))
+    full_styles = [gid for gid in styles if in_stock[gid] == len(CORE_SIZES)]
+    full = len(full_styles)
 
     today = str(date.today())
     write_snapshot(today, full, n)
@@ -180,6 +235,14 @@ def main(detail=False):
             col = (colour.get(gid) or '-')[:16]
             print(f"{i:>3}  {gid:<24} {col:<16} {cells}  {in_stock[gid]}/3")
 
+    if velocity:
+        print_velocity(cur, full_styles, qty, colour)
+
+    conn.close()
+
+    if not velocity:
+        print("\n(run with --velocity for per-style sales velocity — the pricing focus list)")
+
 
 if __name__ == '__main__':
-    main(detail='--detail' in sys.argv)
+    main(detail='--detail' in sys.argv, velocity='--velocity' in sys.argv)

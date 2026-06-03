@@ -91,7 +91,27 @@ It feeds Google Ads budget decisions as a **consideration, not a gate** — full
 the day overwrites that day's row). Metrics only — no commentary. Budget/ad decisions belong
 in `google-ads/BUDGET_REVIEW_PROCESS.md`, not here.
 
+## Velocity (`--velocity`) — the pricing focus list
+
+`availability.py --velocity` keeps the locked headline table, then attaches **sales
+velocity to the Full styles only** — the list of styles you can actually act on for
+pricing. For each Full style: trailing units sold over 30d / 90d / 365d, 90-day
+**units/day**, and **weeks of cover** (total FREE stock ÷ weekly rate; `inf` = no 90d
+sales). Sorted fastest-first, so the styles worth pricing attention sit at the top and
+the dead weight (full grids, ~0 sales) sinks to the bottom.
+
+This is the lens for "what should I focus pricing on?": the top of the list is where
+demand is real (watch the low weeks-of-cover ones for restock before pushing spend); the
+bottom is the prune/clear shortlist — core-complete styles tying up the Full count without
+earning it.
+
+Channel: sales are **all-channel by design, and that's correct here** — Birkenstock is
+**not sold on Amazon** (not permitted), so all-channel is effectively Shopify + the
+physical shop, with no Amazon contamination. Keeping it all-channel deliberately covers
+the shop alongside the website. No channel split needed. Velocity is **not** part of the
+locked Full gauge; it's an opt-in companion view and is **not** written to `snapshots.md`.
+
 ## Files
 
-- `availability.py` — ad-hoc Full-count gauge. Run with `python birk-stock/availability.py` (`--detail` for per-size + prune list).
-- `snapshots.md` — daily metrics log (auto-written, one row per day) for trend comparison.
+- `availability.py` — ad-hoc Full-count gauge. Run with `python birk-stock/availability.py` (`--detail` for per-size + prune list; `--velocity` for the per-style sales-velocity pricing focus list).
+- `snapshots.md` — daily metrics log (auto-written, one row per day) for trend comparison. Velocity is **not** logged here.
