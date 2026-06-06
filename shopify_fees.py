@@ -8,7 +8,7 @@ Balance Transactions API.
 
 Also totals PayPal fees if a file named exactly 'Download.CSV' (the raw
 PayPal transaction export) is present in the user's Downloads folder. After
-processing, the file is renamed to 'Downloads-done.CSV'. If no such file is
+processing, the file is renamed to 'Download-done.CSV'. If no such file is
 found, the report prints "PayPal fees not available in the results".
 
 Output: Prints fees totals to console for input into the accounting system.
@@ -112,7 +112,7 @@ def fetch_transactions(start_date, end_date):
 # --- PAYPAL ---
 DOWNLOADS_DIR = os.path.join(os.path.expanduser("~"), "Downloads")
 PAYPAL_FILENAME = "Download.CSV"        # exact case — name comes straight from PayPal
-PAYPAL_DONE_FILENAME = "Downloads-done.CSV"
+PAYPAL_DONE_FILENAME = "Download-done.CSV"
 
 
 def find_paypal_file():
@@ -161,17 +161,14 @@ def report_paypal_fees():
     os.rename(path, done_path)
 
 
-def main():
-    month_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    start_date, end_date = get_date_range(month_arg)
+def report_shopify_fees(start_date, end_date):
+    """Fetch and print the Shopify Payments fee total for the given month."""
     month_label = start_date.strftime("%B %Y")
-
     txns = fetch_transactions(start_date, end_date)
 
     if not txns:
         print(f"{month_label}: No Shopify transactions found")
-        report_paypal_fees()
-        return 0
+        return
 
     total_fee = sum(Decimal(t["fee"]) for t in txns)
     types = Counter(t["type"] for t in txns)
@@ -179,6 +176,12 @@ def main():
     breakdown = ", ".join(f"{count} {typ}{'s' if count != 1 else ''}" for typ, count in types.most_common())
     print(f"{month_label} Shopify Fees: £{total_fee} ({breakdown})")
 
+
+def main():
+    month_arg = sys.argv[1] if len(sys.argv) > 1 else None
+    start_date, end_date = get_date_range(month_arg)
+
+    report_shopify_fees(start_date, end_date)
     report_paypal_fees()
 
     return 0

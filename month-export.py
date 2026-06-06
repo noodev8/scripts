@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """
-SHOPIFY TRANSACTION REPORT GENERATOR
-=====================================
+MONTH-END EXPORT
+================
 
-Generates a CSV matching the Shopify Admin "Analytics > Reports > Shopify Transaction"
-export format, using the Shopify Orders API.
-
-Output: Shopify Transaction.csv (in user's Downloads folder)
+One command for the month-end accounting pack. Produces:
+  - Shopify Transaction.csv in Downloads — a CSV matching the Shopify Admin
+    "Analytics > Reports > Shopify Transaction" export, built from the
+    Shopify Orders API.
+  - Shopify Payments + PayPal fee totals printed to console, for input into
+    the accounting system alongside the CSV. PayPal fees are read from a
+    'Download.CSV' export in Downloads if present (see shopify_fees.py).
+  - Current stock position (units + cost value) printed to console
+    (see stock_position.py).
 
 Usage:
-  python shopify_transaction_report.py              # Last month
-  python shopify_transaction_report.py 2026-03      # Specific month
+  python month-export.py              # Last month
+  python month-export.py 2026-03      # Specific month
 """
 
 import csv
@@ -36,7 +41,7 @@ if not ACCESS_TOKEN:
     raise ValueError("No Shopify access token found in .env (tried SHOPIFY_ACCESS_TOKEN and SHOPIFY_ORDERS_ACCESS_TOKEN)")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SCRIPT_NAME = "shopify_transaction_report"
+SCRIPT_NAME = "month_export"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
@@ -383,7 +388,7 @@ def main():
     month_arg = sys.argv[1] if len(sys.argv) > 1 else None
     start_date, end_date = get_date_range(month_arg)
 
-    log(f"=== SHOPIFY TRANSACTION REPORT ===")
+    log(f"=== MONTH-END EXPORT ===")
     log(f"Period: {start_date} to {end_date}")
 
     orders = fetch_all_orders(start_date, end_date)
@@ -413,6 +418,24 @@ def main():
     log(f"  Tax:      {format_num(totals['Taxes'])}")
     log(f"  Total:    {format_num(totals['Total sales'])}")
     log(f"Output: {output_path}")
+
+    # --- Fees & stock for the accounting system (printed to console) ---
+    # Shopify Payments fees for the same month, PayPal fees from a
+    # 'Download.CSV' export in Downloads (if present), and the current stock
+    # position. Each step is guarded so a problem never blocks the CSV above.
+    print()
+    try:
+        import shopify_fees
+        shopify_fees.report_shopify_fees(start_date, end_date)
+        shopify_fees.report_paypal_fees()
+    except Exception as e:
+        print(f"Fees step skipped (error: {e})")
+
+    try:
+        import stock_position
+        stock_position.report_stock_position()
+    except Exception as e:
+        print(f"Stock position step skipped (error: {e})")
 
     return 0
 
