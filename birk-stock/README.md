@@ -56,6 +56,8 @@ One at-a-glance table, **one row per day**:
 
 The console prints the last ~7 days of this table (trend at a glance). `availability.py --detail` additionally prints the per-size breakdown (what's blocking Full) and the not-Full styles weakest-first (the prune/restock shortlist) — off by default; the table is the whole result.
 
+**Presenting the run in chat:** when the owner asks for a birk-stock run, render the result back as a **markdown grid** (the Date/Full/Styles/Full % table), not raw console text. A clean grid is the expected format every time.
+
 This is the only output. No depth weighting, no status buckets, no per-size in the headline — locked 2 Jun 2026.
 
 ## Data sources
