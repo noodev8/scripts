@@ -59,8 +59,8 @@ When a second campaign does go live, here's what was verified about the system (
 | Source | What it tells us | How to check |
 |--------|-----------------|--------------|
 | `google_stock_track` | Daily snapshot — ad spend, clicks, impressions, Shopify sales | `SELECT * FROM google_stock_track ORDER BY snapshot_date DESC LIMIT 14;` |
-| `google_campaign_daily` | **Per-(date, campaign)** clicks/impressions/cost/imp-share. Source of truth for any per-campaign read since 2026-05-04. | `SELECT * FROM google_campaign_daily WHERE snapshot_date >= CURRENT_DATE - 7 ORDER BY snapshot_date DESC, campaign;` |
-| `adcost_summary_30.csv` | Raw Google Ads export (per-campaign, 30-day daily). Save to Downloads — script auto-moves and processes. | Export from Google Ads UI: Day, Campaign, Clicks, Impr., Cost, Search impr. share. |
+| `google_campaign_daily` | **Per-(date, campaign)** clicks/impressions/cost/imp-share, plus `lost_is_rank` / `lost_is_budget` (added 6 Jun 2026). Source of truth for any per-campaign read since 2026-05-04. | `SELECT * FROM google_campaign_daily WHERE snapshot_date >= CURRENT_DATE - 7 ORDER BY snapshot_date DESC, campaign;` |
+| `adcost_summary_30.csv` | Raw Google Ads export (per-campaign, 30-day daily). Save to Downloads — script auto-moves and processes. | Export columns, in order: Day, Campaign, Clicks, Impr., Cost, Search impr. share, **Search lost IS (rank)**, **Search lost IS (budget)**. The two lost columns **must be appended at the end** — the parser validates/reads the first 7 by position and ignores trailing columns, so inserting them mid-list silently corrupts the read. The two lost columns are optional (older 7-col exports still parse). |
 
 **Imp share source:** single-campaign imp share reads from `google_stock_track.google_search_imp_share`; the multi-campaign window 28 Apr – 13 May is NULL there — use `google_campaign_daily`.
 
@@ -97,6 +97,27 @@ Three numbers tell you which lever is the constraint:
 
 - **Budget:** default ~20% step when criteria met, round to £1. Smaller (£2–4) when the algorithm is on a good trajectory. Hold/slow if ROAS <7x or instability after an increase. No fixed schedule — read signals, not dates.
 - **tROAS (currently 400%):** *Lower* (→300%) when imp share <85% AND spend below cap (volume play). *Raise* (→500%) when imp share 85%+ AND marginal ROAS <5x, or 7d ROAS sliding on a ramp (efficiency play). One lever at a time; give it 5–7 days to re-learn. Don't move it just because you can.
+
+### Lost impression share — rank vs budget (the tripwire)
+
+`google_campaign_daily.lost_is_rank` / `lost_is_budget` split the impression share we *didn't* get. They answer the question imp share alone can't: are we missing demand because we **capped out** (budget) or because a competitor **outranked** us (rank/price)?
+
+**Baseline established 6 Jun 2026 (May–early Jun STANDARD):** lost-to-rank is **~0% every normal day** (0.00–0.12%; only ever twitched to 1.18%, on the 29 May £204 blowout). **Essentially all** lost share is **budget**. Reads:
+
+- **We are not in a rank/price war.** When STANDARD is in an auction it wins it. So missed demand is *not* a pricing problem and *not* bid-conservatism — which removes the case for touching tROAS to "bid harder" (there's no rank loss to recover).
+- **`lost_is_budget` is available impressions, NOT available profit.** It is the exact metric that suckered the £140 raise. The ~10% budget-available headroom on normal days was field-tested: filling it (£140→3.4x, £204→6.7x at 96% imp share) converts **below the 5x floor**. Don't read a budget-lost % as money on the table — the marginal impression there is browse traffic.
+- **`lost_is_budget` spikes on THIN days** (30 May 48%, 17–18 May 31%) because the *eligible pool shrank*, not because a goldmine opened. It co-moves inversely with imp share; on its own it's near-redundant with the imp share we already track.
+
+**The tripwire is `lost_is_rank`, and its whole value is staying near zero.** If STANDARD `lost_is_rank` climbs (>~5% for 2+ days), a competitor has entered or our price has slipped — a *different* problem from a budget cap, and the lever is price/competitiveness, not budget. This is a background weekly glance, not a daily budget input. Quick check:
+
+```sql
+SELECT snapshot_date, search_imp_share, lost_is_rank, lost_is_budget
+FROM google_campaign_daily
+WHERE campaign = 'STANDARD' AND snapshot_date >= CURRENT_DATE - 14
+ORDER BY snapshot_date DESC;
+```
+
+> **Why the ceiling floats (tied to this):** the budget level demand can fund tracks the *eligible-pool size*, not a fixed number. Normal early-Jun days run ~9–11k impressions → ceiling ~£110–130. Peak late-May days ran 14–18k → funded £150–165 at 10–17x. £180 is a **hot-day catch when the pool is big**, not a standing target to climb to. Keep budget uncapped enough to ride a big-pool day; don't set a high standing cap that buys the 3.4x tail on normal days.
 
 ### Stock availability (Birk core sizes) — a consideration, not a gate
 

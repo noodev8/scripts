@@ -14,7 +14,9 @@ Creates daily snapshots dated for YESTERDAY with:
 
 Also imports Google Ads data from CSV file (adcost_summary_30.csv) if available.
 The CSV is the per-campaign export (Day, Campaign, Clicks, Impr., Currency code,
-Cost, Search impr. share). Per-campaign rows are upserted into google_campaign_daily;
+Cost, Search impr. share[, Search lost IS (rank), Search lost IS (budget)]).
+The two lost-IS columns are optional and must be appended at the end (see
+EXPECTED_CSV_HEADERS). Per-campaign rows are upserted into google_campaign_daily;
 sums by date populate google_stock_track ad columns (google_ad_spend, google_clicks,
 google_impressions). google_search_imp_share is populated when a date has exactly one
 campaign reporting (well-defined). When multiple campaigns report for a date, it stays
@@ -64,6 +66,32 @@ def parse_csv_number(value):
         log(f"WARNING: Could not parse number '{value}', using 0")
         return 0
 
+def parse_share_pct(value):
+    """
+    Parse a Google 'share'-type percentage cell into a float or None.
+
+    Handles Google's markers, all of which map to None:
+    - '--'      reporting lag (metric not finalised yet)
+    - '< 10%'   below-threshold censoring
+    - '> 90%'   above-threshold censoring
+    'NN.NN%' -> float.
+    """
+    if value is None:
+        return None
+    s = value.strip().replace('%', '')
+    if not s or s == '--' or s.startswith('<') or s.startswith('>'):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        log(f"WARNING: Could not parse share value '{value}', using NULL")
+        return None
+
+# First 7 columns are validated by position and required. Two optional competitive
+# columns may follow (added to the export 6 Jun 2026):
+#   [7] Search lost IS (rank)   [8] Search lost IS (budget)
+# They must be APPENDED at the end of the Google Ads report — the first-7 validation
+# and index-based reads below assume columns 0-6 are unchanged.
 EXPECTED_CSV_HEADERS = ['Day', 'Campaign', 'Clicks', 'Impr.', 'Currency code', 'Cost', 'Search impr. share']
 
 def read_google_ads_csv(csv_path):
@@ -118,13 +146,10 @@ def read_google_ads_csv(csv_path):
                     # row[4] is currency code
                     cost = parse_csv_number(row[5])
 
-                    search_imp_share = None
-                    share_str = row[6].strip().replace('%', '')
-                    if share_str and share_str != '--' and not share_str.startswith('<'):
-                        try:
-                            search_imp_share = float(share_str)
-                        except ValueError:
-                            log(f"WARNING: Could not parse search imp share '{row[6]}' for {date_str}/{campaign}")
+                    search_imp_share = parse_share_pct(row[6])
+                    # Optional competitive columns (only present once added to the export)
+                    lost_is_rank = parse_share_pct(row[7]) if len(row) > 7 else None
+                    lost_is_budget = parse_share_pct(row[8]) if len(row) > 8 else None
 
                     data.append({
                         'date': date_obj,
@@ -133,6 +158,8 @@ def read_google_ads_csv(csv_path):
                         'impressions': impressions,
                         'cost': cost,
                         'search_imp_share': search_imp_share,
+                        'lost_is_rank': lost_is_rank,
+                        'lost_is_budget': lost_is_budget,
                     })
 
                 except Exception as e:
@@ -160,13 +187,16 @@ def upsert_campaign_daily(cursor, csv_data):
     """
     query = """
     INSERT INTO google_campaign_daily
-        (snapshot_date, campaign, clicks, impressions, cost, search_imp_share)
-    VALUES (%s, %s, %s, %s, %s, %s)
+        (snapshot_date, campaign, clicks, impressions, cost, search_imp_share,
+         lost_is_rank, lost_is_budget)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (snapshot_date, campaign) DO UPDATE SET
         clicks = EXCLUDED.clicks,
         impressions = EXCLUDED.impressions,
         cost = EXCLUDED.cost,
-        search_imp_share = EXCLUDED.search_imp_share
+        search_imp_share = EXCLUDED.search_imp_share,
+        lost_is_rank = EXCLUDED.lost_is_rank,
+        lost_is_budget = EXCLUDED.lost_is_budget
     """
 
     count = 0
@@ -176,6 +206,7 @@ def upsert_campaign_daily(cursor, csv_data):
                 row['date'], row['campaign'],
                 row['clicks'], row['impressions'],
                 row['cost'], row['search_imp_share'],
+                row['lost_is_rank'], row['lost_is_budget'],
             ))
             count += 1
         except Exception as e:
