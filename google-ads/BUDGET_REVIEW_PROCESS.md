@@ -9,7 +9,6 @@ The whole process is three reads — **sales, cost, budget** — plus a record o
 - **Structure (single campaign since 14 May):** STANDARD Shopping, full catalogue incl. the 24 BIRK-WINNER styles. PMAX paused 14 May. IVES paused 9 May for the Amazon fair-pricing test; fold IVES SKUs back into STANDARD when that test ends, don't relaunch the standalone.
 - **Active cap: £100/day, STANDARD only** (set for 8 Jun). tROAS **500%** — *first tROAS move since Feb*, raised from 400% on 8 Jun.
 - **Last change — 8 Jun, £220 → £100 AND tROAS 400% → 500% (paired reset, user-set):** on 7 Jun the day opened superb, so the cap was pushed **hard to £220** to chase it. The report (loaded 8 Jun) shows it spent **£256 for £1,829 sales = 7.1x blended**, with marginal on the extra ~£134 at **~5.0x** (CVR fell 7.3%→5.8%, CTR 3.2%→2.45%). So it **diluted, it didn't crater** — same shape as 28 May (£204 → 6.7x). The £220 spike still forced a learning reset, so we used that reset to make **two changes at once, deliberately**: (1) pull budget back to **£100** — the *proven* efficient band (£90–122 runs 9–16x), not all the way to £80 which risked under-spending; (2) raise **tROAS to 500%** so the quality gate is trained and in place *before* any future climb. Rationale for bundling: the spike already cost us one re-learn, and £100 leaves real spend for the new target to learn on. **Judge over 5–7 days, not 24–48h** — a tROAS change needs a re-learn; expect volume/imp-share to wobble first.
-- **The £140/£180 failures were the same trap — budget headroom + 400% tROAS = junk.** At £180 (96% imp share) the £45 increment bought ~3k impressions for **+1 click**; at £140 the over-cap £158 converted at 3.4x. Holding tROAS at 400% (=4x floor) let Google spend the extra cap *down to 4x marginal by design* — one notch below our 5x floor. **Lesson: any future hard budget push must be paired with a higher tROAS** so headroom can only be spent on quality. The convertible-demand pool topped out ~£100–120 in thinning early-June demand; above it budget bought impressions, not clicks.
 - **Bias now (point-in-time, not a plan):** sitting tight at £100 / 500% through the re-learn. **Don't touch either lever for ~5–7 days** — the campaign is digesting the £220 spike + a hard budget cut + the first tROAS change in 4 months, all at once. Expect imp share and volume to dip while Google retrains the bid; that's the *intended* behaviour of 500%, not a fault. Read signal at the end of the window: did ROAS hold/recover into the 10x+ band *at* £100 with the tighter target? If yes, the quality gate works and the next move is to **resume the steady £10 budget ladder** under the protection of 500% — climb in notches, never leap (the £140/£180/£220 spikes all proved a hard jump buys junk). If 500% over-throttles (spend falls well short of £100, volume craters), ease back toward 450%. tROAS has room to go higher later (realized runs 9–16x) but move it ≤25% at a time.
 - **Open prediction — first day at £100/500% (resolve & delete after the read):** two opposed guesses on the table, the test being *does 500% throttle spend or does Google spend the cap into a weak Tuesday*. **User:** £110 spend / £850 rev (~7.7x) — cap still spent, efficiency barely moves. **Claude:** ~£85 spend / ~£1,000 rev (~11.5x) — the gate makes it picky, undershoots cap, fewer-better clicks lift ROAS. **Deciding tell = spend:** ~£110 = gate not biting (user right); ~£85 = gate throttling (Claude right). Revenue is noisier; judge on spend. Tuesday is a known-weak day, factored by both.
 - **Open flags:**
@@ -37,20 +36,7 @@ The whole process is three reads — **sales, cost, budget** — plus a record o
 
 Maintenance is manual and ad-hoc — add/remove individual styles with one-off SQL when the curated set changes. No automated refresh.
 
-### Adding a second campaign — read before acting (note added 1 Jun 2026)
-
-> **DO NOT make any changes for this until you get explicit go-ahead that a second campaign has *actually* been created in Google Ads.** This is a forward note only. While the account is single-campaign, ignore it. Treating it as a to-do before the campaign exists will desync the doc from reality.
-
-When a second campaign does go live, here's what was verified about the system (1 Jun 2026):
-
-- **Ingestion code needs no change.** `update_google_stock_track.py` is already per-campaign aware. As long as the CSV export keeps the same columns (`Day, Campaign, Clicks, Impr., Currency code, Cost, Search impr. share`) and includes **all** campaigns, a new campaign just appears as new rows. `google_campaign_daily` upserts one row per `(date, campaign)` — the source of truth for per-campaign reads.
-- **Do NOT combine impression share.** Summing/averaging imp share across campaigns is mathematically meaningless (different auction denominators). The code already handles this: `google_stock_track.google_search_imp_share` is written only when exactly one campaign reports that day, and goes **NULL** with 2+ campaigns *by design*. Read per-campaign imp share from `google_campaign_daily` instead. (The historical 28 Apr–13 May multi-campaign window is already frozen NULL there — same behaviour.)
-- **Spend / clicks / impressions still sum fine** in `google_stock_track` — those aggregate correctly. Only imp share doesn't.
-- **Process changes needed (in this doc) once it's live:**
-  - Rewrite **Current State** from "single campaign" to describe both campaigns and which lever applies to which.
-  - In the **Grid Snapshot / Diagnostic table**, read imp share **per-campaign from `google_campaign_daily`**, not `google_stock_track` (which will be NULL). Grids 1 & 2 (money/demand) still work on summed figures, but ROAS becomes *blended* across campaigns.
-  - Add a new `custom_label_0` value for the new campaign and tag its styles via `skusummary.googlecampaign`.
-- **The one genuine gap: per-campaign ROAS.** Sales aren't attributed by campaign today — `google_stock_track` ties total spend to total Shopify sales. With two campaigns on different style sets, blended ROAS hides which one performs. Attributing sales by `custom_label_0`/campaign would need new work. Only worth it if the second campaign targets a distinct style set you want to judge on its own.
+> **Multiple campaigns later:** imp share is **not** summable across campaigns (different auction denominators) — read it per-campaign from `google_campaign_daily`, never `google_stock_track` (which goes NULL with 2+ campaigns by design). The rest of the setup you can work out from the ingestion code when the day comes.
 
 ---
 
@@ -96,7 +82,7 @@ Three numbers tell you which lever is the constraint:
 ### Sizing & rules
 
 - **Budget:** default ~20% step when criteria met, round to £1. Smaller (£2–4) when the algorithm is on a good trajectory. Hold/slow if ROAS <7x or instability after an increase. No fixed schedule — read signals, not dates.
-- **tROAS (currently 400%):** *Lower* (→300%) when imp share <85% AND spend below cap (volume play). *Raise* (→500%) when imp share 85%+ AND marginal ROAS <5x, or 7d ROAS sliding on a ramp (efficiency play). One lever at a time; give it 5–7 days to re-learn. Don't move it just because you can.
+- **tROAS (currently 500%, raised from 400% on 8 Jun):** *Lower* when imp share <85% AND spend below cap (volume play). *Raise* when imp share 85%+ AND marginal ROAS <5x, or 7d ROAS sliding on a ramp (efficiency play). Move ≤25% at a time; one lever at a time; give it 5–7 days to re-learn. Don't move it just because you can.
 
 ### Lost impression share — rank vs budget (the tripwire)
 
@@ -121,9 +107,9 @@ ORDER BY snapshot_date DESC;
 
 ### Stock availability (Birk core sizes) — a consideration, not a gate
 
-`birk-stock/availability.py` gives one number: **Full** = Birk styles holding all three women's core sizes (38/39/40) in stock (today **28 of 125**). Full is the breadth of core-complete product ad spend can ride. It is a **confidence modifier on how hard to push**, never the go/no-go. The go/no-go stays imp share + ROAS.
+`birk-stock/availability.py` gives one number: **Full** = Birk styles holding all three women's core sizes (38/39/40) in stock, out of every style whose grid offers those sizes. Run it for the live count. Full is the breadth of core-complete product ad spend can ride. It is a **confidence modifier on how hard to push**, never the go/no-go. The go/no-go stays imp share + ROAS.
 
-- **A low Full and high ROAS are not a contradiction.** Full measures *range breadth*, not whether the traffic we buy can be fulfilled. tROAS already steers spend to the in-stock, converting styles; the not-Full stragglers don't draw spend. So 28 Full at 11x ROAS → keep pushing; see how far imp share + ROAS let us go.
+- **A low Full and high ROAS are not a contradiction.** Full measures *range breadth*, not whether the traffic we buy can be fulfilled. tROAS already steers spend to the in-stock, converting styles; the not-Full stragglers don't draw spend. So a low Full at 11x ROAS → keep pushing; see how far imp share + ROAS let us go.
 - **Why Full, not a coverage %.** A % hides scale and is contaminated by how many losers sit unpruned in the range. Full is absolute — it moves only when real sellable breadth moves. Read Full as the level; `Full %` (Full ÷ Styles) is just the trend.
 - **Rising Full → more headroom** — add budget *if* imp share is short and ROAS healthy. Full only rises when a style gains its *last missing* core size, so a lift is real breadth (shoulder dumps don't fake it). One subtlety: Full also rises if a dead style is pruned out of the range — that's honest, but it's not new demand to buy, so don't read a prune-driven lift as room for more budget.
 - **Falling Full → push efficiency, not volume.** As the core drains toward the next 6-month delivery, lean on tROAS (the quality throttle) over budget, and treat each step more cautiously — we're buying into thinning fulfillment.
