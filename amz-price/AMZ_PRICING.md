@@ -8,6 +8,15 @@ For a comprehensive pass across all 8 IVES segments in one session, trigger with
 
 > Session-by-session journals are **not** kept here — every price change is in the `amz_price_log` DB table with rationale in `notes` (query at the bottom of Database). This section holds only the **current state** and the **durable rules/observations** distilled from past sessions.
 
+### WHITE creeps + £40 lesson (2026-06-11)
+
+Off the May 25 record (132u/£1,960); 6/1 wk 68u, 6/8 wk pacing similar (~run-rate). The **£40 push on 05 backfired** — crossing to 40.09 (6/4 ladder) collapsed velocity, pulled back to 39.69 on 6/8; now settling. Applied **3 creeps**, everything else held:
+- **WHITE-06 39.29→39.59** (+30p) — volume monster (22u/7d, 16% ret), deepest pile (107 live +49 inb).
+- **WHITE-07 39.40→39.70** (+30p) — 11u/7d, returns settled to **3%** (size-7 fit watch now clean).
+- **WHITE-09 38.90→39.20** (+30p) — scarce harvest, 7u/7d on only **5 live** (+9 inb).
+
+Held: 05 (settling post-£40 revert @39.69), 04 (15u/7d but **37% returns** — fit issue, price is fine), 08 (cold @38.49, 0 sold since 6/8 drop), 03 (creep would round-trip to old 39.79 — slowest size, deep stock).
+
 ### WHITE step-up (2026-06-02)
 
 WHITE still on a tear — **May 25 wk a fresh record: 132 units, £1,960 profit** (beat the prior ~£1,090 "recovered" peak). Demand is not the constraint; the gate is the price-held signal per size. Stacked another **+20p** on the four sizes that printed sales at their just-raised price: **04→39.09, 05→39.89, 06→39.09, 07→39.20**. Held **03** (£39.29 — slowest, deep stock, don't chase old 39.79) and **08/09** (£38.69 / £38.70 — no sale yet at their 05-31 raised price). All under Shopify £41.10. 07's returns settled to ~7% (14d) so it crept too — but the size-7 fit watch stays open.
@@ -27,12 +36,13 @@ Broad surge held — **8 of 9 colours up** on the May 25 wk (NAVY 21/£322, MIDB
 
 ### Priority watches (open)
 
-**WHITE (from 2026-06-02):**
-- **WHITE-05 (£39.89, ~31 live + 136 total inbound, 64u/14d)** — the engine; hottest size, thinnest *live* cover. Confirm inbound lands before the live pile empties, and that 39.89 keeps selling.
-- **WHITE-07 (£39.20)** — size-7 fit pattern, returns at ~7% now. If returns climb post-creep, it's fit not price — drop back.
-- **WHITE-04/06 (£39.09)** — confirm the new price keeps selling before stacking again.
-- **WHITE-08/09 (£38.69 / £38.70)** — held; step only once they print a sale at the current price.
-- **WHITE-03 (£39.29)** — hold; don't chase the old 39.79.
+**WHITE (from 2026-06-11):**
+- **WHITE-05 (£39.69, settling)** — the engine; pulled back from the failed £40.09 push on 6/8. Let 39.69 re-establish velocity. If it stalls in a few days → 39.49. Big inbound (37) landing, cover fine. **£40 is a confirmed ceiling on this size — don't retest soon.**
+- **WHITE-04 (£39.29) — returns watch, NOT price.** 15u/7d but **37% returns/14d**. Selling fine at price; don't creep into the returns. Fit/product issue — watch whether returns ease.
+- **WHITE-08 (£38.49) — cold.** Dropped 6/8, 0 sold since. If still dead in a few days, next move is a real drop to ~37.99 (not a nudge).
+- **WHITE-06 (£39.59), WHITE-07 (£39.70)** — crept 6/11; confirm the new price keeps selling before stacking again.
+- **WHITE-09 (£39.20) — thin.** 5 live +9 inbound; confirm inbound lands before it empties. Harvest creep — fine to keep pushing if it holds.
+- **WHITE-03 (£39.29)** — hold; don't chase the old 39.79 (round-trip).
 
 **COLOUR (from 2026-06-02):**
 - **Crept this round — confirm the new price sells before stacking:** MIDBLUE-05, NAVY-05, GREY-05, BLACKSOLE-08, NAVY-07, BLACKSOLE-03.
