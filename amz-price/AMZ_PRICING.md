@@ -21,6 +21,14 @@ Held: 05 (settling post-£40 revert @39.69), 04 (15u/7d but **37% returns** — 
 
 WHITE still on a tear — **May 25 wk a fresh record: 132 units, £1,960 profit** (beat the prior ~£1,090 "recovered" peak). Demand is not the constraint; the gate is the price-held signal per size. Stacked another **+20p** on the four sizes that printed sales at their just-raised price: **04→39.09, 05→39.89, 06→39.09, 07→39.20**. Held **03** (£39.29 — slowest, deep stock, don't chase old 39.79) and **08/09** (£38.69 / £38.70 — no sale yet at their 05-31 raised price). All under Shopify £41.10. 07's returns settled to ~7% (14d) so it crept too — but the size-7 fit watch stays open.
 
+### COLOUR review (2026-06-11)
+
+Segment healthy — NAVY (21/7d, £607/14d), BEIGE, BLACKSOLE leading; MIDBLUE soft this week; tails (KHAKI/STONE/RED) ticking; BLACK the exit pile @31.99. Applied **5 creeps + 3 drops**:
+- **Creeps (+30p):** NAVY-04→37.99, NAVY-05→39.19, BEIGE-04→37.49, BLACKSOLE-04→37.49, GREY-06→37.79.
+- **Drops:** NAVY-03 38.49→37.99 (dead 13d), MIDBLUE-03 37.29→**36.29** (−£1, 0 sales/14d on 21 live; prior drop didn't revive), **BEIGE-05 40.29→39.99** (supplier-harvest stalled to 1/7d above £40 — pulled back under the ceiling).
+- **£40 held as a ceiling:** NAVY-06 (39.79) and BEIGE-06 (39.80) sell well but were **held below £40** deliberately (WHITE-05 lesson). BLACKSOLE-05 held at 39.49 (round-trip to the 39.99 it was dropped from).
+- **Left running:** BLACK exit @31.99 (~105u, ~8/wk — let run, £29.99 next if you want it gone), GREY-07 @35.49 (low-floor working, don't creep), STONE/KHAKI tail clears.
+
 ### COLOUR step-up (2026-06-02)
 
 Broad surge held — **8 of 9 colours up** on the May 25 wk (NAVY 21/£322, MIDBLUE 19/£271, BEIGE 17/£246, GREY 16/£236 the standouts). Applied **6 creeps + a BLACK deeper clear**:
@@ -44,13 +52,16 @@ Broad surge held — **8 of 9 colours up** on the May 25 wk (NAVY 21/£322, MIDB
 - **WHITE-09 (£39.20) — thin.** 5 live +9 inbound; confirm inbound lands before it empties. Harvest creep — fine to keep pushing if it holds.
 - **WHITE-03 (£39.29)** — hold; don't chase the old 39.79 (round-trip).
 
-**COLOUR (from 2026-06-02):**
-- **Crept this round — confirm the new price sells before stacking:** MIDBLUE-05, NAVY-05, GREY-05, BLACKSOLE-08, NAVY-07, BLACKSOLE-03.
-- **No print at raised price yet — re-check in 2–3 days:** BEIGE-05 (£40.29 — revert toward 40.09 if it stalls), NAVY-08 (£37.79), GREY-06 (£37.49), MIDBLUE-07 (£38.09, fresh return + thin).
-- **BLACKSOLE-05 (£39.99)** — next step crosses £40; judgment call, don't auto-creep.
-- **BLACK deeper clear (04/05/06/08 @ £33.99)** — did 33.99 finally move the pile? If still stuck, decide whether to exit faster / stop restocking entirely.
-- **BLACKSOLE-07 & KHAKI-06** — fit/defect watch, NOT price. Eyeball return reasons.
-- **KHAKI-04/05/07 @ £34.99, GREY-07 @ £35.49** — slow but moving; keep validating the lower-floor policy.
+**COLOUR (from 2026-06-11):**
+- **Crept this round — confirm the new price sells before stacking:** NAVY-04 (£37.99), NAVY-05 (£39.19), BEIGE-04 (£37.49), BLACKSOLE-04 (£37.49), GREY-06 (£37.79).
+- **BEIGE-05 (£39.99)** — pulled back under £40 after stalling at 40.29. Confirm velocity returns at 39.99; if still 1/wk the scarcity-pricing-power story is over, treat as a normal size.
+- **MIDBLUE-03 (£36.29)** — deep drop on dead stock; did £1 finally move it? If still 0/wk, it's below the next test too — consider exit.
+- **MIDBLUE soft this week** (8/7d vs 24/14d) — watch whether it's a blip or a fade; 05/06 were strong, slowed.
+- **£40 ceiling holds:** NAVY-06 (39.79), BEIGE-06 (39.80) — strong sellers held below £40 on purpose. Don't auto-creep over.
+- **BLACKSOLE-05 (£39.49)** — held; don't round-trip to the 39.99 it was dropped from.
+- **BLACK exit pile (04/05/06/08 @ £31.99, ~105u)** — moving ~8/wk. Let run; £29.99 is the next step if you want it cleared faster.
+- **GREY-07 (£35.49) & tail clears (STONE/KHAKI)** — low-floor working; don't creep, keep validating.
+- **RED-05 (£35.99)** — deep-stock tail (20 live) gone quiet; revisit if still dead next session.
 
 ### Carry-forward rules
 
