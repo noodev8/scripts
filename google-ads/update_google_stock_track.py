@@ -39,7 +39,7 @@ from adcost_logging import manage_log_files, create_logger, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "update_google_stock_track"
-CURRENT_TROAS = 600  # Current Google Ads target ROAS setting (%). Update when changed in Google Ads. (400→500 on 8 Jun, 500→600 on 10 Jun 2026)
+CURRENT_TROAS = 550  # Current Google Ads target ROAS setting (%). Update when changed in Google Ads. (400→500 on 8 Jun, 500→600 on 10 Jun, 600→550 on 13 Jun 2026)
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
