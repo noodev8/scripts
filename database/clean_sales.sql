@@ -4,7 +4,7 @@
 --
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, orderstatus_archive,
---      orderstatus (stale Amazon orders), amz_price_log
+--      orderstatus (stale Amazon orders), amz_price_log, amzshipment_archive
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
@@ -31,6 +31,13 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
+-- 60-day window: shipment manifests are only needed until the boxes
+-- land in FBA and reconcile, which is always inside a month. After
+-- that the Amazon reports are the source of truth, so anything older
+-- than 60d is dead reference data.
+DELETE FROM amzshipment_archive
+WHERE created_at < CURRENT_DATE - INTERVAL '60 days';
 
 -- 30-day window = real-world ceiling (20d longest legitimate arrival
 -- observed) + 10d buffer. Typical supplier check-in is ~10 days, so
