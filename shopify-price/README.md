@@ -32,7 +32,36 @@ When the user names a specific groupid and wants to decide a price, produce all 
 
 After these blocks, summarise the read in 3–5 lines and propose a single price move. Don't split into multiple options unless the picture is genuinely ambiguous.
 
+## Portfolio scan (whole-catalogue competitive view)
+
+The deep-dive above is per-groupid. When the question is *"how do our prices sit as a whole vs the market?"* — usually triggered by Google Ads showing we're losing to competition — use `portfolio_scan.py` instead. It rolls both Google CSVs up to groupid level and joins them to the live DB, so you get one screen across the catalogue rather than going product-by-product.
+
+It reads the **two Google docs together**, because they do different jobs:
+
+- **Benchmark doc** (`Your most popular products with price benchmarks`) — where our price sits vs Google's competitive benchmark. The diagnostic. `gap%` **> 0 = we're above benchmark** (pricier than the field); **< 0 = cheaper**.
+- **Sale-price suggestions doc** (`...highest performance impact`) — Google's *aggressive* "cut to here and you'll move volume" price, with an Effectiveness rating (High/Medium/Low). The provocation. **Take with a pinch of salt** — it optimises clicks/conversions, not our margin — but it's directionally useful and shows up as `gSugg`/`cut%`/`eff`.
+
+Join key: Google `Product ID` == `skumap.googleid` (exact match, no normalisation). `clk` is click-weighted so the rollup reflects where traffic actually is. `net%` is net margin at the current price using the cost constants below; the saved CSV also has net margin at Google's suggested price, so you can see the profit cost of chasing the aggressive number.
+
+```
+python shopify-price/refresh_google_csvs.py     # pull latest CSVs first
+python shopify-price/portfolio_scan.py          # default: OVER-benchmark + high clicks (the bleed list)
+python shopify-price/portfolio_scan.py --under  # UNDER benchmark (margin possibly left on the table)
+python shopify-price/portfolio_scan.py --all --min-clicks 0   # everything
+```
+
+The default lens is the "losing to competition" list: priced above benchmark, sorted by clicks. If that lens comes back nearly empty, that's a real result — it means price competitiveness is *not* the problem and the Ads symptom is coming from somewhere else (rank/budget/impression share). The full per-groupid table is always written to `portfolio_scan_<date>.csv` (gitignored) for drill-down. Anything the scan flags is then a candidate for the per-groupid deep-dive above.
+
 ## What's here
+
+| File | Purpose |
+|---|---|
+| `apply_prices.py` | Reads a CSV of price changes and writes them to the database. Dry-run by default. |
+| `apply-prices.md` | How to use `apply_prices.py` — CSV format, commands, verification SQL. |
+| `refresh_google_csvs.py` | Pulls fresh Google Merchant CSVs from Downloads into this folder; keeps only the latest of each type. |
+| `portfolio_scan.py` | Whole-catalogue competitive triage: both Google CSVs rolled up to groupid, joined to live DB. |
+| `staging/` | Where CSVs of pending changes live before they're applied. Delete them once applied. |
+| `README.md` | This file. |
 
 | File | Purpose |
 |---|---|
