@@ -116,6 +116,9 @@ Never reach for `skusummary.variants` or `skusummary.stockvariants` in any query
 ## Shopify Pricing
 When asked to work on pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/README.md` first — it's the short session guide. Don't assume a ritual; ask the user what they want to look at.
 
+## Amazon Pricing
+When asked to work on Amazon/FBA pricing ("amazon prices", "full ives review", "full rieker review", or any segment/brand on Amazon), read `amz-price/README.md` first — the front door and coverage map. The engine is brand-neutral and works for **any** segment we sell on Amazon, not just IVES: `AMZ_PRICING.md` (how it works), `AMZ_FULL_REVIEW.md` (the parameterised full-segment pass), `AMZ_PRODUCTS.md` (per-segment economics + state). No segment is "too small to manage" — thin segments sit on a longer cadence, not excluded.
+
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
 

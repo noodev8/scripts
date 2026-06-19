@@ -32,7 +32,7 @@ Typical session types:
 
 ## Related context
 
-- Amazon pricing conventions: `amz-price/AMZ_PRICING.md`
+- Amazon pricing conventions: `amz-price/README.md` (entry point; engine in `AMZ_PRICING.md`, per-segment data incl. UKD-SEG in `AMZ_PRODUCTS.md`)
 - Scale / segment work: `scale/CLAUDE_CONTEXT.md`
 - Shopify pricing: `shopify-price/README.md`
 
