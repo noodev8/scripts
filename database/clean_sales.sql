@@ -21,7 +21,7 @@ DELETE FROM sales
 WHERE solddate < CURRENT_DATE - INTERVAL '900 days';
 
 DELETE FROM bclog
-WHERE date < CURRENT_DATE - INTERVAL '30 days';
+WHERE date < CURRENT_DATE - INTERVAL '365 days';
 
 DELETE FROM stockorder
 WHERE orderdate < CURRENT_DATE - INTERVAL '365 days';
