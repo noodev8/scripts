@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+-- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 17.4
 
--- Started on 2026-05-04 21:12:25
+-- Started on 2026-06-20 13:14:58
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -480,7 +480,9 @@ CREATE TABLE public.google_campaign_daily (
     clicks integer DEFAULT 0 NOT NULL,
     impressions integer DEFAULT 0 NOT NULL,
     cost numeric(10,2) DEFAULT 0 NOT NULL,
-    search_imp_share numeric(5,2)
+    search_imp_share numeric(5,2),
+    lost_is_rank numeric,
+    lost_is_budget numeric
 );
 
 
@@ -2113,7 +2115,7 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2026-05-04 21:12:27
+-- Completed on 2026-06-20 13:14:59
 
 --
 -- PostgreSQL database dump complete
