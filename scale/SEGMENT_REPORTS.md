@@ -137,7 +137,7 @@ Current override folders:
 - `mayari/` — Birkenstock Mayari. Same two-step flow (`mayari/stock_triage.py`).
 - `arizona-patent/` — Birkenstock Patent Arizona. Same two-step flow (`arizona-patent/stock_triage.py`).
 - `arizona-black/`, `arizona-blue/`, `arizona-brown/`, `arizona-white/`, `arizona-taupe/` — Arizona Birko-Flor colour bricks (Reg+Nar pairs, May 2026). Drill = per-EU-size availability (`size_availability.py`) with the **Inv** (releasable) / **Wsh** (future) stock split.
-- `arizona-general/` — Arizona monitor bucket. Drill = shade breakdown (`shade_breakdown.py`); shade-pairs ranked by demand, promote at £5k.
+- `arizona-general/` — Arizona monitor bucket. Drill = shade breakdown (`shade_breakdown.py`); shade-pairs ranked by demand, promote on judgment (no fixed revenue bar).
 - `madrid/` — Birkenstock Madrid. Style-level triage (`madrid/stock_triage.py`).
 - `milano/` — Birkenstock Milano (4-code brick: Brown + Black, each Reg/Nar). Two-drill chain: `size_availability.py` (one flat row per style/width) → `size_breakdown.py` (size-as-columns, cell = `u30(stk)`). **⭐ Preferred / latest report shape for Birkenstock** — short-named chain (Summary → drill 1 → drill 2) plus a single overwrite-only `## Status` block. Use as the reference when reworking other Birk segments; don't bulk-retrofit, adopt per-segment as each is revisited.
 - `zermatt/` — Birkenstock Zermatt (cork + shearling). Triage with material column (`zermatt/stock_triage.py`).

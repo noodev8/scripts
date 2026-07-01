@@ -7,8 +7,9 @@ together. See ARIZONA-GENERAL.md for what it's for and how to read it.
 
 GENERAL is the minor league: everything that isn't a colour brick yet —
 seasonal dupes, material variants, shade experiments, fresh arrivals, tail.
-The promotion unit is the shade-PAIR (Reg + Nar of one shade). When a pair's
-combined trailing-365 revenue clears the £5k bar, lift it into ARIZONA-<SHADE>.
+The promotion unit is the shade-PAIR (Reg + Nar of one shade). When a pair reads as
+a sustained, dominant seller, lift it into ARIZONA-<SHADE> — a human/style call off
+the demand ranking, not a fixed revenue bar.
 
 Run:  python scale/arizona-general/shade_breakdown.py
 """
@@ -19,7 +20,6 @@ from datetime import date, timedelta
 from logging_utils import get_db_config
 
 SEG = 'ARIZONA-GENERAL'
-BAR = 5000  # £ trailing-365 revenue promotion bar (per shade-pair)
 TODAY = date.today()
 d90 = TODAY - timedelta(days=90)
 d365 = TODAY - timedelta(days=365)
@@ -79,8 +79,8 @@ rows = cur.fetchall()
 conn.close()
 
 print(f"=== {SEG} shade breakdown  ({TODAY}) ===")
-print(f"Promotion bar: £{BAR:,} trailing-365 rev per shade-pair (Reg+Nar). "
-      f"Top rows = the queue; pair the shade names to read a candidate.\n")
+print("Promotion = a human call off the ranking (no fixed revenue bar). "
+      "Top rows = the queue; pair the shade names to read a candidate.\n")
 
 hdr = (f"{'#':>2}  {'Colour':<7} {'Shade':<22} {'Fit':<3} {'GroupID':<18} "
        f"{'Px':>5} {'Stk':>4} {'u90':>4} {'u365':>5} {'Rev365':>8}")

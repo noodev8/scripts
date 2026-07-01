@@ -23,12 +23,14 @@ where everything else waits.
 - **Promotion unit = the shade-pair** (the Regular + Narrow of one shade, e.g.
   "Stone Coin Reg + Stone Coin Nar"). Not the `colour` field — that's too coarse
   (it lumps Eggshell + Pearl as "White", Stone Coin + Basalt + Concrete as "Grey").
-- **Bar = £5,000 trailing-365 revenue** for the pair. When a shade-pair clears it,
-  lift those two codes into a new `ARIZONA-<SHADE>` brick (give it the shade's
+- **Promote on judgment, not a number.** When a shade-pair reads as a coherent,
+  live seller worth focusing on alone — top of the demand ranking, sustained not a
+  blip — lift those two codes into a new `ARIZONA-<SHADE>` brick (give it the shade's
   marketing name, not the blunt colour — that's how TAUPE and the off-whites came up).
+  There's no fixed revenue bar; you decide off the ranking.
 - **Relegation** runs the other way: a brick that fades drops back here.
 - **New codes always land here first** and earn their way out. Don't pre-judge a
-  fresh arrival into a brick — let it prove £5k.
+  fresh arrival into a brick — let it show sustained demand first.
 
 This is the safeguard against what happened pre-split: a riser (Blue) hiding inside
 a big bucket, unseen. Scanning this report occasionally is how neglect stays
@@ -59,13 +61,14 @@ Columns: Colour · Shade · Fit · GroupID · Px · Stk · u90 · u365 · Rev365
 ### How to read it (under 60 seconds)
 
 1. Top colour cluster = most live. Within it, top shade-pair = the candidate.
-2. Add the pair's two Rev365 figures. Near £5k → flag it for a brick conversation.
+2. Add the pair's two Rev365 figures — a strong, sustained pair floating at the top
+   is a brick conversation. Judge it off the ranking, not a fixed number.
 3. Everything with Stk but u365≈0 (Concrete Grey, Sandcastle, Leo) is fresh RRP
    stock that hasn't moved — watch, don't action.
 
-As of the May 2026 split, nothing here is at the bar — Stone Coin (~£2.8k) and the
-off-whites (Eggshell ~£2.0k, Pearl ~£1.9k) are the nearest, all well short. So the
-correct state of this segment right now is **quiet**.
+As of the May 2026 split, nothing here stands out as a brick candidate — Stone Coin
+(~£2.8k trailing) and the off-whites (Eggshell ~£2.0k, Pearl ~£1.9k) lead but none is
+a clear, dominant pair. So the correct state of this segment right now is **quiet**.
 
 ## Quirks worth knowing
 

@@ -9,10 +9,10 @@ The Graceful Taupe Birko-Flor pair:
 - `1029439-ARIZONA` — Narrow
 
 Channel: Shopify. **The first promotion** out of ARIZONA-GENERAL (May 2026),
-lifted on trajectory: ~£4.4k trailing revenue (just under the £5k brick bar) with
-~31 of 61 annual units in the last 90 days. Pre-empted rather than waited for the
-clean £5k cross — so the standing question for this brick is *"is it holding above
-the bar, or should it relegate back to GENERAL?"*
+lifted on trajectory: ~£4.4k trailing revenue with ~31 of 61 annual units in the
+last 90 days — a clear rising pair. Promoted on judgment, not a threshold cross —
+so the standing question for this brick is *"is it still a live, coherent seller,
+or has it faded enough to relegate back to GENERAL?"*
 
 ## The report — `size_availability.py`
 

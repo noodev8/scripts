@@ -4,12 +4,12 @@ Overrides to the defaults in `../SEGMENT_REPORTS.md`. Anything not listed here f
 
 ## Why this segment is different
 
-23 styles split roughly into: a handful of active sellers, a stocked-but-dead middle, a sell-through tail. The standard **Summary** flags whether there's a problem worth attention — but it doesn't tell you *which* of the 23 styles to look at, and going SKU-by-SKU kills motivation.
+31 styles (as of 2026-06-30; was 23 at last count — grown via new Arizona colourways, and corrected down from a high of 33 after two Birko-Flor Madrids, 0040791/0040793, were found mistagged as EVA and moved to MADRID-SEG) split roughly into: a handful of active sellers, a stocked-but-dead middle, a sell-through tail. The standard **Summary** flags whether there's a problem worth attention — but it doesn't tell you *which* of the styles to look at, and going SKU-by-SKU kills motivation.
 
 So EVA-SEG uses a two-step flow:
 
 1. **Summary** (default template from `../SEGMENT_REPORTS.md`) — the entry report. Run on request, then **stop**. Present the Summary and end with a single-line offer: *"If you want to drill, the next step for EVA-SEG is the stock-availability triage."* Do **not** auto-run the triage even if the Summary looks bad — the user decides whether to dig deeper.
-2. **Stock-availability triage** — the segment-specific drill. Run only when the user explicitly asks for it. One row per groupid, sorted by total stock units DESC, so the items where there is most recoverable £ sit at the top and the stock-gutted decisions sit at the bottom. This narrows 23 styles into a small number of actual decisions.
+2. **Stock-availability triage** — the segment-specific drill. Run only when the user explicitly asks for it. One row per groupid, sorted by total stock units DESC, so the items where there is most recoverable £ sit at the top and the stock-gutted decisions sit at the bottom. This narrows 31 styles into a small number of actual decisions.
 
 The standard per-SKU drill from `../SEGMENT_REPORTS.md` is **not** the default drill for EVA-SEG — the triage replaces it. Per-SKU is still available on request when a single groupid needs a closer look.
 

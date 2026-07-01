@@ -44,7 +44,6 @@ sheet = gc.open_by_key('1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0')
 - User makes all strategic decisions — we present data and options
 - Segments designed to be delegatable to staff
 - Each session: check progress, refine existing segments, add new ones
-- Minimum segment threshold: £5k revenue potential
 - 29 segments, no CRAP, no NULL (verified against DB May 2026). Every groupid allocated to a managed segment.
 - "Everything in a segment, even if rubbish" — losers exit naturally via sell-through, not by living in CRAP
 - £500k→£1M needs new bricks (new brands, range expansions)
@@ -90,9 +89,11 @@ residual holding everything else — when a winner is dominant/coherent enough t
 reasoned about alone and you want forced focus on it. IVES-WHITE + LUNAR-GENERAL is the
 original; **Arizona Birko-Flor** (May 2026) follows it: colour bricks ARIZONA-BLACK/
 BLUE/BROWN/WHITE/TAUPE (each just the canonical Reg+Nar pair) + ARIZONA-GENERAL. The
-anti-thrash guard is a **mechanical promotion rule**: new codes always land in GENERAL;
-a shade-pair earns its own brick only on clearing **£5k trailing revenue**; a faded brick
-relegates back. That keeps the boundary rule from being re-litigated per arrival.
+anti-thrash guard is a **default-to-GENERAL rule**: new codes always land in GENERAL;
+a shade-pair earns its own brick when you judge it a coherent, live seller worth focusing
+on alone (read the demand ranking in `shade_breakdown.py`); a faded brick relegates back.
+Promotion is a human/style call, not a revenue threshold — that keeps the boundary rule
+from being re-litigated per arrival.
 
 ## Database Query Patterns
 

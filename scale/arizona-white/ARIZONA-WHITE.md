@@ -13,11 +13,11 @@ Channel: Shopify. A founding colour brick (May 2026).
 **The White wrinkle.** White is the most code-fragmented colour. Two distinct
 off-white shades — **White Eggshell** (`1027346`/`1027339`) and **Graceful Pearl
 White** (`1009920`/`1009921`) — sit in ARIZONA-GENERAL, each with real residual
-demand (~u20-30/yr) but neither at the £5k brick bar. They're the *same shoe class*
-as this brick, so as they deplete their demand should flow to `0552681`/`0552683`
-— make sure this brick has the stock depth to catch it. They will not earn their
-own brick; they sell through. (If a genuinely new white shade ever clears £5k,
-that's a new brick conversation.)
+demand (~u20-30/yr) but neither a strong enough standalone pair to warrant its own
+brick. They're the *same shoe class* as this brick, so as they deplete their demand
+should flow to `0552681`/`0552683` — make sure this brick has the stock depth to catch
+it. They will not earn their own brick; they sell through. (If a genuinely new white
+shade ever becomes a dominant seller, that's a new brick conversation.)
 
 ## The report — `size_availability.py`
 

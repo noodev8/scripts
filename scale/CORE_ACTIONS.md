@@ -16,7 +16,7 @@
 
 This is the **durable playbook** — strategy, economics, channel, seasonal cycle, stock rules and standing actions per segment. It deliberately holds **no sales/GP/stock numbers**: those decay. For live figures use the **Meeting Prep Query** (bottom) or the **Segments Google Sheet** (full overview with codes, channels, revenue, GP, status).
 
-**Segment rules:** £5k+ revenue to qualify (below that nobody owns it). Keep segments under ~10 styles — more, split it. Fill blank slots until total revenue reaches £1M.
+**Segment rules:** Keep segments under ~10 styles — more, split it. Fill blank slots until total revenue reaches £1M.
 
 ---
 
@@ -178,9 +178,10 @@ Birko-Flor Arizona, **re-cut May 2026** from the old width buckets (BF-REG/BF-NA
 into performance **colour bricks** + a GENERAL monitor bucket. Each brick = the
 canonical **Regular + Narrow pair only**. Seasonal dupes, material variants
 (Vegan/Synthetics/Leopard), shade experiments (e.g. eggshell, new buckle colours)
-and fresh arrivals live in **ARIZONA-GENERAL** and earn a brick by clearing **£5k
-trailing revenue** — promotion unit = the **shade-pair**. New codes always land in
-GENERAL first. Patent and Leather stay their own segments.
+and fresh arrivals live in **ARIZONA-GENERAL** and earn a brick when a **shade-pair**
+reads as a sustained, dominant seller (human call off the demand ranking, no fixed
+revenue bar). New codes always land in GENERAL first. Patent and Leather stay their
+own segments.
 **Lead time:** 6 months (committed) | **Cost:** £35.42 (some £37.50) | **RRP:** £80–90 | **Margin:** ~46%
 Each brick has its own folder `scale/arizona-<colour>/` with the **size-availability**
 report (`size_availability.py`) — per EU size, Reg+Nar, with the **Inv** (invoiced,
@@ -200,10 +201,10 @@ Premium price leader, sells year-round. Reg core stock-gutted but ~14 units invo
 Most code-fragmented colour. Off-white shades (White Eggshell, Graceful Pearl) sit in GENERAL with real residual demand that should flow here as they deplete — keep brick depth up. ~19 units invoiced/releasable.
 
 ### ARIZONA-TAUPE — `1029470` Reg, `1029439` Nar
-First promotion out of GENERAL (May 2026) on trajectory (~£4.4k, just under bar). Watch trailing revenue: a fade below ~£4k is the relegation signal.
+First promotion out of GENERAL (May 2026) on trajectory (~£4.4k trailing, a clear riser). Watch trailing revenue: a sustained fade is the relegation signal.
 
 ### ARIZONA-GENERAL — the monitor bucket (25 styles)
-Scan, don't action. Report: `scale/arizona-general/shade_breakdown.py` (shade-pairs ranked by demand). Nearest promotion candidates: Stone Coin (~£2.8k), then the Eggshell/Pearl off-whites — all well short of £5k.
+Scan, don't action. Report: `scale/arizona-general/shade_breakdown.py` (shade-pairs ranked by demand). Nearest promotion candidates: Stone Coin (~£2.8k), then the Eggshell/Pearl off-whites — none yet a dominant pair.
 
 ### Actions
 
@@ -211,7 +212,7 @@ Scan, don't action. Report: `scale/arizona-general/shade_breakdown.py` (shade-pa
 - [ ] Blue: price the £85 Narrow to move; protect the surging Regular's stock
 - [ ] White: keep brick depth to absorb Eggshell/Pearl demand as the dupes deplete
 - [ ] Taupe: confirm it holds above the relegation line
-- [ ] GENERAL: occasional riser-sweep via `shade_breakdown.py` — promote a shade-pair at £5k
+- [ ] GENERAL: occasional riser-sweep via `shade_breakdown.py` — promote a shade-pair when it's a clear, sustained riser
 
 ---
 
