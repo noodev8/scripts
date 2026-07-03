@@ -1,156 +1,146 @@
-# Pricing Operating Model — WORKING DRAFT
+# Shopify Pricing Operating Model
 
-> **Status: DRAFT under active design (started 2026-07-01).** This captures a
-> strategy discussion in progress. Sections marked **[DECIDED]** are settled;
-> **[OPEN]** are still being worked out. Do not treat OPEN items as house rules
-> yet. Continue the discussion from the "Where we're up to" section at the bottom.
+> **Scope: Shopify only — pricing at `groupid` (style) level.**
+> Amazon/SKU-level pricing is out of scope for this doc.
+> **Status: building.** The anchor mechanic is being proven by hand (MD store)
+> before it earns a database column. Disposition thresholds marked *(provisional)*
+> are not house rules yet.
 
 ## Purpose
 
-A systematic, auditable way to price **every** SKU we manage — never missing an
-opportunity, without grinding equal time over SKUs that have no decision. The
-balance being struck is **time spent vs results achieved.**
-
-The catalogue is worked in ~4-hour sessions. A staff member can own the work.
-The owner (business) must be able to **review the output and catch an error**
-without redoing it — so every SKU's fate is *reason-coded*, not asserted.
+A systematic, auditable way to price every Shopify style we manage — never missing
+an opportunity, without grinding equal time over styles that have no decision.
+Every groupid's fate is **reason-coded**, so the owner can review the output and
+catch an error without redoing the analysis.
 
 ---
 
-## The core idea: the Proven Price is the ANCHOR  [DECIDED in principle]
+## How work is triggered
 
-Every managed product has a **proven price** — the price at which it reliably
-sells at acceptable margin. It is the anchor every decision references.
+**A human picks the segment.** You say *"price analyse SEGMENT X"* and we run the
+pass over that segment. There is no automated "which segment is due today" queue.
 
-- **Proven Shopify Price — per `groupid`** (Shopify prices at style level).
-- **Proven Amazon Price — per SKU / `code`** (Amazon prices at size level).
-
-Lifecycle: **Identify → Monitor → Push up (sometimes down).**
-
-1. **Identify** the proven price from history (lifetime dominant sold price +
-   the reasoning already captured in `price_change_log` notes, e.g. "dropped to
-   proven £36").
-2. **Monitor** — every review compares current price + demand *against the anchor*.
-3. **Push up** — probe above the anchor; if the higher price holds (still selling
-   at acceptable rate), the anchor **ratchets up** to the new proven level.
-4. **Come down** — if it stops selling at the anchor, test below; the anchor may
-   **reset down**. The anchor is not a floor or a target — it's the current best
-   known truth, and it moves.
-
-This is what turns pricing from opinion into audit: RAISE/CUT decisions become
-"current price vs stored anchor," which the owner can review by checking the
-**anchor**, not by re-deriving the decision.
-
-### DB design for the anchor  [OPEN]
-Needs building. Candidate shapes to decide between:
-- **Columns:** `skusummary.proven_shopify_price` (per groupid) +
-  `skumap.proven_amz_price` (per code). Simplest; fits existing grain.
-- **Dedicated table:** `proven_price(level, key, price, band_low, band_high,
-  set_date, set_by, source_note)` — keeps history of how the anchor moved.
-Open questions: do we store a single price or a low/high band? Do we keep anchor
-history (when/why it ratcheted)? Who/what writes it — seeded once then hand-tuned,
-or recomputed?
+We do **store the last date each segment was price-analysed** (the *Shopify Price*
+column on the Segments tab of the tracker sheet
+`1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0`). That date is a **memory aid** —
+it tells you when you last looked so you can decide what's worth revisiting. It
+does not decide the work for you.
 
 ---
 
-## Level 1 — The loop: which segment to work today  [DECIDED]
+## The Proven Price anchor
 
-Pick an **action lane**: Shopify Price / Amazon Price / Remove.
-Then pick the segment **most overdue against its own target cadence** for that lane.
+Every managed style has a **proven price** — the price at which it reliably sells
+at acceptable margin. It is the anchor every pricing decision references. Turning
+"should this go up?" into "is current price above or below the stored anchor?" is
+what makes the pass auditable instead of opinion.
 
-`overdue = today − (last-done date in that lane's column on the Segments sheet)`
+**One anchor per `groupid`.**
 
-Target interval, weighted by revenue-at-stake  **[OPEN — intervals are proposed]**:
+Lifecycle:
+1. **Seed (once).** First time we analyse a groupid with no stored anchor, we
+   compute it from history and **write it down**. (Exact derivation rule TBD —
+   pinned when we first seed.)
+2. **Reference.** Every later pass compares current price + recent demand *against
+   the stored anchor*.
+3. **Ratchet up.** Probe above the anchor; if the higher price holds (still selling
+   at an acceptable rate), overwrite the anchor to the new proven level.
+4. **Reset down.** If it stops selling at the anchor, test below; the anchor may
+   move down. The anchor is not a floor or a target — it's the current best known
+   truth, and it moves **deliberately**, never silently.
 
-| Tier | 12m Revenue | Target interval |
-|---|---|---|
-| 1 | > £20k | ~3–4 weeks |
-| 2 | £5k–£20k | ~6–8 weeks |
-| 3 | < £5k | ~6 months |
+### The store
 
-- Blank date = never done = top of queue.
-- `----` = lane doesn't apply to this segment (e.g. Birk has no Amazon lane), skip.
-- Selection is mechanical → the owner can eyeball the sheet and confirm the pick.
+Lives in **`scale/proven_prices.md`** — a single flat table, one row per groupid:
 
-**Tracker:** the **Segments** tab of the tracker sheet
-(`1qc83UrqByH9gel9iOO6hYVqe6PDiA8GXZzEz-XWQtZ0`) now carries three cadence columns
-— **AMZ Price · Shopify Price · Remove** — each holding a last-done date. Managed
-by hand for now; `refresh_segment_data.py` updates Styles/Revenue/GP/GP% only and
-never touches these.
+| groupid | anchor | set_date | source | note |
+|---|---:|---|---|---|
+
+- `source` = `computed` (seeded from history) or `manual` (we set/ratcheted it).
+- **No row / blank anchor = "compute on first analysis, then fill."**
+- Ratcheting overwrites `anchor` + `set_date` + `note`. The store keeps only the
+  **current** truth; if we find we miss the history of *how* an anchor moved, we
+  add that later.
+
+This MD is deliberately hand-inspectable. It will migrate to a DB column once the
+mechanic is proven; nothing about the model depends on it staying an MD.
 
 ---
 
-## Level 2 — The pass: what happens to each SKU in the segment  [DECIDED shape, thresholds OPEN]
+## The pass: one disposition per groupid
 
-**Every SKU in the segment gets exactly one disposition, assigned by a rule, with
-the numbers that triggered it shown. No SKU is silently skipped.** This is the
-audit surface.
+**Every groupid in the segment gets exactly one disposition, assigned by a rule,
+with the numbers that triggered it shown. No groupid is silently skipped.** This
+is the audit surface.
 
 Order of the pass:
 1. **Winners first** (sort u30 desc) — most £ at stake.
 2. **Stocked-and-stalled next** — the recoverable-£ pile.
 3. **Tail last** — quick cull/park calls.
 
-Dispositions (thresholds still to finalise):
+Dispositions *(thresholds provisional until agreed)*:
 
 | Code | Rule | Outcome |
 |---|---|---|
-| **RAISE** | stock > 0 **and** u30 ≥ threshold **and** current price ≤ proven anchor | price up (probe above anchor) |
-| **CUT** | stock > 0 **and** u30 = 0 **and** live ≥ 30d at this price **and** price > anchor/Google | price down |
-| **HOLD-recent** | price change within last 30d | leave — already decided |
-| **HOLD-steady** | selling (u30 > 0) at/near anchor, stock ok | leave — correctly priced |
+| **RAISE** | stock > 0 **and** selling (u30 ≥ threshold) **and** current price ≤ anchor | price up — probe above anchor |
+| **CUT** | stock > 0 **and** u30 = 0 **and** ≥ 30d live at this price **and** price > anchor | price down |
+| **HOLD-recent** | price changed within last 30d | leave — already decided |
+| **HOLD-steady** | selling at/near anchor, stock ok | leave — correctly priced |
 | **WAIT-new** | stock landed within last 30d | no fair run yet |
-| **WAIT-nostock** | sellable stock = 0 | nothing to price (flag Remove lane) |
-| **CULL** | stock > 0 **and** u90 = 0 **and** not on reorder | Remove candidate |
+| **WAIT-nostock** | sellable stock = 0 | nothing to price |
+| **CULL** | stock > 0 **and** u90 = 0 **and** not on reorder | remove candidate |
 
-- The two **action** codes (RAISE/CUT) are the work.
-- The five **non-action** codes are the **owner's review surface**: scan them, challenge
-  any label whose printed numbers/dates don't support it. A mislabel can't hide
-  because the rule and its inputs sit next to every row.
+- The two **action** codes (RAISE / CUT) are the work.
+- The five **non-action** codes are the **owner's review surface**: scan them,
+  challenge any label whose printed numbers don't support it. A mislabel can't
+  hide because the rule and its inputs sit next to every row.
 
----
-
-## Level 3 — The certificate: the date stamp  [DECIDED]
-
-Stamping "SEGMENT · lane · date" asserts *"I passed my eye over the whole category;
-the ones needing a move got moved; the rest are correctly left."*
-
-**"Seen" ≠ "individually deliberated."** This is how we get the flat-SKU-list's
-no-miss guarantee without its cost — completeness is certified at the segment
-level, effort is spent only on the action rows.
+**Data sources (Shopify grain):**
+- current price → `skusummary.shopifyprice`
+- stock → `localstock` where `ordernum='#FREE' AND deleted=0`, summed per groupid
+- u30 / u90 → `sales` where `qty>0 AND soldprice>0` over the window
+- last change date → `price_change_log`
+- anchor → `scale/proven_prices.md`
 
 ---
 
-## Why not a flat SKU round-robin?  [DECIDED — rejected as the primary structure]
+## The report
 
-Listing all SKUs and working one-by-one guarantees no-miss but spends **equal time
-on every SKU** — ~90% of which have no decision on any given pass (EVA-SEG: 31 SKUs
-→ ~3 live decisions). Segments give context (better + faster decisions),
-delegability, and — via the report + disposition rules — a smaller judgment load.
-A SKU-level "last touched" date may still exist as a **backstop audit** (catch a
-quiet SKU the segment passes keep skipping), but it is not the driver.
+A new **Pricing Pass** report — a disposition table, one row per groupid, action
+rows first. This is a *separate* report from the conclusion-free segment Summary;
+its whole job is to print a disposition (a conclusion) with its inputs beside it.
+
+Proposed columns:
+
+| groupid | colour/fit | price | anchor | stock | u30 | u90 | last chg | **disposition** |
+|---|---|---:|---:|---:|---:|---:|---|---|
+
+Built fresh when we run the first pass — not a reshape of the existing Summary.
 
 ---
 
-## Where we're up to / open threads  [continue here]
+## The certificate: the date stamp
 
-- **[OPEN] Proven-price DB design** — columns vs table; single price vs band;
-  keep anchor-move history?; seeding method.
-- **[OPEN] Level-2 thresholds** — the "u30 ≥ threshold" for RAISE, the "near anchor"
-  tolerance, the 30-day "recent"/"new"/"fair run" windows. Numbers not yet fixed.
-- **[OPEN] Cadence intervals** — the tier table above is proposed, not agreed.
-- **[OPEN] Report tooling** — the current EVA triage (`scale/eva/stock_triage.py`)
-  sorts stock-DESC (a clearance lens). A pricing pass wants demand-sorted + a
-  disposition column + grey-out of recently-touched. Decide whether to reshape the
-  per-segment reports to emit the disposition table directly.
-- **[OPEN] Do we still split EVA-SEG?** Parked — may not, now that the operating
-  model (not segment size) is the real lever. Revisit once the process is defined.
-- **[TEST PENDING] Run EVA-SEG through the Level-2 ruleset** and produce the full
-  31-row disposition table — the honest check of whether it really collapses to ~3
-  actions, and the first audit dry-run.
+Completing a pass stamps *"SEGMENT · Shopify Price · date"* on the tracker — the
+assertion *"I passed my eye over the whole category; the ones needing a move got
+moved; the rest are correctly left."*
+
+**"Seen" ≠ "individually deliberated."** Completeness is certified at the segment
+level; effort is spent only on the action rows.
+
+---
+
+## Open threads
+
+- **Anchor derivation rule** — the exact "compute the proven price from history"
+  method. Pinned when we first seed.
+- **Level-2 thresholds** — the RAISE "u30 ≥" bar, the "near anchor" tolerance, the
+  30-day recent/new windows. Provisional above.
+- **First dry-run** — run a real segment through the ruleset and produce the full
+  disposition table: the honest check of whether it collapses to a handful of
+  actions, and the first audit test.
 
 ## Related docs
 - `scale/CLAUDE_CONTEXT.md` — scale/segment context (read first for segment work).
 - `shopify-price/README.md` — the Shopify per-groupid deep-dive + apply flow.
-- `amz-price/AMZ_PRICING.md` — the Amazon pricing engine.
-- `scale/SEGMENT_REPORTS.md` — per-segment report templates.
+- `scale/SEGMENT_REPORTS.md` — the conclusion-free segment Summary (separate from this).
