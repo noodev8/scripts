@@ -1199,7 +1199,7 @@ CREATE TABLE public.skusummary (
     forwardqty integer,
     segment character varying(20),
     lastfew smallint,
-    nextreviewdate date
+    next_shopify_price_review date
 );
 
 

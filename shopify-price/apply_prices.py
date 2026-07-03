@@ -99,7 +99,7 @@ def process_changes(csv_df, current_prices):
         description = str(row.get('description', '')).strip()
 
         # Review is required on every price change — you must decide when to look
-        # at it again (sets groupid_performance.next_review_date, which gates the
+        # at it again (sets skusummary.next_shopify_price_review, which gates the
         # triage). A change row with no valid positive review_days is refused, not
         # silently applied without a cooldown.
         try:
@@ -140,12 +140,12 @@ def apply_changes(conn, changes):
     """Write price changes to skusummary and price_change_log."""
     cur = conn.cursor()
     for ch in changes:
-        # Price, sync flag, and the cooldown all in one write. nextreviewdate =
+        # Price, sync flag, and the cooldown all in one write. next_shopify_price_review =
         # today + review_days parks it out of the triage (see latest_sales.py).
         cur.execute("""
             UPDATE skusummary
             SET shopifyprice = %s, shopifychange = 1,
-                nextreviewdate = CURRENT_DATE + %s
+                next_shopify_price_review = CURRENT_DATE + %s
             WHERE groupid = %s
         """, (ch['new_price'], ch['review_days'], ch['groupid']))
 

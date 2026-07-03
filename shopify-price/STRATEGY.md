@@ -42,7 +42,7 @@ here. The actual pricing signals (size curve, price, dates, margin) come on dril
   (`SUM(qty)`), so a style that sold repeatedly stands out.
 - **Drop styles with 0 current stock** — nothing to price and (for Birkenstock) no
   restock lever, so they'd just be noise. The limit tops the list back up to 10.
-- **Drop parked styles** — anything with a future `nextreviewdate` (see
+- **Drop parked styles** — anything with a future `next_shopify_price_review` (see
   [Review / park](#review--park-the-cooldown)) is in cooldown and hidden, so a style we
   just decided on doesn't loop straight back.
 - Return the **top 10 in-stock styles by units**.
@@ -118,13 +118,13 @@ Once a price is decided, apply it via `apply-prices.md` / `apply_prices.py`.
 So the triage doesn't keep re-surfacing a style we've just handled, every decision sets a
 **next review date**. Until that date passes, the style is hidden from Stage 1.
 
-- **Where it lives:** `skusummary.nextreviewdate` (a `date`). We keep it on the live product
+- **Where it lives:** `skusummary.next_shopify_price_review` (a `date`). We keep it on the live product
   master — the same table our scripts already read for price/cost/stock — not on
   `groupid_performance`. That table *does* have a `next_review_date` the old PowerBuilder
   front-end wrote, but its refreshing cron died in Mar 2026 (its metrics are frozen), so we
   don't build on it. The one live park was migrated onto `skusummary`.
 - **On a price change:** required. `apply_prices.py` refuses a price change with no
-  `review_days` — you must decide when to look again. It sets `next_review_date =
+  `review_days` — you must decide when to look again. It sets `next_shopify_price_review =
   today + review_days` as it applies the price.
 - **On a "no change" or ad-hoc:** `python shopify-price/review.py <groupid> <days>` parks a
   style without changing its price.

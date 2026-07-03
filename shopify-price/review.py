@@ -2,7 +2,7 @@
 """
 Review  —  Shopify pricing strategy: park a groupid.
 
-Sets skusummary.nextreviewdate to today + <days>, so the style drops out of the
+Sets skusummary.next_shopify_price_review to today + <days>, so the style drops out of the
 Stage 1 triage (latest_sales.py) until that date passes.
 
     python shopify-price/review.py 0129443-ARIZONA 7
@@ -23,9 +23,9 @@ from logging_utils import get_db_config
 
 UPDATE = """
     UPDATE skusummary
-    SET nextreviewdate = CURRENT_DATE + %(d)s
+    SET next_shopify_price_review = CURRENT_DATE + %(d)s
     WHERE groupid = %(g)s
-    RETURNING nextreviewdate
+    RETURNING next_shopify_price_review
 """
 
 

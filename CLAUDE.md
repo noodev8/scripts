@@ -114,7 +114,7 @@ These fields are written by the legacy PowerBuilder app only when a record is to
 Never reach for `skusummary.variants` or `skusummary.stockvariants` in any query, even if a doc tells you to.
 
 ## Shopify Pricing
-When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.nextreviewdate` / `review.py`), and applying a decided price (`apply-prices.md` / `apply_prices.py`). Everything starts by filtering to a segment.
+When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.next_shopify_price_review` / `review.py`), and applying a decided price (`apply-prices.md` / `apply_prices.py`). Everything starts by filtering to a segment.
 
 ## Amazon Pricing
 When asked to work on Amazon/FBA pricing ("amazon prices", "full ives review", "full rieker review", or any segment/brand on Amazon), read `amz-price/README.md` first — the front door and coverage map. The engine is brand-neutral and works for **any** segment we sell on Amazon, not just IVES: `AMZ_PRICING.md` (how it works), `AMZ_FULL_REVIEW.md` (the parameterised full-segment pass), `AMZ_PRODUCTS.md` (per-segment economics + state). No segment is "too small to manage" — thin segments sit on a longer cadence, not excluded.

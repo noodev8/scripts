@@ -54,7 +54,7 @@ QUERY = """
           AND s.solddate >= CURRENT_DATE - %(days)s
           -- Parked-style gate: drop anything with a future review date, so a style
           -- we've just decided on doesn't loop straight back. NULL = never parked.
-          AND (ss.nextreviewdate IS NULL OR ss.nextreviewdate <= CURRENT_DATE)
+          AND (ss.next_shopify_price_review IS NULL OR ss.next_shopify_price_review <= CURRENT_DATE)
         GROUP BY s.groupid
     ),
     stk AS (
