@@ -44,7 +44,13 @@ here. The actual pricing signals (size curve, price, dates, margin) come on dril
   restock lever, so they'd just be noise. The limit tops the list back up to 10.
 - Return the **top 10 in-stock styles by units**.
 
-**Columns:** `qty · groupid · colour · width · stock · weeks_cover`.
+**Columns:** `qty · groupid · stock`. Deliberately minimal — the `groupid` is the pick,
+and all product detail (description, colour, size, price) is left to drill-down. We tried
+showing `colour`/`width`, then the full `title`, then a `weeks_cover` figure, and pared
+them all back: `skusummary.colour` is overloaded as a segmentation tag (Mocha filed under
+"Brown") so it's ambiguous, the title is too much to scan, and weeks-cover wasn't getting
+looked at. What's left is what actually gets read — how much it sold, which style, and how
+much stock is left.
 - `stock` = current sellable warehouse units (`localstock`, `#FREE`, not deleted). Never
   `skusummary.stockvariants` — that field is stale.
 - `weeks_cover` = `stock ÷ weekly run-rate`. At current pace, roughly how long until it's

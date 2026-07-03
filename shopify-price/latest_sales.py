@@ -11,12 +11,12 @@ in the window (strongest sellers first). Always filtered to one segment.
 
 Defaults: segment=EVA-SEG, days=30, limit=10, channel=SHP.
 
-Columns: qty (units sold in window), groupid, colour, width, stock (current
-sellable units), weeks_cover (stock / weekly run-rate). Styles with 0 current
-stock are dropped — nothing to price and (for Birkenstock) no restock lever;
-the limit tops the list back up to 10. Size, date and price are deliberately
-ignored — they vary across a style's sales and are derived on drill-down.
-Returns (qty<0) and £0 lines are excluded. See STRATEGY.md.
+Columns: qty (units sold in window), groupid, stock (current sellable units).
+Deliberately minimal — the groupid is the pick; all product detail is derived on
+drill-down. Styles with 0 current stock are dropped — nothing to price and (for
+Birkenstock) no restock lever; the limit tops the list back up to 10. Size, date,
+price and product description are left to drill-down. Returns (qty<0) and £0
+lines are excluded. See STRATEGY.md.
 """
 
 import os
@@ -60,11 +60,9 @@ QUERY = """
         WHERE ordernum = '#FREE' AND COALESCE(deleted,0) = 0 AND qty > 0
         GROUP BY groupid
     )
-    SELECT w.groupid, ss.colour, ss.width, w.units, st.stock,
-           ROUND(st.stock * %(days)s::numeric / (w.units * 7.0), 1) AS weeks_cover
+    SELECT w.groupid, w.units, st.stock
     FROM win w
-    JOIN skusummary ss ON ss.groupid = w.groupid
-    JOIN stk        st ON st.groupid = w.groupid
+    JOIN stk st ON st.groupid = w.groupid
     ORDER BY w.units DESC, w.last_ts DESC
     LIMIT %(limit)s
 """
@@ -85,19 +83,18 @@ def fetch(segment, days, limit, channel):
 
 def render(rows, segment, days, channel):
     print()
+    width = 4 + 2 + 18 + 7
     print(f"Latest {len(rows)} in-stock selling styles  |  segment {segment}  |  "
           f"{channel}, last {days} days")
-    print("=" * 58)
+    print("=" * width)
     if not rows:
         print("  (no in-stock sales in window)")
         print()
         return
-    print(f"{'qty':>4}  {'groupid':<22}{'colour':<10}{'width':<8}"
-          f"{'stock':>6}{'wks':>6}")
-    print("-" * 58)
-    for groupid, colour, width, units, stock, weeks in rows:
-        print(f"{units:>4}  {groupid:<22}{(colour or ''):<10}{(width or ''):<8}"
-              f"{stock:>6}{float(weeks):>6.1f}")
+    print(f"{'qty':>4}  {'groupid':<18}{'stock':>7}")
+    print("-" * width)
+    for groupid, units, stock in rows:
+        print(f"{units:>4}  {groupid:<18}{stock:>7}")
     print()
 
 
