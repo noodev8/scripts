@@ -132,6 +132,14 @@ So the triage doesn't keep re-surfacing a style we've just handled, every decisi
 There's no fixed cooldown — pick per decision (a raise-probe might be 7 days, a healthy
 "leave it" 30). A parked style reappears in the triage automatically once the date passes.
 
+**Session convention:** when proposing a price move, **propose the review window alongside
+it** — one approval, not two. Never silently default it, never leave it for the user to
+remember. Suggest a number with a one-line reason keyed to the move, and the user approves
+or tweaks it:
+- **raise-probe** (testing the ceiling) → short, ~7 days
+- **cut to clear** → ~14 days
+- **hold / healthy** → ~30 days
+
 ---
 
 ## Stages to come
