@@ -1198,7 +1198,8 @@ CREATE TABLE public.skusummary (
     forwardorder character varying(20),
     forwardqty integer,
     segment character varying(20),
-    lastfew smallint
+    lastfew smallint,
+    nextreviewdate date
 );
 
 

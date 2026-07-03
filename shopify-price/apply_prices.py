@@ -140,11 +140,14 @@ def apply_changes(conn, changes):
     """Write price changes to skusummary and price_change_log."""
     cur = conn.cursor()
     for ch in changes:
+        # Price, sync flag, and the cooldown all in one write. nextreviewdate =
+        # today + review_days parks it out of the triage (see latest_sales.py).
         cur.execute("""
             UPDATE skusummary
-            SET shopifyprice = %s, shopifychange = 1
+            SET shopifyprice = %s, shopifychange = 1,
+                nextreviewdate = CURRENT_DATE + %s
             WHERE groupid = %s
-        """, (ch['new_price'], ch['groupid']))
+        """, (ch['new_price'], ch['review_days'], ch['groupid']))
 
         cur.execute("""
             INSERT INTO price_change_log
@@ -159,15 +162,6 @@ def apply_changes(conn, changes):
             'google_price_action',
             'SHP',
         ))
-
-        # Park it: next_review_date = today + review_days (SHP). Same field the
-        # triage gate and price_recommendation.py read.
-        cur.execute("""
-            INSERT INTO groupid_performance (groupid, channel, next_review_date)
-            VALUES (%s, 'SHP', CURRENT_DATE + %s)
-            ON CONFLICT (groupid, channel)
-            DO UPDATE SET next_review_date = EXCLUDED.next_review_date
-        """, (ch['groupid'], ch['review_days']))
     conn.commit()
     cur.close()
 

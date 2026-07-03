@@ -15,10 +15,10 @@ groupid,new_price,review_days,description,change
 - **groupid**: product groupid from `skusummary`
 - **new_price**: the new Shopify price
 - **review_days**: **required on every price change.** Days from today until the style's
-  next review — sets `groupid_performance.next_review_date`, which hides it from the Stage 1
-  triage until then. A change row with no valid positive `review_days` is **refused**
-  (skipped with a reason), never applied without a cooldown. Pick per decision (e.g. 7 for a
-  raise-probe, 30 for a healthy "leave it").
+  next review — sets `skusummary.nextreviewdate`, which hides it from the Stage 1 triage
+  until then. A change row with no valid positive `review_days` is **refused** (skipped with
+  a reason), never applied without a cooldown. Pick per decision (e.g. 7 for a raise-probe,
+  30 for a healthy "leave it").
 - **description**: a note for `price_change_log`. Currently we run **without notes** — leave
   it blank (a single space keeps pandas from writing the literal `nan`). If used, it's the
   reason for *this* change only; don't copy previous notes forward (they're preserved as
@@ -42,7 +42,7 @@ ORDER BY change_date DESC, id DESC;
 python shopify-price/apply_prices.py shopify-price/staging/your_file.csv --confirm
 ```
 
-Always run with `--confirm` — no dry-run-then-wait step. The CSV has already been agreed in conversation; running it is the apply. Updates `skusummary.shopifyprice`, sets `shopifychange=1`, logs to `price_change_log`, and sets `groupid_performance.next_review_date` (today + `review_days`) so the style is parked out of the triage. The nightly Shopify sync (`price_update2.py`) pushes changes live.
+Always run with `--confirm` — no dry-run-then-wait step. The CSV has already been agreed in conversation; running it is the apply. Updates `skusummary.shopifyprice`, sets `shopifychange=1` and `skusummary.nextreviewdate` (today + `review_days`, parking it out of the triage) in one write, and logs to `price_change_log`. The nightly Shopify sync (`price_update2.py`) pushes changes live.
 
 Only run without `--confirm` if you explicitly want to sanity-check a CSV you didn't build in this session.
 
