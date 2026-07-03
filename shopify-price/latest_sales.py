@@ -86,7 +86,7 @@ def fetch(segment, days, limit, channel):
 
 def render(rows, segment, days, channel):
     print()
-    width = 4 + 2 + 18 + 7
+    width = 3 + 2 + 4 + 2 + 18 + 7
     print(f"Latest {len(rows)} in-stock selling styles  |  segment {segment}  |  "
           f"{channel}, last {days} days")
     print("=" * width)
@@ -94,10 +94,10 @@ def render(rows, segment, days, channel):
         print("  (no in-stock sales in window)")
         print()
         return
-    print(f"{'qty':>4}  {'groupid':<18}{'stock':>7}")
+    print(f"{'#':>3}  {'qty':>4}  {'groupid':<18}{'stock':>7}")
     print("-" * width)
-    for groupid, units, stock in rows:
-        print(f"{units:>4}  {groupid:<18}{stock:>7}")
+    for i, (groupid, units, stock) in enumerate(rows, 1):
+        print(f"{i:>3}  {units:>4}  {groupid:<18}{stock:>7}")
     print()
 
 

@@ -47,7 +47,8 @@ here. The actual pricing signals (size curve, price, dates, margin) come on dril
   just decided on doesn't loop straight back.
 - Return the **top 10 in-stock styles by units**.
 
-**Columns:** `qty · groupid · stock`. Deliberately minimal — the `groupid` is the pick,
+**Columns:** `# · qty · groupid · stock`. The `#` is just a row number so a style can be
+picked by number in conversation instead of pasting the groupid. Deliberately minimal — the `groupid` is the pick,
 and all product detail (description, colour, size, price) is left to drill-down. We tried
 showing `colour`/`width`, then the full `title`, then a `weeks_cover` figure, and pared
 them all back: `skusummary.colour` is overloaded as a segmentation tag (Mocha filed under
