@@ -84,14 +84,18 @@ time** — so the page is built to make that visible without any maths or narrat
 1. **Header** — a small vertical table of where we stand now: `now` (list price), `rrp`,
    `cost`, `stock` (total sellable units).
 2. **Pricing timeline** — one row per distinct price we've sold at, **oldest era first**,
-   showing the selling period and **raw units** sold at that price. A stall or an
-   acceleration is then just the shape of the units column against the price column; the
-   reader weighs it, the script doesn't editorialise.
+   showing the selling period, **units** sold at that price (`sold`), and the **pace**
+   (`/wk` = units ÷ era-span). A stall or an acceleration is then just the shape of those
+   two columns against the price column; the reader weighs it, the script doesn't editorialise.
 
-**Deliberately raw units, not a rate.** We tried per-week pace, bars, and auto-takeaway
-lines — all cut. The period is shown next to the units so the reader can judge the tempo
-themselves. The point is that the operator reaches the call and can sanity-check it, not
-that the tool hands down a verdict.
+**Show both units and pace.** They answer different questions — units is magnitude (how much
+that era cleared, i.e. harvest size), pace is tempo (comparable across eras of different
+length). Total alone misleads: 25 sold over four weeks vs 17 over two weeks looks like more,
+but the pace says they're the same ~7/wk. We still cut the bars and auto-takeaway lines — the
+tool lays out the numbers, the operator reaches the call. Pace maths: `units ÷ era-span`, with
+the span floored at ~1 week so a tiny era or a single sale can't show a wild rate (pace off a
+couple of sales is directional, not precise). If it ever feels off, the accurate-but-heavier
+fix is to take era boundaries from `price_change_log` rather than sale dates.
 
 **Size is off by default** (`--sizes` to show the remaining-stock size curve). Size does
 **not** set the price — it's a guardrail you consult before a *cut*, so you don't misread a

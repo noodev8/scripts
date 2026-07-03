@@ -4,8 +4,9 @@ Drill  —  Shopify pricing strategy, Stage 2.
 
 Single-groupid page to decide whether to adjust price. Two blocks:
   * header  — where we are now (price / rrp / cost / stock)
-  * pricing — every price we've sold at, in time order, with raw units sold,
-              so a stall / acceleration is visible without any maths.
+  * pricing — every price we've sold at, in time order, with units sold and the
+              pace (units/week) at that price, so a stall / acceleration shows up
+              even when the price eras ran for different lengths.
 
     python shopify-price/drill.py 0129443-ARIZONA
     python shopify-price/drill.py 0129443-ARIZONA --sizes   # add size curve
@@ -105,14 +106,19 @@ def main():
     print(f"  {'stock':<7}{stock}")
     print()
 
-    # Pricing — every price sold at, oldest first, raw units.
-    print(f"  {'price':<8}{'selling period':<20}{'sold':>5}")
+    # Pricing — every price sold at, oldest first. sold = units in that price era;
+    # /wk = pace = units / era-span, so eras of different length are comparable.
+    # Span floored at 1 week so a very short era (or a single sale) can't show a
+    # wild rate — pace off a couple of sales is directional, not precise.
+    print(f"  {'price':<8}{'selling period':<20}{'sold':>5}{'/wk':>7}")
     if not timeline:
         print(f"  (no sales in last {args.days}d)")
     for sp, units, first_at, last_at in timeline:
         end = "now" if float(sp) == float(price) else f"{last_at:%b %d}"
         period = f"{first_at:%b %d} - {end}"
-        print(f"  {money(sp):<8}{period:<20}{int(units):>5}")
+        weeks = max((last_at - first_at).days, 7) / 7.0
+        per_wk = int(units) / weeks
+        print(f"  {money(sp):<8}{period:<20}{int(units):>5}{per_wk:>7.1f}")
     print()
 
     if sizes is not None:
