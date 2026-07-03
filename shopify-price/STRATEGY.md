@@ -53,9 +53,6 @@ looked at. What's left is what actually gets read — how much it sold, which st
 much stock is left.
 - `stock` = current sellable warehouse units (`localstock`, `#FREE`, not deleted). Never
   `skusummary.stockvariants` — that field is stale.
-- `weeks_cover` = `stock ÷ weekly run-rate`. At current pace, roughly how long until it's
-  gone. Read it with the [no-restock constraint](#key-constraint--no-restock-for-birkenstock):
-  **thin cover on a fast seller is a harvest / price-up signal, not a restock flag.**
 
 **What we deliberately ignore here:** size, date, price (they vary across a style's sales
 — derived on drill-down), and **incoming/allocated stock** (deferred to a later stage; a
@@ -69,6 +66,47 @@ python shopify-price/latest_sales.py EVA-SEG
 python shopify-price/latest_sales.py EVA-SEG --days 30 --limit 10   # explicit defaults
 ```
 Segment defaults to `EVA-SEG`; `--days` defaults to 30; `--limit` defaults to 10.
+
+---
+
+## Stage 2 — Drill-down (single groupid)
+
+**What it answers:** for one style picked off the Stage 1 list, should we adjust its price?
+The whole decision is one relationship — **the price we've charged vs how fast it sold, over
+time** — so the page is built to make that visible without any maths or narration.
+
+**The page (`drill.py <groupid>`):**
+
+1. **Header** — a small vertical table of where we stand now: `now` (list price), `rrp`,
+   `cost`, `stock` (total sellable units).
+2. **Pricing timeline** — one row per distinct price we've sold at, **oldest era first**,
+   showing the selling period and **raw units** sold at that price. A stall or an
+   acceleration is then just the shape of the units column against the price column; the
+   reader weighs it, the script doesn't editorialise.
+
+**Deliberately raw units, not a rate.** We tried per-week pace, bars, and auto-takeaway
+lines — all cut. The period is shown next to the units so the reader can judge the tempo
+themselves. The point is that the operator reaches the call and can sanity-check it, not
+that the tool hands down a verdict.
+
+**Size is off by default** (`--sizes` to show the remaining-stock size curve). Size does
+**not** set the price — it's a guardrail you consult before a *cut*, so you don't misread a
+sold-out core (e.g. 38/39 gone) as dead demand. For a *raise* candidate it barely matters.
+
+**One honest caveat when reading the timeline:** for seasonal Birkenstock, units rising as
+price rose can be the **season arriving, not the price working**. The cleaner signal is a
+price step where the tempo *held* (a rise with no slowdown) — that's the evidence for going
+higher, not the raw "sold more at a higher price".
+
+**Run it:**
+```
+python shopify-price/drill.py 0129443-ARIZONA
+python shopify-price/drill.py 0129443-ARIZONA --sizes         # add size curve
+python shopify-price/drill.py 0129443-ARIZONA --days 180      # widen price history
+```
+`--days` (pricing-history window) defaults to 90.
+
+Once a price is decided, apply it via `apply-prices.md` / `apply_prices.py`.
 
 ---
 
