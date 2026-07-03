@@ -63,6 +63,12 @@ QUERY = """
     SELECT w.groupid, w.units, st.stock
     FROM win w
     JOIN stk st ON st.groupid = w.groupid
+    -- Parked-style gate: drop anything with a future next_review_date (SHP), so a
+    -- style we've just decided on doesn't loop straight back. NULL / no row = never
+    -- parked = eligible. Same field price_recommendation.py and the front-end use.
+    LEFT JOIN groupid_performance gp
+           ON gp.groupid = w.groupid AND gp.channel = 'SHP'
+    WHERE gp.next_review_date IS NULL OR gp.next_review_date <= CURRENT_DATE
     ORDER BY w.units DESC, w.last_ts DESC
     LIMIT %(limit)s
 """

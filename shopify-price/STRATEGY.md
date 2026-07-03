@@ -42,6 +42,9 @@ here. The actual pricing signals (size curve, price, dates, margin) come on dril
   (`SUM(qty)`), so a style that sold repeatedly stands out.
 - **Drop styles with 0 current stock** — nothing to price and (for Birkenstock) no
   restock lever, so they'd just be noise. The limit tops the list back up to 10.
+- **Drop parked styles** — anything with a future `next_review_date` (see
+  [Review / park](#review--park-the-cooldown)) is in cooldown and hidden, so a style we
+  just decided on doesn't loop straight back.
 - Return the **top 10 in-stock styles by units**.
 
 **Columns:** `qty · groupid · stock`. Deliberately minimal — the `groupid` is the pick,
@@ -107,6 +110,27 @@ python shopify-price/drill.py 0129443-ARIZONA --days 180      # widen price hist
 `--days` (pricing-history window) defaults to 90.
 
 Once a price is decided, apply it via `apply-prices.md` / `apply_prices.py`.
+
+---
+
+## Review / park (the cooldown)
+
+So the triage doesn't keep re-surfacing a style we've just handled, every decision sets a
+**next review date**. Until that date passes, the style is hidden from Stage 1.
+
+- **Where it lives:** `groupid_performance.next_review_date`, channel `SHP`. This is the
+  system's existing cooldown field — `price_recommendation.py` already skips a groupid
+  whose review date hasn't arrived, and it's the same field the PowerBuilder front-end's
+  "Next Review" writes. We reuse it rather than adding a field to `skusummary`. It survives
+  the nightly `refresh_perfomance.sql` (that upsert only touches metric columns).
+- **On a price change:** required. `apply_prices.py` refuses a price change with no
+  `review_days` — you must decide when to look again. It sets `next_review_date =
+  today + review_days` as it applies the price.
+- **On a "no change" or ad-hoc:** `python shopify-price/review.py <groupid> <days>` parks a
+  style without changing its price.
+
+There's no fixed cooldown — pick per decision (a raise-probe might be 7 days, a healthy
+"leave it" 30). A parked style reappears in the triage automatically once the date passes.
 
 ---
 

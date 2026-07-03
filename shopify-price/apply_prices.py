@@ -98,6 +98,18 @@ def process_changes(csv_df, current_prices):
         new_price = round(row['new_price'], 2)
         description = str(row.get('description', '')).strip()
 
+        # Review is required on every price change — you must decide when to look
+        # at it again (sets groupid_performance.next_review_date, which gates the
+        # triage). A change row with no valid positive review_days is refused, not
+        # silently applied without a cooldown.
+        try:
+            review_days = int(row.get('review_days'))
+        except (TypeError, ValueError):
+            review_days = None
+        if review_days is None or review_days < 1:
+            skipped.append((gid, 'missing review_days (required for a price change)'))
+            continue
+
         if gid not in current_prices:
             skipped.append((gid, 'not found in skusummary'))
             continue
@@ -118,6 +130,7 @@ def process_changes(csv_df, current_prices):
             'old_price': old_price,
             'new_price': new_price,
             'description': description,
+            'review_days': review_days,
         })
 
     return to_apply, skipped
@@ -146,6 +159,15 @@ def apply_changes(conn, changes):
             'google_price_action',
             'SHP',
         ))
+
+        # Park it: next_review_date = today + review_days (SHP). Same field the
+        # triage gate and price_recommendation.py read.
+        cur.execute("""
+            INSERT INTO groupid_performance (groupid, channel, next_review_date)
+            VALUES (%s, 'SHP', CURRENT_DATE + %s)
+            ON CONFLICT (groupid, channel)
+            DO UPDATE SET next_review_date = EXCLUDED.next_review_date
+        """, (ch['groupid'], ch['review_days']))
     conn.commit()
     cur.close()
 
@@ -198,13 +220,15 @@ def print_summary(to_apply, skipped, confirm, saved_notes=None):
     if to_apply:
         print(f"{prefix}: {len(to_apply)} prices")
         for ch in to_apply:
-            desc_snippet = ch['description'][:50] if ch['description'] else ''
-            print(f"  {ch['groupid']}: {ch['old_price']:.2f} -> {ch['new_price']:.2f}  \"{desc_snippet}\"")
+            print(f"  {ch['groupid']}: {ch['old_price']:.2f} -> {ch['new_price']:.2f}"
+                  f"  (review +{ch['review_days']}d)")
     else:
         print(f"{prefix}: 0 prices")
 
     if skipped:
         print(f"Skipped: {len(skipped)}")
+        for gid, reason in skipped:
+            print(f"  {gid}: {reason}")
 
     if saved_notes:
         print(f"Description updates saved: {len(saved_notes)}")
