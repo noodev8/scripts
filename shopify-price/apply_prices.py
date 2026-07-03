@@ -136,7 +136,7 @@ def process_changes(csv_df, current_prices):
     return to_apply, skipped
 
 
-def apply_changes(conn, changes):
+def apply_changes(conn, changes, changed_by):
     """Write price changes to skusummary and price_change_log."""
     cur = conn.cursor()
     for ch in changes:
@@ -149,6 +149,8 @@ def apply_changes(conn, changes):
             WHERE groupid = %s
         """, (ch['new_price'], ch['review_days'], ch['groupid']))
 
+        # reason_code left NULL — we don't capture a reason (that's the front-end's
+        # decision vocabulary). changed_by = the session operator (see --by).
         cur.execute("""
             INSERT INTO price_change_log
                 (groupid, old_price, new_price, reason_code, reason_notes, changed_by, channel)
@@ -157,16 +159,16 @@ def apply_changes(conn, changes):
             ch['groupid'],
             ch['old_price'],
             ch['new_price'],
-            'google_price',
+            None,
             ch['description'],
-            'google_price_action',
+            changed_by,
             'SHP',
         ))
     conn.commit()
     cur.close()
 
 
-def save_descriptions(conn, all_rows_df, current_data, applied_groupids):
+def save_descriptions(conn, all_rows_df, current_data, applied_groupids, changed_by):
     """Save updated descriptions to price_change_log for rows where the note changed.
 
     Skips groupids that already got a price_change_log entry from apply_changes.
@@ -195,7 +197,7 @@ def save_descriptions(conn, all_rows_df, current_data, applied_groupids):
             INSERT INTO price_change_log
                 (groupid, old_price, new_price, reason_code, reason_notes, changed_by, channel)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (gid, current_price, current_price, 'google_price_note', desc, 'google_price_action', 'SHP'))
+        """, (gid, current_price, current_price, None, desc, changed_by, 'SHP'))
         saved.append(gid)
 
     conn.commit()
@@ -239,6 +241,8 @@ def main():
     parser = argparse.ArgumentParser(description="Apply price changes from a CSV to the database")
     parser.add_argument('csv_file', help="Path to the price change CSV")
     parser.add_argument('--confirm', action='store_true', help="Apply changes (default is dry run)")
+    parser.add_argument('--by', default='Andreas',
+                        help="operator name recorded as changed_by in price_change_log (default Andreas)")
     args = parser.parse_args()
 
     csv_path = args.csv_file
@@ -282,16 +286,16 @@ def main():
         # Apply if confirmed
         applied_groupids = set()
         if confirm and to_apply:
-            apply_changes(conn, to_apply)
+            apply_changes(conn, to_apply, args.by)
             applied_groupids = {ch['groupid'] for ch in to_apply}
-            log(f"Applied {len(to_apply)} price changes")
+            log(f"Applied {len(to_apply)} price changes (by {args.by})")
         elif confirm and not to_apply:
             log("Confirmed but nothing to apply")
 
         # Save description updates for ALL rows (including change=0)
         saved_notes = []
         if confirm:
-            saved_notes = save_descriptions(conn, all_rows_df, current_data, applied_groupids)
+            saved_notes = save_descriptions(conn, all_rows_df, current_data, applied_groupids, args.by)
             if saved_notes:
                 log(f"Saved {len(saved_notes)} description updates")
 

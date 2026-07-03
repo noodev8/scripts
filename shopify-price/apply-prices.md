@@ -39,10 +39,12 @@ ORDER BY change_date DESC, id DESC;
 ### 3. Apply
 
 ```bash
-python shopify-price/apply_prices.py shopify-price/staging/your_file.csv --confirm
+python shopify-price/apply_prices.py shopify-price/staging/your_file.csv --confirm --by Andreas
 ```
 
 Always run with `--confirm` — no dry-run-then-wait step. The CSV has already been agreed in conversation; running it is the apply. Updates `skusummary.shopifyprice`, sets `shopifychange=1` and `skusummary.next_shopify_price_review` (today + `review_days`, parking it out of the triage) in one write, and logs to `price_change_log`. The nightly Shopify sync (`price_update2.py`) pushes changes live.
+
+`--by` records the operator as `changed_by` in `price_change_log` (defaults to `Andreas`) — the same column the front-end fills with the user's name, so tool and manual changes are attributable in one history. `reason_code` is written **NULL** (we don't capture a reason; that's the front-end's decision vocabulary). Ask who's running the session at the start and pass their name.
 
 Only run without `--confirm` if you explicitly want to sanity-check a CSV you didn't build in this session.
 

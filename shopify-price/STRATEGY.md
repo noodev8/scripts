@@ -140,6 +140,12 @@ or tweaks it:
 - **cut to clear** → ~14 days
 - **hold / healthy** → ~30 days
 
+**Who's running it:** ask at the **start of the session** who's doing the pricing (default
+`Andreas`) and pass it to `apply_prices.py --by <name>`. It's written to
+`price_change_log.changed_by` — the same column the front-end fills with the user's name —
+so tool changes and manual UI changes are attributable side by side. `reason_code` is left
+NULL (we capture no reason).
+
 ---
 
 ## Stages to come
