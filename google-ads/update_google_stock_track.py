@@ -34,12 +34,39 @@ import csv
 import os
 import shutil
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from adcost_logging import manage_log_files, create_logger, get_db_config
 
 # Setup logging
 SCRIPT_NAME = "update_google_stock_track"
-CURRENT_TROAS = 650  # Current Google Ads target ROAS setting (%). Update when changed in Google Ads. (500→600 on 10 Jun, 600→550 on 13 Jun, 550→600 on 17 Jun, 600→650 on 30 Jun 2026)
+
+# Google Ads target ROAS (%) history, by EFFECTIVE date (the first day the floor ran).
+# Each row is stamped with the floor that was live on THAT day — not "today's" floor —
+# so a day whose spend backfills late (imp-share lag can be 2-3 days) still records the
+# correct tROAS. When you change tROAS in the Google Ads UI, append one row here with the
+# effective date. Do NOT edit historical rows. (Previously a single CURRENT_TROAS constant
+# stamped every newly-populated day with today's value, which mis-stamped late backfills —
+# it silently tagged 25-29 Jun as 650 when they ran at 600; fixed 5 Jul 2026.)
+TROAS_INITIAL = 400  # floor in effect before the first scheduled change below
+TROAS_SCHEDULE = [
+    (date(2026, 6, 8), 500),
+    (date(2026, 6, 10), 600),
+    (date(2026, 6, 13), 550),
+    (date(2026, 6, 17), 600),
+    (date(2026, 6, 30), 650),
+    (date(2026, 7, 6), 600),
+]
+
+def troas_for_date(d):
+    """Return the tROAS floor (%) that was live on date `d` per TROAS_SCHEDULE."""
+    value = TROAS_INITIAL
+    for eff_date, troas in TROAS_SCHEDULE:  # ascending by effective date
+        if d >= eff_date:
+            value = troas
+        else:
+            break
+    return value
+
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
@@ -288,7 +315,7 @@ def update_google_ads_data(cursor, daily_data):
                 if existing_troas is None:
                     cursor.execute(
                         "UPDATE google_stock_track SET troas = %s WHERE id = %s",
-                        (CURRENT_TROAS, record_id),
+                        (troas_for_date(row['date']), record_id),
                     )
                     log(f"Backfilled troas for {row['date']}")
                     stats['updated'] += 1
@@ -307,7 +334,7 @@ def update_google_ads_data(cursor, daily_data):
             """
             cursor.execute(update_query, (
                 row['cost'], row['clicks'], row['impressions'],
-                row['search_imp_share'], CURRENT_TROAS, record_id,
+                row['search_imp_share'], troas_for_date(row['date']), record_id,
             ))
             imp_str = f"{row['search_imp_share']:.1f}%" if row['search_imp_share'] is not None else "NULL (multi-campaign)"
             log(f"Updated {row['date']}: £{row['cost']:.2f}, {row['clicks']} clicks, {row['impressions']} impressions, imp share {imp_str}")
@@ -608,7 +635,8 @@ def insert_stock_snapshot(cursor, metrics):
     RETURNING id, snapshot_date
     """
 
-    params = {**metrics, 'troas': CURRENT_TROAS}
+    # Snapshot row is dated CURRENT_DATE - 1 (yesterday) — stamp the floor live that day.
+    params = {**metrics, 'troas': troas_for_date(date.today() - timedelta(days=1))}
 
     try:
         cursor.execute(query, params)
