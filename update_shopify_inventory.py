@@ -331,6 +331,12 @@ def update_variant_links_in_database(variant_updates, cur, conn):
     Update the variantlink field in the database with current variant IDs.
     variant_updates: dict {code: variant_id}
     """
+    # RETIREMENT NOTE (2026-07-08): variantlink is now ALSO captured in real time by the bcweb
+    # Add / Modify tool (bcweb-server/utils/shopify.js -> upsertProduct), which writes it straight
+    # from the Shopify productSet response whenever a product is created/edited & pushed from there.
+    # This nightly refresh is a SAFETY NET while both the PowerBuilder add/modify screen and bcweb run.
+    # It can be RETIRED once PowerBuilder add/modify is gone and every product flows through bcweb.
+    # (Keep running for now — it's a no-op for products already synced by bcweb.)
     if not variant_updates:
         return
 
