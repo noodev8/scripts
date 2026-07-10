@@ -8,7 +8,8 @@
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
---   5. Refresh 365-day sales totals on skumap (amz365, shp365, cmb365)
+--   5. Recompute return profit (negated) now that prices are repaired
+--   6. Refresh 365-day sales totals on skumap (amz365, shp365, cmb365)
 --
 -- Replaces the manual PowerBuilder cleanup process.
 -- ================================================================
@@ -128,7 +129,65 @@ WHERE qty < 0
 
 
 -- ----------------------------------------------------------------
--- STEP 5: Update 365-day sales totals on skumap
+-- STEP 5: Recompute return profit (negated)
+--
+-- Returns (qty < 0) are inserted with no profit, and steps 2-3 above
+-- repair their soldprice AFTER the fact — so profit must be (re)computed
+-- here, once the price is known. Stored as the NEGATIVE of the equivalent
+-- sale's per-unit net profit, so a sale and its return net to ~zero.
+--
+-- Per-channel P&L model — the single source of truth is bcweb
+-- docs/profit-model.md (mirrored in update_orders2.shopify_profit and
+-- bcweb-server/utils/profit.js):
+--   VAT    = sold / 6
+--   Gross  = sold - VAT - cost
+--   Profit = (Gross - Expenses) / 1.2
+--   SHP Expenses = (0.30 + 2.9% of sold) + 1.00 packing + 3.44 Royal Mail
+--   AMZ Expenses = 15% referral + fbafee + 2% of fbafee + 2% of referral
+--                  + 0.33 storage + 1.00 DPD + 0.50 wages
+--
+-- Only rows with the inputs the formula needs are touched (SHP needs
+-- skusummary.cost; AMZ also needs amzfeed.fbafee). Returns for deleted
+-- products (no skusummary row) keep their existing estimated profit
+-- rather than being reset to NULL. Idempotent — safe to re-run.
+-- ----------------------------------------------------------------
+
+-- Shopify returns
+UPDATE sales s
+SET profit = -1 * ROUND(
+      ( (s.soldprice - s.soldprice / 6 - ss.cost::numeric)
+        - (0.30 + 0.029 * s.soldprice + 1.00 + 3.44) ) / 1.2
+    , 2)
+FROM skusummary ss
+WHERE s.channel = 'SHP'
+  AND s.qty < 0
+  AND s.soldprice > 0
+  AND ss.groupid = s.groupid
+  AND ss.cost ~ '^[0-9]*\.?[0-9]+$'
+  AND ss.cost::numeric > 0;
+
+-- Amazon returns
+UPDATE sales s
+SET profit = -1 * ROUND(
+      ( (s.soldprice - s.soldprice / 6 - ss.cost::numeric)
+        - ( 0.15 * s.soldprice
+            + af.fbafee::numeric
+            + 0.02 * af.fbafee::numeric
+            + 0.02 * (0.15 * s.soldprice)
+            + 0.33 + 1.00 + 0.50 ) ) / 1.2
+    , 2)
+FROM skusummary ss, amzfeed af
+WHERE s.channel = 'AMZ'
+  AND s.qty < 0
+  AND s.soldprice > 0
+  AND ss.groupid = s.groupid
+  AND af.code = s.code
+  AND ss.cost ~ '^[0-9]*\.?[0-9]+$' AND ss.cost::numeric > 0
+  AND af.fbafee ~ '^[0-9]*\.?[0-9]+$' AND af.fbafee::numeric > 0;
+
+
+-- ----------------------------------------------------------------
+-- STEP 6: Update 365-day sales totals on skumap
 --
 -- Refresh amz365, shp365, cmb365 columns with rolling 365-day
 -- unit counts per channel. Runs after return-price fixes so
