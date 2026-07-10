@@ -36,6 +36,25 @@ def safe(value, max_length=None):
         result = result[:max_length]
     return result
 
+def shopify_profit(sold, cost):
+    """Per-unit NET profit for a Shopify sale (owner's P&L model).
+
+    Mirrors bcweb-server/utils/profit.js -> shopifyProfit; see
+    C:\\bcweb\\docs\\profit-model.md (the single source of truth for these fees).
+        VAT     = sold / 6                    (UK VAT is 1/6 of a VAT-inclusive price)
+        Gross   = sold - VAT - cost
+        Profit  = (Gross - Expenses) / 1.2    (the /1.2 is the flat "cover refunds" haircut)
+    Shopify Expenses = payment fee (30p + 2.9%) + packing 1.00 + Royal Mail 3.44.
+    Returns None when cost is unknown, so the caller can store NULL rather than a wrong figure.
+    """
+    if sold is None or cost is None:
+        return None
+    vat = sold / 6
+    gross = sold - vat - cost
+    payment_fee = 0.30 + 0.029 * sold
+    expenses = payment_fee + 1.00 + 3.44  # packing/wages + Royal Mail
+    return round((gross - expenses) / 1.2, 2)
+
 def format_datetime(dt_str):
     try:
         return datetime.fromisoformat(dt_str.replace("Z", "+00:00")).strftime("%Y%m%d %H:%M:%S")
@@ -174,13 +193,24 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
             log(f"WARNING: No groupid found for SKU {shopifysku} (Order {order_name}) - skipping sales insert")
             return
 
-        # Get brand from skusummary
-        cursor.execute("SELECT brand FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
+        # Get brand and cost from skusummary
+        cursor.execute("SELECT brand, cost FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
         result = cursor.fetchone()
         brand = result[0] if result else None
+        cost_raw = result[1] if result else None
 
         # Extract sales data
         soldprice = float(item.get("price", 0))
+
+        # Per-unit Shopify net profit (skusummary.cost is varchar; parse defensively).
+        # Leave profit NULL when cost is missing/unparseable rather than store a wrong figure.
+        try:
+            cost = float(cost_raw) if cost_raw not in (None, "") else None
+        except (ValueError, TypeError):
+            cost = None
+        profit = shopify_profit(soldprice, cost)
+        if profit is None:
+            log(f"WARNING: No usable cost for groupid {groupid} (SKU {shopifysku}, Order {order_name}) - profit stored as NULL")
         solddate = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).date()
         ordertime = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")).strftime("%H:%M")
         paytype = ",".join(order.get("payment_gateway_names", [])) or "UNKNOWN"
@@ -204,7 +234,7 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
         """, (
             safe(shopifysku, 50), solddate, safe(groupid, 50), safe(order_name, 50), ordertime[:20],
             item.get("quantity"), soldprice, "SHP",
-            paytype, None, title, safe(brand, 50), 0, 0
+            paytype, None, title, safe(brand, 50), profit, 0
         ))
 
         log("Sale inserted successfully")
