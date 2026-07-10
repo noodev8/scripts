@@ -23,6 +23,7 @@ Everything durable lives in the database. Every price change goes to `amz_price_
 | `AMZ_PRICING.md` | **The engine.** Brand-neutral: philosophy, DB mechanics, the pricing decision framework, the carry-forward rules, how to apply & log. Read this for *how* Amazon pricing works here. |
 | `AMZ_FULL_REVIEW.md` | **The procedure.** The parameterised full-segment review — pull data, classify 🟢/🟡/⚪, one dashboard, batch-apply. Takes a `{segment}` argument. |
 | `AMZ_PRODUCTS.md` | **The registry.** Per-segment instance data: economics (cost / FBA fee / RRP / floor / ceiling), proven prices, and a short current-state note. This is where segment-specific knowledge lives — the engine reads its parameters from here. |
+| `PROFIT_MODEL.md` | **The P&L.** How per-unit net profit is calculated — Shopify (locked, in code) and the fully-loaded Amazon stack (VAT + referral + FBA + DPD + wages + storage). Read before trusting `sales.profit` on AMZ (it's raw/unreliable) or building an `amazon_profit()`. |
 
 ## Coverage — segments under Amazon management
 
