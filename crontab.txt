@@ -32,6 +32,9 @@
 # 4:00 AM - Weekly sales cleanup (Mondays only) - purge >900 days, fix return prices
 0 3 * * 1 /apps/scripts/venv/bin/python /apps/scripts/clean_sales.py
 
+# 4:15 AM - Mirror new product images into brookfielduser1 Google Drive (legacy PowerBuilder)
+15 3 * * * /apps/scripts/venv/bin/python /apps/scripts/updateimages.py
+
 
 # ===== DAYTIME PROCESSING =====
 
