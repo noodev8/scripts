@@ -1,0 +1,309 @@
+<title>Order Status Process</title>
+<style>
+  :root{
+    --ground:#f5f7f9; --surface:#ffffff; --sheet:#eef2f5; --sheet-grid:#dde5eb;
+    --ink:#1b2530; --ink-soft:#55606d; --ink-faint:#8894a0;
+    --line:#d7dee5; --line-soft:#e6ebef;
+    --accent:#216e8c; --accent-soft:#e7eef3;
+    --durable:#2f7d57; --durable-bg:#e4f0ea;
+    --transient:#a9761b; --transient-bg:#fbf1de;
+    --fail:#b23a3a; --fail-bg:#f8e5e5;
+    --auto:#5b5296; --auto-bg:#ebe8f3;
+    --mono:ui-monospace,"Cascadia Code","SF Mono",SFMono-Regular,Consolas,"Liberation Mono",monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#11161c; --surface:#1a212a; --sheet:#eef2f5; --sheet-grid:#dde5eb;
+      --ink:#e5eaef; --ink-soft:#a2adb8; --ink-faint:#6f7b87;
+      --line:#2b333d; --line-soft:#232a33;
+      --accent:#5aa8c8; --accent-soft:#1b2b34;
+      --durable:#5cbb8a; --durable-bg:#15271e;
+      --transient:#d3a24a; --transient-bg:#2a2110;
+      --fail:#e07a7a; --fail-bg:#2c1717;
+      --auto:#a99fe0; --auto-bg:#1e1a2c;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f5f7f9; --surface:#ffffff; --ink:#1b2530; --ink-soft:#55606d; --ink-faint:#8894a0;
+    --line:#d7dee5; --line-soft:#e6ebef; --accent:#216e8c; --accent-soft:#e7eef3;
+    --durable:#2f7d57; --durable-bg:#e4f0ea; --transient:#a9761b; --transient-bg:#fbf1de;
+    --fail:#b23a3a; --fail-bg:#f8e5e5; --auto:#5b5296; --auto-bg:#ebe8f3;
+  }
+  :root[data-theme="dark"]{
+    --ground:#11161c; --surface:#1a212a; --ink:#e5eaef; --ink-soft:#a2adb8; --ink-faint:#6f7b87;
+    --line:#2b333d; --line-soft:#232a33; --accent:#5aa8c8; --accent-soft:#1b2b34;
+    --durable:#5cbb8a; --durable-bg:#15271e; --transient:#d3a24a; --transient-bg:#2a2110;
+    --fail:#e07a7a; --fail-bg:#2c1717; --auto:#a99fe0; --auto-bg:#1e1a2c;
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(20px,5vw,64px) clamp(16px,4vw,40px) 96px;}
+
+  /* ---- header ---- */
+  header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:8px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.02em;margin:16px 0 10px;
+    text-wrap:balance;font-weight:680;}
+  .dek{font-size:clamp(16px,2.2vw,19px);color:var(--ink-soft);max-width:60ch;margin:0;}
+  .meta{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--mono);
+    font-size:12.5px;color:var(--ink-faint);}
+  .meta b{color:var(--ink-soft);font-weight:600;}
+
+  /* ---- sections ---- */
+  section{margin-top:52px;}
+  h2{font-size:13px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;
+    color:var(--ink-faint);font-weight:600;margin:0 0 4px;display:flex;align-items:baseline;gap:12px;}
+  h2 .n{color:var(--accent);}
+  .h2sub{font-size:clamp(20px,3vw,26px);font-weight:640;letter-spacing:-.015em;margin:2px 0 20px;
+    text-wrap:balance;line-height:1.2;}
+  p{max-width:70ch;}
+  p.lead{font-size:16.5px;}
+  code,.mono{font-family:var(--mono);font-size:.9em;}
+  p code,li code,td code,.card code{background:var(--accent-soft);color:var(--accent);
+    padding:.08em .38em;border-radius:4px;font-size:.86em;font-weight:500;}
+
+  /* ---- callout: the question ---- */
+  .callout{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--fail);
+    border-radius:10px;padding:24px 26px;margin-top:28px;}
+  .callout .q{font-size:18px;font-weight:600;color:var(--ink);margin:0 0 12px;font-style:italic;
+    max-width:64ch;}
+  .callout .a{margin:0;color:var(--ink-soft);max-width:70ch;}
+  .callout .a b{color:var(--ink);}
+
+  /* ---- schematic sheet (diagram) ---- */
+  .sheet{background:var(--sheet);
+    background-image:linear-gradient(var(--sheet-grid) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--sheet-grid) 1px,transparent 1px);
+    background-size:22px 22px;border:1px solid #cdd6dd;border-radius:12px;
+    padding:20px;overflow-x:auto;box-shadow:0 1px 0 rgba(0,0,0,.04);}
+  .sheet .mermaid{min-width:640px;display:flex;justify-content:center;}
+  .sheet-cap{font-family:var(--mono);font-size:11.5px;color:#6a7680;letter-spacing:.04em;
+    margin:2px 2px 14px;text-transform:uppercase;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;font-family:var(--mono);font-size:12px;
+    color:var(--ink-soft);}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .legend i{width:12px;height:12px;border-radius:3px;border:1.5px solid;display:inline-block;}
+  .lg-pb i{background:var(--accent-soft);border-color:var(--accent);}
+  .lg-dur i{background:var(--durable-bg);border-color:var(--durable);}
+  .lg-tr i{background:var(--transient-bg);border-color:var(--transient);}
+  .lg-auto i{background:var(--auto-bg);border-color:var(--auto);}
+  .lg-fail i{background:var(--fail-bg);border-color:var(--fail);}
+
+  /* ---- tables ---- */
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px;}
+  th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--ink-faint);font-weight:600;background:var(--ground);position:sticky;top:0;}
+  tbody tr:last-child td{border-bottom:none;}
+  td .t{font-family:var(--mono);font-weight:600;}
+  .num{font-variant-numeric:tabular-nums;font-family:var(--mono);}
+  .pill{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;
+    border:1px solid;white-space:nowrap;display:inline-block;}
+  .p-in{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);}
+  .p-out{color:var(--durable);border-color:var(--durable);background:var(--durable-bg);}
+  .p-legacy{color:var(--ink-faint);border-color:var(--line);background:transparent;}
+  .p-dead{color:var(--ink-faint);border-color:var(--line);background:transparent;text-decoration:line-through;}
+
+  /* ---- three-record cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:22px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--line);
+    border-radius:10px;padding:18px 20px;}
+  .card.dur{border-top-color:var(--durable);}
+  .card.gone{border-top-color:var(--fail);}
+  .card .cname{font-family:var(--mono);font-weight:600;font-size:14px;margin-bottom:2px;}
+  .card .cmeta{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;
+    letter-spacing:.06em;margin-bottom:12px;}
+  .card .cstate{font-size:14.5px;color:var(--ink-soft);}
+  .card .cstate b{color:var(--ink);}
+  .verdict{margin-top:20px;padding:16px 20px;background:var(--fail-bg);border:1px solid var(--fail);
+    border-radius:10px;font-size:15px;color:var(--ink);}
+  .verdict b{color:var(--fail);}
+
+  /* ---- edge notes ---- */
+  .edges{display:grid;gap:12px;margin-top:22px;}
+  .edge{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+    display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;}
+  .edge .tag{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--transient);
+    background:var(--transient-bg);border:1px solid var(--transient);border-radius:6px;padding:3px 9px;
+    white-space:nowrap;height:fit-content;letter-spacing:.03em;}
+  .edge p{margin:0;font-size:14.5px;color:var(--ink-soft);}
+  .edge p b{color:var(--ink);}
+
+  .note{font-size:13.5px;color:var(--ink-faint);margin-top:12px;max-width:74ch;}
+  .note b{color:var(--ink-soft);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);line-height:1.9;}
+  footer b{color:var(--ink-soft);font-weight:600;}
+  a{color:var(--accent);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
+  @media (max-width:560px){ .edge{grid-template-columns:1fr;} }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><span class="dot"></span>Internal · Systems Reference<span class="dot"></span>Brookfield Comfort</div>
+    <h1>The Order Status Process</h1>
+    <p class="dek">How a supplier restock travels from order → delivery → goods-in → marked off — and what the system does (and quietly doesn't do) when it never arrives.</p>
+    <div class="meta">
+      <span><b>Scope</b> supplier restock lifecycle + non-delivery</span>
+      <span><b>Source</b> reverse-engineered from code</span>
+      <span><b>Audience</b> internal technical team</span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <p class="q">"We order a restock for a shoe and it doesn't arrive because the supplier was out of stock. What happens?"</p>
+    <p class="a">The watched record — the <code>orderstatus</code> row and PowerBuilder's "on order" total — sits untouched, <b>suppresses a reorder</b> while it waits, then is <b>silently purged at 30 days</b>. No alert, no reorder trigger. The two durable records survive it (<code>stockorder</code> says we ordered; <code>incoming_stock</code> shows nothing arrived) — but <b>nothing reconciles them automatically</b>. That's the gap.</p>
+  </div>
+
+  <section>
+    <h2><span class="n">01</span> The core problem</h2>
+    <div class="h2sub">One table, three unrelated jobs</div>
+    <p class="lead"><code>orderstatus</code> is keyed only by <code>(ordernum, shopifysku)</code> and split <em>solely</em> by <code>ordertype</code>. It isn't an order ledger — it's a <b>transient work queue</b> that gets purged on timers. That's why "did the restock arrive?" has no durable answer <em>in this table</em>.</p>
+    <div class="scroll" style="margin-top:20px;">
+      <table>
+        <thead><tr><th>type</th><th>domain</th><th>direction</th><th>created by</th><th>how it ends</th></tr></thead>
+        <tbody>
+          <tr><td><span class="t">1</span> <span class="pill p-out">customer</span></td><td>fulfilment</td><td>outbound → customer</td><td><code>update_orders2.py</code></td><td>archived when it leaves Shopify</td></tr>
+          <tr><td><span class="t">2</span> <span class="pill p-in">inbound</span></td><td>goods-in</td><td>supplier → local shelf</td><td>PB order screen · <b>1 row/unit</b></td><td>goods-in scan → 30d purge</td></tr>
+          <tr><td><span class="t">3</span> <span class="pill p-in">inbound</span></td><td>goods-in</td><td>supplier → Amazon</td><td>PB order screen · <b>1 row/unit</b></td><td>scan → 7d purge after arrival</td></tr>
+          <tr><td><span class="t">5</span> <span class="pill p-legacy">legacy</span></td><td>internal transfer</td><td>local → Amazon</td><td>hidden PB button · uses <code>qty</code></td><td>never checked off → 30d purge</td></tr>
+          <tr><td><span class="t">6</span> <span class="pill p-dead">dead</span></td><td>PFG pick</td><td>—</td><td>commented out</td><td>—</td></tr>
+          <tr><td><span class="t">0</span> <span class="pill p-dead">transient</span></td><td>scan-row class only</td><td>"unmatched"</td><td>never persisted</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>qty is a red herring.</b> Types 2 and 3 write <b>one row per physical unit</b> and ignore <code>qty</code> — four units ordered = four rows. <code>qty</code> is only meaningful on legacy type-5. Never trust <code>orderstatus.qty</code> for inbound restocks.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span> The lifecycle</h2>
+    <div class="h2sub">Order → delivery → goods-in → marked off — and the dead-end when it doesn't come</div>
+    <div class="sheet">
+      <div class="sheet-cap">fig.1 — restock lifecycle · edges are the system interfaces (table writes)</div>
+      <pre class="mermaid">
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'ui-monospace, SFMono-Regular, Consolas, monospace','fontSize':'13px','lineColor':'#7c8895','primaryColor':'#e7eef3','primaryTextColor':'#14202b','primaryBorderColor':'#216e8c'}}}%%
+flowchart TB
+  A(["Reorder decision"]):::pb --> B["PB order screen<br/>ONE row per unit"]:::pb
+  B -->|"INSERT stockorder"| SO[("stockorder<br/>ordered · kept 365d")]:::durable
+  B -->|"INSERT orderstatus<br/>type 2 or 3 · arrived=0"| OS[("orderstatus<br/>transient queue")]:::transient
+  OS --> D{"Delivered?"}
+  D -->|"Yes"| SCAN["of_scan() · per unit<br/>resolve barcode → match arrived=0<br/>set arrived=1"]:::pb
+  SCAN -->|"type 3 · Amazon"| SV3["Save → localstock #FREE<br/>@ C3-Amazon · allocated=amz"]:::pb
+  SCAN -->|"type 2 · Local"| SV2["Save → localstock #FREE<br/>@ operator shelf · unallocated"]:::pb
+  SCAN -->|"no match → type 0"| SV0["Save → local · unallocated<br/>FBA intent lost"]:::transient
+  SV3 --> INC[("incoming_stock<br/>received · kept 3yr")]:::durable
+  SV2 --> INC
+  SV0 --> INC
+  SCAN -.->|"arrived=1 → 7d later"| MARK["purge received row<br/>type3 · arrived=1 · >7d"]:::auto
+  D -->|"No · supplier OOS"| SIT["Row sits arrived=0<br/>inflates 'on order' → suppresses reorder"]:::fail
+  SIT -.->|"manual · 12–30d"| RPT["stuck_supplier_orders.sql<br/>early-warning report"]:::auto
+  SIT -.->|"30d"| PURGE["30d purge · SILENT<br/>no alert · no reorder trigger"]:::fail
+  classDef pb fill:#e7eef3,stroke:#216e8c,stroke-width:1.3px,color:#14202b;
+  classDef durable fill:#e0efe7,stroke:#2f7d57,stroke-width:1.5px,color:#173a29;
+  classDef transient fill:#fbf1de,stroke:#a9761b,stroke-width:1.4px,color:#4d3a0d;
+  classDef auto fill:#ebe8f3,stroke:#5b5296,stroke-width:1.3px,color:#2e2850;
+  classDef fail fill:#f7e0e0,stroke:#b23a3a,stroke-width:1.6px,color:#5e1c1c;
+      </pre>
+    </div>
+    <div class="legend">
+      <span class="lg-pb"><i></i>PowerBuilder (scan / write)</span>
+      <span class="lg-dur"><i></i>durable record</span>
+      <span class="lg-tr"><i></i>transient / intent-lost</span>
+      <span class="lg-auto"><i></i>cron automation</span>
+      <span class="lg-fail"><i></i>non-delivery dead-end</span>
+    </div>
+    <p class="note" style="margin-top:18px;"><b>Solid edges</b> are the live handoff; <b>dashed edges</b> are timed cron actions. <code>arrived</code> is flipped in PB's in-memory datastore and committed later by a plain datawindow save (<code>wf_update_orderstatus</code>) — the stock write and the order-flag write are decoupled.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span> Goods-in on scan</h2>
+    <div class="h2sub">What the scanner decides, per unit</div>
+    <p class="lead"><code>of_scan()</code> resolves the barcode/FNSKU/SKU to <code>skumap.code</code>, then matches <code>arrived=0</code> rows <b>Amazon-first, then Local</b> (first hit wins). The save routine then routes exactly one unit — always <code>qty 1</code>:</p>
+    <div class="scroll" style="margin-top:20px;">
+      <table>
+        <thead><tr><th>matched scan type</th><th>localstock write</th><th>location</th><th>allocated</th><th>incoming_stock.target</th></tr></thead>
+        <tbody>
+          <tr><td><span class="t">1</span> customer</td><td>none — pick already aligned</td><td>—</td><td>—</td><td><code>Pick</code></td></tr>
+          <tr><td><span class="t">3</span> Amazon</td><td>insert <code>#FREE</code></td><td><code>C3-Amazon</code></td><td><code>amz</code></td><td><code>C3-Amazon</code></td></tr>
+          <tr><td><span class="t">2</span> local</td><td>insert <code>#FREE</code></td><td>operator dropdown</td><td><code>unallocated</code></td><td>that location</td></tr>
+          <tr><td><span class="t">0</span> no match</td><td>insert <code>#FREE</code></td><td>operator dropdown</td><td><code>unallocated</code></td><td>that location</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>Every branch also</b> appends one row to <code>incoming_stock</code> (qty 1) and logs <code>bclog</code> "Goods In {code} → {target}". The type-1 customer branch is commented out in <code>of_scan</code> — the scanner no longer touches customer picks.</p>
+
+    <div class="edges">
+      <div class="edge"><span class="tag">EDGE</span><p><b>Amazon-after-purge downgrade.</b> If a type-3 row was purged (&gt;30d) <em>before</em> a late delivery, the scan finds no match → the unit saves as <code>unallocated</code> local, <b>not</b> <code>C3-Amazon</code>/<code>amz</code>. Stock is banked; FBA intent silently lost. This is precisely the historic #FREE-leak failure mode.</p></div>
+      <div class="edge"><span class="tag">EDGE</span><p><b>Partials can't show in <code>orderstatus</code>.</b> <code>arrived</code> is a binary flag flipped on the <em>first</em> unit scanned. Order 4, receive 3 → the row still reads "arrived." The accurate count lives in <code>incoming_stock</code> (one row per unit), never in <code>orderstatus</code>.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">04</span> Non-delivery</h2>
+    <div class="h2sub">Where the three records stand when the shoe never comes</div>
+    <div class="cards">
+      <div class="card dur">
+        <div class="cname">stockorder</div>
+        <div class="cmeta">ordered · kept 365d</div>
+        <div class="cstate"><b>Still says we ordered it.</b> Durable for a year — well past every orderstatus purge.</div>
+      </div>
+      <div class="card dur">
+        <div class="cname">incoming_stock</div>
+        <div class="cmeta">received · kept 3yr</div>
+        <div class="cstate"><b>No row for this code.</b> Nothing was scanned, so nothing was ever appended.</div>
+      </div>
+      <div class="card gone">
+        <div class="cname">orderstatus</div>
+        <div class="cmeta">transient · purged 30d</div>
+        <div class="cstate"><b>Gone.</b> Inflated "on order" (suppressing reorder) until it silently vanished at day 30.</div>
+      </div>
+    </div>
+    <div class="verdict">
+      <b>The detector is <code style="background:transparent;color:var(--fail);padding:0;">stockorder</code> (ordered) vs <code style="background:transparent;color:var(--fail);padding:0;">incoming_stock</code> (received)</b> — the intelligence exists and survives the purge. But nothing compares them automatically; no standing reconciliation report exists (one was considered and declined as too heavy). Detection today = run <code>stuck_supplier_orders.sql</code> inside the 12–30d window, or notice the SKU is short later.
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">05</span> Timings &amp; retention</h2>
+    <div class="h2sub">Every purge that touches this flow</div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>when</th><th>job</th><th>action</th></tr></thead>
+        <tbody>
+          <tr><td class="num">~8×/day</td><td><code>update_orders2.py</code></td><td>sync type-1 in; purge received type-3 (arrived=1, &gt;7d); 30d backstop (type≠1); drop <code>batch='-1'</code>; localstock sweeps</td></tr>
+          <tr><td class="num">Mon 03:00</td><td><code>clean_sales.py</code></td><td>type-3 ghosts &gt;30d (redundant); <code>stockorder</code> &gt;365d; <code>incoming_stock</code> &gt;3yr; <code>orderstatus_archive</code> &gt;365d; <code>bclog</code> &gt;180d; <code>sales</code> &gt;900d</td></tr>
+          <tr><td class="num">on scan</td><td>PB goods-in</td><td>resolve → match (Amazon before Local) → flip <code>arrived</code> → write localstock / incoming_stock / bclog</td></tr>
+          <tr><td class="num">ad-hoc</td><td><code>stuck_supplier_orders.sql</code></td><td>early-warning 12–30d window; manual delete of confirmed ghosts</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>30 days</b> = ~10d typical supplier lead + 20d longest legitimate arrival observed + buffer. Never shorten below lead time or in-transit stock strands into <code>#FREE</code>. <b>7 days</b> = delivery + reconciliation window for received Amazon rows.</p>
+    <div class="scroll" style="margin-top:20px;">
+      <table>
+        <thead><tr><th>table</th><th>meaning</th><th>retention</th></tr></thead>
+        <tbody>
+          <tr><td><code>orderstatus</code></td><td>transient work queue (types 1/2/3/5)</td><td><span class="pill p-dead" style="text-decoration:none;color:var(--transient);border-color:var(--transient);background:var(--transient-bg);">7–30 days</span></td></tr>
+          <tr><td><code>stockorder</code></td><td><b>what we ordered</b> — durable ordered record</td><td><span class="pill p-out">365 days</span></td></tr>
+          <tr><td><code>incoming_stock</code></td><td><b>what actually arrived</b> — append-only, 1 row/unit</td><td><span class="pill p-out">3 years</span></td></tr>
+          <tr><td><code>orderstatus_archive</code></td><td>fulfilled customer orders</td><td class="num">365 days</td></tr>
+          <tr><td><code>bclog</code></td><td>goods-in activity log</td><td class="num">180 days</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div><b>Source of truth</b> — purges: <code>update_orders2.py</code> (cleanup ~L723–763), <code>database/clean_sales.sql</code>. Scan/save/legacy-pick: PB handlers (<code>of_scan</code>, goods-in-save, Amazon-pick button). Early warning: <code>database/stuck_supplier_orders.sql</code>. Schema: <code>database/DB-Schema.sql</code>.</div>
+    <div style="margin-top:8px;"><b>Companion doc</b> — <code>order-status-process/PROCESS.md</code>. <b>Type 5</b> is legacy/dormant, superseded by <code>localstock.allocated = amz</code> set directly at goods-in.</div>
+  </footer>
+</div>

@@ -3,8 +3,9 @@
 -- Runs weekly via clean_sales.py (cron: Mondays 4am)
 --
 -- Jobs:
---   1. Purge old data from sales, bclog, stockorder, orderstatus_archive,
---      orderstatus (stale Amazon orders), amz_price_log, amzshipment_archive
+--   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),
+--      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log,
+--      amzshipment_archive
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
@@ -26,6 +27,19 @@ WHERE date < CURRENT_DATE - INTERVAL '180 days';
 
 DELETE FROM stockorder
 WHERE orderdate < CURRENT_DATE - INTERVAL '365 days';
+
+-- incoming_stock is the durable "what actually arrived" ledger (1 row per
+-- unit received at goods-in). Retention is 3 YEARS, not shorter, on purpose:
+-- the deepest reader is MAX(arrival_date) per groupid ("days since last
+-- landed") in scale/pricing_pass.py and scale/check_null_segment.sql. The
+-- cutoff must clear the slowest real restock cadence or we delete a still-live
+-- style's last-landed date and it reads as "never arrived". Slowest observed
+-- cadence is ~18 months (data only spans back that far), so 3 years leaves a
+-- year of headroom. Cost of keeping is negligible (~1.5 MB/yr). Do NOT shorten
+-- below ~3 years without re-checking last-arrival reach for active groupids.
+-- Keyed on arrival_date (the field those readers use) so semantics match.
+DELETE FROM incoming_stock
+WHERE arrival_date < CURRENT_DATE - INTERVAL '3 years';
 
 DELETE FROM orderstatus_archive
 WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
