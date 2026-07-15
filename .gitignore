@@ -31,6 +31,10 @@ out/
 merchant-feed/*.json
 merchant-feed-api-*.json
 
+# Google Drive OAuth (brookfielduser1) — client secret + minted token
+drive_oauth_client.json
+drive_token.json
+
 # Amazon upload (generated output)
 amz-product/AMZ-Upload.xlsm
 

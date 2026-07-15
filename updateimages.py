@@ -1,13 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+=============================================================================
+WHY THIS SCRIPT EXISTS — AND WHEN IT CAN BE DELETED (read this first)
+=============================================================================
+This script serves the LEGACY PowerBuilder application, which shows product
+pictures from a Google Drive folder (mirrored locally by Drive-for-Desktop).
+It does two jobs, both of which only matter while PowerBuilder is still in use
+AND while we still push product changes to Shopify via CSV upload:
+
+  * It copies each product's main image into that Google Drive folder so
+    PowerBuilder has a picture to display.
+  * It PROTECTS extra images that were added directly in the Shopify UI. A CSV
+    upload to Shopify (our bulk product-edit route) can wipe images that aren't
+    in the CSV, so we keep a record of them in the `shopifyimages` table and can
+    restore them.
+
+>>> WHEN IS THIS SCRIPT NO LONGER NEEDED? <<<
+  - If the PowerBuilder legacy app is retired, the Drive image mirror is
+    pointless — PowerBuilder is the only thing reading that folder. Job 1 dies.
+  - If we STOP editing products via CSV upload (e.g. all edits happen in the
+    Shopify UI or a replacement app), there is nothing that can clobber
+    UI-added images, so the protection is pointless. Job 2 dies.
+  - If BOTH of the above are true, DELETE THIS SCRIPT ENTIRELY (and its cron
+    entry, its Google Drive folder, and the drive_token.json / .env
+    DRIVE_IMAGES_FOLDER_ID it uses).
+
+If you are reading this in the future wondering "what is updateimages.py and do
+we still need it?" — the answer is: only if PowerBuilder is still live and/or we
+still do CSV product uploads to Shopify. Otherwise it is safe to remove.
+=============================================================================
+
 Keep images in sync for the newest skusummary rows, ahead of full PowerBuilder
 replacement:
 
-1. LOCAL IMAGE SYNC — reads C:/brookfieldcomfort/brookfield.ini for the
-   "dropbox" path, and downloads any missing main image from
-   https://images.brookfieldcomfort.com/{imagename} into
-   {dropbox}\\assets\\images\\ for the last N products loaded to skusummary.
+1. DRIVE IMAGE SYNC — downloads any missing main image from
+   https://images.brookfieldcomfort.com/{imagename} and uploads it straight
+   into brookfielduser1@gmail.com's Google Drive
+   ("My Drive/BrookfieldComfort/Working/assets/images"), for the last N
+   products loaded to skusummary. This is the folder Drive-for-Desktop used to
+   sync down locally for PowerBuilder; uploading via the API means the job can
+   run headless on the VPS with no synced folder present. Auth is a
+   brookfielduser1 OAuth token (see authorize_drive.py) — NOT the merchant-feed
+   service account, so the files are owned by brookfielduser1.
 
 2. SHOPIFY EXTRA-IMAGE SYNC — replaces the old "export CSV, strip Body column,
    run PowerBuilder function" workflow. Extra images uploaded directly in the
@@ -21,6 +56,7 @@ replacement:
 Run ad-hoc: python updateimages.py [--limit 50] [--dry-run]
 """
 
+import io
 import os
 import sys
 import time
@@ -33,14 +69,27 @@ sys.path.insert(0, SCRIPT_DIR)
 from dotenv import load_dotenv
 from logging_utils import get_db_config, manage_log_files, create_logger
 
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+
 load_dotenv(dotenv_path=os.path.join(SCRIPT_DIR, ".env"))
 
 SCRIPT_NAME = "updateimages"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
-INI_PATH = r"C:\brookfieldcomfort\brookfield.ini"
 IMAGE_BASE_URL = "https://images.brookfieldcomfort.com/"
+
+# --- Google Drive (brookfielduser1) target ---
+DRIVE_TOKEN_FILE = os.path.join(SCRIPT_DIR, "drive_token.json")
+# Narrow, non-restricted scope: no Google verification, never-expiring token.
+# Trade-off: the app can only see/write folders IT created — hence we upload
+# into a dedicated app-owned folder whose id is pinned in .env (created once by
+# authorize_drive.py). See authorize_drive.py header for the one-time setup.
+DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+DRIVE_FOLDER_ID = os.getenv("DRIVE_IMAGES_FOLDER_ID")
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
@@ -48,22 +97,68 @@ ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
 GRAPHQL_URL = f"https://{SHOP_NAME}.myshopify.com/admin/api/{API_VERSION}/graphql.json"
 
 
-def get_dropbox_path():
-    """Parse the 'dropbox=' line out of brookfield.ini (plain key=value, no section headers)."""
-    if not os.path.exists(INI_PATH):
-        raise FileNotFoundError(f"Could not find {INI_PATH}")
+def get_drive_service():
+    """Build a Drive API client from brookfielduser1's OAuth token, refreshing if needed."""
+    if not os.path.exists(DRIVE_TOKEN_FILE):
+        raise FileNotFoundError(
+            f"{DRIVE_TOKEN_FILE} not found. Run 'python authorize_drive.py' once "
+            f"(logged in as brookfielduser1@gmail.com) and copy the token to the VPS.")
 
-    with open(INI_PATH, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line.lower().startswith("dropbox="):
-                return line.split("=", 1)[1].strip()
+    creds = Credentials.from_authorized_user_file(DRIVE_TOKEN_FILE, DRIVE_SCOPES)
+    if not creds.valid:
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            with open(DRIVE_TOKEN_FILE, "w", encoding="utf-8") as f:
+                f.write(creds.to_json())
+        else:
+            raise RuntimeError(
+                "drive_token.json is invalid and cannot be refreshed — "
+                "re-run authorize_drive.py.")
+    return build("drive", "v3", credentials=creds, cache_discovery=False)
 
-    raise ValueError(f"No 'dropbox=' line found in {INI_PATH}")
+
+def _escape(name):
+    """Escape single quotes for a Drive query literal."""
+    return name.replace("\\", "\\\\").replace("'", "\\'")
+
+
+def resolve_images_folder_id(service):
+    """Return the pinned app-owned images folder id, verifying the app can see it."""
+    if not DRIVE_FOLDER_ID:
+        raise RuntimeError(
+            "DRIVE_IMAGES_FOLDER_ID is not set in .env. Run "
+            "'python authorize_drive.py' once — it creates the app's images "
+            "folder and writes the id to .env.")
+    try:
+        meta = service.files().get(
+            fileId=DRIVE_FOLDER_ID, fields="id, name, trashed").execute()
+    except Exception as e:
+        raise RuntimeError(
+            f"Cannot access DRIVE_IMAGES_FOLDER_ID={DRIVE_FOLDER_ID}. With the "
+            f"drive.file scope the app only sees folders it created — re-run "
+            f"authorize_drive.py to (re)create it. Underlying error: {e}")
+    if meta.get("trashed"):
+        raise RuntimeError(
+            f"The images folder (id={DRIVE_FOLDER_ID}) is in the trash.")
+    return DRIVE_FOLDER_ID
+
+
+def drive_image_exists(service, folder_id, name):
+    """True if a (non-trashed) file with this name already lives in the folder."""
+    q = (f"name = '{_escape(name)}' and '{folder_id}' in parents and trashed = false")
+    resp = service.files().list(
+        q=q, spaces="drive", fields="files(id)", pageSize=1).execute()
+    return len(resp.get("files", [])) > 0
 
 
 def get_recent_products(limit):
-    """Last N skusummary rows by created date: groupid, imagename, handle."""
+    """Last N Shopify skusummary rows by created date: groupid, imagename, handle.
+
+    Scoped to shopify = 1 on purpose: the job exists to mirror Shopify product
+    images. Non-Shopify rows (shopify = 0) never get an image on one.com or
+    Shopify, so including them just produces a permanent nightly 404 for images
+    that will never arrive.
+    """
     db_config = get_db_config()
     conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
@@ -71,6 +166,7 @@ def get_recent_products(limit):
         SELECT groupid, imagename, handle, created
         FROM skusummary
         WHERE imagename IS NOT NULL AND imagename != ''
+          AND shopify = 1
         ORDER BY created DESC
         LIMIT %s
     """, (limit,))
@@ -80,39 +176,56 @@ def get_recent_products(limit):
     return rows
 
 
-def sync_local_images(rows, images_dir, dry_run=False):
+_MIME_BY_EXT = {
+    ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+    ".gif": "image/gif", ".webp": "image/webp",
+}
+
+
+def _guess_mime(imagename):
+    return _MIME_BY_EXT.get(os.path.splitext(imagename)[1].lower(), "application/octet-stream")
+
+
+def sync_drive_images(rows, service, folder_id, dry_run=False):
     checked = 0
     already_present = 0
-    downloaded = 0
+    uploaded = 0
     failed = 0
 
     for groupid, imagename, handle, created in rows:
         checked += 1
-        local_path = os.path.join(images_dir, imagename)
 
-        if os.path.exists(local_path):
-            already_present += 1
+        try:
+            if drive_image_exists(service, folder_id, imagename):
+                already_present += 1
+                continue
+        except Exception as e:
+            failed += 1
+            log(f"FAILED existence check for {imagename} (groupid={groupid}): {e}")
             continue
 
         if dry_run:
-            log(f"[DRY RUN] Would download {imagename} (groupid={groupid}, created={created})")
-            downloaded += 1
+            log(f"[DRY RUN] Would upload {imagename} (groupid={groupid}, created={created})")
+            uploaded += 1
             continue
 
         url = IMAGE_BASE_URL + imagename
         try:
             resp = requests.get(url, timeout=20)
             resp.raise_for_status()
-            with open(local_path, "wb") as f:
-                f.write(resp.content)
-            downloaded += 1
-            log(f"Downloaded {imagename} (groupid={groupid})")
+            media = MediaIoBaseUpload(
+                io.BytesIO(resp.content), mimetype=_guess_mime(imagename), resumable=False)
+            service.files().create(
+                body={"name": imagename, "parents": [folder_id]},
+                media_body=media, fields="id", supportsAllDrives=False).execute()
+            uploaded += 1
+            log(f"Uploaded {imagename} to Drive (groupid={groupid})")
         except Exception as e:
             failed += 1
             log(f"FAILED {imagename} (groupid={groupid}): {e}")
 
-    log(f"Local images — checked: {checked}, already present: {already_present}, "
-        f"downloaded: {downloaded}, failed: {failed}")
+    log(f"Drive images — checked: {checked}, already present: {already_present}, "
+        f"uploaded: {uploaded}, failed: {failed}")
 
 
 def get_handles_needing_check(handles):
@@ -299,19 +412,19 @@ def full_resync_shopify_images(dry_run=False):
     log("=== FULL SHOPIFY IMAGE RESYNC COMPLETED ===")
 
 
-def sync_images(limit=50, dry_run=False):
-    dropbox_path = get_dropbox_path()
-    images_dir = os.path.join(dropbox_path, "assets", "images")
-
-    if not os.path.isdir(images_dir):
-        raise FileNotFoundError(f"Images folder not found: {images_dir}")
+def sync_images(limit=50, dry_run=False, skip_shopify=False):
+    service = get_drive_service()
+    folder_id = resolve_images_folder_id(service)
 
     rows = get_recent_products(limit)
     log(f"=== IMAGE SYNC STARTED (checking last {limit} new products) ===")
-    log(f"Target folder: {images_dir}")
+    log(f"Target: brookfielduser1 Drive images folder (id={folder_id})")
 
-    sync_local_images(rows, images_dir, dry_run=dry_run)
-    sync_shopify_images(rows, dry_run=dry_run)
+    sync_drive_images(rows, service, folder_id, dry_run=dry_run)
+    if skip_shopify:
+        log("Shopify extra-image sync skipped (--skip-shopify)")
+    else:
+        sync_shopify_images(rows, dry_run=dry_run)
 
     log("=== IMAGE SYNC COMPLETED ===")
 
@@ -321,9 +434,10 @@ if __name__ == "__main__":
     parser.add_argument("--limit", type=int, default=50, help="Number of most recently created skusummary rows to check (default 50)")
     parser.add_argument("--dry-run", action="store_true", help="List what would change without downloading or writing to the DB")
     parser.add_argument("--full", action="store_true", help="One-shot: wipe and rebuild shopifyimages for ALL active products from the Shopify API")
+    parser.add_argument("--skip-shopify", action="store_true", help="Only do the Drive image sync; skip the Shopify extra-image half (no DB writes)")
     args = parser.parse_args()
 
     if args.full:
         full_resync_shopify_images(dry_run=args.dry_run)
     else:
-        sync_images(limit=args.limit, dry_run=args.dry_run)
+        sync_images(limit=args.limit, dry_run=args.dry_run, skip_shopify=args.skip_shopify)
