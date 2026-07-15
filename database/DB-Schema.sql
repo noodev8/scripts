@@ -1379,7 +1379,7 @@ ALTER VIEW public.shopify_health_check OWNER TO brookfield_prod_user;
 CREATE TABLE public.shopifyimages (
     handle character varying(200) NOT NULL,
     imagepos smallint NOT NULL,
-    imagesrc character varying(200)
+    imagesrc text
 );
 
 

@@ -253,6 +253,52 @@ def sync_shopify_images(rows, dry_run=False):
     log(f"Shopify images — refreshed {updated} handle(s) in shopifyimages")
 
 
+def get_all_active_handles():
+    db_config = get_db_config()
+    conn = psycopg2.connect(**db_config)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT handle FROM skusummary
+        WHERE handle IS NOT NULL AND handle != '' AND shopify = 1
+    """)
+    handles = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return handles
+
+
+def full_resync_shopify_images(dry_run=False):
+    """
+    One-shot bootstrap: wipe shopifyimages and rebuild it from the Shopify API
+    for every active product, bypassing the 0/1-row gate used on normal runs.
+    Use this once to recover from a CSV import overwriting UI-added images, or
+    to seed the table before relying on the incremental last-N sync.
+    """
+    if not ACCESS_TOKEN:
+        log("SHOPIFY_ACCESS_TOKEN not found in .env — cannot run full resync")
+        return
+
+    handles = get_all_active_handles()
+    log(f"=== FULL SHOPIFY IMAGE RESYNC STARTED ({len(handles)} active handles) ===")
+
+    if not dry_run:
+        db_config = get_db_config()
+        conn = psycopg2.connect(**db_config)
+        cur = conn.cursor()
+        cur.execute("TRUNCATE TABLE shopifyimages")
+        conn.commit()
+        cur.close()
+        conn.close()
+        log("Truncated shopifyimages")
+    else:
+        log("[DRY RUN] Would truncate shopifyimages")
+
+    handle_images = fetch_shopify_images(handles)
+    updated = update_shopifyimages_table(handle_images, dry_run=dry_run)
+    log(f"Full resync — refreshed {updated} of {len(handles)} handle(s)")
+    log("=== FULL SHOPIFY IMAGE RESYNC COMPLETED ===")
+
+
 def sync_images(limit=50, dry_run=False):
     dropbox_path = get_dropbox_path()
     images_dir = os.path.join(dropbox_path, "assets", "images")
@@ -274,6 +320,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Sync missing product images (local Drive + Shopify extra images)")
     parser.add_argument("--limit", type=int, default=50, help="Number of most recently created skusummary rows to check (default 50)")
     parser.add_argument("--dry-run", action="store_true", help="List what would change without downloading or writing to the DB")
+    parser.add_argument("--full", action="store_true", help="One-shot: wipe and rebuild shopifyimages for ALL active products from the Shopify API")
     args = parser.parse_args()
 
-    sync_images(limit=args.limit, dry_run=args.dry_run)
+    if args.full:
+        full_resync_shopify_images(dry_run=args.dry_run)
+    else:
+        sync_images(limit=args.limit, dry_run=args.dry_run)
