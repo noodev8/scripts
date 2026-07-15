@@ -37,23 +37,24 @@ replacement:
 1. DRIVE IMAGE SYNC — downloads any missing main image from
    https://images.brookfieldcomfort.com/{imagename} and uploads it straight
    into brookfielduser1@gmail.com's Google Drive
-   ("My Drive/BrookfieldComfort/Working/assets/images"), for the last N
-   products loaded to skusummary. This is the folder Drive-for-Desktop used to
-   sync down locally for PowerBuilder; uploading via the API means the job can
-   run headless on the VPS with no synced folder present. Auth is a
-   brookfielduser1 OAuth token (see authorize_drive.py) — NOT the merchant-feed
-   service account, so the files are owned by brookfielduser1.
+   ("My Drive/BrookfieldComfort/Working/assets/images"), for products loaded to
+   skusummary TODAY or YESTERDAY (the nightly default; override with --limit N).
+   This is the folder Drive-for-Desktop used to sync down locally for
+   PowerBuilder; uploading via the API means the job can run headless on the VPS
+   with no synced folder present. Auth is a brookfielduser1 OAuth token (see
+   authorize_drive.py) — NOT the merchant-feed service account, so the files are
+   owned by brookfielduser1.
 
 2. SHOPIFY EXTRA-IMAGE SYNC — replaces the old "export CSV, strip Body column,
    run PowerBuilder function" workflow. Extra images uploaded directly in the
    Shopify UI never make it into skusummary (which only tracks the single main
-   image), so they used to get lost from our database. For the same last N
+   image), so they used to get lost from our database. For the same set of
    products, checks the `shopifyimages` table (handle, imagepos, imagesrc)
    first — only handles with 0 or 1 rows there are queried against the
    Shopify Admin API, to avoid needlessly hitting the API for products we
    already know have multiple images recorded.
 
-Run ad-hoc: python updateimages.py [--limit 50] [--dry-run]
+Run ad-hoc: python updateimages.py [--limit N] [--dry-run] [--skip-shopify]
 """
 
 import io
@@ -67,7 +68,8 @@ import psycopg2
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 from dotenv import load_dotenv
-from logging_utils import get_db_config, manage_log_files, create_logger
+from datetime import timedelta
+from logging_utils import get_db_config, manage_log_files, create_logger, get_uk_time
 
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -151,25 +153,53 @@ def drive_image_exists(service, folder_id, name):
     return len(resp.get("files", [])) > 0
 
 
-def get_recent_products(limit):
-    """Last N Shopify skusummary rows by created date: groupid, imagename, handle.
+def get_recent_products(limit=None):
+    """Shopify skusummary rows to check: groupid, imagename, handle, created.
 
-    Scoped to shopify = 1 on purpose: the job exists to mirror Shopify product
-    images. Non-Shopify rows (shopify = 0) never get an image on one.com or
-    Shopify, so including them just produces a permanent nightly 404 for images
-    that will never arrive.
+    Default (nightly): rows whose `created` date is TODAY or YESTERDAY (UK). New
+    products enter skusummary stamped with the current date, so this catches
+    exactly the new arrivals instead of re-checking dozens of unchanged older
+    rows every night. `created` is text formatted 'YYYYMMDD HH:MM:SS', so its
+    first 8 chars compare chronologically — we test them against yesterday's
+    YYYYMMDD. The UK date (get_uk_time) is used to match how `created` is
+    stamped, even though the VPS clock is GMT.
+
+    MISSED-RUN TRADE-OFF: a today+yesterday window is not self-healing. If the
+    job fails to run for two consecutive nights, products from the dropped day
+    are never picked up automatically — you'll notice the missing PowerBuilder
+    picture and copy that one image in by hand. Deliberate simplicity choice
+    (the VPS is stable and a miss is cheap to fix).
+
+    Includes BOTH Shopify (shopify=1) and non-Shopify (shopify=0) products on
+    purpose: the legacy PowerBuilder app displays every product regardless of
+    sales channel, so it needs a picture for all of them. The old permanent-404
+    worry (non-Shopify images that never exist on one.com) is gone now the window
+    is date-bounded — a missing image only 404s for the day or two a product is
+    new, then it ages out of the window.
+
+    Pass `limit` to override the date window with a plain "last N rows by created"
+    query instead — for ad-hoc catch-up or a full rebuild (e.g. --limit 300).
     """
     db_config = get_db_config()
     conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
-    cur.execute("""
-        SELECT groupid, imagename, handle, created
-        FROM skusummary
-        WHERE imagename IS NOT NULL AND imagename != ''
-          AND shopify = 1
-        ORDER BY created DESC
-        LIMIT %s
-    """, (limit,))
+    if limit is not None:
+        cur.execute("""
+            SELECT groupid, imagename, handle, created
+            FROM skusummary
+            WHERE imagename IS NOT NULL AND imagename != ''
+            ORDER BY created DESC
+            LIMIT %s
+        """, (limit,))
+    else:
+        yesterday = (get_uk_time().date() - timedelta(days=1)).strftime("%Y%m%d")
+        cur.execute("""
+            SELECT groupid, imagename, handle, created
+            FROM skusummary
+            WHERE imagename IS NOT NULL AND imagename != ''
+              AND LEFT(created, 8) >= %s
+            ORDER BY created DESC
+        """, (yesterday,))
     rows = cur.fetchall()
     cur.close()
     conn.close()
@@ -412,13 +442,17 @@ def full_resync_shopify_images(dry_run=False):
     log("=== FULL SHOPIFY IMAGE RESYNC COMPLETED ===")
 
 
-def sync_images(limit=50, dry_run=False, skip_shopify=False):
+def sync_images(limit=None, dry_run=False, skip_shopify=False):
     service = get_drive_service()
     folder_id = resolve_images_folder_id(service)
 
     rows = get_recent_products(limit)
-    log(f"=== IMAGE SYNC STARTED (checking last {limit} new products) ===")
+    if limit is not None:
+        log(f"=== IMAGE SYNC STARTED (checking last {limit} products by created) ===")
+    else:
+        log("=== IMAGE SYNC STARTED (checking products created today + yesterday) ===")
     log(f"Target: brookfielduser1 Drive images folder (id={folder_id})")
+    log(f"Products in window: {len(rows)}")
 
     sync_drive_images(rows, service, folder_id, dry_run=dry_run)
     if skip_shopify:
@@ -431,7 +465,7 @@ def sync_images(limit=50, dry_run=False, skip_shopify=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Sync missing product images (local Drive + Shopify extra images)")
-    parser.add_argument("--limit", type=int, default=50, help="Number of most recently created skusummary rows to check (default 50)")
+    parser.add_argument("--limit", type=int, default=None, help="Override the default (today+yesterday) window with the last N rows by created date — for ad-hoc catch-up or full rebuild")
     parser.add_argument("--dry-run", action="store_true", help="List what would change without downloading or writing to the DB")
     parser.add_argument("--full", action="store_true", help="One-shot: wipe and rebuild shopifyimages for ALL active products from the Shopify API")
     parser.add_argument("--skip-shopify", action="store_true", help="Only do the Drive image sync; skip the Shopify extra-image half (no DB writes)")
