@@ -32,21 +32,20 @@
 # 4:00 AM - Weekly sales cleanup (Mondays only) - purge >900 days, fix return prices
 0 3 * * 1 /apps/scripts/venv/bin/python /apps/scripts/clean_sales.py
 
-# 4:15 AM - Mirror new product images into brookfielduser1 Google Drive (legacy PowerBuilder)
+# 4:15 AM - Mirror new Shopify product images into brookfielduser1 Google Drive (legacy PowerBuilder)
 15 3 * * * /apps/scripts/venv/bin/python /apps/scripts/updateimages.py
 
 
 # ===== DAYTIME PROCESSING =====
 
-# Order sync targets: 10:00, 14:00, 14:30, 14:45, 15:00, 15:10, 22:00
+# Order sync targets: 10:00, 13:00, 14:00, 14:30, 14:45, 15:00, 15:10, 22:00
 # Note: These values are -1 hour to account for GMT server time.
 
-# 10:00 BST & 22:00 BST
-0 9,21 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
+# 10:00 BST, 13:00 BST  & 22:00 BST
+0 9,12,21 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
 
 # 14:00, 14:30, 14:45 BST
 0,30,45 13 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
 
 # 15:00, 15:10 BST
 0,10 14 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
-
