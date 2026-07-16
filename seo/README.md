@@ -66,6 +66,26 @@ Median not mean, because one page at 8% CTR would drag a whole band.
 - **The total at the bottom is the point.** If the whole opportunity is small,
   the answer is that there is no CTR play, and the work is ranking or new pages.
 
+## What we are trying to beat
+
+**Last year's same month. Never last month.** Sandals peak in July: month-over-
+month is season, not progress. `weekly.py` showing "+40%" in July is the season
+recovering, and means nothing.
+
+Measured 2026-07-16 — **we are behind, and it is one page:**
+
+| Month | Clicks | vs last year |
+|---|---|---|
+| 2025-05 → 2026-05 | 1,245 → **916** | **−26%** |
+| 2025-06 → 2026-06 | 1,304 → **1,046** | **−20%** |
+
+**June needs +258 clicks just to draw level.** The three queued tasks sum to
++75–120, so landing all of them closes roughly a third to a half of the gap.
+Anyone reading a within-2026 rise as winning has not checked the year before.
+
+**The real test dates: Sept and Oct 2026 against 699 and 469.** Pages built in
+July show by then. Do not judge before that; do not judge on July at all.
+
 ## What we can actually change
 
 Position, impressions and clicks are **outputs**. Google decides them. The only
@@ -139,6 +159,29 @@ Established 2026-07-16, against data, not assumption:
   `birkenstock-sandals` (136 products) ranks 2.5 and earns 64.
 - **Aggregators are worthless.** `all`, `sandals`, `full-price` are near-supersets
   of collections Google already indexes. It declines to index them. Nothing lost.
+- **Informational is bleeding; collections are winning.** May+Jun year over year:
+  `pages` clicks **−46%** on only −14% impressions, while the collection
+  `birkenstock-narrow-fit-sandals` **doubled, 172 → 333**. The size guide alone
+  went **475 → 220 clicks while its rank improved 14.2 → 10.4** — same
+  impressions, CTR halved 0.88% → 0.40%. Something now answers the question
+  before the user reaches us; AI Overviews is the suspect but GSC cannot prove
+  the mechanism. **That one page is close to our entire year-over-year decline.**
+  The strategy conclusion is not "stop informational" — it is that collections
+  are the engine and informational is a headwind we do not control.
+- **Position is no longer comparable year over year.** If an AI Overview now sits
+  atop a SERP, "position 10" in 2026 is further down the screen than "position 10"
+  in 2025. The size guide ranking *better* while earning *half* is exactly that
+  signature. Compare position within a period, never across years — and never
+  conclude a page improved because its number fell.
+- **Collections lost two-thirds of their impressions and it barely mattered.**
+  May+Jun YoY: 220,008 → 72,582 impressions (−67%) for only −17% clicks, CTR
+  0.51% → 1.27%. Junk impressions being stripped, not traffic lost. Do not raise
+  an alarm about impressions without checking what happened to clicks.
+- **Difficulty is competition, not our page.** Established three times over:
+  `narrow` ranks 7 and `regular` has no searches at all; the size guide ranks 5 on
+  a question nobody answers and 18 on `size chart` that everyone has; Goor ranks
+  8.7 while Rieker ranks 37. Before assuming a page is weak, ask who else is
+  fighting for the term. See "Future-proofing" under State.
 - **Products are a long tail** — 984 pages at 0.5 clicks each. Only workable
   systematically, or not at all.
 - **Blogs are dead** — 9 pages, 2 clicks, 2,005 impressions.
@@ -273,6 +316,14 @@ passing, is the clearest signal available that a dedicated page would win.
 
 **Expected.** 30–45 clicks/28d at a top-3 rank. 4–8 weeks.
 
+**Kept at priority 2 on 2026-07-16 against the analysis, by the owner's call.**
+The informational headwind below is real and was argued as a reason to demote
+this. The counter, and it is a good one: **AI may cite it and send people our
+way.** Being the page an Overview quotes is a position worth holding, and a
+specific well-answered question is more citable than a generic size chart nobody
+can differentiate. Cheap to try, ranks 5th already, small downside. Do not demote
+it on the informational-decline argument alone — that argument was heard.
+
 **Why a separate page and not more size-6 content inside the size guide.** A page
 has **one title**, and the title is the lever. Searchers see `Birkenstock Size
 Guide | Brookfield Comfort` against "why don't birkenstock do size 6" — it does
@@ -317,6 +368,64 @@ Jan 2026 and have held ~1,400+ since, peaking in *spring*, not winter. Clicks
 never moved (12–28/month throughout). A 7× impression rise with flat clicks is
 not understood, and building for it without knowing why is a bet, not a plan.
 Worth ten minutes with `--contains zermatt` over a 16-month window first.
+
+### Future-proofing — the answer to "what after Birkenstock"
+
+Recorded 2026-07-16. **Not current work.** This is the strategic answer to not
+being stuck behind one brand for years, so it does not have to be re-derived.
+
+**Diversification is available, and the demand is already arriving.** Non-brand
+queries are **1,112 queries, 13,584 impr — 33% of all impressions — earning 62
+clicks (11%)**. A third of our visibility is not Birkenstock and converts at
+0.46%. The gap is pages and products, not authority.
+
+**Difficulty is competition, not brand.** The third time this lesson has appeared
+(after narrow-vs-regular and the size guide's head terms):
+
+| | Impr/28d | Pos | Clicks | Read |
+|---|---|---|---|---|
+| Birkenstock | — | 6–9 | — | The moat |
+| `goor` | 2,865 | 8.7 | 11 | Ranks. Obscure = winnable. |
+| `cipriata` | 976 | 10.4 | 5 | Ranks. |
+| `boulevard` | 786 | 8.5 | 3 | Ranks. |
+| Rieker / Lunar / Roamers | — | 22–47 | ~0 | Everyone sells them. Not winnable. |
+
+**Obscurity is itself a moat** — the same shape as the Birkenstock Amazon-ban,
+just smaller. So the path is low-competition niches, **not** big brands. Do not
+try to SEO our way into Rieker; that is what position 37 means.
+
+**Birkenstock authority is downstream of the channel moat, not of any SEO work.**
+Birkenstock is Amazon-banned, so its demand has nowhere online to go but search.
+Rieker demand goes to Amazon, Schuh, rieker.com. This is why Shopify went 99%
+Birkenstock — structural, not accidental.
+
+**The economics — why this is worth anything at all.** Goor, Cipriata and
+Boulevard are **UKD stock: much lower margin**. That does not sink it, it is the
+whole point. At £0.45/click, a few pounds of margin needs a ~10%+ conversion rate
+for paid to break even, and nothing converts at 10% — **paid can never work on
+UKD**. Organic clicks are free, so any conversion is profit. **SEO is the only
+acquisition channel that can ever work on low-margin stock.** Judge these pages
+against zero, not against Birkenstock.
+
+Scale check before anyone gets excited: those three footholds are ~4,627 impr
+earning 19 clicks. At Milano's ~1.2% that is ~55 clicks/28d — a few extra sales a
+month at low margin. Free and compounding, but small. Worth an hour each, not a
+quarter.
+
+**Velcro trainers — dropped 2026-07-16, do not revive.** `mens-velcro-trainers`
+has **0 products and 4,338 impressions** at position 12–15, which looks like the
+biggest non-Birkenstock opportunity on the site. It fails twice, independently:
+
+1. **Trademark.** Velcro is a registered mark; the compliant terms are "riptape"
+   or "hook and loop". The demand is entirely on the word we cannot use —
+   `velcro` 3,578 impr vs **`riptape` 0**, `hook and loop` 76. Nobody searches the
+   safe words; they are retailer jargon. SEO cannot route around this. Whether to
+   use the mark anyway is a legal/brand call, not an SEO one.
+2. **Economics.** UKD, "low profit, if any profit at all" (owner, 2026-07-16).
+   Even free clicks cannot rescue a zero margin.
+
+The empty collection is a live defect regardless — Google shows an empty page to
+thousands a month. Fill it or delete it; do not leave it.
 
 ### Candidates behind the three priorities
 
