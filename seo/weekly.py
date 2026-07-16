@@ -80,9 +80,9 @@ def pct_delta(now, prior):
     return f"({(now - prior) / prior * 100:+.0f}%)"
 
 
-def short(url):
+def short(url, width=52):
     u = url.replace(SITE_ROOT, "") or "/"
-    return u[:52]
+    return u[:width]
 
 
 def main():
@@ -147,25 +147,30 @@ def main():
         print(f"  {t:12} {len(now_t[t]):>6} {c:>7,.0f} {delta(c, pc):>7} "
               f"{share:>6.0f}% {i:>9,.0f} {ctr:>6.2f}%")
 
-    # ---- PAGES ----
-    types = [args.type] if args.type else ["collections", "pages", "products", "homepage", "blogs"]
+    # ---- WINNERS: the pages carrying the site, across every type ----
+    # Split by type this is invisible: the size guide out-earns nearly every
+    # collection, but sits in a different section. Cumulative % is here because
+    # the concentration is the story -- a handful of URLs are the whole site.
     prior_by_url = {r["keys"][0]: r for r in prior_rows}
+    pool = now_t.get(args.type, []) if args.type else now_rows
+    label = f"{args.type.upper()} " if args.type else ""
 
-    for t in types:
-        rows = now_t.get(t, [])
-        if not rows:
-            continue
-        print()
-        print("=" * 74)
-        print(f"{t.upper()} - 28d, top {args.top} by clicks")
-        print("=" * 74)
-        print(f"  {'page':52} {'clicks':>6} {'chg':>6} {'impr':>8} {'CTR':>6} {'pos':>5}")
-        for r in sorted(rows, key=lambda r: -r["clicks"])[:args.top]:
-            p = prior_by_url.get(r["keys"][0])
-            ctr = r["clicks"] / r["impressions"] * 100 if r["impressions"] else 0
-            print(f"  {short(r['keys'][0]):52} {r['clicks']:>6,.0f} "
-                  f"{delta(r['clicks'], p['clicks'] if p else 0):>6} "
-                  f"{r['impressions']:>8,.0f} {ctr:>5.2f}% {r['position']:>5.1f}")
+    print()
+    print("=" * 74)
+    print(f"{label}WINNERS - top {args.top} pages by clicks, 28d")
+    print("=" * 74)
+    print(f"  {'#':>2} {'page':44} {'type':11} {'clicks':>6} {'chg':>6} "
+          f"{'impr':>8} {'CTR':>6} {'pos':>5} {'cum':>5}")
+    running = 0
+    pool_clicks = sum(r["clicks"] for r in pool)
+    for n, r in enumerate(sorted(pool, key=lambda r: -r["clicks"])[:args.top], 1):
+        p = prior_by_url.get(r["keys"][0])
+        ctr = r["clicks"] / r["impressions"] * 100 if r["impressions"] else 0
+        running += r["clicks"]
+        cum = running / pool_clicks * 100 if pool_clicks else 0
+        print(f"  {n:>2} {short(r['keys'][0], 44):44} {classify(r['keys'][0]):11} "
+              f"{r['clicks']:>6,.0f} {delta(r['clicks'], p['clicks'] if p else 0):>6} "
+              f"{r['impressions']:>8,.0f} {ctr:>5.2f}% {r['position']:>5.1f} {cum:>4.0f}%")
 
     # Biggest untapped: lots of impressions, nobody clicking.
     print()

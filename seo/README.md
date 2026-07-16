@@ -62,7 +62,14 @@ Site → type → page. `python weekly.py`.
 |---|---|---|
 | Site | 7d vs prior 7d | ~232 clicks/week — week-over-week is readable |
 | Type | 28d vs prior 28d | collections / homepage / products / pages / blogs |
-| Page | 28d vs prior 28d | a page like mens-goor does ~6 clicks/week; 7d is pure noise |
+| **Winners** | 28d vs prior 28d | **top pages by clicks, across all types, with cumulative %** |
+| Most impr / worst CTR | 28d | shown but not clicked — the untapped end |
+
+**Winners is cross-type on purpose.** Split by type, the picture is invisible:
+the size guide out-earns nearly every collection but sits in a different
+section. The top three pages are a collection, the homepage and an info page.
+
+`--type collections` narrows every section to one type. `--top N` sets rows.
 
 ## What we store
 
@@ -96,6 +103,14 @@ Site: **2,979 clicks**, 261,921 impressions, 1.14% CTR, avg position 11.3.
 
 The size guide alone is **32% of site impressions** — more than all 984 product
 pages combined — and converts worst of the three.
+
+On clicks the same concentration holds: the **top 3 pages are 51%** and the top
+20 are **78%** (28d). Those top three are a collection, the homepage and an info
+page — one of each type.
+
+Not every high-CTR page is an opportunity: `birkenstock-sandals` ranks **2.2**
+with **8.52% CTR** on 352 impressions. It has already won; there is no volume
+behind the term. Check impressions before reading a good CTR as headroom.
 
 ## What we know
 
