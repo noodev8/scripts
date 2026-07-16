@@ -1,128 +1,165 @@
 # SEO — front door
 
-Collection-page SEO for the Shopify store. Read this first for any SEO session.
+Read this first for any SEO session.
 
-## Strategy
+## The goal
 
-**Winners first.** Effort goes to collections that already have product depth and
-commercial intent, not to fixing every thin page. A collection with 175 products
-and no traffic is a bigger prize than ten collections with 3 products each.
+**Increase free clicks.** Be less dependent on Google Shopping.
 
-**The finding that drives the work: internal links.** Collections that nothing
-links to are orphaned — Google may never discover them, and if it does, it treats
-them as unimportant. Orphan status is the cheapest thing to fix and the most
-likely to move the needle. `referring_url_count = 0` in the snapshot is the list.
+This is a 3 / 6 / 12-month game, not a hunt for a win this week. SEO changes take
+4–8 weeks to show. Nothing here is expected to move the P&L this quarter.
 
-**The measurement chain, in order:**
+Scale, so nobody kids themselves (90 days to 2026-07-16):
 
-1. **Index state** — is the page known, crawled, indexed? *(stored)*
-2. **Referring URLs** — does anything link to it? *(stored)*
-3. **Impressions / position** — is it competing? *(live from GSC)*
-4. **Clicks** — the outcome. *(live from GSC)*
+| | Clicks | Impressions | CTR | Cost |
+|---|---|---|---|---|
+| **Organic** | 2,979 | 261,921 | 1.14% | £0 |
+| **Paid** | 28,550 | 1,099,486 | 2.60% | £12,445 |
 
-Only 1 and 2 are snapshotted. 3 and 4 stay live from the Search Analytics API.
+Organic is ~10% of Google clicks, worth ~£1,300/quarter at the £0.44 paid CPC.
+Doubling it is a good year's work and buys ~£5k/year. The case for it is that it
+is free, compounds, and does not stop when you stop paying.
 
-**Sequencing — this is what stops us fooling ourselves.** The chain runs: add
-internal links → Google discovers → crawls → indexes → impressions appear →
-position settles → clicks. That is realistically **4–8 weeks** before clicks mean
-anything. Judged at two weeks, a working intervention looks like a failure.
-Index state, by contrast, flips within days-to-weeks — which is why it's the
-metric that tells us whether the change worked, long before traffic does.
+## The number
 
-## Why the table stores no traffic columns
+**Clicks.** That is the target. Everything else is diagnosis:
 
-Clicks/impressions/position are retrievable from the GSC Search Analytics API for
-16 months at any granularity, so storing them duplicates a better source. Index
-state is the opposite: the URL Inspection API is point-in-time only and Google
-keeps no history, so *"when did this page get indexed?"* is unanswerable after the
-fact unless we snapshot it ourselves.
+| Metric | Role |
+|---|---|
+| **Clicks** | The target. The only one that is money. |
+| Impressions | Diagnostic — are we being shown at all? |
+| Position | Diagnostic — are we being shown where anyone looks? |
+| CTR | Diagnostic — shown, but did they click? |
 
-An earlier `seo_collection_traffic` table stored a **90-day rolling aggregate**
-against a point-in-time date, which smeared every window into every other and made
-the table useless. It was deleted, never populated. Index state has no window at
-all, so consecutive snapshots diff cleanly. **Do not re-add traffic columns here.**
+**Do not score on average position.** It is an average across every query you
+appear for, so ranking for one new obscure term at position 50 makes it look
+*worse* while you gained ground. It punishes growth.
 
-## Process
+**Read them together or you learn nothing repeatable:**
 
-**Snapshot: weekly cron on the VPS, unattended.** Not on request. The whole value
-is an unbroken timeline — snapshots that only happen when someone thinks about SEO
-cluster around sessions and leave gaps exactly where the index changes land.
-Weekly is right: index state moves on days-to-weeks, so daily burns quota on noise
-and monthly is too coarse to tie a `crawled → indexed` flip to the change that
-caused it.
+| Position | CTR | Meaning |
+|---|---|---|
+| flat | flat | The change did nothing. |
+| flat | up | Title/snippet worked — same slot, more clicks. |
+| up | up | Google re-rated the page. The real win. |
+| up | flat | Ranking for queries that aren't ours. |
 
-Cron line (see `crontab.txt`; server clock is GMT):
+## What we can actually change
 
-```
-# 5:30 AM - Weekly SEO index-state snapshot (Mondays)
-30 4 * * 1 /apps/scripts/venv/bin/python /apps/scripts/seo/snapshot_index_state.py
-```
+Position, impressions and clicks are all **outputs**. Google decides them. The
+levers — the only things in our control — are:
 
-No `cd` needed — the script resolves its imports and `.env` from `__file__`, not
-the cwd. Credentials are already on the VPS: `gsc_client.py` uses the same
-`merchant-feed-api-462809` service account key that the nightly merchant feed uses.
+- page title and meta description (what shows in the result)
+- the collection/page description text
+- which products sit in a collection
+- where we link to it from, and the anchor text
 
-**Run timing does not matter.** Rows are point-in-time and keyed on
-`(handle, snapshot_date)`; nothing assumes even spacing, so an off-cycle or
-repeated run costs nothing and there is no "out of sync" state to be in. (This is
-exactly what the old rolling-window traffic table got wrong.)
+## Structure
 
-**Analysis: on-demand, in session.** Ask questions, not for runs — *"what changed
-since we added the links?"*, *"did sandals ever get indexed?"*. Claude queries the
-table; it doesn't populate it. A snapshot taken mid-session is a redundant row.
+Site → type → page. `python weekly.py`.
 
-**The one manual exception:** run a snapshot immediately after a batch of link
-changes, so the before/after boundary is sharp rather than smeared across a weekly
-cycle.
+| Level | Window | Why |
+|---|---|---|
+| Site | 7d vs prior 7d | ~232 clicks/week — week-over-week is readable |
+| Type | 28d vs prior 28d | collections / homepage / products / pages / blogs |
+| Page | 28d vs prior 28d | a page like mens-goor does ~6 clicks/week; 7d is pure noise |
 
-**Progress/status of any run:** `tail -f /apps/scripts/logs/snapshot_index_state.log`
+## What we store
 
-## Caveat: inspecting a URL can cause Google to discover it
+**Nothing.** GSC serves 16 months retroactively at any granularity, so any past
+week is available on demand and no window ever closes on us. If we ever want
+history beyond 16 months, backfill once a year — the data is not going anywhere
+before then. Storing it would duplicate a better source.
 
-Two runs 10 minutes apart on 2026-07-16 saw `birkenstock-sydney` move from
-`URL is unknown to Google` to `Discovered - currently not indexed` with no other
-change. The URL Inspection API appears not to be purely passive — looking at a
-page can register it.
+Changes we make are logged by hand in `CHANGELOG.md` — that is the one thing GSC
+cannot give us. It has 16 months of traffic and no idea what we did to cause it.
 
-So **`unknown → discovered` is not a win** and must not be attributed to
-link-building; we probably caused it by measuring. The transitions that do mean
-something (`crawled → indexed`) are unaffected.
+## Baseline — 2026-07-16
+
+Site: **2,979 clicks**, 261,921 impressions, 1.14% CTR, avg position 11.3.
+
+| Type | Pages | Clicks | % | Impressions | CTR | Clicks/page |
+|---|---|---|---|---|---|---|
+| collections | 101 | 1,429 | 48% | 109,594 | 1.30% | 14.1 |
+| homepage | 1 | 565 | 19% | 6,481 | 8.72% | 565 |
+| products | 984 | 539 | 18% | 56,550 | 0.95% | 0.5 |
+| pages | 11 | 444 | 15% | 87,277 | 0.51% | 40.4 |
+| blogs | 9 | 2 | 0% | 2,005 | 0.10% | 0.2 |
+
+**Traffic is extremely concentrated.** Three URLs hold ~47% of all impressions:
+
+| Page | Impressions | Clicks | CTR | Position |
+|---|---|---|---|---|
+| /pages/birkenstock-size-guide | 83,379 | 334 | 0.40% | 10.1 |
+| /collections/birkenstock-narrow-fit-sandals | 27,752 | 523 | 1.88% | 7.8 |
+| /collections/mens-goor | 12,737 | 74 | 0.58% | 8.5 |
+
+The size guide alone is **32% of site impressions** — more than all 984 product
+pages combined — and converts worst of the three.
+
+## What we know
+
+Established 2026-07-16, against data, not assumption:
+
+- **Average position 11.3 is page two.** We are not being outranked so much as
+  shown where nobody scrolls. Impressions are not the constraint — we have
+  261,921 of them producing 2,979 clicks.
+- **The pages rank for the right queries.** There is no relevance mismatch to fix
+  (checked at query level on the top low-CTR pages).
+- **CTR follows the normal position curve.** Where a page ranks 5–7 it converts
+  3–6%; at 9–13 it converts 0.2–0.5%. No snippet catastrophe.
+- **Indexing is binary and settled.** Indexed pages earn; unindexed earn nothing
+  (0 clicks, 9 impressions across 21 pages). All 63 earning collections are
+  indexed. Indexing is not the constraint.
+- **Specific, intent-led collections are the engine** — the original strategy was
+  right. `birkenstock-slippers` (8 products) earns 111 clicks; the general
+  `birkenstock-sandals` (136 products) ranks 2.5 and earns 64.
+- **Aggregators are worthless.** `all`, `sandals`, `full-price` are near-supersets
+  of collections Google already indexes. It declines to index them, and even when
+  general pages *are* indexed they earn little. Nothing lost.
+- **Products are a long tail** — 984 pages at 0.5 clicks each. Not workable page
+  by page; only systematically or not at all.
+- **Blogs are dead** — 9 pages, 2 clicks, 2,005 impressions.
+- **No conversion data exists.** No GA4, no analytics plumbing. GSC stops at the
+  click. Clicks are the honest proxy until someone wires up GA4.
+
+## Ruled out (and why)
+
+- **Internal links as a lever — unproven, not disproven.** GSC's
+  `referring_urls` counts sitemaps, self-pagination and product-recommendation
+  widgets as links. Your top earner shows "1 referring URL" and it is its own
+  `?page=2`. The field cannot answer whether links move rankings. Settling it
+  needs a real crawl of the site's own `<a href>` map.
+- **Orphan-fixing.** Built on the same broken column. `birkenstock-milano` shows
+  0 referring URLs and earns 73 clicks. "0 refs" means Google's sample returned
+  nothing, not that nothing links there.
+- **Re-organising collections.** The original intent-led structure is the thing
+  that works. Re-organising loses accumulated authority for a hypothesis.
+- **Ad conversion rates do not transfer.** Paid converts at 2.60% because it sits
+  at the top with an image. You cannot inherit that by ranking 11th.
+
+## Traps
+
+- **Seasonality.** Sandals peak in July. Any before/after over the 4–8 weeks SEO
+  takes will be swamped by season. Pilot on season-neutral pages, and keep a
+  control group of pages you deliberately don't touch, so you measure against the
+  site's own trend rather than a page's past self.
+- **Concentration.** 40% of collection traffic is one page. Do not run experiments
+  on `birkenstock-narrow-fit-sandals`.
+- **Weekly page-level clicks are noise.** ~6 clicks/week on a typical page. Read
+  28-day windows at page level, and trends not verdicts.
 
 ## Scripts
 
 | Script | Does |
 |---|---|
-| `snapshot_index_state.py` | Weekly snapshot → `seo_index_state`. Saves `index_state_<date>.json` before the DB write; `--load-from FILE` replays it into the DB without re-inspecting. |
-| `create_seo_index_state_table.sql` | DDL for `seo_index_state`. |
-| `collections_traffic.py` | Live clicks/impressions/position from GSC. Owns traffic; join to snapshots on `handle`. |
+| `weekly.py` | **The report.** Site → type → page, live from GSC. Stores nothing. |
+| `gsc_client.py` | GSC auth + `SITE_URL`. Uses the merchant-feed service account. |
 | `list_collections.py` | Shopify collections + product counts. |
-| `gsc_client.py` | GSC auth + `SITE_URL`. |
 
-Run: `python snapshot_index_state.py`. The API takes ~6s per URL, so 84
-collections is a ~9 minute run. Progress echoes to the terminal when run by hand
-and stays silent under cron (no TTY), so cron mails nothing; the log file has it
-either way. Safe to re-run — the DB write is one commit at the end and the upsert
-makes same-day repeats idempotent.
+Run: `python weekly.py`. Nothing is scheduled — this is a report you read, not a
+job that collects. Everything it shows is retrievable at any time.
 
-## State (2026-07-16)
+## State
 
-**Baseline taken**, 84 collections, 0 errors:
-
-| Coverage state | Count |
-|---|---|
-| Submitted and indexed | 63 |
-| Crawled - currently not indexed | 17 |
-| URL is unknown to Google | 2 |
-| Discovered - currently not indexed | 2 |
-
-**15 orphaned** (nothing links to them). Two distinct problems:
-
-- *Orphaned AND not indexed* — `womens-rieker-sandals` (7 products, unknown),
-  `birkenstock-sydney` (6, discovered). Invisible: nothing links to them, so
-  Google never properly found them.
-- *Orphaned but indexed anyway* — `lunar-flat-sandals` (13),
-  `womens-footwear-for-hiking-walking` (6), `mens-wedding-shoes` (4),
-  `mens-wide-shoes` (4), `birkenstock-milano` (4). Found via sitemap, but nothing
-  on the site vouches for them.
-
-Not yet in the VPS crontab.
+Nothing is in flight. The work has not started — the focus decision comes next.

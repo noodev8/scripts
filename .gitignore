@@ -31,8 +31,6 @@ out/
 merchant-feed/*.json
 merchant-feed-api-*.json
 
-# SEO per-run inspection results — recovery artifact, the DB is the record
-seo/index_state_*.json
 
 # Google Drive OAuth (brookfielduser1) — client secret + minted token
 drive_oauth_client.json
