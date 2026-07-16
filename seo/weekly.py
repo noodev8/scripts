@@ -1,9 +1,9 @@
 """
-SEO: the weekly report. Site -> type -> page, live from Search Console.
+SEO: the progress report. Organic vs paid, then site -> type -> page.
 
-Target is clicks. Impressions and position are diagnostics: impressions say
-whether we are shown at all, position whether we are shown anywhere anyone
-looks, CTR whether being shown earned the click.
+Target is clicks, measured against paid. Impressions and position are
+diagnostics: impressions say whether we are shown at all, position whether we
+are shown anywhere anyone looks, CTR whether being shown earned the click.
 
 Stores nothing. GSC serves 16 months retroactively at any granularity, so any
 past week is available on demand -- there is no window to miss and nothing to
@@ -22,6 +22,7 @@ USAGE:
 import argparse
 import datetime
 import os
+import statistics
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -30,6 +31,12 @@ from gsc_client import get_service, SITE_URL
 
 GSC_LAG_DAYS = 3  # Search Console data is not complete for the last ~3 days
 SITE_ROOT = SITE_URL.rstrip("/")
+
+# CTR-vs-position curve. Bands are narrow low down (where CTR moves fast) and
+# wide further out (where it is flat and pages are few). MIN_IMPR keeps pages
+# with a handful of impressions from setting a band's median on noise.
+BANDS = [(1, 3), (3, 5), (5, 7), (7, 9), (9, 11), (11, 14), (14, 20), (20, 100)]
+MIN_IMPR = 250
 
 
 def classify(url):
@@ -80,9 +87,38 @@ def pct_delta(now, prior):
     return f"({(now - prior) / prior * 100:+.0f}%)"
 
 
+def band_of(position):
+    for lo, hi in BANDS:
+        if lo <= position < hi:
+            return f"{lo}-{hi}"
+    return None
+
+
 def short(url, width=52):
     u = url.replace(SITE_ROOT, "") or "/"
     return u[:width]
+
+
+def paid(start, end):
+    """Paid clicks for a date range, plus how many days of the range have data.
+
+    google_campaign_daily is a manual CSV import and lags GSC, so a window can be
+    partly empty. The day count lets the caller mark the number partial rather
+    than show missing days as a fall in paid traffic.
+    """
+    import psycopg2
+    from logging_utils import get_db_config
+
+    with psycopg2.connect(**get_db_config()) as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT COALESCE(SUM(clicks), 0), COUNT(DISTINCT snapshot_date)
+            FROM google_campaign_daily
+            WHERE snapshot_date BETWEEN %s AND %s
+            """,
+            (start, end),
+        )
+        return cur.fetchone()
 
 
 def main():
@@ -99,11 +135,11 @@ def main():
     m1_start, m1_end = end - datetime.timedelta(days=27), end
     m0_start, m0_end = end - datetime.timedelta(days=55), end - datetime.timedelta(days=28)
 
-    print(f"\nSEO WEEKLY - brookfieldcomfort.com - data to {end}\n")
+    print(f"\nSEO PROGRESS - brookfieldcomfort.com - data to {end}\n")
 
     # ---- SITE: 7d vs prior 7d, 28d vs prior 28d ----
     print("=" * 74)
-    print("SITE - target is clicks")
+    print("ORGANIC - target is clicks")
     print("=" * 74)
     print(f"  {'window':16} {'clicks':>7} {'chg':>7} {'impr':>9} {'CTR':>7} {'pos':>6}")
     periods = [
@@ -121,6 +157,27 @@ def main():
         d = delta(c, site[prior][0]) if prior else "     -"
         pd = pct_delta(c, site[prior][0]) if prior else ""
         print(f"  {name:16} {c:>7,.0f} {d:>7} {i:>9,.0f} {ctr:>6.2f}% {pos:>6.1f}  {pd}")
+
+    # ---- PAID: outline only ----
+    # Deliberately thin. Paid is campaign-level (one campaign is ~96% of clicks)
+    # so it cannot be joined to organic at page or query level -- totals is the
+    # only honest comparison available, and share is context, not a target: the
+    # denominator is ad budget, so share falls when spend rises even if SEO won.
+    print()
+    print("=" * 74)
+    print("VS PAID - context, not a target (share falls when ad spend rises)")
+    print("=" * 74)
+    try:
+        for name in ("last 28d", "prior 28d"):
+            s, e = [(s, e) for n, s, e in periods if n == name][0]
+            p, days, = paid(s, e)
+            org = site[name][0]
+            share = org / (org + p) * 100 if org + p else 0
+            partial = "  (paid partial)" if days < 28 else ""
+            print(f"  {name:12} organic {org:>6,.0f}   paid {p:>7,.0f}   "
+                  f"organic {share:>4.0f}%{partial}")
+    except Exception as e:
+        print(f"  Paid data unavailable ({e}). Refresh via google-ads/how-to-run.md.")
 
     # ---- BY TYPE: 28d vs prior 28d ----
     now_rows = query(service, m1_start, m1_end, ["page"])
@@ -172,18 +229,60 @@ def main():
               f"{r['clicks']:>6,.0f} {delta(r['clicks'], p['clicks'] if p else 0):>6} "
               f"{r['impressions']:>8,.0f} {ctr:>5.2f}% {r['position']:>5.1f} {cum:>4.0f}%")
 
-    # Biggest untapped: lots of impressions, nobody clicking.
+    # ---- CTR VS POSITION: what a slot is worth, and who is short of it ----
+    # Ranking pages by raw CTR is a trap: it just re-discovers that low-ranked
+    # pages convert badly, and puts the size guide top as if a title rewrite
+    # would fix a page that is already exactly where its rank says it should be.
+    # Scoring each page against its OWN band's median separates "ranks badly"
+    # from "ranks fine, earns badly" -- only the second is a title/snippet job.
+    curve = {}
+    for r in now_rows:
+        if r["impressions"] < MIN_IMPR:
+            continue
+        band = band_of(r["position"])
+        if band:
+            curve.setdefault(band, []).append(r["clicks"] / r["impressions"] * 100)
+
     print()
     print("=" * 74)
-    print("MOST IMPRESSIONS, WORST CTR - 28d, shown but not clicked")
+    print(f"CTR VS POSITION - 28d, pages >= {MIN_IMPR} impressions")
     print("=" * 74)
-    print(f"  {'page':52} {'clicks':>6} {'impr':>8} {'CTR':>6} {'pos':>5}")
-    candidates = [r for r in now_rows if r["impressions"] >= 500]
-    for r in sorted(candidates, key=lambda r: r["clicks"] / r["impressions"])[:args.top]:
-        ctr = r["clicks"] / r["impressions"] * 100
-        print(f"  {short(r['keys'][0]):52} {r['clicks']:>6,.0f} {r['impressions']:>8,.0f} "
-              f"{ctr:>5.2f}% {r['position']:>5.1f}")
+    print(f"  {'position':10} {'pages':>6} {'median CTR':>11}")
+    for lo, hi in BANDS:
+        band = f"{lo}-{hi}"
+        if band in curve:
+            n = len(curve[band])
+            thin = "   (thin - treat as noise)" if n < 4 else ""
+            print(f"  {band:10} {n:>6} {statistics.median(curve[band]):>10.2f}%{thin}")
+
+    # Below their own band = the whole realistic title/meta opportunity. The
+    # total is printed because it is the point: if it is small, the CTR play is
+    # not a plan and the work is ranking or new pages instead.
+    pool = now_t.get(args.type, []) if args.type else now_rows
+    short_of = []
+    for r in pool:
+        if r["impressions"] < MIN_IMPR:
+            continue
+        band = band_of(r["position"])
+        if not band or band not in curve:
+            continue
+        ctr, med = r["clicks"] / r["impressions"] * 100, statistics.median(curve[band])
+        if ctr < med:
+            short_of.append((r, ctr, med, (med - ctr) / 100 * r["impressions"]))
+
     print()
+    print("=" * 74)
+    print(f"{label}BELOW CURVE - ranks fine, earns badly. The title/meta job.")
+    print("=" * 74)
+    print(f"  {'page':44} {'impr':>7} {'CTR':>6} {'med':>6} {'pos':>5} {'gap':>6}")
+    for r, ctr, med, gap in sorted(short_of, key=lambda x: -x[3])[:args.top]:
+        print(f"  {short(r['keys'][0], 44):44} {r['impressions']:>7,.0f} {ctr:>5.2f}% "
+              f"{med:>5.2f}% {r['position']:>5.1f} {gap:>+6.0f}")
+    total = sum(g for _, _, _, g in short_of)
+    base = sum(r["clicks"] for r in pool)
+    print(f"\n  Whole opportunity: {total:+,.0f} clicks/28d if every gap closed to "
+          f"median ({total / base * 100:+.0f}% on {base:,.0f}).")
+    print("  Curve is site-wide for sample size; the list above respects --type.\n")
 
 
 if __name__ == "__main__":
