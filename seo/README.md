@@ -15,13 +15,14 @@ paying.
 
 ## The number
 
-**Clicks**, organic vs paid. Everything else is diagnosis:
+**Trailing 12-month clicks.** Everything else is diagnosis:
 
 | Metric | Role |
 |---|---|
-| **Clicks** | The target. The only one that is money. |
+| **Clicks, trailing 12m** | The scoreboard. Season-proof. Must go up. |
+| Clicks, 7d / 28d | Breakage detection only. In July it is sandals, not progress. |
 | Impressions | Are we shown at all? |
-| Position | Are we shown where anyone looks? |
+| Position | Are we shown where anyone looks? Not comparable across years. |
 | CTR | Shown — but did they click? |
 
 **Do not score on average position.** It averages across every query you appear
@@ -68,23 +69,55 @@ Median not mean, because one page at 8% CTR would drag a whole band.
 
 ## What we are trying to beat
 
-**Last year's same month. Never last month.** Sandals peak in July: month-over-
-month is season, not progress. `weekly.py` showing "+40%" in July is the season
-recovering, and means nothing.
+**Trailing 12-month clicks. It must go up. Nothing else is the scoreboard.**
+`weekly.py` prints it first.
 
-Measured 2026-07-16 — **we are behind, and it is one page:**
+A 12-month window holds every season exactly once, so it is season-neutral **by
+construction** — the only way it moves is if something real changed. Its
+month-on-month delta *is* the year-over-year delta for the month that just rolled
+in, so it carries the same signal as "beat the same month last year" without the
+noise of 12 disconnected readings. **One line, always comparable, no seasonal
+adjustment to argue about.**
 
-| Month | Clicks | vs last year |
+**Never judge on 7d or 28d.** Sandals peak in July, so `weekly.py` showing "+40%"
+on 28d is the season recovering and means nothing. Those windows are for spotting
+breakage, not progress.
+
+**Where it stands, 2026-07-16 — falling, and the fall is accelerating:**
+
+| Trailing 12m to | Clicks | Chg | Impressions |
+|---|---|---|---|
+| 2026-03 | 9,124 | — | 1,047,062 |
+| 2026-04 | 9,093 | −31 | 1,020,756 |
+| 2026-05 | 8,764 | **−329** | 966,635 |
+| 2026-06 | **8,506** | **−258** | 897,498 |
+
+**−6.8%.** Impressions −14% across the same window while CTR rose 0.87% → 0.95%.
+
+### A fall is not automatically failure — read this before reacting to the chart
+
+**We deliberately dropped a lot of products and specialised, and sales improved**
+(owner, 2026-07-16). Fewer products means fewer pages, fewer impressions and
+fewer clicks **by design**. Some of this decline is the price of a decision that
+worked. Clicks punish that decision; the P&L does not.
+
+The fall has at least three causes and **GSC cannot separate them**:
+
+| Cause | Evidence | Ours? |
 |---|---|---|
-| 2025-05 → 2026-05 | 1,245 → **916** | **−26%** |
-| 2025-06 → 2026-06 | 1,304 → **1,046** | **−20%** |
+| Deliberate delisting | `products` clicks −31% YoY | Yes — and good |
+| Informational bleed | size guide 475 → 220 while ranking *better* | No — headwind |
+| Lost ground | `collections` −17% YoY, but CTR 0.51% → 1.27% | Unclear |
 
-**June needs +258 clicks just to draw level.** The three queued tasks sum to
-+75–120, so landing all of them closes roughly a third to a half of the gap.
-Anyone reading a within-2026 rise as winning has not checked the year before.
+With no GA4 there is no conversion data to weigh these against revenue, so
+**clicks stay the proxy while being a knowingly imperfect one**. Do not report the
+trailing 12 falling as failure without saying which of the three it is — and if
+you cannot say, say that.
 
-**The real test dates: Sept and Oct 2026 against 699 and 469.** Pages built in
-July show by then. Do not judge before that; do not judge on July at all.
+**First target: stop the fall.** A flat trailing 12 is a win from here. Pages
+built in July show up 4–8 weeks later, so the first honest reading is the trailing
+12 to **Sept/Oct 2026**. Targets beyond "stop the fall" are deliberately not set
+yet — see the priorities in State first.
 
 ## What we can actually change
 
@@ -100,7 +133,8 @@ levers in our control:
 
 | Ask | Command |
 |---|---|
-| **Progress report + breakdown** | `python seo/weekly.py` — organic vs paid, site → type → page |
+| **Progress report + breakdown** | `python seo/weekly.py` — scoreboard, organic vs paid, site → type → page |
+| **Are we up or down?** | `python seo/weekly.py --trend` — the chart: trailing 12 + every month GSC holds |
 | **Collections and their SEO position** | `python seo/collections_seo.py` — every Shopify collection, its position and clicks |
 | **What should we work on?** | `python seo/queries.py` — terms with volume and no page built for them |
 | **What does this page rank for?** | `python seo/queries.py --page /collections/x` |
@@ -132,6 +166,15 @@ duplicate a better source.
 The exception is `CHANGELOG.md` — what we changed, when, and what we expected.
 GSC has 16 months of traffic and no idea what we did to cause it. Log the
 expectation *before* the result is known.
+
+**The scoreboard will force a second exception, and it is a real one.** A
+trailing 12-month total needs 12 months to compute, so GSC's 16 months yield only
+about **five** points — enough to see the current direction, never a multi-year
+trend. Past 16 months GSC is not "a better source", it is *no* source, so storing
+monthly totals would not duplicate anything. The fix is small: **one row per
+month (month, clicks, impressions) — 12 rows a year**, backfilled once from GSC
+while the window still reaches back. Not built yet; decide before the oldest
+months age out, because once they do they are gone for good.
 
 ## What we know
 

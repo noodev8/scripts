@@ -87,6 +87,74 @@ def pct_delta(now, prior):
     return f"({(now - prior) / prior * 100:+.0f}%)"
 
 
+def monthly(service, end):
+    """Every month GSC still holds: (month, clicks, impr, complete).
+
+    Partial months are flagged, not dropped -- the current month and the earliest
+    one (truncated by GSC's 16-month limit) are real data, but comparing them to
+    a full month invents a fall that is only missing days.
+    """
+    rows = query(service, end - datetime.timedelta(days=16 * 31), end, ["date"])
+    if not rows:
+        return []
+
+    months = {}
+    for r in rows:
+        m = months.setdefault(r["keys"][0][:7], [0, 0])
+        m[0] += r["clicks"]
+        m[1] += r["impressions"]
+
+    data_start = min(r["keys"][0] for r in rows)
+    out = []
+    for key in sorted(months):
+        y, mo = int(key[:4]), int(key[5:])
+        first = datetime.date(y, mo, 1)
+        last = datetime.date(y + (mo == 12), mo % 12 + 1, 1) - datetime.timedelta(days=1)
+        complete = first.isoformat() >= data_start and last <= end
+        out.append((key, months[key][0], months[key][1], complete))
+    return out
+
+
+def rolling_12(months):
+    """Trailing 12-month totals, one per complete month.
+
+    A 12-month window contains every season exactly once, so it is season-neutral
+    by construction -- the only way it moves is if something real changed. Its
+    month-on-month delta IS the year-over-year delta for the month that just
+    rolled in: the same signal as a YoY month comparison, smoothed into a trend
+    rather than 12 disconnected readings.
+    """
+    full = [m for m in months if m[3]]
+    return [(full[i][0],
+             sum(w[1] for w in full[i - 11:i + 1]),
+             sum(w[2] for w in full[i - 11:i + 1]))
+            for i in range(11, len(full))]
+
+
+def print_trend(months):
+    """The chart: every month GSC holds, with year-over-year where it exists."""
+    print("=" * 74)
+    print("MONTHLY - the chart. Compare a month to the SAME month a year back.")
+    print("=" * 74)
+    if not months:
+        print("  No data.")
+        return
+    peak = max(m[1] for m in months) or 1
+    by_key = {m[0]: m for m in months}
+    print(f"  {'month':9} {'clicks':>7} {'impr':>9} {'CTR':>6} {'vs yr':>7}")
+    for key, clicks, impr, complete in months:
+        ly = by_key.get(f"{int(key[:4]) - 1}-{key[5:]}")
+        # Only compare complete months to complete months.
+        yoy = (f"{(clicks - ly[1]) / ly[1] * 100:+.0f}%"
+               if ly and ly[1] and ly[3] and complete else "    -")
+        bar = "#" * int(clicks / peak * 24)
+        flag = "  PARTIAL" if not complete else ""
+        print(f"  {key:9} {clicks:>7,.0f} {impr:>9,.0f} "
+              f"{clicks / impr * 100 if impr else 0:>5.2f}% {yoy:>7}  {bar}{flag}")
+    print("\n  Bars are clicks. PARTIAL months are missing days, not losing traffic -")
+    print("  never read a partial month as a fall.")
+
+
 def band_of(position):
     for lo, hi in BANDS:
         if lo <= position < hi:
@@ -125,6 +193,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--type", help="drill into one type (collections/products/pages/blogs)")
     ap.add_argument("--top", type=int, default=15, help="rows per section (default 15)")
+    ap.add_argument("--trend", action="store_true",
+                    help="the chart: trailing 12 + every month GSC holds, then stop")
     args = ap.parse_args()
 
     service = get_service()
@@ -137,9 +207,43 @@ def main():
 
     print(f"\nSEO PROGRESS - brookfieldcomfort.com - data to {end}\n")
 
-    # ---- SITE: 7d vs prior 7d, 28d vs prior 28d ----
+    # ---- THE SCOREBOARD: trailing 12 months ----
+    # This is the number. Everything below it is diagnosis. A 7d or 28d rise in
+    # July is sandals, not progress; a 12-month window has every season in it
+    # exactly once, so it only moves when something real changes.
     print("=" * 74)
-    print("ORGANIC - target is clicks")
+    print("TRAILING 12 MONTHS - the scoreboard. This must go up.")
+    print("=" * 74)
+    months = monthly(service, end)
+    r12 = rolling_12(months)
+    if len(r12) < 2:
+        print("  Not enough complete months yet.")
+    else:
+        print(f"  {'to end of':11} {'clicks':>8} {'chg':>7} {'impr':>10} {'CTR':>7}")
+        for i, (month, clicks, impr) in enumerate(r12):
+            chg = f"{clicks - r12[i - 1][1]:+,.0f}" if i else "      -"
+            print(f"  {month:11} {clicks:>8,.0f} {chg:>7} {impr:>10,.0f} "
+                  f"{clicks / impr * 100 if impr else 0:>6.2f}%")
+        first, last = r12[0], r12[-1]
+        move = (last[1] - first[1]) / first[1] * 100
+        print(f"\n  {move:+.1f}% across the window shown. Each step is one month "
+              f"replacing the same\n  month a year earlier, so a fall means we lost "
+              f"ground on that month.")
+        print("  GSC serves 16 months, so only a few points exist. Backfill yearly")
+        print("  to see further -- see 'What we store' in README.md.")
+
+    if args.trend:
+        print()
+        print_trend(months)
+        print("\n  A fall is not automatically failure: dropping products removes")
+        print("  pages, impressions and clicks by design. See README.md, 'What we")
+        print("  are trying to beat'.\n")
+        return
+
+    # ---- SITE: 7d vs prior 7d, 28d vs prior 28d ----
+    print()
+    print("=" * 74)
+    print("ORGANIC - target is clicks (7d/28d is season, not progress)")
     print("=" * 74)
     print(f"  {'window':16} {'clicks':>7} {'chg':>7} {'impr':>9} {'CTR':>7} {'pos':>6}")
     periods = [
