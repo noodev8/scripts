@@ -335,8 +335,11 @@ copied across before the result is known.
 
 ### Second task — a page answering "why is there no Birkenstock size 6 UK?"
 
-Decided 2026-07-16, after the Arizona page. **Do not start both at once** — one
-change at a time or neither result is readable.
+**Shipped 2026-07-17** — live at `/pages/birkenstock-size-6`, indexing requested.
+Decided 2026-07-16, after the Arizona page. Went out sooner than the "one change
+at a time" rule below intended, alongside the Arizona menu/link fix — both were
+underway the same week, so read results for the two separately, not as one
+combined lift. See `CHANGELOG.md` for the logged expectation and kill criterion.
 
 **The evidence.** ~750 impr/28d across every phrasing, and the generic size guide
 already ranks **top-7 on almost all of them**:
