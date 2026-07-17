@@ -2,6 +2,10 @@
 
 Read this first for any SEO session.
 
+**To *operate* — what to work on, how, and the current experiments — go to
+[`PLAN.md`](PLAN.md).** This file is the *why* (the goal, the scoreboard, what we
+know, what's ruled out); PLAN.md is the *how*.
+
 ## The goal
 
 **Increase free clicks.** Be less dependent on Google Shopping. Paid is the
@@ -109,9 +113,10 @@ The fall has at least three causes and **GSC cannot separate them**:
 | Informational bleed | size guide 475 → 220 while ranking *better* | No — headwind |
 | Lost ground | `collections` −17% YoY, but CTR 0.51% → 1.27% | Unclear |
 
-With no GA4 there is no conversion data to weigh these against revenue, so
-**clicks stay the proxy while being a knowingly imperfect one**. Do not report the
-trailing 12 falling as failure without saying which of the three it is — and if
+GA4 (wired 2026-07-17) now gives conversion data *going forward*, but it cannot
+retroactively separate these three for the historical trailing-12, so **clicks
+stay the proxy for the trend while being a knowingly imperfect one**. Do not report
+the trailing 12 falling as failure without saying which of the three it is — and if
 you cannot say, say that.
 
 **First target: stop the fall.** A flat trailing 12 is a win from here. Pages
@@ -231,8 +236,42 @@ Established 2026-07-16, against data, not assumption:
 - **High CTR is not automatically headroom.** `birkenstock-sandals` ranks 2.2 at
   8.52% CTR on 352 impressions. It has already won; there is no volume behind the
   term. Check impressions before reading a good CTR as opportunity.
-- **No conversion data exists.** No GA4. GSC stops at the click. Clicks are the
-  honest proxy until someone wires up GA4.
+- **Organic converts — measured, not assumed (GA4, 2026-07-17).** GA4 was wired
+  to the merchant-feed service account (`python seo/ga4_client.py`, reproducible).
+  Last 90 days, revenue per session: a free **organic** session is worth **£2.55**
+  — **~77% of a paid session** (£3.32) — and organic visitors engage *longer* (42s
+  vs 33s), so they are not junk traffic. Free organic (search + free Shopping +
+  social) is **~10% of tracked web revenue at £0 acquisition cost**. This is what
+  vindicates the anchor: growing organic clicks grows revenue. Three caveats that
+  govern how it is read:
+  - **GA4 undercounts absolute £** (~60% of the sales table — consent, ad-blockers,
+    cross-device). Trust the *split between channels*, never the absolute pounds.
+  - **"Organic Search" includes brand searches** SEO did not earn (people googling
+    "brookfield comfort"). So £2.55/session *overstates* incremental SEO. GSC can
+    split brand vs non-brand to sharpen it.
+  - **Channel-level, not page-level.** It answers "does organic convert?" (yes),
+    not yet "which pages convert" — that is a landing-page pull.
+- **Two scoreboards, never merged.** SEO is judged on *free clicks* (visibility
+  built); the business is judged on the *P&L*. GA4 attributes revenue by channel,
+  but only SHP is SEO-addressable (AMZ is half the business and invisible to
+  organic; CM3 is the shop). Sales and organic clicks *decoupled* YoY — Jun 2026
+  was sales +75% while organic clicks −20% — because paid (10× organic volume) is
+  the engine. Do not read a sales move as an SEO result, or vice versa.
+- **Intent converts; info is hollow — page-level, GA4 90d (`organic_pages.py`).**
+  Revenue per organic-search session by landing-page type: **product £3.20** (5.3%
+  conv), home £3.75, **collection £1.81** (2.5%), **info £0.44** (0.7%), blog £0.
+  Two conclusions: (1) **info pages barely sell** — 306 organic sessions to the
+  size guide et al. returned 2 purchases. The click count flatters them; the
+  revenue exposes them. This is the "informational bleed" headwind, now costed.
+  (2) **"Collections are the engine" is about *traffic*, not conversion** —
+  products convert ~2× better per session; collections catch browse intent up top,
+  products close it. narrow-fit pulls 280 organic sessions at only £1.43/session
+  yet is still the top-earning collection: a wide free-traffic mouth, not a closer.
+  Trust the *type* rollup, not per-page conv rates (97 purchases / 90d is thin);
+  revenue credits the *landing* page, so browse-then-buy flatters the entry point.
+  **Consequence for the size-6 page:** it is an info page, so expect ~0.7% conv —
+  its case now rests on AI-citation/brand (AI Assistant traffic converts at £6.06/
+  session), not on sales. Revisit the bet with that lens.
 
 ## Ruled out (and why)
 
@@ -267,6 +306,7 @@ Established 2026-07-16, against data, not assumption:
 | `queries.py` | **The miner.** Finds the next task: volume with no page built for it. |
 | `collections_seo.py` | Every Shopify collection with its GSC position and clicks. |
 | `gsc_client.py` | GSC auth + `SITE_URL`. Uses the merchant-feed service account. |
+| `ga4_client.py` | GA4 Data API auth + `PROPERTY_ID`. Same service account. Revenue/sessions by channel or page — the attribution layer GSC lacks. |
 
 **How `queries.py` finds work.** GSC is a mirror, not a market — it only reports
 what we already appear for, so it is blind to greenfield and everything it finds
@@ -283,6 +323,15 @@ size guide names only 7,683 of its 23,371 impressions).
 Nothing is scheduled — these are reports you read, not jobs that collect.
 
 ## State
+
+**How we operate and what to work on next now live in [`PLAN.md`](PLAN.md)** — the
+grid, the two priority lists, the recipes, the current experiments (Arizona vs
+Madrid), and the decision rule. Read that for anything operational.
+
+**Everything below this line is historical context**, kept for the reasoning behind
+past decisions — it is *not* the current queue. Arizona and the size-6 page shipped
+(see `CHANGELOG.md`); priorities are now generated by the two `*_priorities.py`
+reports. Only `Future-proofing` below is still live strategy.
 
 ### Next task — build `/collections/birkenstock-arizona`
 
