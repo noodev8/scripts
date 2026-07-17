@@ -2,9 +2,9 @@
 -- Edit target_invoices / start_date / end_date below for future runs.
 WITH params AS (
   SELECT
-    ARRAY['5290101345']::text[] AS target_invoices,
-    '2026-07-14'::date AS start_date,
-    '2026-07-14'::date AS end_date
+    ARRAY['5290101607']::text[] AS target_invoices,
+    '2026-07-17'::date AS start_date,
+    '2026-07-17'::date AS end_date
 ),
 expected AS (
   SELECT
