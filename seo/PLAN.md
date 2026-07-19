@@ -55,16 +55,24 @@ syncs across both machines).
    the fix is discovery, not content.
 2. Link it from the **menu + parent collection + a high-authority page** (the size
    guide is the most-linked page on the site).
-3. Title + description match the browse terms.
+3. Title + description match the browse terms — find them with
+   `python seo/queries.py --page /collections/<handle>`, or size a specific term with
+   `--query "<term>"` / `--contains <word>`.
 4. Request re-indexing in GSC (URL Inspection → Request Indexing).
 
 **Product work** (product demand → capture + convert):
-1. Weave the search terms into the **description** — natural copy, not stuffing.
-   Keep the **title clean** (it's what shoppers see; the ranking lever is content +
-   links, not a stuffed title).
-2. Link to it from its **own collection** (highest-authority, most relevant link),
+1. **Find the terms:** `python seo/queries.py --page /products/<handle>` — it lists
+   every term the page already ranks for, with impressions and position. Target the
+   ones with real impressions but a **poor position (page 2)**. The top query also
+   shows the *language people actually use* (e.g. "two strap", not "Arizona"). Note:
+   GSC only shows terms you already appear for — greenfield keywords are the parked
+   Keyword Planner job.
+2. Weave those terms into the **description** — natural copy, not stuffing. Keep the
+   **title clean** (it's what shoppers see; the ranking lever is content + links, not
+   a stuffed title).
+3. Link to it from its **own collection** (highest-authority, most relevant link),
    then related-product blocks.
-3. Log it + measure against an untouched **control** (sandals are seasonal — a
+4. Log it + measure against an untouched **control** (sandals are seasonal — a
    control separates your work from July).
 
 ## How to run it (the loop)
