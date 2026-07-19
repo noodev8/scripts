@@ -50,7 +50,7 @@
 # 15:00, 15:10 BST
 0,10 14 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
 
-# 14:00 & 17:00 BST - Shopify "match Amazon price" reconcile (after the operator's late-morning amzfeed refresh).
+# 14:00 & 23:00 BST - Shopify "match Amazon price" reconcile (after the operator's amzfeed refresh).
 # Pins flagged styles' Shopify price to Amazon's cheapest in-stock size. No-op (no API calls) when nothing changed,
-# so the 17:00 run is a free safety net for days the feed is loaded late. See amz-match/README.md.
-0 13,16 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
+# so the 23:00 run is a free safety net for days the feed is loaded late. See amz-match/README.md.
+0 13,22 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py

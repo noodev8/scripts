@@ -60,9 +60,9 @@ Logs: `../logs/amz_match_sync.log` (shared logging, same as every other script).
 `crontab.txt` — twice each afternoon after the amzfeed refresh (times are GMT = BST − 1):
 
 ```
-0 13,16 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
+0 13,22 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
 ```
-= **14:00 & 17:00 BST**. The 17:00 run costs nothing on days the 14:00 run already synced (idempotent no-op), so it just covers days the operator loads the feed late.
+= **14:00 & 23:00 BST**. The 23:00 run costs nothing on days the 14:00 run already synced (idempotent no-op), so it just covers days the operator loads the feed late.
 
 ## Shared dependencies (reused from `C:\scripts`, not duplicated)
 
