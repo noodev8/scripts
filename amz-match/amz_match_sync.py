@@ -12,15 +12,15 @@ WHAT / WHY
     Amazon is the CEILING ("never go higher than Amazon lowest"): Shopify is set exactly to that lowest live Amazon price,
     so Shopify stays competitive and Amazon is never undercut by omission. This zeroes the admin on a chosen few styles.
 
-    Source of truth is amzfeed — Amazon's OWN price, refreshed when the operator loads the Amazon file each late morning.
+    Source of truth is amzfeed — Amazon's OWN price, refreshed when the operator loads the Amazon file.
     Because we reconcile off amzfeed (not off "the moment someone edits Amazon"), this ALSO catches price changes made
     outside our tools (Seller Central by hand, or an Amazon repricer). It is READ-ONLY on amzfeed (never written).
 
 WHEN
-    Cron, twice each afternoon (see crontab.txt) — after the operator has loaded the fresh amzfeed. A run where nothing
-    changed (weekend, a day she was too busy, or Amazon simply didn't move) is a near-instant no-op that touches NO
-    external API: the diff-guard below only pushes a style whose Amazon-lowest actually differs from its live Shopify
-    price. So it is safe to run daily regardless.
+    Cron (see crontab.txt for timing) — scheduled ahead of the Google Merchant feed generation, so the day's changes
+    are carried to Google by that feed. A run where nothing changed (Amazon didn't move, or the feed wasn't reloaded)
+    is a near-instant no-op that touches NO external API: the diff-guard below only pushes a style whose Amazon-lowest
+    actually differs from its live Shopify price. So it is safe to run daily regardless.
 
 WHAT IT DOES per flagged style (mirrors the bcweb Shopify "Apply" write, W1, but automated):
     - no in-stock Amazon size (target is NULL)        -> SKIP, reported as "no_amazon_stock"
@@ -29,24 +29,24 @@ WHAT IT DOES per flagged style (mirrors the bcweb Shopify "Apply" write, W1, but
     - otherwise CHANGE:
         UPDATE skusummary SET shopifyprice = '<2dp string>'         (NOT shopifychange — we push directly below)
         INSERT price_change_log (groupid,'SHP', old, new, NULL, note, 'Amazon match (auto)')   [audit stays honest]
-        then push the new price to Shopify (per variant) and Google Merchant (per googleid), reusing the exact
-        mechanisms proven in ../price_update.py.
+        then push the new price to Shopify (per variant), reusing the mechanism proven in ../price_update.py.
       If the DIRECT Shopify push fails, we set skusummary.shopifychange = 1 as a safety net so the nightly
-      price_update.py sweep re-pushes it (there is no operator watching an automated run). Google self-heals nightly
-      via merchant_feed.py --upload (it regenerates the whole feed from the DB), so a Google miss needs no flag.
+      price_update.py sweep re-pushes it (there is no operator watching an automated run).
+
+    Google Merchant is NOT pushed from here. The merchant_feed.py --upload feed (scheduled after this job) regenerates
+    the whole feed from the DB, so today's price changes reach Google via that one daily feed (no Content API).
 
 RETIRES CLEANLY: this folder + its one crontab line are the whole feature on the scripts side. Delete both when the
     legacy PowerBuilder app (and its manual amzfeed refresh) goes.
 
-SHARED DEPS (reused from the parent C:\scripts, NOT duplicated): logging_utils.py, .env (DB_* + SHOPIFY_ACCESS_TOKEN),
-    and the Google service-account JSON. Enabling a style is a one-liner until the bcweb UI toggle lands:
+SHARED DEPS (reused from the parent C:\scripts, NOT duplicated): logging_utils.py and .env (DB_* + SHOPIFY_ACCESS_TOKEN).
+    Enabling a style is a one-liner until the bcweb UI toggle lands:
         UPDATE skusummary SET match_amazon_price = true WHERE groupid = 'ABC123';
 
 USAGE
     python amz_match_sync.py                 # live reconcile of every flagged style
     python amz_match_sync.py --dry-run       # compute + log what WOULD change; no DB write, no push (run this first)
     python amz_match_sync.py --groupid ABC   # limit to one style (live unless combined with --dry-run)
-    python amz_match_sync.py --no-google     # skip the Google push (Shopify + DB only)
 =======================================================================================================================
 """
 
@@ -64,20 +64,14 @@ sys.path.insert(0, PARENT_DIR)
 import psycopg2
 import requests
 from dotenv import load_dotenv
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 from logging_utils import manage_log_files, create_logger, get_db_config
 
-# --- Credentials come from the SHARED parent .env + Google JSON (same as price_update.py / merchant_feed.py). --------
+# --- Credentials come from the SHARED parent .env (DB_* + SHOPIFY_ACCESS_TOKEN), same as price_update.py. ------------
 load_dotenv(dotenv_path=os.path.join(PARENT_DIR, '.env'))
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"
 ACCESS_TOKEN = os.getenv('SHOPIFY_ACCESS_TOKEN')
-
-GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(PARENT_DIR, 'merchant-feed-api-462809-23c712978791.json')
-GOOGLE_MERCHANT_ID = '124941872'
-GOOGLE_SCOPES = ['https://www.googleapis.com/auth/content']
 
 # The operator recorded against every auto price change so the audit trail + bcweb "Price Changes" tile stay honest.
 CHANGED_BY = 'Amazon match (auto)'
@@ -89,8 +83,6 @@ SCRIPT_NAME = "amz_match_sync"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
 
-google_service = None
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # SQL helper — mirror bcweb-server/utils/sql.js safeNumeric(): the legacy price columns (shopifyprice/cost/rrp/amzprice)
@@ -100,46 +92,6 @@ google_service = None
 def safe_numeric(col):
     return (f"CASE WHEN btrim({col}::text) ~ '^-?[0-9]+(\\.[0-9]+)?$' "
             f"THEN btrim({col}::text)::numeric ELSE NULL END")
-
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Google Content API — copied (trimmed) from price_update.py so this job is self-contained.
-# ---------------------------------------------------------------------------------------------------------------------
-def initialize_google_service():
-    global google_service
-    try:
-        credentials = service_account.Credentials.from_service_account_file(
-            GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_SCOPES
-        )
-        google_service = build('content', 'v2.1', credentials=credentials)
-        return True
-    except Exception as e:
-        log(f"Google API initialisation failed: {e}")
-        return False
-
-
-def update_google_price(google_id, new_price):
-    """products.update one googleid's price + salePrice to new_price (GBP). Returns True or an error string."""
-    global google_service
-    if not google_service:
-        return "Google service not initialised"
-    if not google_id:
-        return "No Google ID provided"
-    try:
-        body = {
-            "price":     {"value": str(new_price), "currency": "GBP"},
-            "salePrice": {"value": str(new_price), "currency": "GBP"},
-        }
-        google_service.products().update(
-            merchantId=GOOGLE_MERCHANT_ID,
-            productId='online:en:GB:' + google_id,
-            body=body
-        ).execute()
-        time.sleep(0.1)
-        return True
-    except Exception as e:
-        time.sleep(0.2)
-        return f"Google API error: {e}"
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -237,33 +189,6 @@ def push_shopify_style(cur, groupid, new_price_str, rrp):
     return (failed == 0 and pushed > 0), pushed, failed
 
 
-def push_google_style(cur, groupid, new_price_str):
-    """Set every Google-eligible size of this style to new_price_str. Best-effort. Returns (pushed, failed)."""
-    # Same eligibility as merchant_feed.py / push_google_price.py: live on Shopify AND flagged for Google at both levels.
-    cur.execute(
-        """
-        SELECT m.googleid
-        FROM skusummary sm
-        JOIN skumap m ON m.groupid = sm.groupid
-        WHERE sm.groupid = %s
-          AND sm.googlestatus = 1 AND sm.shopify = 1 AND m.googlestatus = 1
-          AND COALESCE(m.deleted, 0) = 0
-          AND m.googleid IS NOT NULL AND m.googleid <> ''
-        """,
-        (groupid,)
-    )
-    google_ids = [row[0] for row in cur.fetchall()]
-    pushed, failed = 0, 0
-    for gid in google_ids:
-        result = update_google_price(gid, new_price_str)
-        if result is True:
-            pushed += 1
-        else:
-            failed += 1
-            log(f"  googleid {gid}: update failed — {result}")
-    return pushed, failed
-
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Main reconcile
 # ---------------------------------------------------------------------------------------------------------------------
@@ -271,19 +196,12 @@ def main():
     ap = argparse.ArgumentParser(description="Shopify match-Amazon-price reconcile")
     ap.add_argument("--dry-run", action="store_true", help="compute + log what would change; no DB write, no push")
     ap.add_argument("--groupid", help="limit to a single style")
-    ap.add_argument("--no-google", action="store_true", help="skip the Google Merchant push")
     args = ap.parse_args()
 
     started = time.time()
     mode = "DRY-RUN" if args.dry_run else "LIVE"
     scope = f", groupid={args.groupid}" if args.groupid else ""
     log(f"=== amz_match_sync start ({mode}{scope}) ===")
-
-    google_ready = False
-    if not args.no_google and not args.dry_run:
-        google_ready = initialize_google_service()
-        if not google_ready:
-            log("Warning: Google push disabled (init failed) — merchant_feed.py will catch these tonight")
 
     db = get_db_config()
     conn = psycopg2.connect(**db)
@@ -301,7 +219,6 @@ def main():
                {sn_cost}                  AS cost,
                {sn_rrp}                   AS rrp,
                COALESCE(ss.shopify, 0)    AS live,
-               COALESCE(ss.googlestatus, 0) AS gstatus,
                amz.lowest                 AS amz_lowest
         FROM skusummary ss
         LEFT JOIN (
@@ -327,7 +244,7 @@ def main():
     push_shopify_fail = 0
     report_lines = []
 
-    for groupid, cur_price, cost, rrp, live, gstatus, amz_lowest in rows:
+    for groupid, cur_price, cost, rrp, live, amz_lowest in rows:
         # 1) No sellable Amazon size to match to.
         if amz_lowest is None:
             skip_no_stock += 1
@@ -343,7 +260,7 @@ def main():
             report_lines.append(f"{groupid}: SKIP below_cost (Amazon lowest £{target_str} < cost £{float(cost):.2f})")
             continue
 
-        # 3) Already matched — no DB write, no API call (the free no-op that makes daily/weekend runs cheap).
+        # 3) Already matched — no DB write, no API call (the free no-op that makes repeat runs cheap).
         cur_str = f"{float(cur_price):.2f}" if cur_price is not None else None
         if cur_str == target_str:
             unchanged += 1
@@ -397,13 +314,6 @@ def main():
                 except Exception as e:
                     conn.rollback()
                     log(f"  {groupid}: failed to set shopifychange fallback — {e}")
-
-            # Push to Google (best-effort). A miss self-heals via tonight's merchant_feed.py --upload (regenerates the
-            # whole feed from the DB), so no flag is needed on failure.
-            if google_ready and gstatus == 1:
-                g_pushed, g_failed = push_google_style(cur, groupid, target_str)
-                if g_failed:
-                    log(f"  {groupid}: Google push {g_pushed} ok / {g_failed} failed (merchant_feed.py will correct tonight)")
 
     cur.close()
     conn.close()

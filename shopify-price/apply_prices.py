@@ -3,7 +3,7 @@
 Apply Prices
 
 Reads a CSV of price changes and writes them to the database. The nightly
-Shopify sync (price_update2.py) picks up rows where shopifychange=1.
+Shopify sync (price_update.py) picks up rows where shopifychange=1.
 
 CSV columns: groupid, new_price, description, change
 Rows with change=1 are applied. Rows with change=0 can still have their

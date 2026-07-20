@@ -1,9 +1,12 @@
 # --- USAGE ---
-# python price_update.py                    # Changed only (default), Google updates enabled
-# python price_update.py full               # Force full update, Google updates enabled
-# python price_update.py --no-google        # Changed only, Google updates disabled
-# python price_update.py full --no-google   # Force full update, Google updates disabled
+# python price_update.py                    # Changed only (default)
+# python price_update.py full               # Force full update
+# python price_update.py --groupid <id>     # Update a specific groupid only
 # python price_update.py --help             # Show usage help
+#
+# Shopify-only price sync. Google Merchant prices are handled entirely by the nightly
+# merchant-feed/merchant_feed.py --upload full feed (SFTP); this script no longer touches
+# Google. (--no-google is still accepted as a no-op so existing cron lines don't break.)
 #
 
 import psycopg2
@@ -12,8 +15,6 @@ import sys
 import time
 import os
 from datetime import datetime
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 from dotenv import load_dotenv
 from logging_utils import manage_log_files, create_logger, get_db_config
 
@@ -30,38 +31,10 @@ LOG_RETENTION = 3  # days
 if not ACCESS_TOKEN:
     raise ValueError("SHOPIFY_ACCESS_TOKEN not found in .env file")
 
-# --- GOOGLE CONFIGURATION ---
-GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'merchant-feed-api-462809-23c712978791.json')
-GOOGLE_MERCHANT_ID = '124941872'
-GOOGLE_SCOPES = ['https://www.googleapis.com/auth/content']
-
-# Global Google service instance
-google_service = None
-
 # Setup logging
 SCRIPT_NAME = "price_update"
 manage_log_files(SCRIPT_NAME)
 log = create_logger(SCRIPT_NAME)
-
-
-def initialize_google_service():
-    """Initialize Google Content API service"""
-    global google_service
-    try:
-        # Get the directory where this script is located
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        credentials_path = os.path.join(script_dir, GOOGLE_SERVICE_ACCOUNT_FILE)
-
-        credentials = service_account.Credentials.from_service_account_file(
-            credentials_path, scopes=GOOGLE_SCOPES
-        )
-        google_service = build('content', 'v2.1', credentials=credentials)
-        return True
-    except Exception as e:
-        log(f"Google API initialization failed: {str(e)}")
-        return False
-
-
 
 
 
@@ -330,57 +303,15 @@ def update_variant_price(variant_id, new_price, rrp=None):
     return "Rate limit exceeded"
 
 
-def update_google_price(google_id, new_price):
-    """Update Google Merchant Center product price"""
-    global google_service
-
-    if not google_service:
-        return "Google service not initialized"
-
-    if not google_id:
-        return "No Google ID provided"
-
-    try:
-        request_body = {
-            "price": {
-                "value": str(new_price),
-                "currency": "GBP"
-            },
-            "salePrice": {
-                "value": str(new_price),
-                "currency": "GBP"
-            }
-        }
-
-        response = google_service.products().update(
-            merchantId=GOOGLE_MERCHANT_ID,
-            productId= 'online:en:GB:' + google_id,
-            body=request_body
-        ).execute()
-
-        # Small delay after Google API call
-        time.sleep(0.1)
-        return True
-
-    except Exception as e:
-        # Add delay even for errors to avoid overwhelming the API
-        time.sleep(0.2)
-        return f"Google API error: {str(e)}"
-
-
-
-
 def show_usage():
     print("Usage:")
-    print("  python price_update.py                    # Only update changed, Google enabled")
-    print("  python price_update.py full               # Force update all, Google enabled")
-    print("  python price_update.py --no-google        # Only update changed, Google disabled")
-    print("  python price_update.py full --no-google   # Force update all, Google disabled")
+    print("  python price_update.py                    # Only update changed")
+    print("  python price_update.py full               # Force update all")
     print("  python price_update.py --groupid <id>     # Update specific groupid only")
     print("  python price_update.py --help             # Show help")
     print("")
-    print("Google updates: Uses googleid from skumap table, updates price only (no availability), currency always GBP")
-    print("RRP updates: Now includes compare_at_price from RRP field in skusummary table")
+    print("Shopify-only. Google Merchant prices are pushed by the nightly merchant_feed.py full feed.")
+    print("RRP updates: Includes compare_at_price from RRP field in skusummary table")
 
 
 def main():
@@ -393,7 +324,6 @@ def main():
 
     # Parse command line arguments
     mode = "changed"
-    google_updates_enabled = True
     specific_groupid = None
 
     i = 1
@@ -402,22 +332,14 @@ def main():
         if arg.lower() == "full":
             mode = "full"
         elif arg.lower() == "--no-google":
-            google_updates_enabled = False
+            pass  # deprecated no-op — this script no longer pushes Google; kept so existing cron lines don't break
         elif arg.lower() == "--groupid" and i + 1 < len(sys.argv):
             specific_groupid = sys.argv[i + 1]
             i += 1  # Skip the next argument since we consumed it
         i += 1
 
     # Log start of operation
-    log(f"Starting price update - mode: {mode}, Google updates: {'enabled' if google_updates_enabled else 'disabled'}")
-
-    # Initialize Google service if enabled
-    google_initialized = False
-    if google_updates_enabled:
-        google_initialized = initialize_google_service()
-        if not google_initialized:
-            log("Warning: Google updates disabled due to initialization failure")
-            google_updates_enabled = False
+    log(f"Starting price update - mode: {mode}")
 
     db_config = get_db_config()
     conn = psycopg2.connect(**db_config)
@@ -435,8 +357,6 @@ def main():
     group_rows = cur.fetchall()
     total_processed = 0
     shopify_updates = 0
-    google_updates = 0
-    google_failures = 0
     processed_groups = 0
     total_groups = len(group_rows)
     variant_updates = {}  # Track variant IDs that need database updates
@@ -466,14 +386,14 @@ def main():
 
     for groupid, shopifyprice, rrp in group_rows:
         processed_groups += 1
-        cur.execute("SELECT code, variantlink, googleid FROM skumap WHERE groupid = %s", (groupid,))
+        cur.execute("SELECT code, variantlink FROM skumap WHERE groupid = %s", (groupid,))
         variants = cur.fetchall()
 
         success = True
         group_price_changed = False  # Track if any variant in this group had a price change
         first_price_change = None   # Store details of first price change for logging
 
-        for code, variantlink, googleid in variants:
+        for code, variantlink in variants:
             # Check if we have variant data from the batch lookup
             if code in variant_data:
                 variant_id, current_price, product_title = variant_data[code]
@@ -513,20 +433,6 @@ def main():
                     if not group_price_changed:
                         group_price_changed = True
                         first_price_change = (current_price, shopifyprice)
-
-                    # Update Google price if enabled and googleid exists
-                    if google_updates_enabled and googleid:
-                        google_start = datetime.now()
-                        google_result = update_google_price(googleid, shopifyprice)
-                        google_end = datetime.now()
-                        google_duration = (google_end - google_start).total_seconds()
-
-                        if google_result is True:
-                            google_updates += 1
-                            log(f"{code}: Google price updated to £{shopifyprice} [Google: {google_duration:.2f}s]")
-                        else:
-                            google_failures += 1
-                            log(f"{code}: Google update failed - {google_result} [Google: {google_duration:.2f}s]")
                 else:
                     log(f"{code}: Shopify update failed - {result} [Shopify: {shopify_duration:.2f}s]")
                     success = False
@@ -542,7 +448,7 @@ def main():
 
         # Progress logging for full mode every 50 groups
         if mode == "full" and processed_groups % 50 == 0:
-            log(f"Progress: {processed_groups}/{total_groups} groups processed, {total_processed} variants checked, {shopify_updates} Shopify updates, {google_updates} Google updates")
+            log(f"Progress: {processed_groups}/{total_groups} groups processed, {total_processed} variants checked, {shopify_updates} Shopify updates")
 
         if mode == "changed" and success:
             cur.execute("UPDATE skusummary SET shopifychange = 0 WHERE groupid = %s", (groupid,))
@@ -565,10 +471,6 @@ def main():
     # Final summary log with timing breakdown
     summary = f"Sync complete - mode: {mode}, groups: {len(group_rows)}, total variants: {total_processed}"
     summary += f", Shopify price changes: {shopify_updates}"
-    if google_updates_enabled:
-        summary += f", Google updates: {google_updates}, Google failures: {google_failures}"
-    else:
-        summary += ", Google updates: disabled"
     summary += f", Total duration: {duration_str}"
 
     log(summary)

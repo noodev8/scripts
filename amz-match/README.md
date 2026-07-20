@@ -12,7 +12,7 @@ shopifyprice  =  MIN(amzfeed.amzprice)   over that groupid's rows WHERE amzlive 
 
 Amazon is the **ceiling** ("never higher than Amazon lowest") — Shopify stays competitive and Amazon is never undercut by omission. Zero admin on the chosen few.
 
-Source of truth is **`amzfeed`** (Amazon's own price, refreshed when the operator loads the Amazon file each late morning). Reconciling off `amzfeed` — rather than off "the moment someone edits Amazon" — means it also catches changes made **outside our tools** (Seller Central by hand, or a repricer). `amzfeed` is **read-only** here.
+Source of truth is **`amzfeed`** (Amazon's own price, refreshed when the operator loads the Amazon file). Reconciling off `amzfeed` — rather than off "the moment someone edits Amazon" — means it also catches changes made **outside our tools** (Seller Central by hand, or a repricer). `amzfeed` is **read-only** here.
 
 ## Behaviour per style
 
@@ -21,16 +21,16 @@ Source of truth is **`amzfeed`** (Amazon's own price, refreshed when the operato
 | No in-stock Amazon size (`amzlive>0` gives nothing) | **skip** — `no_amazon_stock` |
 | Amazon lowest `< cost` | **skip** — `below_cost` (never sell Shopify at a loss) |
 | Amazon lowest already equals Shopify price | **no-op** — no DB write, no API call |
-| Otherwise | **change** — update `shopifyprice`, log `price_change_log` (`changed_by = 'Amazon match (auto)'`), push Shopify + Google |
+| Otherwise | **change** — update `shopifyprice`, log `price_change_log` (`changed_by = 'Amazon match (auto)'`), push Shopify |
 
 Above-RRP is **allowed** (flagged in the log), same as the manual Apply (W1).
 
-A run where nothing changed (weekend / operator too busy / Amazon didn't move) is a near-instant **no-op that hits no external API** — the diff-guard only pushes a style whose Amazon-lowest actually differs. Safe to run daily.
+A run where nothing changed (Amazon didn't move, or the feed wasn't reloaded) is a near-instant **no-op that hits no external API** — the diff-guard only pushes a style whose Amazon-lowest actually differs. Safe to run daily.
 
 ## Push & failure handling
 
 - **Shopify**: per-variant REST price update (same as `../price_update.py`). If the direct push fails, the row is flagged `shopifychange = 1` so the **nightly `price_update.py` sweep** re-pushes it (no operator watches an automated run).
-- **Google**: per-`googleid` Content API update. A miss self-heals via tonight's `merchant_feed.py --upload` (regenerates the whole feed from the DB), so no flag is needed.
+- **Google**: **not pushed from here.** The `merchant_feed.py --upload` feed (scheduled after this job) regenerates the whole feed from the DB, so the day's price changes reach Google Merchant via that one daily feed (over SFTP — no Content API).
 
 ## Enabling a style
 
@@ -50,20 +50,16 @@ Requires the column — see `bcweb/bcweb-server/migrations/20260719_skusummary_m
 python amz_match_sync.py            # live reconcile of every flagged style
 python amz_match_sync.py --dry-run  # log what WOULD change; no DB write, no push  (run this first)
 python amz_match_sync.py --groupid ABC123
-python amz_match_sync.py --no-google
 ```
 
 Logs: `../logs/amz_match_sync.log` (shared logging, same as every other script).
 
 ## Schedule
 
-`crontab.txt` — twice each afternoon after the amzfeed refresh (times are GMT = BST − 1):
-
-```
-0 13,22 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
-```
-= **14:00 & 23:00 BST**. The 23:00 run costs nothing on days the 14:00 run already synced (idempotent no-op), so it just covers days the operator loads the feed late.
+Runs on a cron schedule ahead of the nightly Google Merchant feed, so the day's price changes are carried to
+Merchant Center by that feed (no separate Google push). See **`crontab.txt`** for the actual timing — it's the
+single source of truth; don't restate times here.
 
 ## Shared dependencies (reused from `C:\scripts`, not duplicated)
 
-`logging_utils.py`, `.env` (`DB_*`, `SHOPIFY_ACCESS_TOKEN`), and the Google service-account JSON. Retires as a unit: delete this folder + the crontab line when the legacy PowerBuilder app (and its manual amzfeed refresh) goes.
+`logging_utils.py` and `.env` (`DB_*`, `SHOPIFY_ACCESS_TOKEN`). Retires as a unit: delete this folder + the crontab line when the legacy PowerBuilder app (and its manual amzfeed refresh) goes.

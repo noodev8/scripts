@@ -3,7 +3,7 @@
 # TIMES are BST - Go up 1hr for GMT
 
 # 2:00 AM - Database backup (first, when DB is stable)
-0 1 * * * /apps/scripts/pg_backup.sh
+0 1 * * * /apps/scripts/venv/bin/python /apps/scripts/pg_backup.sh
 
 # 2:15 AM - Price tracking (capture current prices before any changes)
 15 1 * * * /apps/scripts/venv/bin/python /apps/scripts/price_track.py
@@ -13,6 +13,10 @@
 
 # 2:30 AM Saturday - Full sweep (catches drift, refreshes variant links + RRP)
 30 1 * * 6 /apps/scripts/venv/bin/python /apps/scripts/price_update.py full --no-google
+
+# 2:40 AM - Shopify "match Amazon price" reconcile
+# Pins flagged styles' Shopify price to Amazon's cheapest in-stock size before feed generation.
+40 1 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
 
 # 2:45 AM - Stock tracking (after prices updated, snapshot for yesterday)
 45 1 * * * /apps/scripts/venv/bin/python /apps/scripts/google-ads/update_google_stock_track.py
@@ -41,7 +45,7 @@
 # Order sync targets: 10:00, 13:00, 14:00, 14:30, 14:45, 15:00, 15:10, 22:00
 # Note: These values are -1 hour to account for GMT server time.
 
-# 10:00 BST, 13:00 BST  & 22:00 BST
+# 10:00 BST, 13:00 BST & 22:00 BST
 0 9,12,21 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
 
 # 14:00, 14:30, 14:45 BST
@@ -49,8 +53,3 @@
 
 # 15:00, 15:10 BST
 0,10 14 * * * /apps/scripts/venv/bin/python /apps/scripts/update_orders2.py
-
-# 14:00 & 23:00 BST - Shopify "match Amazon price" reconcile (after the operator's amzfeed refresh).
-# Pins flagged styles' Shopify price to Amazon's cheapest in-stock size. No-op (no API calls) when nothing changed,
-# so the 23:00 run is a free safety net for days the feed is loaded late. See amz-match/README.md.
-0 13,22 * * * /apps/scripts/venv/bin/python /apps/scripts/amz-match/amz_match_sync.py
