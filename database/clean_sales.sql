@@ -42,7 +42,7 @@ DELETE FROM incoming_stock
 WHERE arrival_date < CURRENT_DATE - INTERVAL '3 years';
 
 DELETE FROM orderstatus_archive
-WHERE archivedate < CURRENT_DATE - INTERVAL '365 days';
+WHERE archivedate < CURRENT_DATE - INTERVAL '180 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
