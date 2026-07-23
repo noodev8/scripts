@@ -116,3 +116,6 @@ powerbuilder/*.zip
 *.dump
 *.gz
 
+
+# Google OAuth client secrets
+client_secret*.json
