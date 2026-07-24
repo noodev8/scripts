@@ -24,6 +24,10 @@ overlaps with most (by shared sizes), not a single brand-wide mode. Brands
 with no recurring set at all (every groupid's size set is unique, or too few
 groupids) are skipped and listed separately.
 
+Only groupids with at least one actual Amazon sale (sales.channel='AMZ',
+qty>0, ever) are reported — a groupid that's listed but has never sold isn't
+worth filling out with more sizes.
+
     python missing_sizes.py
     python missing_sizes.py --brand Strive
     python missing_sizes.py --segment STRIVE-SEG
@@ -43,7 +47,7 @@ from decimal import Decimal
 
 import psycopg2
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from logging_utils import get_db_config
 
 MIN_GROUPIDS_FOR_MODE = 3
@@ -58,6 +62,12 @@ QUERY = """
     WHERE sm.deleted = 0
       AND sm.uksize IS NOT NULL
       AND sm.uksize <> ''
+"""
+
+SOLD_QUERY = """
+    SELECT DISTINCT groupid
+    FROM sales
+    WHERE channel = 'AMZ' AND qty > 0
 """
 
 
@@ -75,12 +85,15 @@ def fetch(brand, segment):
     try:
         with conn.cursor() as cur:
             cur.execute(sql, params)
-            return cur.fetchall()
+            rows = cur.fetchall()
+            cur.execute(SOLD_QUERY)
+            sold_groupids = {r[0] for r in cur.fetchall()}
+        return rows, sold_groupids
     finally:
         conn.close()
 
 
-def analyse(rows):
+def analyse(rows, sold_groupids):
     """Returns (gaps, skipped_brands)."""
     groupids = defaultdict(lambda: {
         "brand": None, "segment": None, "colour": None,
@@ -119,6 +132,8 @@ def analyse(rows):
     for groupid, g in groupids.items():
         if not g["listed_sizes"]:
             continue  # not on Amazon at all — out of scope
+        if groupid not in sold_groupids:
+            continue  # listed but never sold on Amazon — not worth filling out
         clusters = brand_clusters.get(g["brand"])
         if not clusters:
             continue  # brand skipped for insufficient data
@@ -185,8 +200,8 @@ def main():
     ap.add_argument("--segment", help="filter to one segment (skusummary.segment)")
     args = ap.parse_args()
 
-    rows = fetch(args.brand, args.segment)
-    gaps, skipped_brands = analyse(rows)
+    rows, sold_groupids = fetch(args.brand, args.segment)
+    gaps, skipped_brands = analyse(rows, sold_groupids)
     render(gaps, skipped_brands, args.brand, args.segment)
 
 
