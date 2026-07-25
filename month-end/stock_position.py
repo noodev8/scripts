@@ -26,7 +26,13 @@ Usage:
   python stock_position.py
 """
 
+import os
+import sys
+
 import psycopg2
+
+# Shared logging/DB config lives at the repo root
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from logging_utils import get_db_config
 
 # Stock position: #FREE local stock + Amazon amztotal, valued at groupid cost.

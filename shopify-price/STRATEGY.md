@@ -125,9 +125,9 @@ So the triage doesn't keep re-surfacing a style we've just handled, every decisi
 
 - **Where it lives:** `skusummary.next_shopify_price_review` (a `date`). We keep it on the live product
   master — the same table our scripts already read for price/cost/stock — not on
-  `groupid_performance`. That table *does* have a `next_review_date` the old PowerBuilder
-  front-end wrote, but its refreshing cron died in Mar 2026 (its metrics are frozen), so we
-  don't build on it. The one live park was migrated onto `skusummary`.
+  `groupid_performance`. That table *did* have a `next_review_date` the old PowerBuilder
+  front-end wrote, but its refreshing cron died in Mar 2026 and the table has since been
+  retired to `groupid_performance_delete`. The one live park was migrated onto `skusummary`.
 - **On a price change:** required. `apply_prices.py` refuses a price change with no
   `review_days` — you must decide when to look again. It sets `next_shopify_price_review =
   today + review_days` as it applies the price.

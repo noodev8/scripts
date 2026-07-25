@@ -173,10 +173,14 @@ Shopify is a Birkenstock shop (85% of Shopify revenue on average, ranging 71-93%
 
 Always be investigating so we're ready when growth demands it. Ives approaching ceiling makes this essential.
 
-**Principles:**
-- Investigation costs nothing. Always be open.
-- Evaluate against benchmarks: Lunar (41% margin, 4-day lead), Rieker (31% margin, 2-week lead).
-- Only commit when: margin proven, lead time short, clear gap being filled.
+Investigation costs nothing — always be open. Only commit when the margin is
+proven, the lead time is short, and there's a clear gap being filled.
+
+This section holds pipeline **state**: which brands are live, under
+investigation, or ruled out. For the candidate list and how to cost a brand out,
+see `BRAND_EXPANSION.md`. How to *screen* candidates is an open question — no
+scoring system is currently settled, so start that discussion fresh rather than
+inheriting one.
 
 ### Active — Testing
 
@@ -196,13 +200,6 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 |-------|-----|
 | Skechers | Margins too thin (~16.5%) |
 | TikTok Shop | Wrong demographic |
-
-### Next Actions
-- [ ] Get full Frisco FBA stock landed (sizes 4, 6, 8 still in transit for Navy/Smoke)
-- [ ] Monitor Frisco sell-through rate over Apr-May — target: 5+ units/colour/month
-- [ ] Decide on Frisco Black for Amazon listing based on Navy/Smoke performance
-- [ ] Cleveland — evaluate whether to list on Amazon or leave as Shopify-only test
-- [ ] Ask WMSC about autumn/winter Free Spirit range if summer proves out
 
 ---
 
@@ -225,7 +222,7 @@ Always be investigating so we're ready when growth demands it. Ives approaching 
 - **Manager report template:** `scale/SEGMENT_REPORTS.md`
 - **Email playbook:** `scale/KLAVIYO_EMAIL_PLAYBOOK.md`
 - **Meeting rules:** `scale/MEETING_RULES.md`
-- **DB schema:** `database/DB-Schema.sql`
-- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `price_track`, `groupid_performance`, `google_stock_track`
+- **DB schema:** read it live via the postgres MCP
+- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `price_track`, `google_stock_track`
 - **Key view:** `shopify_health_check`
 - **Identity:** "High-efficiency distribution engine for brands that already dominate demand"

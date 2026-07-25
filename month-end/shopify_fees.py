@@ -32,7 +32,7 @@ from collections import Counter
 from dotenv import load_dotenv
 
 # --- CONFIGURATION ---
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 SHOP_DOMAIN = "brookfieldcomfort2.myshopify.com"
 API_VERSION = "2025-04"

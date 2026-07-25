@@ -9,7 +9,8 @@ Brookfield Comfort is scaling from ~£500k to £1M revenue. The approach: build 
 ## Key Files (in this folder)
 
 - `PRICING_PROCESS.md` — **WORKING DRAFT** operating model for pricing every SKU systematically: the Proven Price anchor (per-groupid Shopify / per-SKU Amazon), the segment cadence loop, the per-SKU disposition ruleset, and open threads. Read this when the topic is "how we price/review across the catalogue" (as opposed to a single-groupid deep-dive).
-- `SCALE_PLAN.md` — Master strategy, established facts, decision log, brand pipeline
+- `SCALE_PLAN.md` — Master strategy, established facts, decision log, brand pipeline **state** (§8: who's live, under investigation, ruled out)
+- `BRAND_EXPANSION.md` — Candidate brands for new accounts, the mechanics of costing one out (the two loaded-cost stacks, reading a live listing, acquisition cost), and dated facts gathered per brand. No screening system is settled — start that discussion fresh, don't inherit one.
 - `CORE_ACTIONS.md` — All active segments with groupids, data tables, actions, weekly routine, meeting prep query
 - `PORTFOLIO_ANALYSIS.md` — Ives dependency analysis, unsegmented product assessment, portfolio growth plan
 - `MEETING_RULES.md` — 5 rules for segment meetings

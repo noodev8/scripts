@@ -28,10 +28,13 @@ from decimal import Decimal, ROUND_HALF_UP
 from calendar import monthrange
 from collections import defaultdict
 from dotenv import load_dotenv
+
+# Shared logging/DB config lives at the repo root
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from logging_utils import manage_log_files, create_logger
 
 # --- CONFIGURATION ---
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 SHOP_DOMAIN = "brookfieldcomfort2.myshopify.com"
 API_VERSION = "2025-04"

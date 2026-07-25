@@ -10,7 +10,7 @@ the two tables go out of sync on that style forever — even though it's the
 same 7-digit Birkenstock code.
 
 This matters at goods-in: any script matching `birktracker` codes against
-`incoming_stock`/`skumap`/`skusummary` (e.g. `birk_check_combined.sql`) will
+`incoming_stock`/`skumap`/`skusummary` (e.g. `check_combined.sql`) will
 show a false "not arrived" shortfall for a style that actually arrived fine,
 just under a differently-spelled code.
 
@@ -78,8 +78,8 @@ SET code = regexp_replace(code, '^1015487-Honolulu Essentials EVA Unisex-', '101
 WHERE code LIKE '1015487-Honolulu Essentials EVA Unisex-%';
 ```
 
-See `birk_fix_code_naming.sql` for a worked example (includes a preview
-`SELECT` to check old->new pairs before running the `UPDATE`).
+Run the equivalent `SELECT` first to check the old->new pairs before running
+the `UPDATE`.
 
 ## Note
 

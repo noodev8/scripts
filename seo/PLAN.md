@@ -91,6 +91,20 @@ syncs across both machines).
 - **Two scoreboards, never merged:** SEO = free clicks; the business = the P&L. Free
   clicks don't have to prove ROI — that's a paid problem.
 
+## Hygiene — thin collections
+
+Empty or near-empty collections are bad pages regardless of clicks: thin content,
+they look broken, and they waste crawl budget. `thin_collections.py` finds the
+delete candidates, sorted fewest-products-first.
+
+    python seo/thin_collections.py           # all, thinnest first
+    python seo/thin_collections.py --max 3   # only those with <= 3 products
+
+Two flags exist so we don't delete something worth keeping: SMART collections can
+be empty now and refill seasonally (an empty MANUAL collection is the real dead
+page), and `seo` marks a page where a custom SEO title was set. Deleting still
+needs the link check and a 301 — this only finds candidates.
+
 ## Current experiments (live)
 
 - **Arizona vs Madrid** — do internal links get a stuck collection *indexed* (Gate 1,

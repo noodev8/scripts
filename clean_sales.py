@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Weekly sales table maintenance.
+Sales table maintenance.
 Runs clean_sales.sql to:
   1. Delete sales older than 900 days
   2. Fix returns that arrived with soldprice = 0
 
-Cron: 0 4 * * 1 /apps/scripts/venv/bin/python /apps/scripts/clean_sales.py
+Runs on cron -- see crontab.txt for the schedule and invocation.
 """
 
 import psycopg2
@@ -23,7 +23,7 @@ def main():
     start_time = datetime.now()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    sql_path = os.path.join(script_dir, "database", "clean_sales.sql")
+    sql_path = os.path.join(script_dir, "clean_sales.sql")
 
     try:
         with open(sql_path, "r", encoding="utf-8") as f:

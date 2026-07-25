@@ -737,7 +737,7 @@ def main():
         if batch_deleted > 0:
             log(f"Deleted {batch_deleted} orderstatus records with batch = '-1'")
 
-        # 30-day window must match clean_sales.sql. Real-world supplier lead is
+        # 30-day window. Real-world supplier lead is
         # ~10 days typical, 20 days longest legitimate arrival observed — 30d
         # is the ceiling + buffer. This delete ignores `arrived`, acting as a
         # backstop that also clears arrived=1 rows with NULL arriveddate the

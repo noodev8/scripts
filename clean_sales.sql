@@ -1,6 +1,6 @@
 -- ================================================================
 -- clean_sales.sql
--- Runs weekly via clean_sales.py (cron: Mondays 4am)
+-- Run by clean_sales.py on cron -- see crontab.txt for the schedule
 --
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),
@@ -67,9 +67,6 @@ WHERE created_at < CURRENT_DATE - INTERVAL '60 days';
 -- trail is lost but stock isn't — factored into future reorders via
 -- normal stock-aware logic. Acceptable trade vs. keeping ghosts in
 -- the PB Amazon Total report that would suppress legitimate reorders.
---
--- See database/stuck_supplier_orders.sql for the 21-day early-warning
--- report that surfaces candidates before this auto-purge fires.
 DELETE FROM orderstatus
 WHERE ordertype = 3
   AND arrived = 0

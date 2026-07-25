@@ -260,8 +260,11 @@ are still used before moving them.
 ### Confirmed keep — do not touch
 
 `logging_utils.py` (root, imported by ~25 scripts via `sys.path` inserts —
-moving it breaks everything), `crontab.txt`, `CLAUDE.md`, `WAYS_OF_WORKING.md`,
+moving it breaks everything), `crontab.txt`, `CLAUDE.md`,
 all nine live cron scripts, `powerbuilder/` (legacy app still in use).
+
+`WAYS_OF_WORKING.md` was on this list and was **deleted by the owner**
+(2026-07-25). Don't reinstate it.
 
 ---
 
