@@ -14,8 +14,8 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 ## Common Commands
 
 ### Running Scripts
-- **Order sync and pick allocation**: `python update_orders2.py`
-- **Pick allocation only**: `python update_orders2.py --picks`
+- **Order sync and pick allocation**: `python orders/update_orders.py`
+- **Pick allocation only**: `python orders/update_orders.py --picks`
 - **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
 - **Inventory sync**: `python update_shopify_inventory.py`
 - **Shopify title/tag sync**: `python update_shopify_titles.py`, `python update_shopify_tags.py`
@@ -34,7 +34,7 @@ restate a schedule anywhere else; it rots.
 ## Architecture & Key Components
 
 ### Core Scripts
-- **`update_orders2.py`**: Shopify order synchronization with timezone handling and pick allocation
+- **`orders/update_orders.py`**: Shopify order synchronization with timezone handling and pick allocation
 - **`merchant-feed/merchant_feed.py`**: Google Merchant Center feed generation with product categorization
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 

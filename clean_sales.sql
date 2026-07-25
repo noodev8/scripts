@@ -148,7 +148,7 @@ WHERE qty < 0
 -- sale's per-unit net profit, so a sale and its return net to ~zero.
 --
 -- Per-channel P&L model — the single source of truth is bcweb
--- docs/profit-model.md (mirrored in update_orders2.shopify_profit and
+-- docs/profit-model.md (mirrored in orders/update_orders.py shopify_profit and
 -- bcweb-server/utils/profit.js):
 --   VAT    = sold / 6
 --   Gross  = sold - VAT - cost

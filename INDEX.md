@@ -26,6 +26,7 @@ docs and material, not runnable.
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |
 | `month-end/` | BC-ops | Month-end accounting pack: transaction CSV, fees, stock position | `python month-end/month-export.py` | no | `README.md` |
+| `orders/` | BC-ops | Shopify order sync + pick allocation (`--picks` for picks only) | `python orders/update_orders.py` | yes | `README.md` |
 | `ofd/` | OFD | Online Front Door — separate business | interactive | no | `BUSINESS_PLAN.md` |
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
 | `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
@@ -41,7 +42,6 @@ foldered yet.
 | File | Domain | What it does | Cron |
 |---|---|---|---|
 | `logging_utils.py` | BC-ops | Shared logging + DB config. **Imported by ~25 scripts via `sys.path` — do not move** | — |
-| `update_orders2.py` | BC-ops | Shopify order sync + pick allocation (`--picks` for picks only) | yes |
 | `update_shopify_inventory.py` | BC-ops | Pushes stock levels to Shopify | yes |
 | `update_shopify_titles.py` | BC-ops | Pushes product titles to Shopify | yes |
 | `update_shopify_tags.py` | BC-ops | Pushes product tags to Shopify | yes |

@@ -8,7 +8,7 @@ follows.
 
 ## Shopify — LOCKED (source of truth)
 
-Defined in code: `update_orders2.py` → `shopify_profit(sold, cost)`, mirrored by
+Defined in code: `orders/update_orders.py` → `shopify_profit(sold, cost)`, mirrored by
 `bcweb-server` `shopifyProfit`. Written to `sales.profit` per unit at order-sync
 (commit a7cf657). Do not re-invent — change the code, not this doc.
 
