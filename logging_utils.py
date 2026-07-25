@@ -11,7 +11,10 @@ import pytz
 from dotenv import load_dotenv
 
 # --- LOGGING CONFIGURATION ---
-LOG_ARCHIVE_DAYS = 1  # Keep 1 day of archived logs
+# 14 days, not 1. The first question when an unattended job turns out to have
+# been failing is "since when?", and one day of history can never answer it.
+# Volumes are tiny -- a fortnight is well under 2 MB.
+LOG_ARCHIVE_DAYS = 14
 
 # --- TIMEZONE CONFIGURATION ---
 UK_TIMEZONE = pytz.timezone('Europe/London')
@@ -80,19 +83,27 @@ def manage_log_files(script_name):
     # Cleanup old archived logs (keep only LOG_ARCHIVE_DAYS)
     cutoff_date = get_uk_time().date() - timedelta(days=LOG_ARCHIVE_DAYS)
     
+    # Sweep by date across EVERY script's archives, not just this one's. A
+    # script that stops running never runs again to clean up after itself, so
+    # its archives would otherwise sit here forever (e.g. update_orders2_*,
+    # left behind when that script was renamed).
     for filename in os.listdir(archive_dir):
-        if filename.startswith(f"{script_name}_") and filename.endswith(".log"):
+        if not filename.endswith(".log"):
+            continue
+
+        # Archives are named <script>_YYYY-MM-DD.log
+        date_part = filename[:-len(".log")].rsplit("_", 1)[-1]
+        try:
+            file_date = datetime.strptime(date_part, "%Y-%m-%d").date()
+        except ValueError:
+            # Not a dated archive -- leave it alone
+            continue
+
+        if file_date < cutoff_date:
             try:
-                # Extract date from filename
-                date_part = filename.replace(f"{script_name}_", "").replace(".log", "")
-                file_date = datetime.strptime(date_part, "%Y-%m-%d").date()
-                
-                if file_date < cutoff_date:
-                    old_log_path = os.path.join(archive_dir, filename)
-                    os.remove(old_log_path)
-                    print(f"Removed old log: {filename}")
-            except (ValueError, OSError):
-                # Skip files that don't match expected format or can't be removed
+                os.remove(os.path.join(archive_dir, filename))
+                print(f"Removed old log: {filename}")
+            except OSError:
                 continue
 
 def create_logger(script_name):
