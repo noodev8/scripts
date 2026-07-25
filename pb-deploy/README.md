@@ -33,6 +33,30 @@ publishing, go through PowerShell:
 5. **Waits for you to confirm (y/N)**, then creates the release and uploads the zip.
 6. Reads the release back from GitHub and prints a pass/fail table.
 
+## The "nothing new" warning
+
+Before the confirm prompt, the script compares the timestamps of the compiled
+output against when the last release went out. If no PBD or exe is newer, you
+haven't compiled since you last published, so you'd be shipping the same build
+under a new version number. You get:
+
+```
+  NOTE: nothing has been compiled since v2.17 went out (25/07 18:12).
+        This would republish the same build under a new version number.
+```
+
+**It warns, it doesn't block** — answer `y` and it publishes anyway. The check
+is one-directional by design: it can prove nothing changed, but not that
+something did, because recompiling untouched source still bumps the PBD
+timestamps. So it never gives a false alarm, and a missed one costs you a
+version number and nothing else.
+
+This is deliberately the cheap check. Comparing actual file contents would be
+stronger, but PowerBuilder rewrites PBL internals on every IDE open (see
+`GIT_INSTRUCTIONS.md` in the Drive folder) and PBDs are regenerated from those,
+so a content hash would likely differ on every build regardless — reporting
+"changed" every time and telling you nothing.
+
 ## How you know it worked
 
 You don't need to go and check the releases page. After uploading, the script

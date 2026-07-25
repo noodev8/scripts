@@ -91,9 +91,10 @@ $parsed = @($releases |
     ForEach-Object {
         $null = $_.tag_name -match '^v(\d+)\.(\d+)$'
         [pscustomobject]@{
-            Tag   = $_.tag_name
-            Major = [int]$Matches[1]
-            Minor = [int]$Matches[2]
+            Tag       = $_.tag_name
+            Major     = [int]$Matches[1]
+            Minor     = [int]$Matches[2]
+            Published = $_.published_at
         }
     } | Sort-Object Major, Minor)
 
@@ -118,11 +119,37 @@ if ($releases | Where-Object { $_.tag_name -eq $tag }) {
     Fail "Release $tag already exists. Pass a different -Version."
 }
 
+# --- Has anything been compiled since the last release? -------------------
+# The zip's own timestamp is useless here - it is rebuilt every run, so it is
+# always "now". The compiled output is what carries the answer: if no PBD is
+# newer than the last release, nothing has been compiled since, so there is
+# nothing new to ship.
+#
+# One-directional on purpose. It can prove nothing changed; it cannot prove
+# something did, because recompiling untouched source still bumps the PBD
+# timestamps. So it warns and lets you decide - it never blocks.
+$nothingNew = $false
+if ($latest -and $latest.Published) {
+    $compiled = @(Get-ChildItem -LiteralPath (Split-Path -Parent $zipFile.FullName) -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -in @(".pbd", ".exe") })
+    if ($compiled.Count -gt 0) {
+        $newestBuild = ($compiled | Measure-Object LastWriteTime -Maximum).Maximum
+        $lastRelease = ([datetime]$latest.Published).ToLocalTime()
+        if ($newestBuild -le $lastRelease) { $nothingNew = $true }
+    }
+}
+
 # --- Confirm -------------------------------------------------------------
 Write-Head "About to publish"
 Write-Host "  Repo    : $Owner/$Repo"
 Write-Host "  Tag     : $tag"
 Write-Host ("  Asset   : {0}  ({1:n0} KB, built {2:dd/MM HH:mm})" -f $AssetName, ($zipFile.Length / 1KB), $zipFile.LastWriteTime)
+
+if ($nothingNew) {
+    Write-Host ""
+    Write-Host ("  NOTE: nothing has been compiled since {0} went out ({1:dd/MM HH:mm})." -f $latest.Tag, ([datetime]$latest.Published).ToLocalTime()) -ForegroundColor Yellow
+    Write-Host "        This would republish the same build under a new version number." -ForegroundColor Yellow
+}
 
 if (-not $Yes) {
     Write-Host ""
