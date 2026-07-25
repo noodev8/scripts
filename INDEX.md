@@ -34,7 +34,6 @@ docs and material, not runnable.
 | `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
 | `shopify-sync/` | BC-ops | Nightly push to Shopify: prices, stock, titles, tags + daily price history | `python shopify-sync/price_update.py` | yes | `README.md` |
-| `ukd/` | BC-analysis | UKD supplier channel — session guide, no scripts | interactive | no | `README.md` |
 | `archive/` | Reference | Retired files. Soft delete — never referenced from live docs or code | — | no | — |
 
 ## Root scripts
