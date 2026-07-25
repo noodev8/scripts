@@ -10,7 +10,11 @@ Runs on cron -- see crontab.txt for the schedule and invocation.
 
 import psycopg2
 import os
+import sys
 from datetime import datetime
+
+# Shared logging/DB config lives at the repo root, one level up
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from logging_utils import manage_log_files, create_logger, get_db_config
 
 SCRIPT_NAME = "clean_sales"

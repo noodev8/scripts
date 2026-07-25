@@ -27,8 +27,8 @@ records what runs when** — it mirrors the server, which is authoritative. Neve
 restate a schedule anywhere else; it rots.
 
 ### Database Operations
-- **Backup database**: `./pg_backup.sh` (PostgreSQL backup script)
-- **Sales-table maintenance**: `python clean_sales.py` (runs `clean_sales.sql` alongside it)
+- **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`)
+- **Sales-table maintenance**: `python db-maint/clean_sales.py` (runs `clean_sales.sql` alongside it)
 - For schema, query the database directly via the postgres MCP rather than looking for a schema file
 
 ## Architecture & Key Components

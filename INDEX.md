@@ -20,6 +20,7 @@ docs and material, not runnable.
 | `amz-product/` | BC-ops | New-product loader for Amazon | `python amz-product/amz_upload.py` | no | `CLAUDE_CONTEXT.md`, `how-to-run.md` |
 | `barcodes/` | Reference | Ad-hoc barcode generation on request | ask | no | `README.md` |
 | `birk-stock/` | BC-analysis | Birkenstock core-size availability (the `Full` metric) | `python birk-stock/availability.py` | no | `README.md` |
+| `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
 | `google-ads/` | BC-ops | Ads spend/stock tracking + budget reviews | `python google-ads/update_google_stock_track.py` | yes | `BUDGET_REVIEW_PROCESS.md`, `how-to-run.md` |
@@ -48,8 +49,6 @@ foldered yet.
 | `price_update.py` | BC-ops | Pushes agreed prices to Shopify | yes |
 | `price_track.py` | BC-ops | Records daily price/stock/sales history | yes |
 | `updateimages.py` | BC-ops | Mirrors new product images into Google Drive | yes |
-| `clean_sales.py` + `clean_sales.sql` | BC-ops | Sales/orderstatus table maintenance and purges | yes |
-| `pg_backup.sh` | BC-ops | PostgreSQL backup | yes |
 | `authorize_drive.py` | BC-ops | One-off Google Drive OAuth for `updateimages.py` | no |
 
 ## Root docs and config

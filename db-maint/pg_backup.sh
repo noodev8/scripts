@@ -7,7 +7,8 @@
 # Google Drive retention: Unlimited (version history)
 #
 
-BACKUP_DIR="/apps/scripts/database"
+# Deliberately outside the git checkout -- backups are not source code.
+BACKUP_DIR="/apps/backups"
 DATE=$(date +%Y-%m-%d)
 
 # Make sure the backup directory exists
