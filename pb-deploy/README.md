@@ -3,6 +3,27 @@
 Packages a fresh PowerBuilder build into `BrookfieldUpdate.zip` and publishes it
 as a new release on [brookfielduser1/BrookfieldApp](https://github.com/brookfielduser1/BrookfieldApp/releases).
 
+## Summary
+
+Compile in PowerBuilder, double-click `release.bat`, answer `y`. That replaces
+the old manual routine of zipping the exe and PBDs by hand, copying the zip to
+Downloads, and uploading it to a new release.
+
+| | |
+|---|---|
+| **You run** | `release.bat` — the only entry point |
+| **Ships** | `brookfieldcomfort.exe` + every `*.pbd`. No PBLs, no runtime DLLs |
+| **Version** | Next tag worked out from the last release: `v2.17` → `v2.18` |
+| **Asset** | Always `BrookfieldUpdate.zip`, so `/releases/latest/download/` links keep working |
+| **Stops you if** | A PBD is older than its PBL — that library didn't rebuild |
+| **Warns you if** | Nothing has been compiled since the last release |
+| **Confirms** | Re-reads the release from GitHub and prints a pass/fail table |
+| **Needs** | `GITHUB_TOKEN` in `C:\scripts\.env` — per machine, see setup below |
+| **Leaves behind** | One zip, overwritten each build. Nothing accumulates |
+
+Nothing is published until you answer the prompt, and a failed upload cleans up
+after itself.
+
 ## Run it
 
 Compile in PowerBuilder first, then double-click `release.bat` — or run it from
@@ -72,15 +93,15 @@ Checking GitHub yourself is then a belt-and-braces confirmation, not the test.
 
 ## Running it on the other machine
 
-The scripts are machine-agnostic — nothing is hardcoded to the laptop. On a new
-machine they work out both folders themselves:
+The scripts are machine-agnostic — nothing is hardcoded to the laptop.
 
-The **PowerBuilder output folder** is searched for under your user profile and
+The **PowerBuilder output folder** is the only machine-dependent path, and it's
+worked out automatically. It's searched for under your user profile and
 on every drive letter, as `<root>\My Drive [(noodev8@gmail.com)]\Business\
 Brookfield Comfort\Powerbuilder`. A candidate only counts if
 `brookfieldcomfort.exe` is actually in it, so a stale or empty copy of the tree
-won't match. It's the only machine-dependent path — the zip is built and
-uploaded from there, nothing else on disk is touched.
+won't match. The zip is built and uploaded from there; nothing else on disk is
+touched.
 
 So try it with no `.env` change first. If auto-detection misses, the script
 stops and tells you exactly what to add:
