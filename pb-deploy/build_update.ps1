@@ -16,7 +16,11 @@ param(
     [string]$Source,
 
     # Build the zip even if a PBD is older than its PBL.
-    [switch]$Force
+    [switch]$Force,
+
+    # Set by release.ps1 - suppresses the "nothing published" footer, since in
+    # that case publishing is about to happen.
+    [switch]$FromRelease
 )
 
 $ErrorActionPreference = "Stop"
@@ -128,5 +132,11 @@ finally {
     if ($tempZip) { Remove-Item -LiteralPath $tempZip -Force -ErrorAction SilentlyContinue }
 }
 
-Write-Host ""
-Write-Host "Zip only - nothing published. Use release.bat to build and publish in one go." -ForegroundColor DarkGray
+if (-not $FromRelease) {
+    Write-Host ""
+    Write-Host "Zip only - nothing published. Use release.bat to build and publish in one go." -ForegroundColor DarkGray
+}
+
+# Explicit, so a caller reading $LASTEXITCODE sees this script's result rather
+# than a stale value left by whatever ran before it.
+exit 0

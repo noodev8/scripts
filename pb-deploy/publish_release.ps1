@@ -72,7 +72,7 @@ if (-not $Zip) {
     $Zip = Join-Path $sourceDir $AssetName
 }
 if (-not (Test-Path -LiteralPath $Zip)) {
-    Fail "Zip not found: $Zip`nRun build_update.bat first."
+    Fail "Zip not found: $Zip`nRun release.bat, which builds the zip before publishing it."
 }
 $zipFile = Get-Item -LiteralPath $Zip
 
@@ -200,3 +200,7 @@ Write-Host "$tag published and verified." -ForegroundColor Green
 Write-Host ("  {0}  ({1:n0} KB)" -f $asset.name, ($asset.size / 1KB))
 Write-Host "  $($release.html_url)"
 Write-Host ""
+
+# Explicit, so a caller reading $LASTEXITCODE sees this script's result rather
+# than a stale value left by whatever ran before it.
+exit 0

@@ -5,20 +5,24 @@ as a new release on [brookfielduser1/BrookfieldApp](https://github.com/brookfiel
 
 ## Run it
 
-Compile in PowerBuilder first, then double-click one of these (or run it from
-cmd, from any folder):
+Compile in PowerBuilder first, then double-click `release.bat` — or run it from
+cmd, from any folder:
 
-| Front door | Does |
-|---|---|
-| `release.bat` | **The full deploy** — builds the zip, then publishes the GitHub release |
-| `build_update.bat` | Builds the zip only, no upload |
+```
+C:\scripts\pb-deploy\release.bat
+```
 
-Both anchor on their own location, so the working directory doesn't matter, and
-both pause at the end so you can read the result. The `.ps1` files alongside
-hold the logic (`env_util.ps1` holds the bits both share) — don't invoke those
-directly, cmd hands `.ps1` files to the default editor rather than running them.
+That's the only thing you run. It anchors on its own location, so the working
+directory doesn't matter, and it pauses at the end so you can read the result.
 
-### What `release.bat` does
+The `.ps1` files hold the logic — `release.ps1` (routes your flags to the right
+step), `build_update.ps1` (zip), `publish_release.ps1` (upload), `env_util.ps1`
+(the bits both share). Don't invoke those directly: cmd hands `.ps1` files to
+the default editor rather than running them. To build a zip *without*
+publishing, go through PowerShell:
+`powershell -ExecutionPolicy Bypass -File C:\scripts\pb-deploy\build_update.ps1`
+
+### What it does
 
 1. Collects `brookfieldcomfort.exe` + every `*.pbd` from the compile output folder
    (`My Drive (noodev8@gmail.com)\Business\Brookfield Comfort\Powerbuilder`).
@@ -101,7 +105,7 @@ rather than guessing.
 
 ## Flags
 
-Pass these to `release.bat` (they reach the publish step) or `build_update.bat`:
+Pass these to `release.bat` — they reach the publish step:
 
 | Flag | Purpose |
 |---|---|
