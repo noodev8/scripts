@@ -36,7 +36,20 @@ Dumps `brookfield_prod` and `splitleague_prod` with `pg_dump -Fc`, gzips them,
 and uploads to Google Drive (`ServerBackups`) via `rclone` under
 brookfieldcomfort@gmail.com.
 
-**Retention:** 3 days locally, unlimited on Drive via version history.
+**Retention:** 3 days locally, 10 days on Drive. Both are pruned by the script.
+Drive was previously never pruned — it had accumulated every backup since 2025.
+
+**Every step is checked and the script exits non-zero if anything fails**, so
+cron reports it. That matters: the Drive OAuth token expired on 7 Apr 2026 and
+`rclone`'s errors were ignored, so the script printed "Backup complete" nightly
+for 109 days while nothing reached Drive. Local dumps were fine throughout, but
+they self-prune after 3 days, so the only off-site copy was months stale.
+If you edit this script, keep the exit-code checks.
+
+Re-authorising Drive when the token expires (it will): `rclone config reconnect
+bcgoogle:` — the server has no browser, so SSH in with
+`ssh -L 53682:localhost:53682 root@vps` first, answer yes to auto config, and
+open the printed `127.0.0.1:53682` link in a local browser.
 
 **Backups are written to `/apps/backups`, outside the git checkout.** They used
 to go to `/apps/scripts/database`, which meant database dumps accumulating
