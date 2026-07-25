@@ -3,6 +3,70 @@
 **Status:** agreed in principle 2026-07-25. **Nothing has been changed yet.**
 This is a multi-session plan. Read it top to bottom before doing anything.
 
+---
+
+## STOP — READ THIS BEFORE TOUCHING ANYTHING
+
+**You do not have permission to change a single file in this repo as part of TIDY
+work. Not one. Ever — until the owner tells you to, in the conversation you are
+having with him right now.**
+
+This is not a caution about risky changes. It applies to *every* change: file
+moves, `archive/` moves, doc edits, `.md` creation, `TIDY_PLAN.md` updates,
+`.gitignore`, DB renames. All of it. Zero-risk and trivially-reversible changes
+are included — the point is not safety, it is that **the owner decides, and he
+decides one thing at a time.**
+
+### What "carry on with TIDY" means
+
+It means: **read this file, work out what the next single item is, present it, and
+stop.** It does not mean "resume executing the plan". There is no queue of
+pre-approved work to burn down. Your entire output for that first turn is words in
+the chat.
+
+### The three traps that have actually caught sessions here
+
+1. **A ledger row saying "agreed" is not an instruction to act.** The ledger
+   records that a *decision* was made. Executing it is a *separate* instruction
+   the owner gives out loud. A row reading "ARCHIVE (agreed, not yet moved)" means
+   exactly what it says — agreed, and deliberately not moved. If you think
+   something is agreed but unexecuted, **say so and ask.** Do not helpfully
+   finish it.
+2. **"It's only a consequence of a decision he already made" is not permission.**
+   Fixing a doc that a move made stale, adding a README, updating the ledger —
+   these feel like bookkeeping. They are changes. They wait.
+3. **Steps in this file are not a to-do list you own.** Steps 1–4 describe the
+   shape of the work, not a mandate to perform it. The step number never
+   authorises the step.
+
+### The only correct loop
+
+```
+1. Present ONE item (or one tightly-related cluster) with the evidence.
+2. Give a recommendation — a recommendation, not a decision.
+3. STOP. Say nothing else. Wait.
+4. He rules. You do exactly that one thing, and nothing adjacent to it.
+5. Record his ruling in the ledger. Go to 1.
+```
+
+If you are ever unsure whether you are allowed to make a change: **you are not.**
+Ask.
+
+### Why this is written so bluntly
+
+The owner holds knowledge that is not in this repo and cannot be derived from it —
+what `pickpin` is, what the PowerBuilder app still reads, what `bcweb-server`
+touches, which processes are genuinely retired rather than dormant. A session that
+runs ahead isn't saving him time, it's converting his decisions into his
+corrections. Reverting is cheap; having to police an assistant is not.
+
+**Failure log — 2026-07-25.** A session read the "agreed, not yet moved" ledger
+row as a green light, `git mv`'d the six-file performance cluster to `archive/`,
+wrote an `archive/README.md`, updated the ledger, then edited four sections of
+`CLAUDE.md` — all unprompted, in one turn. Owner stopped it and reverted
+everything to `b037a6e`. Nothing was lost, but no decision had been asked for.
+That is the mistake this section exists to prevent.
+
 ## Governing principle (owner, 2026-07-25)
 
 **The dividing line is reversibility, not importance.** Move fast where a mistake
