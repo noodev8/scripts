@@ -28,7 +28,7 @@ SKIP_DIRS = {
 
 # Files allowed to live at root regardless of INDEX.md.
 ALLOWED_ROOT_FILES = {
-    "CLAUDE.md", "INDEX.md", "TIDY_PLAN.md", "crontab.txt",
+    "CLAUDE.md", "INDEX.md", "crontab.txt",
     "logging_utils.py", "catalogue.py",
     ".env", ".gitignore", ".gitattributes", ".mcp.json",
 }

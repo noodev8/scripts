@@ -107,8 +107,59 @@ When asked to work on SEO ("seo", "collection pages", "why isn't X ranking", "fr
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
 
-## Folder Tidy-Up (TIDY)
-When asked to work on the tidy-up ("TIDY", "carry on with TIDY", "the tidy-up", "scripts folder tidy"), read `TIDY_PLAN.md` first — **all of it, before touching anything.** It opens with a hard stop rule: no file changes of any kind, including trivially-reversible ones, without the owner's explicit go-ahead in that conversation. "Carry on with TIDY" means present the next single item and wait — not resume executing the plan. An "agreed" row in its decision ledger is a record, not an instruction to act.
+## How this folder is organised
+
+Settled during the Jul 2026 tidy-up. `INDEX.md` is the lookup — one row per
+capability, with the front-door doc for each. `python catalogue.py` checks the
+index against reality and reports anything that has drifted.
+
+**A folder per capability.** Anything you'd describe in a sentence ("Shopify
+order sync", "month-end accounting pack") gets a folder, whether it's one file
+or ten. Root holds only shared infrastructure — `logging_utils.py`,
+`catalogue.py` — the top-level docs, and the credentials. **A new script does
+not go at root.**
+
+**Every capability folder gets a front-door `.md`.** What it does, how to run
+it, and the gotchas that would otherwise cost the next person an hour. A
+paragraph and a usage line beats nothing. This applies to colleague
+contributions too.
+
+**Anchor every path on `__file__`, never the working directory.** Cron runs
+with no `cd`, so `os.path.join("logs", ...)` resolves against the invoking
+user's home, not the repo. Scripts in a folder reach the root with
+`REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))`, then
+`sys.path.insert(0, REPO_ROOT)` for `logging_utils` and the same for `.env`.
+This has bitten twice: pick lists were silently written to `/root/logs` on the
+VPS for months.
+
+**Check exit codes in anything unattended.** `pg_backup.sh` ignored `rclone`'s
+exit code and printed "Backup complete" for 109 days while nothing reached
+Google Drive. If cron runs it, it must fail loudly and exit non-zero.
+
+**Nothing is deleted for being old — it's archived.** `archive/` is a soft
+delete: still in git, recovery is one `git mv`. Retired database tables get a
+`_delete` suffix rather than a `DROP` (check `pg_depend` and `pg_constraint`
+first — views and foreign keys follow a rename silently). Never read from or
+write to a `_delete` table.
+
+**Never point a live doc at `archive/`.** Archiving is a soft delete, not a
+filing location. If archiving strands a reference, remove the reference or
+inline the useful part.
+
+**Never restate a schedule outside `crontab.txt`.** No clock times in
+docstrings, READMEs or comments. `crontab.txt` mirrors the VPS, which is
+authoritative — re-pull with `ssh root@vps "crontab -l"` before editing.
+
+**Credentials live at the repo root**, beside `.env`: the Google OAuth and
+service-account JSONs. All are gitignored, so `git pull` does not deploy them —
+they are hand-copied to the VPS. A `secrets/` folder was considered and
+rejected: it would only move files from one place git doesn't show to another,
+while adding a manual server-side step whose failure mode is a 3am auth error.
+`merchant-feed-api-*.json` is also shared by `merchant-feed/` and `scale/`.
+
+**`.gitignore`'s blanket `*.txt` / `*.csv` is deliberate** — those are generated
+data files. Be aware a new `.txt` doc will be invisible to git; write docs as
+`.md`.
 
 ## Two machines — memory does not sync
 The user runs Claude Code on two machines (`C:\Users\aandr\` and `C:\Users\UserPC\`). Auto-memory lives under each machine's local `.claude/projects/C--scripts/memory/` and is **not** synced between them — a memory written on one machine is invisible on the other. Treat memory as machine-local context, not global truth. When something is important enough to follow the user across machines, put it in a tracked doc (CLAUDE.md, scale/CLAUDE_CONTEXT.md, amz-price/AMZ_PRICING.md, etc.) — those are in the repo and shared.

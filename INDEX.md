@@ -54,19 +54,15 @@ if you're about to add a script here, it wants a folder instead.
 | `INDEX.md` | This file |
 | `catalogue.py` | Checks this index against reality (`python catalogue.py`). Report only — never changes anything |
 | `crontab.txt` | Mirror of the VPS crontab. **The only schedule reference** |
-| `TIDY_PLAN.md` | Folder tidy-up, in progress |
 | `.env` | Credentials, not in git |
 | `client_secret.json`, `drive_oauth_client.json`, `drive_token.json`, `merchant-feed-api-*.json` | Google service-account and OAuth credentials |
 
 ## Conventions
 
-- **A folder per capability.** Something you'd describe in a sentence gets a
-  folder, whether it's one file or ten.
-- **Every capability folder gets a front-door `.md`** saying what it does and how
-  to run it. A paragraph and a usage line beats nothing.
-- **Nothing is deleted for being old — it's archived.** `archive/` is a soft
-  delete, tracked in git. Retired DB tables get a `_delete` suffix rather than a
-  `DROP`.
-- **Never point a live doc at `archive/`.** If archiving strands a reference,
-  remove the reference.
-- **Never restate a schedule** outside `crontab.txt`.
+See **"How this folder is organised"** in `CLAUDE.md` — folder per capability,
+a front-door `.md` for each, paths anchored on `__file__`, `archive/` as a soft
+delete, and schedules only in `crontab.txt`.
+
+Kept in one place deliberately: two copies of a rule is how the old docs rotted.
+
+Run `python catalogue.py` to check this index against reality.
