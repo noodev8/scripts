@@ -29,7 +29,7 @@ A run where nothing changed (Amazon didn't move, or the feed wasn't reloaded) is
 
 ## Push & failure handling
 
-- **Shopify**: per-variant REST price update (same as `../price_update.py`). If the direct push fails, the row is flagged `shopifychange = 1` so the **nightly `price_update.py` sweep** re-pushes it (no operator watches an automated run).
+- **Shopify**: per-variant REST price update (same as `../shopify-sync/price_update.py`). If the direct push fails, the row is flagged `shopifychange = 1` so the **nightly `price_update.py` sweep** re-pushes it (no operator watches an automated run).
 - **Google**: **not pushed from here.** The `merchant_feed.py --upload` feed (scheduled after this job) regenerates the whole feed from the DB, so the day's price changes reach Google Merchant via that one daily feed (over SFTP — no Content API).
 
 ## Enabling a style

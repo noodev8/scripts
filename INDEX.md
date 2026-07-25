@@ -33,22 +33,18 @@ docs and material, not runnable.
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
 | `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
+| `shopify-sync/` | BC-ops | Nightly push to Shopify: prices, stock, titles, tags + daily price history | `python shopify-sync/price_update.py` | yes | `README.md` |
 | `ukd/` | BC-analysis | UKD supplier channel — session guide, no scripts | interactive | no | `README.md` |
 | `archive/` | Reference | Retired files. Soft delete — never referenced from live docs or code | — | no | — |
 
 ## Root scripts
 
-Root holds shared infrastructure and the live cron scripts that haven't been
-foldered yet.
+Every capability now lives in a folder. Root holds only shared infrastructure —
+if you're about to add a script here, it wants a folder instead.
 
 | File | Domain | What it does | Cron |
 |---|---|---|---|
 | `logging_utils.py` | BC-ops | Shared logging + DB config. **Imported by ~25 scripts via `sys.path` — do not move** | — |
-| `update_shopify_inventory.py` | BC-ops | Pushes stock levels to Shopify | yes |
-| `update_shopify_titles.py` | BC-ops | Pushes product titles to Shopify | yes |
-| `update_shopify_tags.py` | BC-ops | Pushes product tags to Shopify | yes |
-| `price_update.py` | BC-ops | Pushes agreed prices to Shopify | yes |
-| `price_track.py` | BC-ops | Records daily price/stock/sales history | yes |
 
 ## Root docs and config
 

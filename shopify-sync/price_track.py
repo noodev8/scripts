@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
+import os
+import sys
+
 import psycopg2
 from datetime import date, timedelta
+
+# Shared logging/DB config lives at the repo root, one level up
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from logging_utils import manage_log_files, create_logger, get_db_config
 
 # Setup logging

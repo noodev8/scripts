@@ -184,7 +184,7 @@ of the Shopify/Google feeds. The PB script shows the real default is **`googlest
 - The **master switch is `shopify`**, not `googlestatus`. Both Google and Shopify outputs gate on
   `shopify=1`:
   - Merchant/Google feed (`merchant_feed.py`): `WHERE googlestatus=1 AND shopify=1 AND m.googlestatus=1`
-  - Shopify price sync (`price_update.py`): `WHERE shopify=1`
+  - Shopify price sync (`shopify-sync/price_update.py`): `WHERE shopify=1`
 - So with **`shopify=0`**, the product is inert to both feeds **regardless** of `googlestatus`.
 - Therefore we **mirror PB (`googlestatus=1`)** and rely on `shopify=0` for inertness. This avoids
   diverging from PB-created rows. If the owner prefers belt-and-braces, `googlestatus=0` is also safe

@@ -16,11 +16,13 @@ import time
 import os
 from datetime import datetime
 from dotenv import load_dotenv
+# Shared logging/DB config lives at the repo root, one level up
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from logging_utils import manage_log_files, create_logger, get_db_config
 
 # --- SHOPIFY CONFIGURATION ---
 # Load environment variables from .env
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env'))
 
 SHOP_NAME = "brookfieldcomfort2"
 API_VERSION = "2025-04"

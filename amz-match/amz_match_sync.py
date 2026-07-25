@@ -29,7 +29,7 @@ WHAT IT DOES per flagged style (mirrors the bcweb Shopify "Apply" write, W1, but
     - otherwise CHANGE:
         UPDATE skusummary SET shopifyprice = '<2dp string>'         (NOT shopifychange — we push directly below)
         INSERT price_change_log (groupid,'SHP', old, new, NULL, note, 'Amazon match (auto)')   [audit stays honest]
-        then push the new price to Shopify (per variant), reusing the mechanism proven in ../price_update.py.
+        then push the new price to Shopify (per variant), reusing the mechanism proven in ../shopify-sync/price_update.py.
       If the DIRECT Shopify push fails, we set skusummary.shopifychange = 1 as a safety net so the nightly
       price_update.py sweep re-pushes it (there is no operator watching an automated run).
 
