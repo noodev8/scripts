@@ -61,7 +61,7 @@
 0 3 * * 1 /apps/scripts/venv/bin/python /apps/scripts/db-maint/clean_sales.py
 
 # 4:15 AM - Mirror new Shopify product images into brookfielduser1 Google Drive (legacy PowerBuilder)
-15 3 * * * /apps/scripts/venv/bin/python /apps/scripts/updateimages.py
+15 3 * * * /apps/scripts/venv/bin/python /apps/scripts/images/updateimages.py
 
 
 # ===== DAYTIME PROCESSING =====
