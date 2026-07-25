@@ -24,6 +24,7 @@ docs and material, not runnable.
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
 | `google-ads/` | BC-ops | Ads spend/stock tracking + budget reviews | `python google-ads/update_google_stock_track.py` | yes | `BUDGET_REVIEW_PROCESS.md`, `how-to-run.md` |
+| `images/` | BC-ops | Product image sync to Drive (for PowerBuilder) + Shopify extra-image protection | `python images/updateimages.py` | yes | `README.md` |
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |
 | `month-end/` | BC-ops | Month-end accounting pack: transaction CSV, fees, stock position | `python month-end/month-export.py` | no | `README.md` |
@@ -48,8 +49,6 @@ foldered yet.
 | `update_shopify_tags.py` | BC-ops | Pushes product tags to Shopify | yes |
 | `price_update.py` | BC-ops | Pushes agreed prices to Shopify | yes |
 | `price_track.py` | BC-ops | Records daily price/stock/sales history | yes |
-| `updateimages.py` | BC-ops | Mirrors new product images into Google Drive | yes |
-| `authorize_drive.py` | BC-ops | One-off Google Drive OAuth for `updateimages.py` | no |
 
 ## Root docs and config
 

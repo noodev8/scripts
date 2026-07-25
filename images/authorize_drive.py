@@ -50,9 +50,12 @@ from googleapiclient.discovery import build
 from dotenv import load_dotenv
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CLIENT_FILE = os.path.join(SCRIPT_DIR, "drive_oauth_client.json")
-TOKEN_FILE = os.path.join(SCRIPT_DIR, "drive_token.json")
-ENV_FILE = os.path.join(SCRIPT_DIR, ".env")
+# Credentials and .env live at the repo root, one level up -- shared with the
+# other scripts and deliberately never committed (see .gitignore).
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+CLIENT_FILE = os.path.join(REPO_ROOT, "drive_oauth_client.json")
+TOKEN_FILE = os.path.join(REPO_ROOT, "drive_token.json")
+ENV_FILE = os.path.join(REPO_ROOT, ".env")
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 FOLDER_NAME = "images"

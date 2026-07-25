@@ -54,7 +54,7 @@ replacement:
    Shopify Admin API, to avoid needlessly hitting the API for products we
    already know have multiple images recorded.
 
-Run ad-hoc: python updateimages.py [--limit N] [--dry-run] [--skip-shopify]
+Run ad-hoc: python images/updateimages.py [--limit N] [--dry-run] [--skip-shopify]
 """
 
 import io
@@ -66,7 +66,9 @@ import requests
 import psycopg2
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, SCRIPT_DIR)
+# Shared code, .env and the Drive credentials all live at the repo root, one up.
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
 from dotenv import load_dotenv
 from datetime import timedelta
 from logging_utils import get_db_config, manage_log_files, create_logger, get_uk_time
@@ -76,7 +78,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-load_dotenv(dotenv_path=os.path.join(SCRIPT_DIR, ".env"))
+load_dotenv(dotenv_path=os.path.join(REPO_ROOT, ".env"))
 
 SCRIPT_NAME = "updateimages"
 manage_log_files(SCRIPT_NAME)
@@ -85,7 +87,7 @@ log = create_logger(SCRIPT_NAME)
 IMAGE_BASE_URL = "https://images.brookfieldcomfort.com/"
 
 # --- Google Drive (brookfielduser1) target ---
-DRIVE_TOKEN_FILE = os.path.join(SCRIPT_DIR, "drive_token.json")
+DRIVE_TOKEN_FILE = os.path.join(REPO_ROOT, "drive_token.json")
 # Narrow, non-restricted scope: no Google verification, never-expiring token.
 # Trade-off: the app can only see/write folders IT created — hence we upload
 # into a dedicated app-owned folder whose id is pinned in .env (created once by
