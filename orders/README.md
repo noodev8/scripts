@@ -4,6 +4,50 @@ Shopify order synchronisation and pick allocation. This is the busiest live
 process in the repo — it runs unattended several times a day (see `crontab.txt`)
 and is also run by hand from the laptop.
 
+> ## ⚠️ This logic exists in two places. Change both, or neither.
+>
+> Since **2026-07-28** the same pipeline also runs inside BCWEB:
+>
+> | | Where | Trigger |
+> |---|---|---|
+> | 1 | `C:\scripts\orders\update_orders.py` (this file) | cron — `crontab.txt` |
+> | 2 | `C:\bcweb\bcweb-server\utils\orderSync.js` | the **Sync orders** button on BCWEB → Analytics → Sales (`POST /order-sync`) |
+>
+> **Both are live.** The cron was *not* switched off. They write the same rows in
+> the same tables — `orderstatus`, `orderstatus_archive`, `sales`, `localstock` —
+> and are expected to produce the same outcome.
+>
+> A change made in one and not the other does not fail loudly. It produces a
+> database where some rows followed one set of rules and some followed the other,
+> with nothing recording which. That already happened once on the Amazon side
+> with `sales.profit`.
+>
+> The profit formula is duplicated a second time:
+> `shopify_profit()` ↔ `C:\bcweb\bcweb-server\utils\shopifyProfit.js`.
+>
+> Full behaviour inventory and every deliberate divergence:
+> **`C:\bcweb\docs\order-sync-port.md`**.
+>
+> ### Things the Node port fixed that this script still does
+>
+> None are urgent, but know them before you assume the two agree exactly:
+>
+> - **No pagination.** `limit=250`, no `Link` follow. Past 250 open unfulfilled
+>   orders the fetch truncates — and the archive step then archives every order it
+>   didn't see, because absence from the fetched list is how archiving is decided.
+> - **Re-seen orders re-book their sale.** Archive → Shopify hands the order back →
+>   a fresh `sales` row. 38 duplicate rows in the live table today.
+> - **`batch::int` raises** on a blank or non-numeric `batch`, taking the whole run
+>   down with only "Unexpected error" in the log.
+> - **The split-row `localstock` id is random with no collision guard.** One clash
+>   is a unique violation that unwinds the entire run.
+> - **Two lines of the same SKU in one order**: the second line's quantity and its
+>   sale row are dropped (the `orderstatus` PK is `(ordernum, shopifysku)`).
+>
+> Also worth knowing: `safe()` type-checks for `str`, so `shippingcost` — passed as
+> a float — is written as `''` on **every** row. The port reproduces that
+> deliberately rather than diverging.
+
 ## Run
 
 From the repo root:

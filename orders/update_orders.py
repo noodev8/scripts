@@ -1,3 +1,36 @@
+"""
+#####################################################################################################################
+##                                                                                                                 ##
+##   !!  THIS BUSINESS LOGIC EXISTS IN TWO PLACES.  CHANGE BOTH, OR NEITHER.  !!                                   ##
+##                                                                                                                 ##
+##     1. THIS FILE                    C:\\scripts\\orders\\update_orders.py        (VPS: /apps/scripts/orders/…)     ##
+##        driven by  cron  — see C:\\scripts\\crontab.txt                                                            ##
+##                                                                                                                 ##
+##     2. THE NODE PORT                C:\\bcweb\\bcweb-server\\utils\\orderSync.js   (VPS: /apps/bcweb-server/…)      ##
+##        driven by  POST /order-sync  <- the "Sync orders" button on BCWEB's Analytics -> Sales screen             ##
+##        BOTH ARE LIVE. This cron was NOT switched off when the port shipped (2026-07-28).                         ##
+##                                                                                                                 ##
+##   They write the SAME rows in the SAME tables — orderstatus, orderstatus_archive, sales, localstock — and they   ##
+##   are expected to produce the SAME outcome. A change made in one and not the other does not fail loudly; it      ##
+##   produces a database where some rows were written by one set of rules and some by the other, with nothing       ##
+##   recording which. That is the failure mode to be afraid of here. It has already happened once on the Amazon     ##
+##   side with sales.profit (C:\\bcweb\\docs\\update-amazon-port.md, "Running alongside PowerBuilder").               ##
+##                                                                                                                 ##
+##   The profit formula is doubly duplicated:                                                                      ##
+##       shopify_profit()  below   <->   C:\\bcweb\\bcweb-server\\utils\\shopifyProfit.js                             ##
+##                                                                                                                 ##
+##   Reasoning, the full behaviour inventory, and every deliberate divergence in the port:                          ##
+##       C:\\bcweb\\docs\\order-sync-port.md                                                                          ##
+##                                                                                                                 ##
+##   KNOWN DIFFERENCES the port fixed and this file still has (all documented in that doc, none urgent):            ##
+##     * no pagination past 250 open orders — and the archive step then archives everything it did not see          ##
+##     * an order archived and later re-seen by Shopify re-books its sale (38 duplicate rows in `sales` today)      ##
+##     * `batch::int` raises on a blank/non-numeric batch and takes the WHOLE run down with it                      ##
+##     * the split-row localstock id is random with no collision guard; a clash unwinds the whole run               ##
+##     * two lines of the same SKU in one order: the second line's quantity and sale row are dropped                ##
+##                                                                                                                 ##
+#####################################################################################################################
+"""
 
 import psycopg2
 import requests
@@ -47,8 +80,12 @@ def safe(value, max_length=None):
 def shopify_profit(sold, cost):
     """Per-unit NET profit for a Shopify sale (owner's P&L model).
 
-    Mirrors bcweb-server/utils/profit.js -> shopifyProfit; see
-    C:\\bcweb\\docs\\profit-model.md (the single source of truth for these fees).
+    !! DUPLICATED LOGIC — the other copy is C:\\bcweb\\bcweb-server\\utils\\shopifyProfit.js.
+       Both write `sales.profit` on SHP rows, which BCWEB's Analytics screens add up. If the
+       two formulas ever disagree the totals become a blend, with nothing recording which row
+       got which. Change both or neither. See the banner at the top of this file.
+       (An earlier version of this docstring pointed at bcweb-server/utils/profit.js and
+       docs/profit-model.md — neither had ever been written. The paths above are real.)
         VAT     = sold / 6                    (UK VAT is 1/6 of a VAT-inclusive price)
         Gross   = sold - VAT - cost
         Profit  = (Gross - Expenses) / 1.2    (the /1.2 is the flat "cover refunds" haircut)

@@ -34,7 +34,12 @@ restate a schedule anywhere else; it rots.
 ## Architecture & Key Components
 
 ### Core Scripts
-- **`orders/update_orders.py`**: Shopify order synchronization with timezone handling and pick allocation
+- **`orders/update_orders.py`**: Shopify order synchronization with timezone handling and pick allocation.
+  ⚠️ **This logic is DUPLICATED in BCWEB** — `C:\bcweb\bcweb-server\utils\orderSync.js`, behind the "Sync orders" button on
+  Analytics → Sales. Both are live (the cron was not switched off). They write the same rows in the same tables, so a change to
+  one and not the other silently produces a database written under two sets of rules. The profit formula is duplicated a second
+  time (`shopify_profit()` ↔ `bcweb-server/utils/shopifyProfit.js`). Read `orders/README.md` and
+  `C:\bcweb\docs\order-sync-port.md` before touching either.
 - **`merchant-feed/merchant_feed.py`**: Google Merchant Center feed generation with product categorization
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 
