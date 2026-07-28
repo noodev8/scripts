@@ -42,6 +42,7 @@ different, restock-focused question).
 import os
 import sys
 import argparse
+import csv
 from collections import Counter, defaultdict
 from decimal import Decimal
 
@@ -160,6 +161,17 @@ def fmt_sizes(sizes):
     return ",".join(out)
 
 
+CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "missing_sizes.csv")
+
+
+def write_csv(gaps, path=CSV_PATH):
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["groupid", "missing_sizes"])
+        for r in sorted(gaps, key=lambda r: (r["brand"], sorted(r["expected"]), -len(r["missing"]), r["groupid"])):
+            writer.writerow([r["groupid"], fmt_sizes(r["missing"])])
+
+
 def render(gaps, skipped_brands, brand_filter, segment_filter):
     print()
     label = brand_filter or segment_filter or "all brands"
@@ -203,6 +215,8 @@ def main():
     rows, sold_groupids = fetch(args.brand, args.segment)
     gaps, skipped_brands = analyse(rows, sold_groupids)
     render(gaps, skipped_brands, args.brand, args.segment)
+    write_csv(gaps)
+    print(f"CSV written: {CSV_PATH}")
 
 
 if __name__ == "__main__":

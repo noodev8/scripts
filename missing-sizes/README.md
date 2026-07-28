@@ -14,8 +14,10 @@ python missing-sizes/missing_sizes.py --brand Strive
 python missing-sizes/missing_sizes.py --segment STRIVE-SEG
 ```
 
-Output is one row per groupid with a gap: brand, groupid, colour, segment, sizes
-currently listed on Amazon, sizes missing.
+Console output is one row per groupid with a gap: brand, groupid, colour,
+segment, sizes currently listed on Amazon, sizes missing. Also written to
+`missing_sizes.csv` (overwritten each run) alongside the script, with just
+`groupid` and `missing_sizes` columns.
 
 ## How it decides what "the full range" is
 
