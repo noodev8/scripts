@@ -29,7 +29,10 @@ restate a schedule anywhere else; it rots.
 ### Database Operations
 - **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`)
 - **Sales-table maintenance**: `python db-maint/clean_sales.py` (runs `clean_sales.sql` alongside it)
-- For schema, query the database directly via the postgres MCP rather than looking for a schema file
+- **Read queries**: `python db/query.py "SELECT ..."` — read-only, see `db/README.md`
+- For schema, query the database directly (`information_schema`) rather than looking for a
+  schema file — there isn't one, and it would rot. There is deliberately **no Postgres MCP**;
+  don't reinstate one without asking. `db/README.md` explains why.
 
 ## Architecture & Key Components
 
