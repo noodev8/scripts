@@ -29,7 +29,11 @@ restate a schedule anywhere else; it rots.
 ### Database Operations
 - **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`)
 - **Sales-table maintenance**: `python db-maint/clean_sales.py` (runs `clean_sales.sql` alongside it)
-- **Read queries**: `python db/query.py "SELECT ..."` — read-only, see `db/README.md`
+- **All database access goes through `db/`** — `python db/query.py "SELECT ..."` to read,
+  `python db/write.py "UPDATE ..."` to write. `db/README.md` is the front door. This is what
+  "use the db process" or "use the db folder" refers to.
+- **Writing to the database is allowed.** No approval ritual beyond agreeing what to change.
+  `write.py` is transactional, has `--dry-run`, and refuses an unscoped UPDATE/DELETE.
 - For schema, query the database directly (`information_schema`) rather than looking for a
   schema file — there isn't one, and it would rot. There is deliberately **no Postgres MCP**;
   don't reinstate one without asking. `db/README.md` explains why.

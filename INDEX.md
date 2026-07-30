@@ -20,7 +20,7 @@ docs and material, not runnable.
 | `amz-product/` | BC-ops | New-product loader for Amazon | `python amz-product/amz_upload.py` | no | `CLAUDE_CONTEXT.md`, `how-to-run.md` |
 | `barcodes/` | Reference | Ad-hoc barcode generation on request | ask | no | `README.md` |
 | `birk-stock/` | BC-analysis | Birkenstock core-size availability (the `Full` metric) | `python birk-stock/availability.py` | no | `README.md` |
-| `db/` | BC-analysis | Read-only ad-hoc queries against the production database | `python db/query.py "SELECT ..."` | no | `README.md` |
+| `db/` | BC-analysis | Ad-hoc reads and writes against the production database | `python db/query.py "SELECT ..."`, `python db/write.py "UPDATE ..."` | no | `README.md` |
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |

@@ -1,8 +1,11 @@
 # db/ — querying the production database
 
-The front door for reading data out of `brookfield_prod`. **Start here** rather than
-looking for a schema file or an MCP server; there is no schema file, and the Postgres
-MCP was removed in Jul 2026 (see "Why no MCP" below).
+The front door for reading and writing `brookfield_prod`. **Start here** rather than looking
+for a schema file or an MCP server; there is no schema file, and the Postgres MCP was removed
+in Jul 2026 (see "Why no MCP" below).
+
+- **Read** → `python db/query.py "SELECT ..."`
+- **Write** → `python db/write.py "UPDATE ..."`
 
 ## Ad-hoc queries
 
@@ -22,9 +25,35 @@ echo "SELECT 1" | python db/query.py
 - Credentials come from `logging_utils.get_db_config()`, which reads `.env` at the
   repo root — the same path every scheduled script uses.
 
-**This is for interactive lookups.** Anything scheduled, repeated, or that writes should
-be its own script in its own capability folder, connecting with `get_db_config()`
-directly. `query.py` is deliberately not importable as a library.
+**This is for interactive lookups.** Anything scheduled or repeated should be its own script
+in its own capability folder, connecting with `get_db_config()` directly.
+
+## Writing
+
+**Writing to the database is allowed.** Andreas is fine with AI writing to prod; there are no
+hoops to jump through and no approval ritual beyond the normal one of agreeing what to change.
+Use `write.py` so every write happens the same way:
+
+```bash
+python db/write.py "UPDATE skusummary SET segment='IVES' WHERE groupid='X'"
+python db/write.py --dry-run "DELETE FROM price_track WHERE created < '2024-01-01'"
+python db/write.py --file migration.sql
+```
+
+- Everything in one invocation runs in **one transaction** — all statements commit together,
+  or all roll back if any fails. A failed run changes nothing.
+- Reports the row count per statement and a total, so you can see what you touched.
+- `--dry-run` executes for real, prints the counts, then rolls back. Worth doing first when
+  the WHERE clause is doing heavy lifting.
+- **The one guard:** an `UPDATE` or `DELETE` with no `WHERE` is refused (exit 2) unless you
+  pass `--all-rows`. That is the mistake worth catching; nothing else is in the way.
+
+Sensible habit, not a rule: `query.py` the SELECT version of your WHERE clause first, check
+the count is what you expect, then run the write.
+
+Note this is still the live production database, shared with the scheduled scripts and the
+bcweb pricing tool. Prefer a targeted WHERE over a broad one, and think about whether an
+existing capability folder already owns the table you are about to change.
 
 ## Finding your way around the schema
 
@@ -88,11 +117,14 @@ repeat across seasons, so `created` tells you about the style, not the stock.
 A Postgres MCP server (`@modelcontextprotocol/server-postgres`) was used until Jul 2026 and
 removed. Three reasons: the package was deprecated upstream and unmaintained; its config
 lived in a gitignored `.mcp.json` that had to be hand-recreated per machine and kept going
-missing; and it only ever worked inside an interactive Claude Code session, whereas
-`query.py` works there, on the VPS, and under cron. A future AI session should use
-`query.py` and should not reinstate an MCP server without asking.
+missing; and it only ever worked inside an interactive Claude Code session, whereas these
+scripts work there, on the VPS, and under cron.
 
-If `query.py` is unavailable for some reason, `psql` works with the same `.env` credentials:
+**Do not reinstate an MCP server without asking Andreas first.** Missing is the intended
+state, not a fault. `docs/postgres-mcp-setup.md` keeps the install instructions for the day
+he asks for them — that document is a reference, not a to-do.
+
+If the scripts are unavailable for some reason, `psql` works with the same `.env` credentials:
 
 ```bash
 PGPASSWORD=... psql -h 217.154.35.5 -U brookfield_prod_user brookfield_prod -c "SELECT 1"

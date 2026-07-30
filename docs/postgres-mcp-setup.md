@@ -1,19 +1,33 @@
 # PostgreSQL MCP setup — per-machine (Windows)
 
-The Postgres MCP server lets Claude query the Brookfield production DB (`brookfield_prod`)
-directly, instead of going through a Python script or `psql`.
+## ⛔ Do not follow this document unless Andreas has explicitly asked for the MCP to be installed
+
+**The Postgres MCP was removed in Jul 2026 and is not the way we talk to the database.**
+Use `db/` in `C:\scripts` instead — `python db/query.py` to read, `python db/write.py` to
+write. `C:\scripts\db\README.md` is the front door and covers everything the MCP did.
+
+This file is kept only so that the install is easy to repeat **if Andreas asks for it**. It is
+not a to-do. Do not act on it because the MCP appears to be missing — missing is the intended
+state. If you think it should be reinstated, say so and wait for an answer.
+
+Why it was removed: `@modelcontextprotocol/server-postgres` is deprecated upstream and
+unmaintained; the config lives in a gitignored `.mcp.json` that must be hand-recreated per
+machine and kept silently going missing; and it only ever worked inside an interactive Claude
+Code session, not on the VPS and not under cron. The `db/` scripts work everywhere.
+
+---
+
+The rest of this document applies only once Andreas has asked for it.
 
 The config lives in a **project-scoped `.mcp.json` at the repo root**. That file holds the DB
 password in its connection string, so it is **gitignored and does NOT travel with the repo** —
-you recreate it on each machine. This is the single most common reason it "disappears": nothing
-is broken, the file just isn't on this machine.
+you recreate it on each machine.
 
 This doc is kept **identical in both repos** — `C:\scripts\docs\postgres-mcp-setup.md` and
 `C:\bcweb\docs\postgres-mcp-setup.md`. Edit one, copy to the other.
 
 > ⚠️ This connects to the **LIVE production database** — the same one the pricing tool and the
-> Python scripts write to. Reads are safe; treat it as read-mostly. Do not run destructive SQL
-> (UPDATE/DELETE/DROP) against it for exploration.
+> Python scripts write to.
 
 Windows only. Both machines the user runs (`C:\Users\aandr\`, `C:\Users\UserPC\`) are Windows,
 and MCP config does not sync between them — set up each one separately.
@@ -98,12 +112,13 @@ the repo, and trivial to recreate — versus hand-editing the large shared `~/.c
 Claude Code rewrites on its own and where a hand-added block is easy to lose. It also mirrors how
 `klaviyo` is configured in `C:\scripts`.
 
-## If it goes missing
+## If it goes missing (having previously been asked for)
 
-Work through these in order — the first two cover almost every case:
+Since Jul 2026 the answer is almost always "it is meant to be missing" — see the banner at the
+top. If Andreas has asked for it and it still will not appear, work through these:
 
 1. **`.mcp.json` is absent or has no `postgres-brookfield` block.** Most likely. Recreate per
-   above. Note `C:\scripts\.mcp.json` has held only `klaviyo` since Apr 2026.
+   above.
 2. **Wrong machine.** Config does not sync between `aandr` and `UserPC`. "It worked yesterday"
    often means it worked on the other machine.
 3. **The approval dialog was dismissed** rather than approved on session start — the server
@@ -113,13 +128,15 @@ Work through these in order — the first two cover almost every case:
 4. **npx/network.** The server is fetched from npm on each start. Test with
    `npx -y @modelcontextprotocol/server-postgres --help`.
 
-## Fallbacks when the MCP isn't available
+## What to use instead (the default)
 
-Not having it is inconvenient, not blocking. Both are already allowlisted:
+Not having the MCP is not a blocker — this is the supported path, not a workaround:
 
-- `psql` directly — `PGPASSWORD=... psql -h 217.154.35.5 -U brookfield_prod_user brookfield_prod -c "..."`
-- A short Python script using `logging_utils.get_db_config()`, which reads the same `.env`.
-  This is how the scheduled scripts do it and is the more reliable route.
+- `python db/query.py "SELECT ..."` — read-only.
+- `python db/write.py "UPDATE ..."` — writes, transactional, with `--dry-run`.
+- `C:\scripts\db\README.md` — schema discovery, key tables, and the data-quality traps.
+
+`psql` also works with the same `.env` credentials if you need it.
 
 ## Caveat: the upstream package is deprecated
 
