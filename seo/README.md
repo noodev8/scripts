@@ -507,20 +507,19 @@ earning 19 clicks. At Milano's ~1.2% that is ~55 clicks/28d — a few extra sale
 month at low margin. Free and compounding, but small. Worth an hour each, not a
 quarter.
 
-**Velcro trainers — dropped 2026-07-16, do not revive.** `mens-velcro-trainers`
-has **0 products and 4,338 impressions** at position 12–15, which looks like the
-biggest non-Birkenstock opportunity on the site. It fails twice, independently:
+**Velcro trainers — deleted from Shopify 2026-07-16, no longer in live collection list.**
+`mens-velcro-trainers` no longer exists in Shopify (confirmed 2026-07-30). GSC still shows
+~3.7k impressions because Google's index hasn't fully refreshed, but the page returns 404
+and earns 0 clicks now. Historical decision: It was dropped because:
 
 1. **Trademark.** Velcro is a registered mark; the compliant terms are "riptape"
    or "hook and loop". The demand is entirely on the word we cannot use —
    `velcro` 3,578 impr vs **`riptape` 0**, `hook and loop` 76. Nobody searches the
-   safe words; they are retailer jargon. SEO cannot route around this. Whether to
-   use the mark anyway is a legal/brand call, not an SEO one.
+   safe words; they are retailer jargon. SEO cannot route around this.
 2. **Economics.** UKD, "low profit, if any profit at all" (owner, 2026-07-16).
    Even free clicks cannot rescue a zero margin.
 
-The empty collection is a live defect regardless — Google shows an empty page to
-thousands a month. Fill it or delete it; do not leave it.
+No action needed; Google will de-index it as the 404 crawl happens.
 
 ### Candidates behind the three priorities
 
