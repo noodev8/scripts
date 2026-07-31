@@ -34,6 +34,7 @@ docs and material, not runnable.
 | `pb-deploy/` | BC-ops | Packages a PowerBuilder build and publishes it as a BrookfieldApp GitHub release | `pb-deploy\release.bat` | no | `README.md` |
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
 | `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
+| `social/` | BC-analysis | Facebook/Instagram brand awareness — **plan only, nothing built** | interactive | no | `README.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
 | `shopify-sync/` | BC-ops | Nightly push to Shopify: prices, stock, titles, tags + daily price history | `python shopify-sync/price_update.py` | yes | `README.md` |
 | `archive/` | Reference | Retired files. Soft delete — never referenced from live docs or code | — | no | — |
