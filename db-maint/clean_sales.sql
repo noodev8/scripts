@@ -41,8 +41,17 @@ WHERE orderdate < CURRENT_DATE - INTERVAL '365 days';
 DELETE FROM incoming_stock
 WHERE arrival_date < CURRENT_DATE - INTERVAL '3 years';
 
+-- 21-day window (cut from 180d -> 30d -> 21d, 2026-07-31). No routine reader:
+-- Shopify customer rows (channel='SHOPIFY', ordertype=1, ~90% of the table) are
+-- kept ONLY as a forensic backstop if the order-sync logic misbehaves, and that
+-- is caught in days, not months -- if it's wrong we go to Shopify itself, which
+-- is the real source. The supplier rows (channel='MANUAL', ordertype 2/3) back
+-- the "+" undo on a zeroed line in bcweb Order Status
+-- (routes/order-status-restore.js); that is a same-day / next-morning action, so
+-- 21d is still ~20x its real reach. Don't shorten below ~a week without
+-- re-checking that restore path.
 DELETE FROM orderstatus_archive
-WHERE archivedate < CURRENT_DATE - INTERVAL '180 days';
+WHERE archivedate < CURRENT_DATE - INTERVAL '21 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
