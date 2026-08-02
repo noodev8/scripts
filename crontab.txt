@@ -66,18 +66,20 @@
 
 # ===== DAYTIME PROCESSING =====
 
-# Order sync targets: 10:00, 13:00, 14:00, 14:30, 14:45, 15:00, 15:10, 22:00 
-# Note: These values are -1 hour to account for GMT server time.
+# Order sync targets: 10:00, 13:00, 14:00, 15:00, 22:00 BST
+# Note: Hour values are -1 to account for GMT server time.
 
-# 10:00 BST, 13:00 BST  & 22:00 BST
-0 9,12,21 * * * /apps/scripts/venv/bin/python /apps/scripts/orders/update_orders.py
-
-# 14:00, 14:30, 14:45 BST
-0,30,45 13 * * * /apps/scripts/venv/bin/python /apps/scripts/orders/update_orders.py
-
-# 15:00, 15:10 BST
-0,10 14 * * * /apps/scripts/venv/bin/python /apps/scripts/orders/update_orders.py
+# 10:00, 13:00, 14:00, 15:00, 22:00 BST
+0 9,12,13,14,21 * * * /apps/scripts/venv/bin/python /apps/scripts/orders/update_orders.py
 
 # Every 2h, 9am-11pm BST (08-22 GMT) - sends un-sent Shopify price changes to Google
 0 8-22/2 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/google-price-sweep.js
+
+# ====== OTHER ==============
+# Social — publish due Facebook posts. Also runs the monthly asset cleanup (15th, 3am).
+# TIMES are GMT (server) - BST equivalent in the comment
+0 3 * * *  cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/social-publish-sweep.js   # 04:00 BST - housekeeping
+0 8 * * *  cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/social-publish-sweep.js   # 09:00 BST - morning
+0 12 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/social-publish-sweep.js   # 13:00 BST - lunch
+0 18 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/social-publish-sweep.js   # 19:00 BST - evening
 
