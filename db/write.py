@@ -35,6 +35,9 @@ from logging_utils import get_db_config
 # Statements that change data and are near-always meant to be scoped.
 UNSCOPED_RISK = re.compile(r"^\s*(update|delete)\s", re.IGNORECASE)
 
+# $tag$ ... $tag$ dollar quoting, as used by function bodies.
+DOLLAR_TAG = re.compile(r"\$[A-Za-z_][A-Za-z0-9_]*\$|\$\$")
+
 
 def split_statements(sql):
     """Split on semicolons that aren't inside quotes or dollar-quoted blocks."""
@@ -60,16 +63,68 @@ def split_statements(sql):
     return [s.strip() for s in statements if s.strip()]
 
 
+def sql_skeleton(stmt):
+    """Strip comments and the contents of string literals, leaving the SQL keywords.
+
+    The guard below has to read real keywords, not text that merely looks like them.
+    Without this, `-- housekeeping\\nUPDATE skusummary SET segment=segment` does not
+    start with "UPDATE" as far as a regex is concerned, and an unscoped UPDATE walks
+    straight past the guard; equally, the word "where" sitting in a comment or a quoted
+    string must not count as a WHERE clause.
+
+    Inspection only -- the statement actually executed is always the original text.
+    """
+    out = []
+    i, n = 0, len(stmt)
+
+    while i < n:
+        ch = stmt[i]
+        two = stmt[i:i + 2]
+
+        if two == "--":  # line comment, runs to end of line
+            end = stmt.find("\n", i)
+            i = n if end == -1 else end
+            out.append(" ")
+            continue
+
+        if two == "/*":  # block comment
+            end = stmt.find("*/", i + 2)
+            i = n if end == -1 else end + 2
+            out.append(" ")
+            continue
+
+        if ch == "$":
+            tag = DOLLAR_TAG.match(stmt, i)
+            if tag:
+                marker = tag.group(0)
+                end = stmt.find(marker, i + len(marker))
+                i = n if end == -1 else end + len(marker)
+                out.append(" '' ")
+                continue
+
+        if ch in "'\"":
+            end = stmt.find(ch, i + 1)
+            i = n if end == -1 else end + 1
+            out.append(" ident " if ch == '"' else " '' ")
+            continue
+
+        out.append(ch)
+        i += 1
+
+    return "".join(out).strip()
+
+
 def check_unscoped(statements, allow_all_rows):
     """Refuse an UPDATE/DELETE with no WHERE unless explicitly allowed."""
     if allow_all_rows:
         return None
     for stmt in statements:
-        if UNSCOPED_RISK.match(stmt) and not re.search(r"\bwhere\b", stmt, re.IGNORECASE):
-            verb = stmt.split()[0].upper()
+        bare = sql_skeleton(stmt)
+        if UNSCOPED_RISK.match(bare) and not re.search(r"\bwhere\b", bare, re.IGNORECASE):
+            verb = bare.split()[0].upper()
             return (
                 f"{verb} with no WHERE clause would affect every row:\n"
-                f"  {stmt[:120]}\n"
+                f"  {bare[:120]}\n"
                 f"Add a WHERE, or pass --all-rows if that really is the intent."
             )
     return None
@@ -124,7 +179,9 @@ def main():
                 cur.execute(stmt)
                 affected = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
                 total += affected
-                label = " ".join(stmt.split()[:6])
+                # Label from the comment-stripped form, so a leading comment
+                # doesn't hide the verb.
+                label = " ".join(sql_skeleton(stmt).split()[:6])
                 print(f"{cur.statusmessage:<20} {affected:>7} row(s)  <- {label}")
 
         if args.dry_run:
