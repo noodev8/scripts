@@ -32,6 +32,7 @@ docs and material, not runnable.
 | `orders/` | BC-ops | Shopify order sync + pick allocation (`--picks` for picks only) | `python orders/update_orders.py` | yes | `README.md` |
 | `ofd/` | OFD | Online Front Door — separate business | interactive | no | `BUSINESS_PLAN.md` |
 | `pb-deploy/` | BC-ops | Packages a PowerBuilder build and publishes it as a BrookfieldApp GitHub release | `pb-deploy\release.bat` | no | `README.md` |
+| `returns/` | BC-ops | Books Shopify refunds out of `sales` as negative rows | `python returns/sync_returns.py` | yes | `README.md` |
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
 | `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
