@@ -87,16 +87,23 @@ adjustment to argue about.**
 on 28d is the season recovering and means nothing. Those windows are for spotting
 breakage, not progress.
 
-**Where it stands, 2026-07-16 — falling, and the fall is accelerating:**
+**Where it stands, 2026-08-08 — falling, but the rate of fall is easing:**
 
-| Trailing 12m to | Clicks | Chg | Impressions |
-|---|---|---|---|
-| 2026-03 | 9,124 | — | 1,047,062 |
-| 2026-04 | 9,093 | −31 | 1,020,756 |
-| 2026-05 | 8,764 | **−329** | 966,635 |
-| 2026-06 | **8,506** | **−258** | 897,498 |
+| Trailing 12m to | Clicks | Chg | Impressions | CTR |
+|---|---|---|---|---|
+| 2026-03 | 9,124 | — | 1,047,062 | 0.87% |
+| 2026-04 | 9,093 | −31 | 1,020,756 | 0.89% |
+| 2026-05 | 8,764 | **−329** | 966,635 | 0.91% |
+| 2026-06 | 8,506 | **−258** | 897,498 | 0.95% |
+| 2026-07 | **8,335** | −171 | 820,943 | **1.02%** |
 
-**−6.8%.** Impressions −14% across the same window while CTR rose 0.87% → 0.95%.
+**−8.6%.** Impressions −22% across the same window while CTR rose 0.87% → **1.02%**.
+The monthly step has shrunk each month since May (−329, −258, −171).
+
+**Read impressions and CTR together before calling this a loss.** Clicks are down
+8.6% while impressions are down 22% — we are being *shown* far less but converting
+what we are shown much better. That is the arithmetic signature of a smaller, more
+economical catalogue, not of losing ranked ground. See the next section.
 
 ### A fall is not automatically failure — read this before reacting to the chart
 
@@ -113,11 +120,55 @@ The fall has at least three causes and **GSC cannot separate them**:
 | Informational bleed | size guide 475 → 220 while ranking *better* | No — headwind |
 | Lost ground | `collections` −17% YoY, but CTR 0.51% → 1.27% | Unclear |
 
+**Owner's read, 2026-08-11 — the first cause is the dominant one.** The trailing
+12 is falling because we pruned a lot of products: fewer pages, fewer impressions,
+a more economical catalogue, and **the rising CTR is the evidence** — 0.87% →
+1.02% while impressions fell 22%. Do not treat the falling line as a verdict on
+the SEO work. The genuine problem is narrower and sits in the next section.
+
 GA4 (wired 2026-07-17) now gives conversion data *going forward*, but it cannot
 retroactively separate these three for the historical trailing-12, so **clicks
 stay the proxy for the trend while being a knowingly imperfect one**. Do not report
 the trailing 12 falling as failure without saying which of the three it is — and if
 you cannot say, say that.
+
+### The real problem — collections stopped doing their job (open, 2026-08-11)
+
+**Collections are not performing as they used to, or as we expect them to.** They
+are still 49% of site clicks (470 of 958, 28d) but fell −103 over the prior 28d,
+and the two we deliberately intervened on both failed. Meanwhile Google is
+**favouring individual product pages** on exactly the browse queries a collection
+should own:
+
+| Arizona, 28d to 2026-08-08 | |
+|---|---|
+| `arizona` cluster | 13 clicks, 2,457 impr, 0.53% CTR |
+| `arizona birkenstock` | 549 impr, **pos 4.0**, 0 clicks |
+| `/collections/birkenstock-arizona` | **2 impressions**, 0 clicks |
+| `/products/birkenstock-arizona-synthetic-sand` | 18 clicks, 44 impr, **40.91% CTR, pos 2.1** |
+
+The demand is real and it is ranking — it is just resolving to a product page, not
+the collection. Three weeks after linking the collection from the menu and from
+`birkenstock-sandals`, the collection is not being served at all.
+
+**We do not know why, and we do not know how to turn it to our advantage yet.**
+That is the honest state. Candidate explanations, none tested:
+
+- Google reads a single-colour product page as the better answer for a style query
+  (the query names a *product*, "arizona", not a category).
+- Merchant Listings / Shopping structured data give product pages an eligibility
+  a collection page does not have — note the one experiment that *worked*
+  (size-6 blog) sits on demand that is 1,209 of 1,210 impressions plain blue-link
+  with **zero** MERCHANT_LISTINGS.
+- The collection is too new/thin in link terms to displace an incumbent product
+  page that already earns 40% CTR.
+
+**If product pages are what Google wants, the lever may be to stop fighting it** —
+work the product pages that already win (titles, meta, images, internal links from
+the collection *to* them) rather than trying to consolidate demand upward onto a
+collection Google has twice declined to serve. Not decided; **deprioritised by the
+owner 2026-08-11** — record findings here, do not open new collection experiments
+until this is picked back up.
 
 **First target: stop the fall.** A flat trailing 12 is a win from here. Pages
 built in July show up 4–8 weeks later, so the first honest reading is the trailing
@@ -289,6 +340,20 @@ Established 2026-07-16, against data, not assumption:
 
 ## Traps
 
+- **The size-6 page is a BLOG, not a page.** This has been got wrong repeatedly
+  (in this README, and from memory). Verified live 2026-08-11:
+
+  | URL | Status | What it is |
+  |---|---|---|
+  | `/blogs/info/why-doesnt-birkenstock-make-a-uk-size-6-brookfield-comfort` | **200** | **The size-6 article — the one that ranks.** Self-canonical, ~6.3k words rendered |
+  | `/pages/birkenstock-size-guide` | 200 | The main size guide. Separate page, also has size-6 content, competes on the same queries |
+  | `/pages/birkenstock-size-6` | **404** | **Never existed.** Unpublished draft. Not in sitemap, unknown to Google, nothing links to it |
+
+  The 404 is harmless — no links, no equity, no redirect needed. Do **not** go
+  looking for it, and do not "fix" it. If you want the size-6 article, it is the
+  blog URL. Note both live pages carry size-6 content, which is exactly why they
+  split the cluster.
+
 - **Seasonality.** Sandals peak in July. Any before/after over the 4–8 weeks SEO
   takes will be swamped by season. Pilot on season-neutral pages and keep a
   control group you deliberately don't touch, so you measure against the site's
@@ -384,7 +449,13 @@ copied across before the result is known.
 
 ### Second task — a page answering "why is there no Birkenstock size 6 UK?"
 
-**Shipped 2026-07-17** — live at `/pages/birkenstock-size-6`, indexing requested.
+**Shipped 2026-07-17** — live at
+`/blogs/info/why-doesnt-birkenstock-make-a-uk-size-6-brookfield-comfort`, indexing
+requested. ⚠️ **Corrected 2026-08-11: this originally read `/pages/birkenstock-size-6`,
+which is wrong — that path 404s and has never existed.** Verified 2026-08-11: not in
+the sitemap, unknown to Google, and nothing on the site links to it (a draft page
+that was never published). The thing that shipped is the blog post above. Nothing
+needs fixing on the site; the broken path existed only in this doc.
 Decided 2026-07-16, after the Arizona page. Went out sooner than the "one change
 at a time" rule below intended, alongside the Arizona menu/link fix — both were
 underway the same week, so read results for the two separately, not as one
