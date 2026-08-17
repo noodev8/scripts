@@ -75,17 +75,24 @@ working directory.
 `--picks` skips step 1 and runs allocation against whatever is already in
 `orderstatus`.
 
-## Pick lists
+## Pick history
 
-Every allocated pick is appended to a CSV under `logs/picklist_archive/` at the
-repo root, named `YYYYMMDD-HH-MM-PickList.csv`. Picks allocated in the same
-minute share a file, and a run that allocates nothing creates no file.
+**Nothing records pick history right now.** The CSV that used to be written to
+`logs/picklist_archive/` was removed (Aug 2026) pending a proper replacement.
 
-**Retention is 100 files, not 100 days** — despite what the function's docstring
-says, there is no date logic. Once the folder reaches 100, the oldest are deleted
-so that 100 remain. Files are ordered by `os.path.getctime`, which on Linux is
-the inode-change time — so moving files into this folder makes them look new and
-will confuse the pruning. Don't.
+It was never a pick list despite the name: the filename was stamped per run, so
+each file held only the picks that run had just allocated — never the outstanding
+list. Retention counted files, not days, so history was also being eaten on a
+rolling basis.
+
+The files already in `logs/picklist_archive/` were left in place deliberately.
+They carry `code, ordernum, location` with the timestamp in the filename, and are
+the backfill source for whatever replaces this. **Don't delete them.**
+
+Until a replacement lands, the only trace of a pick is `localstock.ordernum` and
+that row's `location` — which is current state, not history. A re-pick overwrites
+`ordernum` in place, and the goods-in cleanup deletes the row outright, so it
+cannot answer "where was this SKU picked from" after the fact.
 
 ## Paths
 
