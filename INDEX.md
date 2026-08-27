@@ -19,6 +19,7 @@ docs and material, not runnable.
 | `amz-price/` | BC-analysis | Amazon/FBA pricing reviews, any segment | interactive | no | `README.md` |
 | `amz-product/` | BC-ops | New-product loader for Amazon | `python amz-product/amz_upload.py` | no | `CLAUDE_CONTEXT.md`, `how-to-run.md` |
 | `barcodes/` | Reference | Ad-hoc barcode generation on request | ask | no | `README.md` |
+| `birk-dependency/` | BC-analysis | Baseline + tracking for reducing Shopify's Birkenstock dependency | interactive | no | `BENCHMARK.md` |
 | `birk-stock/` | BC-analysis | Birkenstock core-size availability (the `Full` metric) | `python birk-stock/availability.py` | no | `README.md` |
 | `db/` | BC-analysis | Ad-hoc reads and writes against the production database | `python db/query.py "SELECT ..."`, `python db/write.py "UPDATE ..."` | no | `README.md` |
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
