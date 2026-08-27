@@ -20,6 +20,7 @@ between the two machines. Anything below is settled unless he reopens it.
 | **The focus brands are Lunar, Goor, Rieker and Remonte.** These are what the next months are spent on. | 27 Aug 2026 |
 | **Skechers is being exited** — ignore it in readings, don't price it, don't buy it. | 27 Aug 2026 |
 | **Roamers and Grafters are parked** — not a focus, folded into "other brands". | 27 Aug 2026 |
+| **Every product gets an assigned channel.** Shopify and Amazon compete for the same demand — pulling one up pulls the other down. No plan may assume a Shopify gain is incremental. See "Channel assignment" below. | 27 Aug 2026 |
 
 ## How these numbers are calculated
 
@@ -116,11 +117,78 @@ flatter or drag the numbers either way.
 | Remonte | £118 | £3,277 | 3.5% |
 | Goor | £2,214 | £1,114 | 66.5% |
 
-Lunar, Rieker and Remonte all sell 15–30× better on Amazon than on our own site. That gap is
-the opportunity and the proof it's achievable — the demand is real, we're just capturing it
-on someone else's platform at a worse margin (Amazon runs 10.2% overall against Shopify's
-15.3%). **Goor is the exception and the useful counter-example:** it already does better on
-Shopify than on Amazon, and at 16.3% it is the highest-margin brand of the four.
+Lunar, Rieker and Remonte all sell 15–30× better on Amazon than on our own site.
+
+**Do not read that gap as £150k of headroom.** It is the same demand, and the two channels
+compete for it — see "Channel assignment" below, where the Ives episode is costed. **Goor is
+the exception and the useful counter-example:** it already does better on Shopify than on
+Amazon, and at 16.3% it is the highest-margin brand of the four.
+
+## Channel assignment
+
+**Shopify and Amazon are not additive. Pulling demand to one pulls it off the other, and the
+Amazon side does not simply bounce back.**
+
+This is settled by evidence, not theory. Lunar's Shopify price was cut to £29.99 on the
+reasoning that our own fees could absorb it, against £38 on Amazon where the fees are much
+higher. A separate Google campaign was then pointed at the St Ives segment. Shopify sales
+rose. Within days Amazon sales for Ives collapsed, and it took weeks of work to recover.
+
+Ives, monthly, by channel:
+
+| month | Shopify units | Shopify profit | Amazon units | Amazon profit |
+|---|---|---|---|---|
+| Jun 2025 | 32 | £100 | 474 | £2,451 |
+| Jul 2025 | 25 | £97 | 390 | £2,048 |
+| **Aug 2025** | **51** | **£198** | **162** | **£833** |
+| Sep 2025 | 36 | £172 | 156 | £805 |
+| Oct 2025 | 41 | £187 | 205 | £1,051 |
+| Nov 2025 | 16 | £74 | 120 | £610 |
+| … | | | | |
+| Mar 2026 | 27 | £107 | 279 | £1,176 |
+| Apr 2026 | 21 | £108 | 518 | £2,180 |
+| May 2026 | 11 | £16 | 635 | £2,685 |
+
+In the month Shopify doubled — 25 units to 51, **+£101 of profit** — Amazon fell 390 units to
+162, **−£1,215 of profit**. The trade was roughly **twelve pounds lost for every pound
+gained**, and Amazon stayed depressed for six months; it did not regain April's level until
+Apr 2026.
+
+Some of that August step is seasonal, but not most of it. The prior year's same step was
+Aug 129 → Sep 112 units, a 13% decline. This one was 390 → 162, a 58% decline, in the month
+the campaign ran.
+
+### Why the Shopify price cut didn't pay
+
+The cut to £29.99 was made because our own fees are lower. Over the last 12 months, they
+cancel out almost exactly:
+
+| channel | units | ASP | profit per unit | margin |
+|---|---|---|---|---|
+| Amazon | 3,483 | £38.46 | **£4.32** | 11.2% |
+| Shopify | 183 | £32.30 | **£4.37** | 13.5% |
+
+**Five pence a pair.** The lower fee was handed straight to the customer in the lower price,
+so Shopify has no per-unit advantage on Ives at all — while Amazon carries 19× the volume.
+Moving a sale from Amazon to Shopify earns nothing extra, and risks the Amazon rank and
+velocity that produced the volume in the first place. That is the worst possible trade.
+
+### The rule this sets
+
+1. **Assign a primary channel per product before spending anything on it.** Decide, then
+   price and promote for that channel only.
+2. **Decide it on profit per unit, not on fee percentage.** Fees only matter after price. A
+   lower fee handed to the customer is not a saving.
+3. **Never treat a Shopify gain as incremental** unless the Amazon line for the same product
+   has been checked over the following weeks. Judge any Shopify push on the *pair*.
+4. **Where Amazon is the assigned channel, hold the Shopify price at or above Amazon's** so
+   the site doesn't undercut the channel doing the volume.
+5. **Goor is the shape to look for** — products that do better on Shopify than Amazon are
+   where Shopify growth is genuinely free of this trade-off.
+
+Reducing Birkenstock dependency therefore cannot mean "move Lunar to Shopify". It means
+finding and buying volume that Shopify can win *without* taking it off Amazon — Goor-shaped
+products, and stock in sizes we currently cannot sell at all.
 
 **And what's actually on the shelf:**
 
@@ -186,6 +254,12 @@ flatters it without building anything):
 | Focus-four styles with ≥70% size coverage | 11 of 78 |
 | Focus-four stock at cost | £4,305 |
 | Non-Birkenstock share of Shopify stock at cost | 7.4% |
+| **Focus-four Amazon profit, rolling 12m — the guard rail** | **£18,496** |
+
+That last line is the one that stops this programme doing harm. Focus-brand profit on Amazon
+is £18,496 against £1,435 on Shopify — thirteen times larger. Any Shopify gain bought by a
+fall in that number is a loss, and it will not show up in the primary metric at all. Read the
+two together, every month.
 
 Track non-Birkenstock in **absolute pounds** alongside the share. If Birkenstock has a poor
 summer, the share falls on its own and nothing has actually been fixed.
