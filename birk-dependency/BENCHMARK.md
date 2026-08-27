@@ -8,6 +8,19 @@ Prior-year window: 27 Aug 2024 – 26 Aug 2025.
 Source: `sales`, `channel='SHP'`. Sales history only reaches Aug 2024 (`db-maint/clean_sales.py`
 purges older rows), so two full years is all the comparison there is.
 
+## Decisions on file
+
+Scope calls made by Andreas, recorded here rather than in per-machine memory so they travel
+between the two machines. Anything below is settled unless he reopens it.
+
+| Decision | Date |
+|---|---|
+| **Measure at brand level only.** Birkenstock is Birkenstock — no style-level split (Arizona, Gizeh…). It measures a risk he isn't managing. | 27 Aug 2026 |
+| **Mixed-brand orders / basket composition is not a metric.** Cross-sell isn't a lever being pulled. | 27 Aug 2026 |
+| **The focus brands are Lunar, Goor, Rieker and Remonte.** These are what the next months are spent on. | 27 Aug 2026 |
+| **Skechers is being exited** — ignore it in readings, don't price it, don't buy it. | 27 Aug 2026 |
+| **Roamers and Grafters are parked** — not a focus, folded into "other brands". | 27 Aug 2026 |
+
 ## How these numbers are calculated
 
 `sales.soldprice` and `sales.profit` are **per unit**, not line totals, and returns are
@@ -72,27 +85,72 @@ to £1.4k now. Year on year over the same window:
 The dependency is rising from both ends. Any plan that only adds new brands, without
 arresting the decline in the ones already listed, starts from behind.
 
-## Four things worth knowing before planning
+## The four focus brands
 
-**1. The group is not dependent on Birkenstock — Shopify is.**
+Lunar, Goor, Rieker and Remonte are where the next months go. Together they are **78% of
+non-Birkenstock Shopify revenue and 89% of its profit** — so the programme does not depend on
+finding new brands, it depends on these four working.
+
+| brand | units | revenue | profit | margin |
+|---|---|---|---|---|
+| Lunar | 258 | £7,982 | £986 | 12.4% |
+| Goor | 68 | £2,214 | £360 | 16.3% |
+| Rieker | 34 | £1,533 | £75 | 4.9% |
+| Remonte | 2 | £118 | £14 | 11.5% |
+| **Focus four** | **362** | **£11,847** | **£1,435** | **12.1%** |
+| Skechers *(exiting)* | 40 | £2,154 | −£16 | −0.7% |
+| Other brands *(parked — incl. Roamers, Grafters)* | 27 | £1,107 | £196 | 17.7% |
+| **Non-Birkenstock total** | **429** | **£15,108** | **£1,615** | **10.7%** |
+
+Skechers is excluded from every target below — it is on the way out and its −£16 shouldn't
+flatter or drag the numbers either way.
+
+### Where each one stands
+
+**Shopify against Amazon, same stock, last 12 months:**
+
+| brand | Shopify | Amazon | Shopify as % of the pair |
+|---|---|---|---|
+| Lunar | £7,982 | £147,738 | 5.1% |
+| Rieker | £1,533 | £22,871 | 6.3% |
+| Remonte | £118 | £3,277 | 3.5% |
+| Goor | £2,214 | £1,114 | 66.5% |
+
+Lunar, Rieker and Remonte all sell 15–30× better on Amazon than on our own site. That gap is
+the opportunity and the proof it's achievable — the demand is real, we're just capturing it
+on someone else's platform at a worse margin (Amazon runs 10.2% overall against Shopify's
+15.3%). **Goor is the exception and the useful counter-example:** it already does better on
+Shopify than on Amazon, and at 16.3% it is the highest-margin brand of the four.
+
+**And what's actually on the shelf:**
+
+| brand | styles live | with stock | units | at cost | avg size cover | ≥70% cover |
+|---|---|---|---|---|---|---|
+| Lunar | 40 | 28 | 121 | £1,772 | 32.8% | 4 of 40 |
+| Rieker | 26 | **7** | 52 | £1,681 | 23.1% | 6 of 26 |
+| Remonte | 5 | 3 | 12 | £441 | 40.0% | 1 of 5 |
+| Goor | 7 | 6 | 27 | £411 | 29.8% | 0 of 7 |
+| **Focus four** | **78** | **44** | **212** | **£4,305** | — | **11 of 78** |
+
+This is the binding constraint. Nineteen of Rieker's 26 live styles have no stock at all, and
+across the four only 11 of 78 styles carry 70% or more of their size run. It is not a
+listings problem — everything is already live on Shopify. **Buying has to move before
+anything else will.**
+
+## The reframe: the business isn't Birk-dependent, the website is
 
 | channel | revenue | profit | Birkenstock |
 |---|---|---|---|
 | Shopify | £220,912 | £33,808 | 93% of revenue |
 | Amazon | £195,943 | £20,060 | **£0 — none** |
 | CM3 | £5,276 | £1,370 | — |
+| **All channels** | **£422,131** | **£55,238** | **49% of revenue** |
 
-Amazon turns over £196k a year with no Birkenstock at all — £147,738 of it Lunar. Across the
-whole business Birkenstock is ~49% of revenue. We already know how to sell non-Birkenstock
-footwear profitably; we do not currently do it on our own site.
+Amazon turns over £196k a year with no Birkenstock at all. Across the whole business
+Birkenstock is ~49% of revenue. We already know how to sell non-Birkenstock footwear
+profitably; we do not currently do it on our own site.
 
-**2. Lunar is the obvious lever, and it is not a listing problem.**
-40 of 42 Lunar styles are already `shopify=1`. Lunar did £147,738 on Amazon and £7,982 on
-Shopify — a **19:1** split on the same stock. Whatever is wrong is demand, price, or size
-depth, not catalogue coverage. Same shape for Rieker: 26/26 listed, £22,871 Amazon vs £1,533
-Shopify.
-
-**3. The stock is where the dependency actually lives.**
+## The stock is where the dependency lives
 
 | | styles on Shopify | with any stock | units in stock | stock at cost |
 |---|---|---|---|---|
@@ -100,50 +158,13 @@ Shopify.
 | Other | 111 | 55 | 261 | £5,299 |
 
 **92.6% of the working capital on the site is Birkenstock.** Half the non-Birkenstock
-catalogue has no stock at all, and average size coverage on the non-Birkenstock styles is
-**26.4%** against 45.0% for Birkenstock — only 16 of 111 non-Birk styles carry 70%+ of their
-size run. A listing at 26% size coverage is close to unsellable. Reducing the dependency is a
-buying decision before it is a marketing one, and it will move cash from a brand at 15.6%
-margin into brands currently running at 12.4% (Lunar) and below.
+catalogue has no stock at all, and average size coverage on those styles is **26.4%** against
+45.0% for Birkenstock. A listing at 26% size coverage is close to unsellable. Reducing the
+dependency is a buying decision before it is a marketing one, and it will move cash from a
+brand at 15.6% margin into brands currently running at 12.1% across the focus four.
 
 (Coverage per `CLAUDE.md`: `skumap` for the size universe, `localstock` for what is in stock.
 Never `skusummary.variants` / `stockvariants`.)
-
-**4. There is no basket effect to lose — and no cross-sell happening either.**
-
-| order type | orders | revenue | AOV |
-|---|---|---|---|
-| Birkenstock only | 3,631 | £236,810 | £65.22 |
-| Non-Birkenstock only | 418 | £16,879 | £40.38 |
-| Mixed | **3** | £439 | £146.34 |
-
-Three mixed orders in twelve months. Good news: the non-Birkenstock business stands on its
-own, so growing it does not risk a Birkenstock attach rate. Bad news: nothing on the site is
-currently pulling a Birkenstock buyer toward anything else — and the mixed AOV of £146 hints
-at what it would be worth if it did.
-
-## Supporting detail
-
-**Concentration inside the dependency** — Arizona alone is 42.6% of Birkenstock revenue, and
-**39.6% of all Shopify revenue** from a single style. Top styles by revenue share of Birk:
-Arizona 42.6%, Gizeh 13.6%, Bend 9.7%, Milano 9.2%, Madrid 8.3%, Zermatt 7.8%, Mayari 4.9%.
-Everything else is under 1% each.
-
-**Non-Birkenstock brands on Shopify, last 12 months:**
-
-| brand | units | revenue | profit | margin |
-|---|---|---|---|---|
-| Lunar | 258 | £7,982 | £986 | 12.4% |
-| Goor | 68 | £2,214 | £360 | 16.3% |
-| Skechers | 40 | £2,154 | −£16 | −0.7% |
-| Rieker | 34 | £1,533 | £75 | 4.9% |
-| Roamers | 5 | £253 | £54 | 21.4% |
-| Grafters | 5 | £174 | £38 | 21.6% |
-| 10 others | 19 | £798 | £118 | — |
-
-Skechers is selling at a loss and Rieker at 4.9% — thin enough that a Shopify pricing pass on
-the non-Birkenstock tail (`shopify-price/STRATEGY.md`) is worth doing before any spend goes
-behind these brands.
 
 **Return rate** is not a differentiator: 12.7% of Birkenstock units, 11.2% of the rest.
 
@@ -160,10 +181,14 @@ flatters it without building anything):
 |---|---|
 | Non-Birkenstock Shopify profit, rolling 12m | £1,615 |
 | Non-Birkenstock Shopify revenue, rolling 12m | £15,108 |
+| **Focus-four Shopify profit, rolling 12m** | **£1,435** |
+| **Focus-four Shopify revenue, rolling 12m** | **£11,847** |
+| Focus-four styles with ≥70% size coverage | 11 of 78 |
+| Focus-four stock at cost | £4,305 |
 | Non-Birkenstock share of Shopify stock at cost | 7.4% |
-| Non-Birk styles with ≥70% size coverage | 16 of 111 |
-| Arizona share of total Shopify revenue | 39.6% |
-| Mixed-brand orders per year | 3 |
 
 Track non-Birkenstock in **absolute pounds** alongside the share. If Birkenstock has a poor
 summer, the share falls on its own and nothing has actually been fixed.
+
+Skechers is excluded from the focus-four lines by definition; as it winds down it will drag
+the whole-tail lines slightly, which is expected and not a signal.
