@@ -3,6 +3,10 @@
 Goal: **materially reduce Shopify's dependence on Birkenstock within 6–12 months.**
 This is the starting line. Re-measure against it; don't re-derive it.
 
+Published as an artifact: https://claude.ai/code/artifact/cd664dc3-fc12-4a97-89d4-67e44670d272
+Republish by passing that URL — do not publish a fresh one, or the link goes stale on the
+other machine. (Memory is machine-local; this line is the only cross-machine record of it.)
+
 Baseline window: **27 Aug 2025 – 26 Aug 2026** (rolling 12 months).
 Prior-year window: 27 Aug 2024 – 26 Aug 2025.
 Source: `sales`, `channel='SHP'`. Sales history only reaches Aug 2024 (`db-maint/clean_sales.py`
