@@ -23,6 +23,7 @@ between the two machines. Anything below is settled unless he reopens it.
 | **Every product gets an assigned channel.** Shopify and Amazon compete for the same demand — pulling one up pulls the other down. No plan may assume a Shopify gain is incremental. See "Channel assignment" below. | 27 Aug 2026 |
 | **Padders and Caprice are being introduced.** Not yet in any figure here — add them to the focus group once they have stock and sales. | 27 Aug 2026 |
 | **Goor is the first task.** See "Task 1 — Goor" below. | 27 Aug 2026 |
+| **Aim new buying at £70+ retail.** Profit per pair is £3.10 under £40 against £14.83 at £70–90. Diversification means dearer product, not cheaper. See "Price band is the real lever". | 27 Aug 2026 |
 
 ## How these numbers are calculated
 
@@ -285,13 +286,86 @@ that barely profits from it.
    more than the entire current non-Birkenstock total of £1,615, from a brand we already
    stock, list and know how to sell.
 
+## Price band is the real lever
+
+Asked whether Goor is worth stocking at a £40 RRP when the ROAS is hard, and whether the aim
+should be products with a £70+ AOV. The data says **the £70+ instinct is right, and by a much
+wider margin than it looks.** Shopify, last 12 months, by selling price:
+
+| price band | units | ASP | profit per unit | margin | break-even ROAS |
+|---|---|---|---|---|---|
+| under £40 | 1,122 | £33.19 | £3.10 | 9.3% | **10.7×** |
+| £40–55 | 443 | £46.02 | £5.17 | 11.2% | 8.9× |
+| £55–70 | 1,498 | £64.10 | £9.15 | 14.3% | 7.0× |
+| **£70–90** | **1,020** | **£75.00** | **£14.83** | **19.8%** | **5.1×** |
+| £90+ | 231 | £103.75 | £19.24 | 18.5% | 5.4× |
+
+A £75 pair earns **nearly five times** the profit of a £33 pair. The cause is fixed cost per
+order — 30p payment fee, £1.00 packing, £3.44 Royal Mail, £4.74 in total before the `/1.2`
+haircut. At £33 that is 14% of the order; at £75 it is 6%. Cheap shoes are eaten by postage.
+
+"Break-even ROAS" above is simply price ÷ profit — the return needed for an ad-funded sale to
+wash its face. **Under £40 you need 10.7×; at £70–90 you need 5.1×.** That is the whole of
+the ROAS problem, stated properly, and it is a structural fact about the price point rather
+than anything to do with the brand.
+
+**The strategic consequence is bigger than Goor.** The non-Birkenstock tail averages £35.22 —
+squarely in the worst band on the table. Every diversification brand currently held sits in
+the £3–5 per unit zone while Birkenstock sits at £9.63 and the £70–90 band sits at £14.83. So
+**the way out of Birkenstock dependency is not cheaper brands, it is dearer ones.** Anything
+bought to replace Birkenstock revenue should be aimed at £70+ retail, or it will need three
+times the units to earn the same money and will never fund its own advertising.
+
+## Should we still stock Goor?
+
+**Yes — but as a non-paid line, at full RRP, and understood as a tidy-up rather than a
+strategy.**
+
+The case for:
+
+- **It is the exception in its price band.** At the full £40 RRP, Goor returns £9.54 on a
+  £15.98 cost — a 23.9% margin, against the 9.3% typical under £40. Its break-even ROAS is
+  **4.2×, better than Birkenstock's own 6.4×**. The general rule about cheap product does not
+  apply to Goor *at RRP*, because the cost price is unusually good.
+- **The capital is trivial.** £411 on the shelf now; a full size run across seven styles is
+  low four figures against £66,282 tied up in Birkenstock.
+- **It is counter-seasonal.** December and May peaks land in the Q4/Q1 trough where
+  Birkenstock does £13.7k and £20.8k against £103k in Q2. Overheads don't take the winter off.
+- **No cannibalisation.** £5.30 per unit on Shopify against £0.74 on Amazon.
+
+The case against, stated honestly:
+
+- **It only works at RRP.** Discounted to the £27.59 it has actually been selling at, profit
+  per pair falls to £2.89 and break-even ROAS rises to **9.5×** — unfundable. The margin is a
+  price-discipline story, not a product story.
+- **It is small.** Recovering last year's 359 units is ~£1,900 of profit. Worth having,
+  nowhere near enough to move a 95.2% dependency.
+
+**So: restock it, hold RRP with no discounting, and do not fund it from the Shopping campaign
+at the blended 6× target** — at 6× a Goor sale at RRP is fine, but the same budget spent on a
+£75 Birkenstock earns £14.83 instead of £9.54, so paid should follow the price band. Give
+Goor organic, email and repeat traffic, where its 4.2× break-even makes it comfortably
+profitable, and let it fill the winter trough.
+
+Do the restock because it is cheap, quick and recovers a business we already had. Do **not**
+treat it as the answer to the dependency — that has to come from £70+ product.
+
 ## Incoming: Padders and Caprice
 
-Both are being introduced and appear in no figure in this document. When they have stock and
-sales, add them to the focus group and re-baseline that section. Two things to settle before
-spend goes behind either, per the rules already established: assign each product a primary
-channel on **profit per unit**, and buy a full size run rather than a broad thin spread — the
-Goor position above is what a thin spread looks like eighteen months later.
+Both are being introduced and appear in no figure in this document — neither brand exists in
+`skusummary` yet. When they have stock and sales, add them to the focus group and re-baseline
+that section.
+
+Three things to settle before spend goes behind either, all following from the sections
+above:
+
+1. **Buy them at £70+ retail** if the range allows it. That is the band that earns £14.83 a
+   pair and can carry its own advertising at 5.1×. A £40 introduction repeats the problem
+   the rest of the tail already has.
+2. **Assign each product a primary channel on profit per unit** before any campaign is built.
+3. **Buy a full size run on fewer styles**, not a thin spread across many. The Goor position
+   above — 27 pairs across seven styles, one at zero coverage — is what a thin spread looks
+   like eighteen months later.
 
 ## The reframe: the business isn't Birk-dependent, the website is
 
