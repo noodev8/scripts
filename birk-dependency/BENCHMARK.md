@@ -21,6 +21,8 @@ between the two machines. Anything below is settled unless he reopens it.
 | **Skechers is being exited** — ignore it in readings, don't price it, don't buy it. | 27 Aug 2026 |
 | **Roamers and Grafters are parked** — not a focus, folded into "other brands". | 27 Aug 2026 |
 | **Every product gets an assigned channel.** Shopify and Amazon compete for the same demand — pulling one up pulls the other down. No plan may assume a Shopify gain is incremental. See "Channel assignment" below. | 27 Aug 2026 |
+| **Padders and Caprice are being introduced.** Not yet in any figure here — add them to the focus group once they have stock and sales. | 27 Aug 2026 |
+| **Goor is the first task.** See "Task 1 — Goor" below. | 27 Aug 2026 |
 
 ## How these numbers are calculated
 
@@ -204,6 +206,92 @@ This is the binding constraint. Nineteen of Rieker's 26 live styles have no stoc
 across the four only 11 of 78 styles carry 70% or more of their size run. It is not a
 listings problem — everything is already live on Shopify. **Buying has to move before
 anything else will.**
+
+## Task 1 — Goor
+
+Goor is the first brand worked because it is the only focus brand that already wins on
+Shopify, and because **its decline accounts for most of the problem this whole programme is
+trying to solve.**
+
+Seven styles, all supplier **UKD**, all segment **UKD-SEG**. Men's smart brogues and Oxfords
+plus one boys' patent Oxford. Cost £13.98–£15.98, RRP £40.
+
+### It hasn't underperformed — it has been switched off
+
+| Shopify | prior 12m | last 12m | change |
+|---|---|---|---|
+| units | 359 | 68 | **−81%** |
+| revenue | £11,269 | £2,214 | −80% |
+| profit | £1,603 | £360 | **−78%** |
+| profit per unit | £4.46 | £5.30 | +19% |
+
+Note the last row. Per-unit economics **improved** — the ASP rose from £31.39 to £32.56 as
+discounting stopped. This is not a brand losing its market. It is a brand that stopped being
+supplied.
+
+Put beside the headline decline: total non-Birkenstock Shopify profit fell £3,411 → £1,615,
+a loss of £1,796. **Goor alone is £1,243 of that — 69% of the entire non-Birkenstock
+collapse.** The monthly units tell it plainly: 34, 59, 44, 49 through late 2024, against 2,
+2, 2, 7, 6, 9 through 2026.
+
+### Why: there are 27 pairs in the building
+
+| style | | sizes | in stock | units | coverage |
+|---|---|---|---|---|---|
+| M014A | Mens Brogue Oxford Black | 9 | 6 | 6 | 67% |
+| B710AP | Boys Oxford Tie Patent Black | 11 | 6 | 10 | 55% |
+| M710AP | Mens Patent Tuxedo Dress Shoe | 9 | 3 | 7 | 33% |
+| M291AP | Mens Smart Oxford Tie Patent | 7 | 2 | 2 | 29% |
+| M968BC | Mens Tan/Navy Brogue Oxford | 7 | 1 | 1 | 14% |
+| M014B | Mens Brogue Oxford Brown | 9 | 1 | 1 | 11% |
+| M410B | Mens 4-Eye Brogue Gibson Tan | 7 | **0** | **0** | **0%** |
+| **total** | | **59** | **19** | **27** | **32%** |
+
+£411 of stock at cost. M968BC is the best-selling men's style on Shopify and it is down to a
+single pair in a single size. M410B is listed and completely unbuyable.
+
+### The economics justify restocking it properly
+
+At full RRP the two M014 styles return **£9.54 profit per pair** — against Birkenstock's
+Shopify average of **£9.63**. Effectively identical earnings per pair, on stock costing
+£15.98 instead of Birkenstock's ~£34.94 average. **The same capital works about twice as
+hard in Goor**, and it is not seasonal — these are year-round occasion and formal shoes,
+peaking around December and May rather than following the sandal cycle that concentrates
+Birkenstock into Q2.
+
+### Shopify is unambiguously the right channel for it
+
+| channel | units | ASP | profit per unit |
+|---|---|---|---|
+| Shopify | 68 | £32.56 | **£5.30** |
+| Amazon | 35 | £31.83 | **£0.74** |
+
+Goor earns **seven times more per pair on Shopify than on Amazon**, and M410B actually loses
+money on Amazon (−£0.76 per unit). This is the exact inverse of Ives — and it is why Goor
+carries no cannibalisation risk. Pushing Goor on Shopify takes almost nothing off a channel
+that barely profits from it.
+
+### What to do
+
+1. **Reorder from UKD across all seven styles**, to a full size run. This is the whole task —
+   nothing else moves until it does. The same order can cover the parked UKD-SEG brands
+   (Roamers, Grafters, Mod Comfys, Dek, R21, Cipriata, Scimitar).
+2. **Assign Goor to Shopify** under the channel rule. Consider withdrawing M410B from Amazon
+   rather than restocking it there.
+3. **Hold RRP.** B710AP has been selling at £27.59 against a £30 list; at £30 it returns
+   £4.51 a pair instead of £2.89 — **+56% per pair** for no volume risk worth the name, given
+   it already sells at £30 today.
+4. **Recovering the prior year's 359 units at today's £5.30 per unit is ~£1,900 of profit** —
+   more than the entire current non-Birkenstock total of £1,615, from a brand we already
+   stock, list and know how to sell.
+
+## Incoming: Padders and Caprice
+
+Both are being introduced and appear in no figure in this document. When they have stock and
+sales, add them to the focus group and re-baseline that section. Two things to settle before
+spend goes behind either, per the rules already established: assign each product a primary
+channel on **profit per unit**, and buy a full size run rather than a broad thin spread — the
+Goor position above is what a thin spread looks like eighteen months later.
 
 ## The reframe: the business isn't Birk-dependent, the website is
 
