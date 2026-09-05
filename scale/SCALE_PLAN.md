@@ -8,7 +8,7 @@
 
 - **12m revenue:** ~£310k (Feb 2026 baseline; refresh due end of May after spring data lands)
 - **Ives share of GP:** ~60% — target sub-50% by end-2026
-- **Active push:** Birkenstock Shopify peak (Apr–Jul) — Google Ads scaling. **Current cap & rationale live in `google-ads/BUDGET_REVIEW_PROCESS.md`** (don't restate the number here — it goes stale).
+- **Active push:** Birkenstock Shopify peak (Apr–Jul) — Google Ads scaling. Current cap & tROAS live in the Google Ads UI (don't restate the number here — it goes stale).
 - **Open initiatives:** REMONTE-WIN promotion for next winter; Frisco Amazon scale. (Rieker Summer reorder decision closed — M1655 retired 18 May.)
 - **Recent shifts:** Madrid EVA + Arizona Patent absorbed into existing segments; Frisco live on Amazon FBA
 
@@ -100,7 +100,6 @@ These are confirmed by data analysis. Referenced throughout but stated only here
 - Current spend: ~£17k/year, ROAS 10x. Headroom to 5x ROAS and still profitable.
 - Incrementally increase daily budget, seasonal acceleration (Mar-Jul) and pullback (Nov-Feb)
 - **Constraint:** Stock must be available before increasing spend
-- **Budget review process:** See `google-ads/BUDGET_REVIEW_PROCESS.md`
 
 ### Lever 3: Lunar/Amazon Expansion (Profit growth)
 - Maintain relentless Ives stock depth — every stockout day is lost profit
@@ -205,7 +204,7 @@ inheriting one.
 
 ## 9. Decision Log
 
-**Google Ads budget changes are logged in `google-ads/BUDGET_REVIEW_PROCESS.md` only. Don't duplicate here.** This log is for strategic / non-budget decisions.
+**Google Ads budget/tROAS changes are not logged in this repo.** This log is for strategic / non-budget decisions.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|

@@ -95,7 +95,7 @@ Scripts include comprehensive error handling with detailed logging. Check log fi
 
 These fields are written by the legacy PowerBuilder app only when a record is touched for other reasons. Verified Apr 2026: White Arizona BF Reg had `stockvariants=1` while localstock showed all 8 sizes in stock; the row hadn't been updated in 14 months. Can be wrong in either direction (stale-low or stale-high), and dividing by them produces nonsense like 114% size coverage or NULL-pushed-to-THIN classifications.
 
-**If you find these fields in an existing SQL block (including in other docs like `google-ads/BUDGET_REVIEW_PROCESS.md`), the block is wrong. Rewrite it before running.**
+**If you find these fields in an existing SQL block, the block is wrong. Rewrite it before running.**
 
 #### How to get size info correctly
 

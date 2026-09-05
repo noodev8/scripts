@@ -20,12 +20,12 @@ docs and material, not runnable.
 | `amz-product/` | BC-ops | New-product loader for Amazon | `python amz-product/amz_upload.py` | no | `CLAUDE_CONTEXT.md`, `how-to-run.md` |
 | `barcodes/` | Reference | Ad-hoc barcode generation on request | ask | no | `README.md` |
 | `birk-dependency/` | BC-analysis | Baseline + tracking for reducing Shopify's Birkenstock dependency | interactive | no | `BENCHMARK.md` |
-| `birk-stock/` | BC-analysis | Birkenstock core-size availability (the `Full` metric) | `python birk-stock/availability.py` | no | `README.md` |
+| `birk-stock/` | BC-analysis | Birkenstock delivery-vs-invoice check + birktracker code naming | `check_combined.sql` (edit params, run against DB) | no | `invoice_check_README.md` |
 | `db/` | BC-analysis | Ad-hoc reads and writes against the production database | `python db/query.py "SELECT ..."`, `python db/write.py "UPDATE ..."` | no | `README.md` |
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
-| `google-ads/` | BC-ops | Ads spend/stock tracking + budget reviews | `python google-ads/update_google_stock_track.py` | yes | `BUDGET_REVIEW_PROCESS.md`, `how-to-run.md` |
+| `google-ads/` | BC-ops | Ads spend/stock tracking | `python google-ads/update_google_stock_track.py` | yes | `how-to-run.md` |
 | `images/` | BC-ops | Product image sync to Drive (for PowerBuilder) + Shopify extra-image protection | `python images/updateimages.py` | yes | `README.md` |
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |

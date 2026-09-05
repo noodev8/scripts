@@ -8,7 +8,8 @@ Creates daily snapshots dated for YESTERDAY with:
 2. Total Stock: All products in inventory (localstock + Amazon)
 3. Shopify Sales: Sales from the snapshot date (yesterday)
 4. Birk Ad-Readiness: counts of READY styles, READY units, and THIN-selling styles
-   (Birkenstock-only — definition matches BUDGET_REVIEW_PROCESS.md, single source of truth).
+   (Birkenstock-only — definition lives in calculate_birk_ad_readiness() below,
+   which is the single source of truth).
    Reflects current stock at script run-time (yesterday's row gets today's stock —
    same convention as live_stock_units).
 
@@ -500,8 +501,7 @@ def calculate_birk_ad_readiness(cursor):
     """
     Calculate Birkenstock ad-readiness counts.
 
-    Definition matches BUDGET_REVIEW_PROCESS.md (single source of truth).
-    If the rule changes there, change it here too.
+    This docstring is the single source of truth for the rule.
 
     - Universe: skusummary where brand='Birkenstock', segment NOT NULL/CRAP,
       shopify=1, googlestatus=1
