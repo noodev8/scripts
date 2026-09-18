@@ -62,6 +62,31 @@ if not ACCESS_TOKEN:
 ENABLE_DELETION = False
 DELETION_DAYS_THRESHOLD = 5
 
+# --- POSTAGE PRICES — the one place to edit when the shipping prices change. --------------------------------------
+# Twin: NEXT_DAY_POSTAGE in C:\bcweb\bcweb-server\utils\orderSync.js.
+#
+# A customer order's courier is DERIVED from what the customer paid for shipping at checkout, and only ever at INSERT.
+# Pay the NEXT-DAY price -> courier "4" (Royal Mail 24). Pay anything else — the standard price, free shipping, nothing
+# at all -> "5" (Royal Mail 48). Only the next-day price is listed here because "5" is the catch-all: the standard
+# price is never tested and never needs to be.
+#
+# WHEN THE PRICES CHANGE (once or twice a year):
+#   1. If the STANDARD price changed, there is nothing to do — it is not tested.
+#   2. If the NEXT-DAY price changed: put the new price first, move the old price second, delete whatever was second.
+#   3. Make the identical edit to NEXT_DAY_POSTAGE in orderSync.js. Both run live; changing one and not the other is
+#      the failure mode described in the banner at the top of this file.
+#
+# KEEP EXACTLY TWO — current, and the one immediately before it. The previous price is carried only for the changeover,
+# so an order paid at the old price shortly before the change still gets RM24 when it syncs after. A longer history is
+# a liability: an old next-day price that happens to equal a later STANDARD price would silently upgrade standard
+# customers to RM24.
+#
+# Current prices for reference (2026-09-18): standard 4.45, next day 6.45. Both Royal Mail.
+NEXT_DAY_POSTAGE = (
+    6.45,   # current   — from 2026-09-18
+    5.95,   # previous  — for orders paid just before the change; drop when the next change comes round
+)
+
 # Setup logging using the standardized logging_utils
 SCRIPT_NAME = "update_orders"
 manage_log_files(SCRIPT_NAME)
@@ -450,7 +475,9 @@ def run_order_sync(cursor):
         shipping_cost_str = order.get("total_shipping_price_set", {}).get("shop_money", {}).get("amount")
         shipping_cost = float(shipping_cost_str) if shipping_cost_str else None
         shipping_notes = safe(order.get("note"))
-        courier = str(4 if shipping_cost == 5.95 else 5)
+        # Courier is decided ONLY at insert, from what was paid for shipping. Prices live in NEXT_DAY_POSTAGE
+        # at the top of this file — change them there, not here.
+        courier = str(4 if shipping_cost in NEXT_DAY_POSTAGE else 5)
 
         for item in order.get("line_items", []):
             shopifysku = safe(item.get("sku"))
