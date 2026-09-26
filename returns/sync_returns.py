@@ -296,9 +296,17 @@ def insert_return(cursor, line, product, unit_profit):
         INSERT INTO sales (
             channel, code, solddate, groupid, ordernum, ordertime,
             qty, soldprice, productname, brand, profit,
-            returnsaleid, source_key
+            returnsaleid, source_key, rrp
         )
-        VALUES ('SHP', %s, %s::date, %s, %s, '', %s, %s, %s, %s, %s, %s, %s)
+        VALUES ('SHP', %s, %s::date, %s, %s, '', %s, %s, %s, %s, %s, %s, %s,
+            -- rrp (2026-09-26): the ORIGINAL sale's stamped rrp, so a sale and its return carry the same figure; falls back to
+            -- the style's current skusummary.rrp for sales booked before the column existed. varchar junk -> NULL.
+            COALESCE(
+                (SELECT rrp FROM sales WHERE channel = 'SHP' AND ordernum = %s AND code = %s AND qty > 0 AND rrp IS NOT NULL
+                 ORDER BY id LIMIT 1),
+                (SELECT CASE WHEN btrim(rrp::text) ~ '^-?[0-9]+([.][0-9]+)?$' THEN btrim(rrp::text)::numeric END
+                 FROM skusummary WHERE groupid = %s LIMIT 1)
+            ))
         ON CONFLICT (source_key) WHERE source_key IS NOT NULL DO NOTHING
         """,
         (
@@ -313,6 +321,9 @@ def insert_return(cursor, line, product, unit_profit):
             -unit_profit if unit_profit is not None else None,
             safe(line["returnsaleid"], 50),
             line["source_key"],
+            line["ordernum"],
+            line["code"],
+            product["groupid"],
         ),
     )
     return cursor.rowcount

@@ -32,6 +32,7 @@
 #####################################################################################################################
 """
 
+import math
 import psycopg2
 import requests
 from datetime import datetime, timedelta
@@ -196,11 +197,20 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
             log(f"WARNING: No groupid found for SKU {shopifysku} (Order {order_name}) - skipping sales insert")
             return
 
-        # Get brand and cost from skusummary
-        cursor.execute("SELECT brand, cost FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
+        # Get brand, cost and rrp from skusummary. rrp is stamped onto the sale (2026-09-26) so it survives the style being
+        # deleted or re-priced. !! bcweb-server/utils/orderSync.js stamps it too - keep the two in step. !!
+        cursor.execute("SELECT brand, cost, rrp FROM skusummary WHERE groupid = %s LIMIT 1", (groupid,))
         result = cursor.fetchone()
         brand = result[0] if result else None
         cost_raw = result[1] if result else None
+        rrp_raw = result[2] if result else None
+        # skusummary.rrp is varchar and can hold junk ('RRP', '') - NULL rather than a wrong number.
+        try:
+            rrp = round(float(rrp_raw), 2) if rrp_raw not in (None, "") else None
+            if rrp is not None and not math.isfinite(rrp):  # float() accepts "nan"/"inf"
+                rrp = None
+        except (ValueError, TypeError):
+            rrp = None
 
         # Extract sales data
         soldprice = float(item.get("price", 0))
@@ -228,16 +238,16 @@ def insert_into_sales(cursor, order, item, shopifysku, order_name):
             INSERT INTO sales (
                 code, solddate, groupid, ordernum, ordertime, qty,
                 soldprice, channel, paytype, collectedvat,
-                productname, brand, profit, discount
+                productname, brand, profit, discount, rrp
             ) VALUES (
                 %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s,
-                %s, %s, %s, %s
+                %s, %s, %s, %s, %s
             )
         """, (
             safe(shopifysku, 50), solddate, safe(groupid, 50), safe(order_name, 50), ordertime[:20],
             item.get("quantity"), soldprice, "SHP",
-            paytype, None, title, safe(brand, 50), profit, 0
+            paytype, None, title, safe(brand, 50), profit, 0, rrp
         ))
 
         log("Sale inserted successfully")
