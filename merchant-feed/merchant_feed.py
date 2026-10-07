@@ -72,30 +72,6 @@ def determine_gender_and_age(gender):
         return "unisex", "adult"
 
 
-def determine_product_type(gender, titledetail):
-    if not gender:
-        return ""
-    gender_upper = gender.strip().upper()
-    title_upper = titledetail.strip().upper() if titledetail else ""
-
-    if gender_upper == "UNISEX":
-        return "Home > Womens > Footwear"
-    if gender_upper == "WOMENS":
-        if "SANDAL" in title_upper:
-            return "Home > Womens > Footwear > Womens Sandals"
-        if "SLIPPER" in title_upper:
-            return "Home > Womens > Footwear > Womens Slippers"
-        if "TRAINER" in title_upper:
-            return "Home > Womens > Footwear > Womens Trainers"
-        return "Home > Womens > Footwear"
-    if gender_upper == "MENS":
-        if "WIDE" in title_upper:
-            return "Home > Womens > Footwear > Mens Wide Fit"
-        return "Home > Mens > Footwear"
-    return ""
-
-
-
 def determine_stock_availability(localstock_qty, localstock_deleted, amzlive, ukdstock, code=None):
     """
     Determine stock availability based on priority:
@@ -132,7 +108,8 @@ def generate_feed():
             m.code, m.variantlink, m.uksize, m.ean, m.googleid,
             COALESCE(SUM(CASE WHEN ls.deleted = 0 THEN ls.qty ELSE 0 END), 0) as localstock_qty,
             CASE WHEN COUNT(CASE WHEN ls.deleted = 0 THEN 1 END) > 0 THEN 0 ELSE 1 END as localstock_deleted,
-            af.amzlive, uk.stock as ukdstock, sd.description
+            af.amzlive, uk.stock as ukdstock, sd.description,
+            mpt.product_type, mpt.google_category
         FROM skusummary sm
         JOIN skumap m ON sm.groupid = m.groupid
         LEFT JOIN attributes a ON a.groupid = sm.groupid
@@ -141,11 +118,12 @@ def generate_feed():
         LEFT JOIN amzfeed af ON af.code = m.code
         LEFT JOIN ukdstock uk ON uk.code = m.code
         LEFT JOIN shopify_description sd ON sd.handle = sm.handle
+        LEFT JOIN merchant_product_type mpt ON mpt.groupid = sm.groupid
         WHERE sm.googlestatus = 1 AND sm.shopify = 1 AND m.googlestatus = 1
         GROUP BY sm.groupid, sm.shopifyprice, sm.imagename, sm.brand, sm.colour,
                  sm.material, sm.cost, sm.rrp, sm.handle, sm.googlecampaign,
                  a.gender, t.shopifytitle, m.code, m.variantlink, m.uksize, m.ean, m.googleid,
-                 af.amzlive, uk.stock, sd.description
+                 af.amzlive, uk.stock, sd.description, mpt.product_type, mpt.google_category
     """)
 
     rows = cur.fetchall()
@@ -161,7 +139,6 @@ def generate_feed():
             image_name = row["imagename"]
             title = row["title"]
             gender = row["gender"]
-            product_type = determine_product_type(gender, title)
 
             # 1. GTIN from skumap.ean, remove "B" at end, validate length
             raw_gtin = str(row["ean"]) if row["ean"] else ""
@@ -204,8 +181,9 @@ def generate_feed():
                 "cost_of_goods_sold": f"{float(row['cost']):.2f} GBP" if pd.notnull(row["cost"]) else "",
                 "price": price,
                 "sale_price": sale_price,
-                "google_product_category": 187,
-                "product_type": product_type,
+                # Approved in the weekly review (product_types.py); Shoes and no type until then
+                "google_product_category": int(row["google_category"]) if pd.notnull(row["google_category"]) else 187,
+                "product_type": row["product_type"] if pd.notnull(row["product_type"]) else "",
                 "brand": row["brand"],
                 "gtin": gtin,
                 "condition": "new",

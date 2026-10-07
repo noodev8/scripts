@@ -58,6 +58,26 @@ kept on purpose** — shoppers search by style code. Where little is left after
 cleaning, the proposal is the title plus the stock code; better to fix those in
 Shopify, which helps the website too.
 
+## Product type and Google category
+
+Same pattern as descriptions: reviewed with Claude, stored in
+`merchant_product_type`, and simply read by the nightly feed. An unreviewed
+product goes out with no `product_type` and category 187 (Shoes).
+
+```
+python merchant-feed/product_types.py review          # list new/changed proposals
+python merchant-feed/product_types.py approve --all
+python merchant-feed/product_types.py approve <groupid> --type "Home > ..." --category 209
+```
+
+Proposals come from `attributes.gender` and `attributes.producttype`, e.g.
+`Home > Unisex > Footwear > Unisex Sandals` (plus "Wide Fit" when the title says
+wide). Category is 187 (Shoes), except `Accessories`, which are all socks: 209.
+A product comes back for review only if its proposal changes — fix the
+`attributes` row and it will.
+
+Run both reviews in the same session; they're independent.
+
 ## Configuration
 
 Read from the root `.env`:
