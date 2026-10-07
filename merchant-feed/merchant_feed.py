@@ -132,7 +132,7 @@ def generate_feed():
             m.code, m.variantlink, m.uksize, m.ean, m.googleid,
             COALESCE(SUM(CASE WHEN ls.deleted = 0 THEN ls.qty ELSE 0 END), 0) as localstock_qty,
             CASE WHEN COUNT(CASE WHEN ls.deleted = 0 THEN 1 END) > 0 THEN 0 ELSE 1 END as localstock_deleted,
-            af.amzlive, uk.stock as ukdstock
+            af.amzlive, uk.stock as ukdstock, sd.description
         FROM skusummary sm
         JOIN skumap m ON sm.groupid = m.groupid
         LEFT JOIN attributes a ON a.groupid = sm.groupid
@@ -140,11 +140,12 @@ def generate_feed():
         LEFT JOIN localstock ls ON ls.code = m.code
         LEFT JOIN amzfeed af ON af.code = m.code
         LEFT JOIN ukdstock uk ON uk.code = m.code
+        LEFT JOIN shopify_description sd ON sd.handle = sm.handle
         WHERE sm.googlestatus = 1 AND sm.shopify = 1 AND m.googlestatus = 1
         GROUP BY sm.groupid, sm.shopifyprice, sm.imagename, sm.brand, sm.colour,
                  sm.material, sm.cost, sm.rrp, sm.handle, sm.googlecampaign,
                  a.gender, t.shopifytitle, m.code, m.variantlink, m.uksize, m.ean, m.googleid,
-                 af.amzlive, uk.stock
+                 af.amzlive, uk.stock, sd.description
     """)
 
     rows = cur.fetchall()
@@ -195,7 +196,8 @@ def generate_feed():
             feed_rows.append({
                 "id": row["googleid"],
                 "title": title,
-                "description": title,
+                # Approved in the weekly review (descriptions.py); title until then
+                "description": row["description"] if pd.notnull(row["description"]) else title,
                 "link": f"https://brookfieldcomfort.com/products/{handle}?variant={variant_id}",
                 "image_link": f"https://images.brookfieldcomfort.com/{image_name}",
                 "availability": availability,
