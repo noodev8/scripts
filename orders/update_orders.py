@@ -82,10 +82,10 @@ DELETION_DAYS_THRESHOLD = 5
 # a liability: an old next-day price that happens to equal a later STANDARD price would silently upgrade standard
 # customers to RM24.
 #
-# Current prices for reference (2026-09-18): standard 4.45, next day 6.45. Both Royal Mail.
+# Current prices for reference (2026-10-07): standard FREE (was 4.45), next day 6.50. Both Royal Mail.
 NEXT_DAY_POSTAGE = (
-    6.45,   # current   — from 2026-09-18
-    5.95,   # previous  — for orders paid just before the change; drop when the next change comes round
+    6.50,   # current   — from 2026-10-07
+    6.45,   # previous  — for orders paid just before the change; drop when the next change comes round
 )
 
 # Setup logging using the standardized logging_utils
