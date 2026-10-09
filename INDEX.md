@@ -25,7 +25,6 @@ docs and material, not runnable.
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
-| `google-ads/` | BC-ops | Ads spend/stock tracking | `python google-ads/update_google_stock_track.py` | yes | `how-to-run.md` |
 | `images/` | BC-ops | Product image sync to Drive (for PowerBuilder) + Shopify extra-image protection | `python images/updateimages.py` | yes | `README.md` |
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |

@@ -136,7 +136,7 @@ These are confirmed by data analysis. Referenced throughout but stated only here
 | Monthly revenue | £26k avg | £42k avg | `sales` table |
 | Gross profit margin (blended) | ~28% | 28%+ | `sales.profit` |
 | Repeat purchase rate | 6.8% | 12%+ | Klaviyo / order analysis |
-| Google Ads ROAS | 10x | 7x+ (with higher spend) | Google Ads / `google_stock_track` |
+| Google Ads ROAS | 10x | 7x+ (with higher spend) | BCWEB Google Ads screen / `google_campaign_daily` |
 | Shopify orders/day | ~8 | ~15 | `sales` where channel='SHP' |
 | Amazon orders/day | ~11 | ~15 | `sales` where channel='AMZ' |
 | Average order value | ~£43 | £48+ | `sales` |
@@ -222,6 +222,6 @@ inheriting one.
 - **Email playbook:** `scale/KLAVIYO_EMAIL_PLAYBOOK.md`
 - **Meeting rules:** `scale/MEETING_RULES.md`
 - **DB schema:** read it live via the postgres MCP
-- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `price_track`, `google_stock_track`
+- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `price_track`, `stock_daily`, `google_campaign_daily`
 - **Key view:** `shopify_health_check`
 - **Identity:** "High-efficiency distribution engine for brands that already dominate demand"

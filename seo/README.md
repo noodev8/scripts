@@ -210,8 +210,8 @@ the denominator: turn ad spend up and organic share falls even if SEO is winning
 Score on organic clicks. Two limits worth knowing — `google_campaign_daily` is
 campaign-level (one campaign is ~96% of clicks), so paid can never be compared to
 organic at page or query level; and it is a manual CSV import that lags GSC, so a
-window marked partial is missing days, not losing traffic. Refresh via
-`google-ads/how-to-run.md`.
+window marked partial is missing days, not losing traffic. Refresh via the
+Import panel on BCWEB's Google Ads screen.
 
 ## What we store
 

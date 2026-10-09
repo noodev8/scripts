@@ -281,7 +281,7 @@ def main():
             print(f"  {name:12} organic {org:>6,.0f}   paid {p:>7,.0f}   "
                   f"organic {share:>4.0f}%{partial}")
     except Exception as e:
-        print(f"  Paid data unavailable ({e}). Refresh via google-ads/how-to-run.md.")
+        print(f"  Paid data unavailable ({e}). Refresh via the Import panel on BCWEB's Google Ads screen.")
 
     # ---- BY TYPE: 28d vs prior 28d ----
     now_rows = query(service, m1_start, m1_end, ["page"])
