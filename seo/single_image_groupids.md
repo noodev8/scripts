@@ -108,5 +108,5 @@ Heavily Birkenstock. Arizona alone is ~30% of the list; Birk styles together are
 ## Notes / caveats
 
 - Counts are **product-level** images (Shopify `product.images`, first 20). Variant-only images not attached at product level aren't counted — which is the gap you'd want surfaced anyway.
-- This is authoritative (live API), not the `shopifyimages` DB table (which only holds handles the nightly `updateimages.py` job has touched).
+- This is authoritative (live API).
 - Re-run any time: `python seo/find_single_image_groupids.py --csv seo/single_image_groupids.csv`. Use `--min 3` to widen the threshold.

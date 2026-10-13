@@ -3,10 +3,7 @@ find_single_image_groupids.py — one-off audit.
 
 Lists every Shopify groupid that has fewer than 2 images live on Shopify.
 
-This queries the Shopify Admin GraphQL API directly (the authoritative source),
-NOT the `shopifyimages` DB table — that table only holds handles the nightly
-updateimages.py job has touched (0/1-row handles inside a date window), so it
-can't tell "genuinely single-image" apart from "never synced".
+This queries the Shopify Admin GraphQL API directly (the authoritative source).
 
 Mapping is skusummary.handle -> groupid where shopify = 1.
 

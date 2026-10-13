@@ -20,7 +20,6 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 - **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
 - **Shopify title/tag sync**: `python shopify-sync/update_shopify_titles.py`, `python shopify-sync/update_shopify_tags.py`
 - **Price push to Shopify**: `python shopify-sync/price_update.py`, `python shopify-sync/price_track.py`
-- **Product images**: `python images/updateimages.py`
 
 Most of these run unattended on the VPS. **`crontab.txt` is the only place that
 records what runs when** — it mirrors the server, which is authoritative. Never

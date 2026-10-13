@@ -25,7 +25,6 @@ docs and material, not runnable.
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
-| `images/` | BC-ops | Product image sync to Drive (for PowerBuilder) + Shopify extra-image protection | `python images/updateimages.py` | yes | `README.md` |
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |
 | `month-end/` | BC-ops | Month-end accounting pack: transaction CSV, fees, stock position | `python month-end/month-export.py` | no | `README.md` |
@@ -57,7 +56,7 @@ if you're about to add a script here, it wants a folder instead.
 | `catalogue.py` | Checks this index against reality (`python catalogue.py`). Report only — never changes anything |
 | `crontab.txt` | Mirror of the VPS crontab. **The only schedule reference** |
 | `.env` | Credentials, not in git |
-| `client_secret.json`, `drive_oauth_client.json`, `drive_token.json`, `merchant-feed-api-*.json` | Google service-account and OAuth credentials |
+| `client_secret.json`, `merchant-feed-api-*.json` | Google service-account and OAuth credentials |
 
 ## Conventions
 
