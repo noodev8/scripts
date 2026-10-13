@@ -13,7 +13,6 @@ The database is the master in every case. These scripts only push outward.
 | `price_update.py` | Pushes prices to Shopify |
 | `update_shopify_inventory.py` | Pushes stock levels |
 | `update_shopify_titles.py` | Pushes product titles |
-| `update_shopify_tags.py` | Pushes tags — full compare every run |
 | `price_track.py` | Records daily price/stock/sales history into `price_track` |
 
 They're independent — none imports another, and each can be run alone.
@@ -30,7 +29,6 @@ python shopify-sync/price_update.py full             # force a full update
 python shopify-sync/price_update.py --groupid <id>   # one groupid
 python shopify-sync/update_shopify_inventory.py
 python shopify-sync/update_shopify_titles.py --force # ignore sync status
-python shopify-sync/update_shopify_tags.py --dry-run # preview, change nothing
 python shopify-sync/price_track.py
 ```
 

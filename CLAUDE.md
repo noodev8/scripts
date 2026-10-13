@@ -18,7 +18,7 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 - **Pick allocation only**: `python orders/update_orders.py --picks`
 - **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
 - **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
-- **Shopify title/tag sync**: `python shopify-sync/update_shopify_titles.py`, `python shopify-sync/update_shopify_tags.py`
+- **Shopify title sync**: `python shopify-sync/update_shopify_titles.py`
 - **Price push to Shopify**: `python shopify-sync/price_update.py`, `python shopify-sync/price_track.py`
 
 Most of these run unattended on the VPS. **`crontab.txt` is the only place that

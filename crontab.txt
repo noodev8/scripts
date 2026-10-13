@@ -55,8 +55,8 @@
 # 3:30 AM - Google Merchant feed (after prices/inventory updated)
 30 2 * * * /apps/scripts/venv/bin/python /apps/scripts/merchant-feed/merchant_feed.py --upload
 
-# 3:45 AM - Nightly Shopify tag sync
-45 2 * * * /apps/scripts/venv/bin/python /apps/scripts/shopify-sync/update_shopify_tags.py
+# 3:45 AM - (retired) Shopify 'lastfew' tag sync retired 2026-10-13 - update_shopify_tags.py deleted,
+# skusummary.lastfew dropped. Legacy PowerBuilder feature, no longer used (collection now uses 'clearance').
 
 # 4:00 AM - Weekly sales cleanup (Mondays only) - purge >900 days, fix return prices
 0 3 * * 1 /apps/scripts/venv/bin/python /apps/scripts/db-maint/clean_sales.py
