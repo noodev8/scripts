@@ -5,7 +5,7 @@
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),
 --      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log,
---      amzshipment_archive
+--      amzshipment_archive, google_product_daily + google_campaign_daily + shopify_delivery (2yr)
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
@@ -55,6 +55,20 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '21 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
+-- Google Ads imports: 2 YEARS (owner, 2026-10-14: "Just store 2 years. No point holding all this information"). The deepest
+-- reader is bcweb Reports -> Revenue, whose year-before column reaches back exactly 24 months (routes/analytics-revenue.js);
+-- the Google Ads screens and Ad Daily read 400 days at most, seo/weekly.py a few weeks. Strict '<' keeps the boundary day the
+-- Revenue window still opens on. Do NOT shorten below 2 years while Revenue compares a full year before.
+DELETE FROM google_product_daily
+WHERE snapshot_date < CURRENT_DATE - INTERVAL '2 years';
+
+DELETE FROM google_campaign_daily
+WHERE snapshot_date < CURRENT_DATE - INTERVAL '2 years';
+
+-- Shopify delivery charged per order (bcweb Reports -> Revenue): same 2-year reach as the Google tables above, same reason.
+DELETE FROM shopify_delivery
+WHERE order_day < CURRENT_DATE - INTERVAL '2 years';
 
 -- 60-day window: shipment manifests are only needed until the boxes
 -- land in FBA and reconcile, which is always inside a month. After
