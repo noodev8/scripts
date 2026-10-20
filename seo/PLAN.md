@@ -1,5 +1,13 @@
 # SEO — the plan (how we operate)
 
+> **Paused 2026-10-20 (owner): SEO is not worth active investment.** This doc is the
+> method if it is ever picked back up — it is not a current work queue, and there
+> are no live experiments. Why: README, "Status". Two corrections stand whatever
+> happens: (1) the **collection recipe does not work for a style search** — those are
+> answered by the free Shopping grid (README, "The real problem"); check the
+> `searchAppearance` split before building anything; (2) don't break the pages that
+> already earn — check `weekly.py` and 301 before deleting one.
+
 The operating doc. Read this to know **what we do and what to work on next**.
 `README.md` is the background reference (the goal, the scoreboard, what we know,
 what's ruled out). `CHANGELOG.md` logs every change + expectation + outcome. The
@@ -105,15 +113,12 @@ be empty now and refill seasonally (an empty MANUAL collection is the real dead
 page), and `seo` marks a page where a custom SEO title was set. Deleting still
 needs the link check and a 301 — this only finds candidates.
 
-## Current experiments (live)
+## Experiments (none live — all closed 2026-10-20)
 
-- **Arizona vs Madrid** — do internal links get a stuck collection *indexed* (Gate 1,
-  ~1–2 wks) and then *earning clicks* (Gate 2, 4–8 wks)? Both linked 2026-07-17.
-  First honest read **~2026-08-14**. Compare at equal age, on rate not raw clicks
-  (Arizona ~2,441 impr vs Madrid ~818).
-- **Size-6 page** — informational page test, same window.
-- **Product recipe** — first test not started. Candidate: `arizona-white-patent`
-  (190 impr, 25% conversion, ranks 8.4 — enough traffic to read a signal).
+- **Arizona vs Madrid** — failed. Indexing passed for Madrid, clicks never came for
+  either; the searches are answered by the free Shopping grid. `PROGRESS.md`.
+- **Size-6 page** — worked and kept: pos 1.4–2.2 on its questions, #4 page on the site.
+- **Product recipe** — never started, and not starting (paused).
 
 ## Settled — don't re-litigate
 

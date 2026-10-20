@@ -6,6 +6,32 @@ Read this first for any SEO session.
 [`PLAN.md`](PLAN.md).** This file is the *why* (the goal, the scoreboard, what we
 know, what's ruled out); PLAN.md is the *how*.
 
+## Status, 2026-10-20 — not worth active investment (owner's read)
+
+**Owner, 2026-10-20: "to me this looks like SEO is no good for us."** No new SEO
+work: no new pages, no collection experiments, no title/meta rounds. The reports
+still run if anyone wants to look. What tipped it, all measured (data to
+2026-10-17):
+
+- **The scoreboard is still falling, and faster.** Trailing 12: −171, −285, −303
+  in the last three months (the August note below said the fall was easing; it
+  reversed). Same month a year back: Jul −13%, Aug −26%, **Sep −43%**.
+- **The collection play is dead for style searches**, and now we know why: those
+  searches are answered by the **free Shopping grid**, where a collection page cannot
+  appear (see "The real problem" below, now resolved).
+- **The CTR play is worth +3 clicks/28d** across the whole site.
+- **The one win is small.** The size-6 blog worked (pos 1.4–2.2 on its questions,
+  the #4 page on the site) but it is an info page: ~21 clicks/28d at ~0.7% conversion.
+- **The prize was always small** — organic ~£1,300/quarter at the paid CPC, ~15% of
+  Google clicks.
+
+**What is still worth protecting is the traffic we already have.** Organic visitors
+still convert at ~77% of a paid one for free (GA4, "What we know"). This needs no
+project, only care: before deleting or renaming a page that earns organic clicks
+(homepage, `birkenstock-narrow-fit-sandals`, `birkenstock-slippers`, the size-6
+blog, the size guide, `mens-goor`, `birkenstock-milano`), check it in `weekly.py`
+and 301 it if it goes.
+
 ## The goal
 
 **Increase free clicks.** Be less dependent on Google Shopping. Paid is the
@@ -87,7 +113,7 @@ adjustment to argue about.**
 on 28d is the season recovering and means nothing. Those windows are for spotting
 breakage, not progress.
 
-**Where it stands, 2026-08-08 — falling, but the rate of fall is easing:**
+**Where it stands, 2026-10-17 — falling, and the fall is speeding up again:**
 
 | Trailing 12m to | Clicks | Chg | Impressions | CTR |
 |---|---|---|---|---|
@@ -95,10 +121,17 @@ breakage, not progress.
 | 2026-04 | 9,093 | −31 | 1,020,756 | 0.89% |
 | 2026-05 | 8,764 | **−329** | 966,635 | 0.91% |
 | 2026-06 | 8,506 | **−258** | 897,498 | 0.95% |
-| 2026-07 | **8,335** | −171 | 820,943 | **1.02%** |
+| 2026-07 | 8,335 | −171 | 820,943 | 1.02% |
+| 2026-08 | 8,050 | **−285** | 762,762 | 1.06% |
+| 2026-09 | **7,747** | **−303** | 743,655 | 1.04% |
 
-**−8.6%.** Impressions −22% across the same window while CTR rose 0.87% → **1.02%**.
-The monthly step has shrunk each month since May (−329, −258, −171).
+**−15% since March.** At 2026-08-08 the monthly step had shrunk three months running
+(−329, −258, −171) and this section said the fall was easing. It then grew again
+(−285, −303). Same month a year back: Jul −13%, Aug −26%, **Sep −43%**. CTR has held
+above last year's, so the delisting explanation below still applies, but it does not
+explain a fall that keeps widening. Arizona alone went 26 → 8 clicks (Aug) and
+8 → 2 (Sep) while its impressions tripled — the free Shopping grid, see "The real
+problem" below.
 
 **Read impressions and CTR together before calling this a loss.** Clicks are down
 8.6% while impressions are down 22% — we are being *shown* far less but converting
@@ -132,7 +165,7 @@ stay the proxy for the trend while being a knowingly imperfect one**. Do not rep
 the trailing 12 falling as failure without saying which of the three it is — and if
 you cannot say, say that.
 
-### The real problem — collections stopped doing their job (open, 2026-08-11)
+### The real problem — collections stopped doing their job (opened 2026-08-11, resolved 2026-10-20)
 
 **Collections are not performing as they used to, or as we expect them to.** They
 are still 49% of site clicks (470 of 958, 28d) but fell −103 over the prior 28d,
@@ -151,29 +184,46 @@ The demand is real and it is ranking — it is just resolving to a product page,
 the collection. Three weeks after linking the collection from the menu and from
 `birkenstock-sandals`, the collection is not being served at all.
 
-**We do not know why, and we do not know how to turn it to our advantage yet.**
-That is the honest state. Candidate explanations, none tested:
+**Resolved 2026-10-20: style searches are answered by the free Shopping grid, not
+by ordinary results.** GSC's `searchAppearance` split of every query containing the
+style name, 28d to 2026-10-17:
 
-- Google reads a single-colour product page as the better answer for a style query
-  (the query names a *product*, "arizona", not a category).
-- Merchant Listings / Shopping structured data give product pages an eligibility
-  a collection page does not have — note the one experiment that *worked*
-  (size-6 blog) sits on demand that is 1,209 of 1,210 impressions plain blue-link
-  with **zero** MERCHANT_LISTINGS.
-- The collection is too new/thin in link terms to displace an incumbent product
-  page that already earns 40% CTR.
+| | Arizona impr | clicks | pos | Madrid impr | clicks |
+|---|---|---|---|---|---|
+| **MERCHANT_LISTINGS** (free Shopping grid) | **892** | 1 | 2.1 | **72** | 0 |
+| PRODUCT_SNIPPETS (blue link with price/stars) | 128 | 0 | 19.6 | 26 | 0 |
+| Plain blue link (the rest) | ~75 | 0 | — | ~7 | 0 |
 
-**If product pages are what Google wants, the lever may be to stop fighting it** —
-work the product pages that already win (titles, meta, images, internal links from
-the collection *to* them) rather than trying to consolidate demand upward onto a
-collection Google has twice declined to serve. Not decided; **deprioritised by the
-owner 2026-08-11** — record findings here, do not open new collection experiments
-until this is picked back up.
+The "pos 1–3, zero clicks" rows in `queries.py` are grid tiles, each a single size
+of one product (`?variant=` URLs). Of the three candidate explanations recorded on
+2026-08-11, it was the second (Merchant Listings eligibility) — and the size-6 blog,
+the one test that worked, sits on demand with **zero** grid impressions. A collection
+page cannot appear in that grid at all, so **no amount of linking, copy or indexing
+puts it in front of a style search.** That is why Arizona and Madrid failed, and
+why `/collections/birkenstock-arizona` (2 impr) and `/collections/birkenstock-madrid`
+(0 impr) are still dead two months later.
 
-**First target: stop the fall.** A flat trailing 12 is a win from here. Pages
-built in July show up 4–8 weeks later, so the first honest reading is the trailing
-12 to **Sept/Oct 2026**. Targets beyond "stop the fall" are deliberately not set
-yet — see the priorities in State first.
+**And the grid gets shown more and clicked less, year on year:**
+
+| Arizona | Impr | Clicks |
+|---|---|---|
+| Aug 2025 → Aug 2026 | 1,336 → 3,811 | 26 → 8 |
+| Sep 2025 → Sep 2026 | 583 → **4,872** | 8 → **2** |
+
+Madrid is the same shape, smaller (Sep: 154 → 822 impr, 5 → 2 clicks). The likely
+reason is our own paid Shopping ad sitting above the free tile and taking the click —
+**unproven**, GSC cannot see paid. Either way the lever is the **product feed**
+(tile title, image, price — `merchant-feed/`, Google Ads), not a page, and those
+clicks may well arrive as paid ones.
+
+**Consequence: the PLAN.md "collection work" recipe does not apply to a style
+search.** Before building or linking a collection for a term, run the
+`searchAppearance` split (`dimensions: ["searchAppearance"]` with a
+`query contains <term>` filter). If most impressions are MERCHANT_LISTINGS, there
+is no page to build.
+
+**The target was "stop the fall" by the Sept/Oct 2026 read. It did not stop** — see
+the trailing-12 table above and the Status section at the top.
 
 ## What we can actually change
 
