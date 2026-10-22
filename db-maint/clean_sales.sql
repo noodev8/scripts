@@ -4,7 +4,7 @@
 --
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),
---      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log,
+--      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log + price_change_log (1yr),
 --      amzshipment_archive, google_product_daily + google_campaign_daily + shopify_delivery (2yr)
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
@@ -55,6 +55,13 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '21 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
+-- Shopify's price log, on the same year as Amazon's (owner, 2026-10-22: prune it so it doesn't grow for this and future
+-- queries). The deepest reader is bcweb Analytics -> Price Changes, whose window tops out at 365 days; the pricing drill's
+-- history (last 20 per style) goes empty for a style not repriced in a year, which the owner accepted. Keyed on change_date,
+-- which every row has (changed_at is NULL on the older ones). Do NOT shorten below a year while Price Changes reads one.
+DELETE FROM price_change_log
+WHERE change_date < CURRENT_DATE - INTERVAL '365 days';
 
 -- Google Ads imports: 2 YEARS (owner, 2026-10-14: "Just store 2 years. No point holding all this information"). The deepest
 -- reader is bcweb Reports -> Revenue, whose year-before column reaches back exactly 24 months (routes/analytics-revenue.js);
