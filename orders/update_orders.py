@@ -77,15 +77,14 @@ DELETION_DAYS_THRESHOLD = 5
 #   3. Make the identical edit to NEXT_DAY_POSTAGE in orderSync.js. Both run live; changing one and not the other is
 #      the failure mode described in the banner at the top of this file.
 #
-# KEEP EXACTLY TWO — current, and the one immediately before it. The previous price is carried only for the changeover,
+# KEEP AT MOST TWO — current, and the one immediately before it. The previous price is carried only for the changeover,
 # so an order paid at the old price shortly before the change still gets RM24 when it syncs after. A longer history is
 # a liability: an old next-day price that happens to equal a later STANDARD price would silently upgrade standard
 # customers to RM24.
 #
-# Current prices for reference (2026-10-07): standard FREE (was 4.45), next day 6.50. Both Royal Mail.
+# Current prices for reference (2026-10-23): standard 4.50, next day 6.50. Both Royal Mail.
 NEXT_DAY_POSTAGE = (
-    6.50,   # current   — from 2026-10-07
-    6.45,   # previous  — for orders paid just before the change; drop when the next change comes round
+    6.50,   # current   — from 2026-10-07 (previous 6.45 dropped 2026-10-23, changeover long done)
 )
 
 # Setup logging using the standardized logging_utils
