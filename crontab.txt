@@ -65,15 +65,11 @@
 
 # ===== DAYTIME PROCESSING =====
 
-# Order sync targets: 10:00, 13:00, 14:00, 15:00, 22:00 BST
+# Order sync — EVERY sales channel (Shopify, eBay, …), bcweb-server: the same code as the Update Orders button, sharing its lock,
+# so a press during a run just waits. Replaced orders/update_orders.py + the separate eBay job on 2026-11-01.
 # Note: Hour values are -1 to account for GMT server time.
-
 # 10:00, 13:00, 14:00, 15:00, 22:00 BST
-0 9,12,13,14,21 * * * /apps/scripts/venv/bin/python /apps/scripts/orders/update_orders.py
-
-# eBay orders (bcweb-server — same code as the Update Orders button): 5 minutes BEFORE each order sync above, never the same minute
-# (both allocate shelf stock and the Python takes no lock). 09:55, 12:55, 13:55, 14:55, 21:55 BST.
-55 8,11,12,13,20 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/ebay-order-sync.js
+0 9,12,13,14,21 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/order-sync.js
 
 # 22:30 BST - Shopify return sync. Runs after the last order sync of the day so
 # a same-day sale is already booked before its refund tries to reverse it.

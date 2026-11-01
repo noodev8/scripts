@@ -24,8 +24,7 @@ Worth knowing, because it looks like it should have been covered:
 
 | | Does it handle returns? |
 |---|---|
-| `orders/update_orders.py` | No. Inserts a positive `sales` row when the order is created, never revisits it. |
-| `bcweb-server/utils/orderSync.js` | No. Same insert-only logic. |
+| bcweb's order sync (`bcweb-server/utils/shopifyOrderSync.js`) | No. Inserts a positive `sales` row when the order is created, never revisits it. (The Python `orders/update_orders.py` did the same; retired 2026-11-01.) |
 | `month-end/month-export.py` | Reads refunds from the Shopify API, but only to build the accountant's CSV. Never writes to the database. |
 
 The sale was synced automatically; the un-sale was a manual monthly job. That
@@ -45,15 +44,14 @@ asymmetry is what this script closes.
    profit, negated — so a sale and its return net to ~zero.
 
 **Pagination is followed via the `Link` header.** Don't remove it: a 30-day
-window is already ~1,700 orders, which is seven pages. `update_orders.py` still
-has the un-paginated version of this bug.
+window is already ~1,700 orders, which is seven pages.
 
 ## The guard that matters
 
 A reversal is only written when a **matching positive sale row exists and still
 has unreversed units**.
 
-Shopify refunds cover cancellations as well as returns, and `update_orders.py`
+Shopify refunds cover cancellations as well as returns, and the order sync
 skips cancelled orders at insert time — so those orders were never booked as a
 sale. Without the guard, a cancelled-before-shipping order books a negative row
 against a sale that does not exist, inventing a loss out of nothing.
@@ -92,8 +90,7 @@ rather than recomputing.
 
 Note: `clean_sales.sql`'s step 5 comment cites `bcweb docs/profit-model.md` and
 `bcweb-server/utils/profit.js` as the source of truth. Neither file has ever
-existed — the real paths are `orders/update_orders.py` `shopify_profit()` and
-`bcweb-server/utils/shopifyProfit.js`.
+existed — the real path is `bcweb-server/utils/shopifyProfit.js`.
 
 ## The refund haircut stays
 

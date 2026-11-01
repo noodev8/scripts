@@ -28,7 +28,6 @@ docs and material, not runnable.
 | `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |
 | `month-end/` | BC-ops | Month-end accounting pack: transaction CSV, fees, stock position | `python month-end/month-export.py` | no | `README.md` |
-| `orders/` | BC-ops | Shopify order sync + pick allocation (`--picks` for picks only) | `python orders/update_orders.py` | yes | `README.md` |
 | `ofd/` | OFD | Online Front Door — separate business | interactive | no | `BUSINESS_PLAN.md` |
 | `pb-deploy/` | BC-ops | Packages a PowerBuilder build and publishes it as a BrookfieldApp GitHub release | `pb-deploy\release.bat` | no | `README.md` |
 | `returns/` | BC-ops | Books Shopify refunds out of `sales` as negative rows | `python returns/sync_returns.py` | yes | `README.md` |

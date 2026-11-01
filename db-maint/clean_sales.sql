@@ -177,9 +177,8 @@ WHERE qty < 0
 -- here, once the price is known. Stored as the NEGATIVE of the equivalent
 -- sale's per-unit net profit, so a sale and its return net to ~zero.
 --
--- Per-channel P&L model — the single source of truth is bcweb
--- docs/profit-model.md (mirrored in orders/update_orders.py shopify_profit and
--- bcweb-server/utils/profit.js):
+-- Per-channel P&L model — the single source of truth is
+-- bcweb-server/utils/shopifyProfit.js (Shopify) and utils/amzProfit.js (Amazon):
 --   VAT    = sold / 6
 --   Gross  = sold - VAT - cost
 --   Profit = (Gross - Expenses) / 1.2

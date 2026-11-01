@@ -14,8 +14,6 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 ## Common Commands
 
 ### Running Scripts
-- **Order sync and pick allocation**: `python orders/update_orders.py`
-- **Pick allocation only**: `python orders/update_orders.py --picks`
 - **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
 - **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
 - **Shopify title sync**: `python shopify-sync/update_shopify_titles.py`
@@ -40,12 +38,9 @@ restate a schedule anywhere else; it rots.
 ## Architecture & Key Components
 
 ### Core Scripts
-- **`orders/update_orders.py`**: Shopify order synchronization with timezone handling and pick allocation.
-  ⚠️ **This logic is DUPLICATED in BCWEB** — `C:\bcweb\bcweb-server\utils\orderSync.js`, behind the "Sync orders" button on
-  Analytics → Sales. Both are live (the cron was not switched off). They write the same rows in the same tables, so a change to
-  one and not the other silently produces a database written under two sets of rules. The profit formula is duplicated a second
-  time (`shopify_profit()` ↔ `bcweb-server/utils/shopifyProfit.js`). Read `orders/README.md` and
-  `C:\bcweb\docs\order-sync-port.md` before touching either.
+- **Order sync is NOT in this repo** (since 2026-11-01). `orders/update_orders.py` was retired; Shopify, eBay and any future channel
+  are read, booked and picked by bcweb — `bcweb-server/utils/orderSync.js` (the Update Orders button, and the cron line
+  `scripts/order-sync.js` in `crontab.txt`). See `bcweb/docs/order-sync.md`. Don't add an order script here.
 - **`merchant-feed/merchant_feed.py`**: Google Merchant Center feed generation with product categorization
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 
