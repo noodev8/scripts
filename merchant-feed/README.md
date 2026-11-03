@@ -32,7 +32,11 @@ text — but **only once someone has approved it**. Until then the feed sends th
 title, as it always did. The nightly run never calls Shopify and never cleans
 anything; it reads `shopify_description.description` and that's all.
 
-Approval is a weekly review, done with Claude, using `descriptions.py`:
+Approval is a review run when asked (roughly monthly), done with Claude — the
+`/descriptions-review` skill in bcweb — using `descriptions.py`. The same approved
+text is read by bcweb's eBay listing, so the review covers **every Shopify
+product that is one of our styles**, not only Google-live ones (2026-11-03); the
+feed still only sends Google-live products.
 
 ```
 python merchant-feed/descriptions.py review           # fetch from Shopify, list new/changed
@@ -42,7 +46,7 @@ python merchant-feed/descriptions.py approve <groupid> --text "Hand-written text
 ```
 
 `review` fetches every product (two Shopify calls), cleans the HTML, and lists
-feed products that are new or whose Shopify text has changed since approval.
+products that are new or whose Shopify text has changed since approval.
 Each proposal is in `merchant-feed/logs/description_review.md`, with any words
 worth a second look (delivery, free, returns, sale, here...) flagged. Most flags
 are harmless ("Free Spirit", "pressure-free cuff") — they're prompts, not errors.

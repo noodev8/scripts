@@ -189,15 +189,17 @@ def refresh(conn, log=print):
 
 RISKY = re.compile(r"\b(?:deliver\w*|dispatch\w*|free|returns?|sale|% off|discount\w*|click|here|order by|next day|same day|24 ?hr)\b", re.IGNORECASE)
 
+# Every Shopify product that is one of our styles, not only Google-live ones
+# (owner, 2026-11-03): eBay listing reads the same approved text, and a style
+# off Google would otherwise never come up and stay blocked there. The gift
+# card (no skusummary row) is left out by the join.
 PENDING_SQL = """
     SELECT DISTINCT sm.groupid, t.shopifytitle, sd.handle, sd.description_html,
            sd.approved_at IS NOT NULL AS was_approved
     FROM skusummary sm
-    JOIN skumap m ON m.groupid = sm.groupid
     LEFT JOIN title t ON t.groupid = sm.groupid
     JOIN shopify_description sd ON sd.handle = sm.handle
-    WHERE sm.googlestatus = 1 AND sm.shopify = 1 AND m.googlestatus = 1
-      AND sd.approved_html IS DISTINCT FROM sd.description_html
+    WHERE sd.approved_html IS DISTINCT FROM sd.description_html
     ORDER BY sm.groupid
 """
 
@@ -223,7 +225,7 @@ def review(conn):
     with open(path, "w", encoding="utf-8") as f:
         f.write(f"# Description review - {len(pending)} to approve, {flagged} with words to check\n\n")
         f.write("\n".join(lines))
-    print(f"{len(pending)} new/changed feed products, {flagged} with words to check")
+    print(f"{len(pending)} new/changed products, {flagged} with words to check")
     print(f"Proposals written to {path}")
 
 
