@@ -14,7 +14,7 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 ## Common Commands
 
 ### Running Scripts
-- **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
+- **Google Merchant feed**: NOT in this repo since 2026-11-08 — bcweb's `bcweb-server/scripts/merchant-feed.js --upload` (rules `utils/merchantFeed.js`). The description / product-type REVIEWS (`merchant-feed/descriptions.py`, `product_types.py`) are still here.
 - **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
 - **Shopify title sync**: `python shopify-sync/update_shopify_titles.py`
 - **Daily price history**: `python shopify-sync/price_track.py`. (The Shopify price PUSH, `price_update.py`, was retired 2026-11-08 — BCWEB pushes prices live; the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`.)
@@ -41,7 +41,7 @@ restate a schedule anywhere else; it rots.
 - **Order sync is NOT in this repo** (since 2026-11-01). `orders/update_orders.py` was retired; Shopify, eBay and any future channel
   are read, booked and picked by bcweb — `bcweb-server/utils/orderSync.js` (the Update Orders button, and the cron line
   `scripts/order-sync.js` in `crontab.txt`). See `bcweb/docs/order-sync.md`. Don't add an order script here.
-- **`merchant-feed/merchant_feed.py`**: Google Merchant Center feed generation with product categorization
+- **Google Merchant feed is NOT in this repo** (since 2026-11-08). `merchant-feed/merchant_feed.py` was retired to `archive/merchant-feed/`; the nightly feed is bcweb's `bcweb-server/scripts/merchant-feed.js` (cron line in `crontab.txt`). `merchant-feed/` keeps the descriptions / product-type review scripts, whose approved text and types the bcweb feed reads.
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 
 ### Database Schema

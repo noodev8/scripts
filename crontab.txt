@@ -51,8 +51,9 @@
 # 3:15 AM - Shopify titles update (update product titles)
 15 2 * * * /apps/scripts/venv/bin/python /apps/scripts/shopify-sync/update_shopify_titles.py
 
-# 3:30 AM - Google Merchant feed (after prices/inventory updated)
-30 2 * * * /apps/scripts/venv/bin/python /apps/scripts/merchant-feed/merchant_feed.py --upload
+# 3:30 AM - Google Merchant feed (after prices/inventory updated) - bcweb-server, Node. Replaced merchant-feed/merchant_feed.py on
+# 2026-11-08 (same file, compared line by line; Python in archive/merchant-feed/). Logs its own result to bclog ('Merchant Feed').
+30 2 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/merchant-feed.js --upload
 
 # 3:45 AM - (retired) Shopify 'lastfew' tag sync retired 2026-10-13 - update_shopify_tags.py deleted,
 # skusummary.lastfew dropped. Legacy PowerBuilder feature, no longer used (collection now uses 'clearance').
