@@ -22,7 +22,7 @@ records what runs when** — it mirrors the server, which is authoritative. Neve
 restate a schedule anywhere else; it rots.
 
 ### Database Operations
-- **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`)
+- **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`, uploads to Drive). Ends every run with a bclog row (section 'Backup', OK / FAILED) that bcweb's dashboard warns from — cron mail goes nowhere (no MAILTO).
 - **Sales-table maintenance**: `python db-maint/clean_sales.py` (runs `clean_sales.sql` alongside it)
 - **All database access goes through `db/`** — `python db/query.py "SELECT ..."` to read,
   `python db/write.py "UPDATE ..."` to write. `db/README.md` is the front door. This is what
