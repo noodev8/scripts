@@ -222,6 +222,6 @@ inheriting one.
 - **Email playbook:** `scale/KLAVIYO_EMAIL_PLAYBOOK.md`
 - **Meeting rules:** `scale/MEETING_RULES.md`
 - **DB schema:** read it live via the postgres MCP
-- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `price_track`, `stock_daily`, `google_campaign_daily`
+- **Key tables:** `sales`, `skusummary`, `skumap`, `localstock`, `stock_daily`, `google_campaign_daily`
 - **Key view:** `shopify_health_check`
 - **Identity:** "High-efficiency distribution engine for brands that already dominate demand"

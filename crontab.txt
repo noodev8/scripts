@@ -29,8 +29,8 @@
 # 2:00 AM - Database backup (first, when DB is stable)
 0 1 * * * /apps/scripts/db-maint/pg_backup.sh
 
-# 2:15 AM - Price tracking (capture current prices before any changes)
-15 1 * * * /apps/scripts/venv/bin/python /apps/scripts/shopify-sync/price_track.py
+# 2:15 AM - Price tracking (price_track.py) - RETIRED 2026-11-08, line removed; the price_track table was dropped the same day
+# (nothing read it; stock_daily, amz_size_history, price_change_log and sales hold the same facts). Script in archive/shopify-sync/.
 
 # 2:30 AM - Shopify price push (price_update.py) - RETIRED 2026-11-08, both lines commented out on the VPS.
 # BCWEB pushes every price to Shopify the moment it is set; nothing sets shopifychange=1 any more, and the Saturday full sweep would

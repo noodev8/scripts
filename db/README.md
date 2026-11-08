@@ -36,7 +36,7 @@ Use `write.py` so every write happens the same way:
 
 ```bash
 python db/write.py "UPDATE skusummary SET segment='IVES' WHERE groupid='X'"
-python db/write.py --dry-run "DELETE FROM price_track WHERE created < '2024-01-01'"
+python db/write.py --dry-run "DELETE FROM bclog WHERE date < '2024-01-01'"
 python db/write.py --file migration.sql
 ```
 
@@ -80,7 +80,6 @@ python db/query.py "SELECT relname, n_live_tup FROM pg_stat_user_tables ORDER BY
 | `localstock` | current inventory levels |
 | `skumap` | the full size universe per `groupid` |
 | `title` | product names, in `title.shopifytitle`, keyed by `groupid` |
-| `price_track` | price history and performance |
 | `incoming_stock` | actual stock arrivals, with `arrival_date` |
 | `birktracker` | Birkenstock forward orders and deliveries |
 

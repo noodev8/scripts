@@ -15,7 +15,7 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 
 ### Running Scripts
 - **Google Merchant feed**: NOT in this repo since 2026-11-08 — bcweb's `bcweb-server/scripts/merchant-feed.js --upload` (rules `utils/merchantFeed.js`). The description / product-type REVIEWS (`merchant-feed/descriptions.py`, `product_types.py`) are still here.
-- **Daily price history**: `python shopify-sync/price_track.py`. (The Shopify price PUSH, `price_update.py`, was retired 2026-11-08 — BCWEB pushes prices live; the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`.)
+- **Shopify (prices, titles, stock) is NOT in this repo** since 2026-11-08 — BCWEB pushes all of it (stock at the end of every Update Orders); the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`. The whole `shopify-sync/` folder, `price_track.py` included, is in `archive/shopify-sync/`; the `price_track` table was dropped.
 
 Most of these run unattended on the VPS. **`crontab.txt` is the only place that
 records what runs when** — it mirrors the server, which is authoritative. Never
@@ -47,7 +47,6 @@ PostgreSQL database with key tables:
 - `skusummary`: Product master data with cost, pricing, seasonality
 - `sales`: Historical sales transactions
 - `localstock`: Current inventory levels
-- `price_track`: Price history and performance tracking
 
 Tables suffixed `_delete` are retired — soft-deleted, pending a real drop. Never
 read from or write to one.

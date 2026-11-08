@@ -78,7 +78,7 @@ ORDER BY code;
 
 - `amzfeed.buybox` — not maintained, always 0.00.
 - `amzfeed.amzsoldprice` / `amzsolddate` — unreliable when null; use the `sales` table for last sold price/date.
-- `price_track` table — **Shopify only.** Never use for Amazon analysis.
+- `price_track` table — dropped 2026-11-08 (it was Shopify-only). Amazon size history is `amz_size_history`.
 
 ## Pricing decision framework
 
