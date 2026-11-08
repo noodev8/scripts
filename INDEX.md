@@ -33,7 +33,7 @@ docs and material, not runnable.
 | `returns/` | BC-ops | Books Shopify refunds out of `sales` as negative rows | `python returns/sync_returns.py` | yes | `README.md` |
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
-| `shopify-sync/` | BC-ops | Nightly push to Shopify: prices, stock, titles + daily price history | `python shopify-sync/price_update.py` | yes | `README.md` |
+| `shopify-sync/` | BC-ops | Nightly push to Shopify: stock, titles + daily price history (prices are pushed by BCWEB) | `python shopify-sync/update_shopify_inventory.py` | yes | `README.md` |
 | `archive/` | Reference | Retired files. Soft delete — never referenced from live docs or code | — | no | — |
 
 ## Root scripts

@@ -9,8 +9,9 @@ tools/views we've agreed so far.
 (e.g. `EVA-SEG`). The full segment list lives in `scale/CLAUDE_CONTEXT.md`. We never look
 at the catalogue as a whole for pricing — we look at one segment at a time.
 
-The technical path for *applying* a decided price is unchanged: `apply-prices.md` +
-`apply_prices.py`. This file is about *deciding*.
+A decided price is *applied* in BCWEB (the Shopify pricing screens), which pushes it to Shopify
+live. `apply_prices.py` was retired on 2026-11-08 (`archive/shopify-price/`), so the references
+to it below are history. This file is about *deciding*.
 
 ## Key constraint — no restock for Birkenstock
 

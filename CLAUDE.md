@@ -17,7 +17,7 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 - **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
 - **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
 - **Shopify title sync**: `python shopify-sync/update_shopify_titles.py`
-- **Price push to Shopify**: `python shopify-sync/price_update.py`, `python shopify-sync/price_track.py`
+- **Daily price history**: `python shopify-sync/price_track.py`. (The Shopify price PUSH, `price_update.py`, was retired 2026-11-08 — BCWEB pushes prices live; the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`.)
 
 Most of these run unattended on the VPS. **`crontab.txt` is the only place that
 records what runs when** — it mirrors the server, which is authoritative. Never
@@ -102,7 +102,7 @@ These fields are written by the legacy PowerBuilder app only when a record is to
 Never reach for `skusummary.variants` or `skusummary.stockvariants` in any query, even if a doc tells you to.
 
 ## Shopify Pricing
-When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.next_shopify_price_review` / `review.py`), and applying a decided price (`apply-prices.md` / `apply_prices.py`). Everything starts by filtering to a segment.
+When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.next_shopify_price_review` / `review.py`), and applying a decided price — **in BCWEB** (the Shopify pricing screens / W1, which push to Shopify live; `apply_prices.py` was retired to `archive/shopify-price/` on 2026-11-08 — never write `shopifyprice` directly). Everything starts by filtering to a segment.
 
 ## Amazon Pricing
 When asked to work on Amazon/FBA pricing ("amazon prices", "full ives review", "full rieker review", or any segment/brand on Amazon), read `amz-price/README.md` first — the front door and coverage map. The engine is brand-neutral and works for **any** segment we sell on Amazon, not just IVES: `AMZ_PRICING.md` (how it works), `AMZ_FULL_REVIEW.md` (the parameterised full-segment pass), `AMZ_PRODUCTS.md` (per-segment economics + state). No segment is "too small to manage" — thin segments sit on a longer cadence, not excluded.

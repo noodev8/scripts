@@ -1,5 +1,7 @@
 # amz-match — Shopify "match Amazon price"
 
+> **2026-11-08:** the nightly `price_update.py` sweep this job fell back on was retired. If this job is ever revived, a failed Shopify push needs another retry (e.g. push through bcweb's `shopify.pushIfLive`); setting `shopifychange = 1` no longer does anything.
+
 Self-contained cron job that pins the Shopify price of **chosen styles** to Amazon's cheapest **in-stock** size.
 
 ## The rule

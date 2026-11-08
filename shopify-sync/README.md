@@ -1,16 +1,15 @@
 # Shopify Sync
 
-The nightly push from our database to Shopify — prices, stock, titles, tags —
-plus the daily price/stock history snapshot. All five run unattended in one
+The nightly push from our database to Shopify — stock, titles —
+plus the daily price/stock history snapshot. The three run unattended in one
 overnight block; see `crontab.txt` for schedules.
 
 The database is the master in every case. These scripts only push outward.
 
-## The five scripts
+## The scripts
 
 | Script | Does |
 |---|---|
-| `price_update.py` | Pushes prices to Shopify |
 | `update_shopify_inventory.py` | Pushes stock levels |
 | `update_shopify_titles.py` | Pushes product titles |
 | `price_track.py` | Records daily price/stock/sales history into `price_track` |
@@ -24,34 +23,21 @@ reads the same data.
 ## Run
 
 ```
-python shopify-sync/price_update.py                  # changed rows only (default)
-python shopify-sync/price_update.py full             # force a full update
-python shopify-sync/price_update.py --groupid <id>   # one groupid
 python shopify-sync/update_shopify_inventory.py
 python shopify-sync/update_shopify_titles.py --force # ignore sync status
 python shopify-sync/price_track.py
 ```
 
-## How a price actually reaches Shopify
+## How a price reaches Shopify
 
-Worth knowing, because it's a two-step handshake and neither half is obvious:
+**BCWEB pushes it, the moment it is set** (the Shopify pricing screens / W1 and Add / Modify →
+`bcweb-server/utils/shopify.js`). There is no nightly price push any more: `price_update.py` and
+`shopify-price/apply_prices.py` were retired on 2026-11-08 (both in `archive/`). Nothing sets
+`skusummary.shopifychange = 1` now, so the flag is dead. A direct `UPDATE` of `shopifyprice`
+still never reaches Shopify — set prices in BCWEB.
 
-1. A decided price is applied with `shopify-price/apply_prices.py`, which writes
-   `skusummary.shopifyprice`, sets **`shopifychange = 1`**, sets the review date,
-   and logs to `price_change_log`.
-2. The nightly `price_update.py` selects `WHERE shopify = 1 AND shopifychange = 1`,
-   pushes those to Shopify, and clears the flag.
-
-**So a direct `UPDATE` of `shopifyprice` never reaches Shopify** — without the
-flag, the sweep doesn't see it. Always go through `apply_prices.py`.
-
-The same handshake is the safety net elsewhere: `amz-match/amz_match_sync.py`
-pushes prices directly and, if that push fails, sets `shopifychange = 1` so this
-sweep re-pushes it. Nobody watches an automated run, so the retry has to be
-automatic.
-
-`--no-google` on the cron lines is a **no-op**, kept only so existing cron
-entries don't break. Google Merchant prices come from `merchant-feed/`.
+Drift between BCWEB and Shopify is checked by hand as a monthly task:
+`node scripts/shopify-price-check.js` in `bcweb-server/` (`--fix` re-pushes the styles that differ).
 
 ## Paths
 
