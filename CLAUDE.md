@@ -17,7 +17,7 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 - **Google Merchant feed**: NOT in this repo since 2026-11-08 — bcweb's `bcweb-server/scripts/merchant-feed.js --upload` (rules `utils/merchantFeed.js`). The description / product-type REVIEWS (`merchant-feed/descriptions.py`, `product_types.py`) are still here.
 - **Shopify (prices, titles, stock) is NOT in this repo** since 2026-11-08 — BCWEB pushes all of it (stock at the end of every Update Orders); the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`. The whole `shopify-sync/` folder, `price_track.py` included, is in `archive/shopify-sync/`; the `price_track` table was dropped.
 
-Most of these run unattended on the VPS. **`crontab.txt` is the only place that
+Most of these run unattended on the VPS. **bcweb's `docs/crontab.txt` is the only place that
 records what runs when** — it mirrors the server, which is authoritative. Never
 restate a schedule anywhere else; it rots.
 
@@ -38,7 +38,7 @@ restate a schedule anywhere else; it rots.
 ### Core Scripts
 - **Order sync is NOT in this repo** (since 2026-11-01). `orders/update_orders.py` was retired; Shopify, eBay and any future channel
   are read, booked and picked by bcweb — `bcweb-server/utils/orderSync.js` (the Update Orders button, and the cron line
-  `scripts/order-sync.js` in `crontab.txt`). See `bcweb/docs/order-sync.md`. Don't add an order script here.
+  `scripts/order-sync.js` in bcweb's `docs/crontab.txt`). See `bcweb/docs/order-sync.md`. Don't add an order script here.
 - **Google Merchant feed is NOT in this repo** (since 2026-11-08). `merchant-feed/merchant_feed.py` was retired to `archive/merchant-feed/`; the nightly feed is bcweb's `bcweb-server/scripts/merchant-feed.js` (cron line in `crontab.txt`). `merchant-feed/` keeps the descriptions / product-type review scripts, whose approved text and types the bcweb feed reads.
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 
@@ -149,9 +149,9 @@ write to a `_delete` table.
 filing location. If archiving strands a reference, remove the reference or
 inline the useful part.
 
-**Never restate a schedule outside `crontab.txt`.** No clock times in
-docstrings, READMEs or comments. `crontab.txt` mirrors the VPS, which is
-authoritative — re-pull with `ssh root@vps "crontab -l"` before editing.
+**Never restate a schedule outside the crontab** — bcweb's `docs/crontab.txt` (moved
+there from this repo 2026-11-08). No clock times in docstrings, READMEs or comments.
+It mirrors the VPS, which is authoritative — re-pull with `ssh root@vps "crontab -l"` before editing.
 
 **Credentials live at the repo root**, beside `.env`: the Google OAuth and
 service-account JSONs. All are gitignored, so `git pull` does not deploy them —

@@ -59,7 +59,7 @@ Logs: `../logs/amz_match_sync.log` (shared logging, same as every other script).
 ## Schedule
 
 Runs on a cron schedule ahead of the nightly Google Merchant feed, so the day's price changes are carried to
-Merchant Center by that feed (no separate Google push). See **`crontab.txt`** for the actual timing — it's the
+Merchant Center by that feed (no separate Google push). See bcweb's **`docs/crontab.txt`** for the actual timing — it's the
 single source of truth; don't restate times here.
 
 ## Shared dependencies (reused from `C:\scripts`, not duplicated)

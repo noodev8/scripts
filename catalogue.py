@@ -6,7 +6,8 @@ Report only. This script never moves, edits or deletes anything; it prints what
 looks wrong and exits 1 so it can be wired into a check later.
 
 Checks:
-  1. Every script path in crontab.txt exists on disk.
+  1. Every script path in the crontab exists on disk. The crontab lives in bcweb
+     (docs/crontab.txt, moved there 2026-11-08); bcweb is expected beside this repo.
   2. Every capability folder has a front-door .md.
   3. Every .py at root or in a capability folder is mentioned in INDEX.md.
   4. Nothing unexpected is sitting at root.
@@ -28,7 +29,7 @@ SKIP_DIRS = {
 
 # Files allowed to live at root regardless of INDEX.md.
 ALLOWED_ROOT_FILES = {
-    "CLAUDE.md", "INDEX.md", "crontab.txt",
+    "CLAUDE.md", "INDEX.md",
     "logging_utils.py", "catalogue.py",
     ".env", ".gitignore", ".gitattributes", ".mcp.json",
 }
@@ -39,7 +40,7 @@ ALLOWED_ROOT_PATTERNS = [
     re.compile(r"^\..+$"),          # any dotfile
 ]
 
-# The VPS path prefix used in crontab.txt, mapped onto this checkout.
+# The VPS path prefix used in the crontab, mapped onto this checkout.
 CRON_PREFIX = "/apps/scripts/"
 
 
@@ -60,9 +61,9 @@ def capability_folders():
 
 def check_crontab_paths(problems):
     """Every script the crontab invokes must exist on disk."""
-    crontab = os.path.join(ROOT, "crontab.txt")
+    crontab = os.path.join(ROOT, "..", "bcweb", "docs", "crontab.txt")
     if not os.path.exists(crontab):
-        problems.append(("crontab", "crontab.txt not found"))
+        problems.append(("crontab", "bcweb/docs/crontab.txt not found (bcweb checked out beside this repo?)"))
         return 0
 
     seen = set()

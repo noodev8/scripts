@@ -4,7 +4,7 @@
 Google Merchant Center feed is `bcweb-server/scripts/merchant-feed.js --upload`, its rules in
 `bcweb-server/utils/merchantFeed.js` — the same file the Python built, compared line by line before the switch. The
 Python `merchant_feed.py` is in `archive/merchant-feed/` (history only; don't run or extend it). The schedule is in
-`crontab.txt`.
+bcweb's `docs/crontab.txt`.
 
 What stays here are the two REVIEWS, run with Claude when asked. Their approved results are stored in the database
 (`shopify_description`, `merchant_product_type`) and the bcweb feed simply reads them.

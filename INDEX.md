@@ -3,7 +3,7 @@
 Quick lookup for everything in this folder. One row per capability — what it is,
 how to run it, and where the detail lives.
 
-**Schedules are not listed here.** `crontab.txt` is the only record of what runs
+**Schedules are not listed here.** bcweb's `docs/crontab.txt` is the only record of what runs
 when, and it mirrors the VPS, which is authoritative. The `Cron` column below
 says only *whether* something is scheduled, never at what time.
 
@@ -51,7 +51,6 @@ if you're about to add a script here, it wants a folder instead.
 | `CLAUDE.md` | Standing instructions — read first |
 | `INDEX.md` | This file |
 | `catalogue.py` | Checks this index against reality (`python catalogue.py`). Report only — never changes anything |
-| `crontab.txt` | Mirror of the VPS crontab. **The only schedule reference** |
 | `.env` | Credentials, not in git |
 | `client_secret.json`, `merchant-feed-api-*.json` | Google service-account and OAuth credentials |
 
@@ -59,7 +58,7 @@ if you're about to add a script here, it wants a folder instead.
 
 See **"How this folder is organised"** in `CLAUDE.md` — folder per capability,
 a front-door `.md` for each, paths anchored on `__file__`, `archive/` as a soft
-delete, and schedules only in `crontab.txt`.
+delete, and schedules only in bcweb's `docs/crontab.txt`.
 
 Kept in one place deliberately: two copies of a rule is how the old docs rotted.
 

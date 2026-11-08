@@ -1,6 +1,6 @@
 -- ================================================================
 -- clean_sales.sql
--- Run by clean_sales.py on cron -- see crontab.txt for the schedule
+-- Run by clean_sales.py on cron -- see bcweb's docs/crontab.txt for the schedule
 --
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),

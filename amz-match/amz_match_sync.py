@@ -17,7 +17,7 @@ WHAT / WHY
     outside our tools (Seller Central by hand, or an Amazon repricer). It is READ-ONLY on amzfeed (never written).
 
 WHEN
-    Cron (see crontab.txt for timing) — scheduled ahead of the Google Merchant feed generation, so the day's changes
+    Cron (see bcweb's docs/crontab.txt for timing) — scheduled ahead of the Google Merchant feed generation, so the day's changes
     are carried to Google by that feed. A run where nothing changed (Amazon didn't move, or the feed wasn't reloaded)
     is a near-instant no-op that touches NO external API: the diff-guard below only pushes a style whose Amazon-lowest
     actually differs from its live Shopify price. So it is safe to run daily regardless.

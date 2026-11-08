@@ -15,7 +15,7 @@ python returns/sync_returns.py --since 2026-06-03  # backfill from a date
 python returns/sync_returns.py --dry-run           # report, write nothing
 ```
 
-Scheduled — see `crontab.txt`. Works from any directory; the script anchors on
+Scheduled — see bcweb's `docs/crontab.txt`. Works from any directory; the script anchors on
 its own location, not the working directory.
 
 ## Why nothing else was already doing this

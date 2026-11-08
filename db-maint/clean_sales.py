@@ -5,7 +5,7 @@ Runs clean_sales.sql to:
   1. Delete sales older than 900 days
   2. Fix returns that arrived with soldprice = 0
 
-Runs on cron -- see crontab.txt for the schedule and invocation.
+Runs on cron -- see bcweb's docs/crontab.txt for the schedule and invocation.
 """
 
 import psycopg2
