@@ -1,28 +1,18 @@
 # Shopify Sync
 
-The nightly push from our database to Shopify — stock —
-plus the daily price/stock history snapshot. The two run unattended in one
-overnight block; see `crontab.txt` for schedules.
+Only `price_track.py` is left here: the daily price/stock/sales history snapshot into `price_track` (it records, it doesn't push).
+See `crontab.txt` for its schedule.
 
-The database is the master in every case. These scripts only push outward.
-
-## The scripts
-
-| Script | Does |
-|---|---|
-| `update_shopify_inventory.py` | Pushes stock levels |
-| `price_track.py` | Records daily price/stock/sales history into `price_track` |
-
-They're independent — none imports another, and each can be run alone.
-
-`price_track.py` is the odd one out: it doesn't push anything to Shopify, it
-records history. It lives here because it runs in the same nightly block and
-reads the same data.
+**Nothing in this repo pushes to Shopify any more** (2026-11-08). BCWEB does it all:
+- **prices and titles** — sent with every BCWEB product push (the pricing screens, Add / Modify); `price_update.py` and
+  `update_shopify_titles.py` retired;
+- **stock** — set at the end of every Update Orders run (button and cron), `bcweb-server/utils/shopifyStockSync.js`;
+  `update_shopify_inventory.py` (3am) retired. Stock changed by hand in Shopify admin is overwritten — change it in BCWEB.
+All three scripts are in `archive/shopify-sync/`.
 
 ## Run
 
 ```
-python shopify-sync/update_shopify_inventory.py
 python shopify-sync/price_track.py
 ```
 

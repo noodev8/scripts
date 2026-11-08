@@ -15,7 +15,6 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 
 ### Running Scripts
 - **Google Merchant feed**: NOT in this repo since 2026-11-08 — bcweb's `bcweb-server/scripts/merchant-feed.js --upload` (rules `utils/merchantFeed.js`). The description / product-type REVIEWS (`merchant-feed/descriptions.py`, `product_types.py`) are still here.
-- **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
 - **Daily price history**: `python shopify-sync/price_track.py`. (The Shopify price PUSH, `price_update.py`, was retired 2026-11-08 — BCWEB pushes prices live; the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`.)
 
 Most of these run unattended on the VPS. **`crontab.txt` is the only place that

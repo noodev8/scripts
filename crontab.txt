@@ -45,8 +45,9 @@
 # Replaced google-ads/update_google_stock_track.py on 2026-10-09. Logs its own result to bclog ('Stock Daily').
 45 1 * * * cd /apps/production/bcweb-server && /root/.nvm/versions/node/v22.17.0/bin/node scripts/stock-daily.js
 
-# 3:00 AM - Shopify inventory sync (update stock levels)
-0 2 * * * /apps/scripts/venv/bin/python /apps/scripts/shopify-sync/update_shopify_inventory.py
+# 3:00 AM - Shopify inventory sync (update_shopify_inventory.py) - RETIRED 2026-11-08, line removed. Shopify's stock is now set by
+# bcweb's Update Orders (utils/shopifyStockSync.js) - every order-sync run below and every button press, not once a night.
+# Script kept in archive/shopify-sync/.
 
 # 3:15 AM - Shopify titles update (update_shopify_titles.py) - RETIRED 2026-11-08, line removed. BCWEB sends the title with every
 # Shopify push (an Add / Modify title edit is live at once); the script only re-checked new products. The monthly check
