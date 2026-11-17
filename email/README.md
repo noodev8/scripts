@@ -44,6 +44,6 @@ Any Spoks credential belongs in `bcweb-server\.env`, not this repo's `.env`.
 ## If a cron job is ever needed
 
 A scheduled contact/tag sync is the one piece that could legitimately land back
-in this repo, since unattended jobs live here and `crontab.txt` is authoritative
-for schedules. Not decided. Ask first, and record it in `crontab.txt` if it
+in this repo, since unattended jobs live here and bcweb's `docs/crontab.txt` is authoritative
+for schedules. Not decided. Ask first, and record it in bcweb's `docs/crontab.txt` if it
 happens.

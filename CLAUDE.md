@@ -14,19 +14,15 @@ This is a Python-based e-commerce automation and analytics system for Brookfield
 ## Common Commands
 
 ### Running Scripts
-- **Order sync and pick allocation**: `python orders/update_orders.py`
-- **Pick allocation only**: `python orders/update_orders.py --picks`
-- **Google Merchant feed**: `python merchant-feed/merchant_feed.py`
-- **Inventory sync**: `python shopify-sync/update_shopify_inventory.py`
-- **Shopify title sync**: `python shopify-sync/update_shopify_titles.py`
-- **Price push to Shopify**: `python shopify-sync/price_update.py`, `python shopify-sync/price_track.py`
+- **Google Merchant feed**: NOT in this repo since 2026-11-08 — bcweb's `bcweb-server/scripts/merchant-feed.js --upload` (rules `utils/merchantFeed.js`). The description / product-type REVIEWS (`merchant-feed/descriptions.py`, `product_types.py`) are still here.
+- **Shopify (prices, titles, stock) is NOT in this repo** since 2026-11-08 — BCWEB pushes all of it (stock at the end of every Update Orders); the monthly drift check is bcweb's `bcweb-server/scripts/shopify-price-check.js`. The whole `shopify-sync/` folder, `price_track.py` included, is in `archive/shopify-sync/`; the `price_track` table was dropped.
 
-Most of these run unattended on the VPS. **`crontab.txt` is the only place that
+Most of these run unattended on the VPS. **bcweb's `docs/crontab.txt` is the only place that
 records what runs when** — it mirrors the server, which is authoritative. Never
 restate a schedule anywhere else; it rots.
 
 ### Database Operations
-- **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`)
+- **Backup database**: `./db-maint/pg_backup.sh` (server-side only; writes to `/apps/backups`, uploads to Drive). Ends every run with a bclog row (section 'Backup', OK / FAILED) that bcweb's dashboard warns from — cron mail goes nowhere (no MAILTO).
 - **Sales-table maintenance**: `python db-maint/clean_sales.py` (runs `clean_sales.sql` alongside it)
 - **All database access goes through `db/`** — `python db/query.py "SELECT ..."` to read,
   `python db/write.py "UPDATE ..."` to write. `db/README.md` is the front door. This is what
@@ -40,13 +36,10 @@ restate a schedule anywhere else; it rots.
 ## Architecture & Key Components
 
 ### Core Scripts
-- **`orders/update_orders.py`**: Shopify order synchronization with timezone handling and pick allocation.
-  ⚠️ **This logic is DUPLICATED in BCWEB** — `C:\bcweb\bcweb-server\utils\orderSync.js`, behind the "Sync orders" button on
-  Analytics → Sales. Both are live (the cron was not switched off). They write the same rows in the same tables, so a change to
-  one and not the other silently produces a database written under two sets of rules. The profit formula is duplicated a second
-  time (`shopify_profit()` ↔ `bcweb-server/utils/shopifyProfit.js`). Read `orders/README.md` and
-  `C:\bcweb\docs\order-sync-port.md` before touching either.
-- **`merchant-feed/merchant_feed.py`**: Google Merchant Center feed generation with product categorization
+- **Order sync is NOT in this repo** (since 2026-11-01). `orders/update_orders.py` was retired; Shopify, eBay and any future channel
+  are read, booked and picked by bcweb — `bcweb-server/utils/orderSync.js` (the Update Orders button, and the cron line
+  `scripts/order-sync.js` in bcweb's `docs/crontab.txt`). See `bcweb/docs/order-sync.md`. Don't add an order script here.
+- **Google Merchant feed is NOT in this repo** (since 2026-11-08). `merchant-feed/merchant_feed.py` was retired to `archive/merchant-feed/`; the nightly feed is bcweb's `bcweb-server/scripts/merchant-feed.js` (cron line in `crontab.txt`). `merchant-feed/` keeps the descriptions / product-type review scripts, whose approved text and types the bcweb feed reads.
 - **`logging_utils.py`**: Centralized logging and database configuration utilities. Lives at root and is imported by ~25 scripts via `sys.path` inserts — do not move it
 
 ### Database Schema
@@ -54,7 +47,6 @@ PostgreSQL database with key tables:
 - `skusummary`: Product master data with cost, pricing, seasonality
 - `sales`: Historical sales transactions
 - `localstock`: Current inventory levels
-- `price_track`: Price history and performance tracking
 
 Tables suffixed `_delete` are retired — soft-deleted, pending a real drop. Never
 read from or write to one.
@@ -107,13 +99,13 @@ These fields are written by the legacy PowerBuilder app only when a record is to
 Never reach for `skusummary.variants` or `skusummary.stockvariants` in any query, even if a doc tells you to.
 
 ## Shopify Pricing
-When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.next_shopify_price_review` / `review.py`), and applying a decided price (`apply-prices.md` / `apply_prices.py`). Everything starts by filtering to a segment.
+When asked to work on Shopify pricing ("pricing review", "let's do prices", "shopify price check", or similar), read `shopify-price/STRATEGY.md` first — it's the current strategy, built in stages: segment-first triage (Stage 1, `latest_sales.py`), single-groupid drill-down (Stage 2, `drill.py`), the review-date cooldown (`skusummary.next_shopify_price_review` / `review.py`), and applying a decided price — **in BCWEB** (the Shopify pricing screens / W1, which push to Shopify live; `apply_prices.py` was retired to `archive/shopify-price/` on 2026-11-08 — never write `shopifyprice` directly). Everything starts by filtering to a segment.
 
 ## Amazon Pricing
 When asked to work on Amazon/FBA pricing ("amazon prices", "full ives review", "full rieker review", or any segment/brand on Amazon), read `amz-price/README.md` first — the front door and coverage map. The engine is brand-neutral and works for **any** segment we sell on Amazon, not just IVES: `AMZ_PRICING.md` (how it works), `AMZ_FULL_REVIEW.md` (the parameterised full-segment pass), `AMZ_PRODUCTS.md` (per-segment economics + state). No segment is "too small to manage" — thin segments sit on a longer cadence, not excluded.
 
 ## SEO
-**SEO is paused (owner, 2026-10-20: not worth active investment)** — the reports still run, but don't propose new SEO work; the reasons are in `seo/README.md` → "Status". When asked to work on SEO ("seo", "collection pages", "why isn't X ranking", "free clicks"), read `seo/PLAN.md` first — how we operate: the grid (collection vs product × browse- vs product-intent), the two priority lists, the recipes, and the live experiments. `seo/README.md` is the *why* (goal: increase free clicks, measured against paid; less Google Shopping dependence; 3/6/12-month horizon; what's ruled out). **Target is clicks** — a free-visibility gauge, not sales; SEO and the P&L are separate scoreboards, never merged. Impressions/position/CTR are diagnostics. Priorities come from `python seo/collection_priorities.py` (browse demand) and `python seo/product_priorities.py` (product value) — both write `.md` lists and have a `--review` cooldown. Progress: `python seo/weekly.py`; organic revenue: `python seo/ga4_client.py`. **We store nothing from GSC** (16 months retroactive). Changes go in `seo/CHANGELOG.md`. Don't score on average position, don't rank by impressions alone (weight by value/revenue), and don't trust GSC's `referringUrls` (it counts sitemaps and pagination).
+**SEO moved to bcweb on 2026-11-07** (owner: "move SEO work into this repo"). The reports are Node scripts in `bcweb-server/scripts/seo/` (`weekly.js`, `queries.js`, `collections.js`, `collection-priorities.js`, `product-priorities.js`, `page-history.js`, `organic-pages.js`, `link-check.js`), the docs (PLAN, README, CHANGELOG, PROGRESS) in bcweb's `docs/seo/`. Work there — read `docs/seo/PLAN.md` first. The Python folder is retired to `archive/seo/` (history only; don't run or extend it — its CHANGELOG / PLAN are frozen at 2026-11-07, the live copies are in bcweb).
 
 ## Scale Work
 For scale/segment work, read `scale/CLAUDE_CONTEXT.md` first — it contains all context including strategy, Google Sheets access, DB query patterns, and segment naming conventions.
@@ -157,9 +149,9 @@ write to a `_delete` table.
 filing location. If archiving strands a reference, remove the reference or
 inline the useful part.
 
-**Never restate a schedule outside `crontab.txt`.** No clock times in
-docstrings, READMEs or comments. `crontab.txt` mirrors the VPS, which is
-authoritative — re-pull with `ssh root@vps "crontab -l"` before editing.
+**Never restate a schedule outside the crontab** — bcweb's `docs/crontab.txt` (moved
+there from this repo 2026-11-08). No clock times in docstrings, READMEs or comments.
+It mirrors the VPS, which is authoritative — re-pull with `ssh root@vps "crontab -l"` before editing.
 
 **Credentials live at the repo root**, beside `.env`: the Google OAuth and
 service-account JSONs. All are gitignored, so `git pull` does not deploy them —

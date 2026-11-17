@@ -1,38 +1,26 @@
-# Merchant Feed
+# Merchant Feed — the reviews
 
-Builds the Google Merchant Center product feed and uploads it.
+**The feed itself moved to bcweb on 2026-11-08** (owner: the Python moves into BCWEB one script at a time). The nightly
+Google Merchant Center feed is `bcweb-server/scripts/merchant-feed.js --upload`, its rules in
+`bcweb-server/utils/merchantFeed.js` — the same file the Python built, compared line by line before the switch. The
+Python `merchant_feed.py` is in `archive/merchant-feed/` (history only; don't run or extend it). The schedule is in
+bcweb's `docs/crontab.txt`.
 
-`merchant_feed.py` pulls live product data from PostgreSQL, writes a TSV feed,
-and pushes it to Google Merchant Center over SFTP. It runs unattended on the VPS
-— see `crontab.txt` for the schedule.
-
-## Run
-
-```
-python merchant-feed/merchant_feed.py
-```
-
-Works from any directory: the script resolves its own location, reaches back to
-the repo root for `logging_utils`, and loads `.env` from there.
-
-## Output
-
-`GOOGLE-DATA-Merchant.txt` — the generated feed. It's written twice: once into
-`merchant-feed/logs/` (the copy that gets uploaded) and once into this folder.
-**It's a build artefact, not source** — it's overwritten on every run, so don't
-edit it or treat its contents as a reference.
-
-Logs go to `merchant-feed/logs/`, rotated into `merchant-feed/archive_logs/` —
-this folder keeps its own, separate from the repo-root `logs/`.
+What stays here are the two REVIEWS, run with Claude when asked. Their approved results are stored in the database
+(`shopify_description`, `merchant_product_type`) and the bcweb feed simply reads them.
 
 ## Descriptions
 
 The `description` column is the product's Shopify description, cleaned to plain
 text — but **only once someone has approved it**. Until then the feed sends the
-title, as it always did. The nightly run never calls Shopify and never cleans
+title, as it always did. The nightly feed (bcweb) never calls Shopify and never cleans
 anything; it reads `shopify_description.description` and that's all.
 
-Approval is a weekly review, done with Claude, using `descriptions.py`:
+Approval is a review run when asked (roughly monthly), done with Claude — the
+`/descriptions-review` skill in bcweb — using `descriptions.py`. The same approved
+text is read by bcweb's eBay listing, so the review covers **every Shopify
+product that is one of our styles**, not only Google-live ones (2026-11-03); the
+feed still only sends Google-live products.
 
 ```
 python merchant-feed/descriptions.py review           # fetch from Shopify, list new/changed
@@ -42,7 +30,7 @@ python merchant-feed/descriptions.py approve <groupid> --text "Hand-written text
 ```
 
 `review` fetches every product (two Shopify calls), cleans the HTML, and lists
-feed products that are new or whose Shopify text has changed since approval.
+products that are new or whose Shopify text has changed since approval.
 Each proposal is in `merchant-feed/logs/description_review.md`, with any words
 worth a second look (delivery, free, returns, sale, here...) flagged. Most flags
 are harmless ("Free Spirit", "pressure-free cuff") — they're prompts, not errors.

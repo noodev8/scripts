@@ -1,11 +1,11 @@
 -- ================================================================
 -- clean_sales.sql
--- Run by clean_sales.py on cron -- see crontab.txt for the schedule
+-- Run by clean_sales.py on cron -- see bcweb's docs/crontab.txt for the schedule
 --
 -- Jobs:
 --   1. Purge old data from sales, bclog, stockorder, incoming_stock (3yr),
---      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log,
---      amzshipment_archive
+--      orderstatus_archive, orderstatus (stale Amazon orders), amz_price_log + price_change_log (1yr),
+--      amzshipment_archive, google_product_daily + google_campaign_daily + shopify_delivery (2yr)
 --   2-3. Fix returns that arrived with soldprice = 0
 --        (so GP/margin calculations aren't skewed)
 --   4. Delete unresolvable returns
@@ -55,6 +55,27 @@ WHERE archivedate < CURRENT_DATE - INTERVAL '21 days';
 
 DELETE FROM amz_price_log
 WHERE log_date < CURRENT_DATE - INTERVAL '365 days';
+
+-- Shopify's price log, on the same year as Amazon's (owner, 2026-10-22: prune it so it doesn't grow for this and future
+-- queries). The deepest reader is bcweb Analytics -> Price Changes, whose window tops out at 365 days; the pricing drill's
+-- history (last 20 per style) goes empty for a style not repriced in a year, which the owner accepted. Keyed on change_date,
+-- which every row has (changed_at is NULL on the older ones). Do NOT shorten below a year while Price Changes reads one.
+DELETE FROM price_change_log
+WHERE change_date < CURRENT_DATE - INTERVAL '365 days';
+
+-- Google Ads imports: 2 YEARS (owner, 2026-10-14: "Just store 2 years. No point holding all this information"). The deepest
+-- reader is bcweb Reports -> Revenue, whose year-before column reaches back exactly 24 months (routes/analytics-revenue.js);
+-- the Google Ads screens and Ad Daily read 400 days at most, seo/weekly.py a few weeks. Strict '<' keeps the boundary day the
+-- Revenue window still opens on. Do NOT shorten below 2 years while Revenue compares a full year before.
+DELETE FROM google_product_daily
+WHERE snapshot_date < CURRENT_DATE - INTERVAL '2 years';
+
+DELETE FROM google_campaign_daily
+WHERE snapshot_date < CURRENT_DATE - INTERVAL '2 years';
+
+-- Shopify delivery charged per order (bcweb Reports -> Revenue): same 2-year reach as the Google tables above, same reason.
+DELETE FROM shopify_delivery
+WHERE order_day < CURRENT_DATE - INTERVAL '2 years';
 
 -- 60-day window: shipment manifests are only needed until the boxes
 -- land in FBA and reconcile, which is always inside a month. After
@@ -156,9 +177,8 @@ WHERE qty < 0
 -- here, once the price is known. Stored as the NEGATIVE of the equivalent
 -- sale's per-unit net profit, so a sale and its return net to ~zero.
 --
--- Per-channel P&L model — the single source of truth is bcweb
--- docs/profit-model.md (mirrored in orders/update_orders.py shopify_profit and
--- bcweb-server/utils/profit.js):
+-- Per-channel P&L model — the single source of truth is
+-- bcweb-server/utils/shopifyProfit.js (Shopify) and utils/amzProfit.js (Amazon):
 --   VAT    = sold / 6
 --   Gross  = sold - VAT - cost
 --   Profit = (Gross - Expenses) / 1.2

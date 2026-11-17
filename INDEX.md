@@ -3,7 +3,7 @@
 Quick lookup for everything in this folder. One row per capability — what it is,
 how to run it, and where the detail lives.
 
-**Schedules are not listed here.** `crontab.txt` is the only record of what runs
+**Schedules are not listed here.** bcweb's `docs/crontab.txt` is the only record of what runs
 when, and it mirrors the VPS, which is authoritative. The `Cron` column below
 says only *whether* something is scheduled, never at what time.
 
@@ -25,17 +25,14 @@ docs and material, not runnable.
 | `db-maint/` | BC-ops | Weekly sales-table purge + nightly database backup | `python db-maint/clean_sales.py`, `./db-maint/pg_backup.sh` | yes | `README.md` |
 | `docs/` | Reference | Reference material and setup notes | — | no | — |
 | `email/` | BC-analysis | Klaviyo email strategy and campaigns | interactive | no | `EMAIL_STRATEGY.md` |
-| `merchant-feed/` | BC-ops | Google Merchant Center product feed | `python merchant-feed/merchant_feed.py` | yes | `README.md` |
+| `merchant-feed/` | BC-analysis | Description + product-type reviews for the Google feed (the feed itself is in bcweb since 2026-11-08) | `python merchant-feed/descriptions.py review` | no | `README.md` |
 | `missing-sizes/` | BC-analysis | Amazon size-coverage gap report | `python missing-sizes/missing_sizes.py` | no | `README.md` |
 | `month-end/` | BC-ops | Month-end accounting pack: transaction CSV, fees, stock position | `python month-end/month-export.py` | no | `README.md` |
-| `orders/` | BC-ops | Shopify order sync + pick allocation (`--picks` for picks only) | `python orders/update_orders.py` | yes | `README.md` |
 | `ofd/` | OFD | Online Front Door — separate business | interactive | no | `BUSINESS_PLAN.md` |
 | `pb-deploy/` | BC-ops | Packages a PowerBuilder build and publishes it as a BrookfieldApp GitHub release | `pb-deploy\release.bat` | no | `README.md` |
 | `returns/` | BC-ops | Books Shopify refunds out of `sales` as negative rows | `python returns/sync_returns.py` | yes | `README.md` |
 | `scale/` | BC-analysis | Segment strategy, pricing process, brand expansion | interactive | no | `CLAUDE_CONTEXT.md` |
-| `seo/` | BC-analysis | Organic clicks: collection/product priorities, experiments | `python seo/weekly.py` | no | `PLAN.md` |
 | `shopify-price/` | BC-analysis | Shopify pricing reviews and price application | interactive | no | `STRATEGY.md` |
-| `shopify-sync/` | BC-ops | Nightly push to Shopify: prices, stock, titles + daily price history | `python shopify-sync/price_update.py` | yes | `README.md` |
 | `archive/` | Reference | Retired files. Soft delete — never referenced from live docs or code | — | no | — |
 
 ## Root scripts
@@ -54,7 +51,6 @@ if you're about to add a script here, it wants a folder instead.
 | `CLAUDE.md` | Standing instructions — read first |
 | `INDEX.md` | This file |
 | `catalogue.py` | Checks this index against reality (`python catalogue.py`). Report only — never changes anything |
-| `crontab.txt` | Mirror of the VPS crontab. **The only schedule reference** |
 | `.env` | Credentials, not in git |
 | `client_secret.json`, `merchant-feed-api-*.json` | Google service-account and OAuth credentials |
 
@@ -62,7 +58,7 @@ if you're about to add a script here, it wants a folder instead.
 
 See **"How this folder is organised"** in `CLAUDE.md` — folder per capability,
 a front-door `.md` for each, paths anchored on `__file__`, `archive/` as a soft
-delete, and schedules only in `crontab.txt`.
+delete, and schedules only in bcweb's `docs/crontab.txt`.
 
 Kept in one place deliberately: two copies of a rule is how the old docs rotted.
 

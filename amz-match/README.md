@@ -1,5 +1,7 @@
 # amz-match — Shopify "match Amazon price"
 
+> **2026-11-08:** the nightly `price_update.py` sweep this job fell back on was retired. If this job is ever revived, a failed Shopify push needs another retry (e.g. push through bcweb's `shopify.pushIfLive`); setting `shopifychange = 1` no longer does anything.
+
 Self-contained cron job that pins the Shopify price of **chosen styles** to Amazon's cheapest **in-stock** size.
 
 ## The rule
@@ -30,7 +32,7 @@ A run where nothing changed (Amazon didn't move, or the feed wasn't reloaded) is
 ## Push & failure handling
 
 - **Shopify**: per-variant REST price update (same as `../shopify-sync/price_update.py`). If the direct push fails, the row is flagged `shopifychange = 1` so the **nightly `price_update.py` sweep** re-pushes it (no operator watches an automated run).
-- **Google**: **not pushed from here.** The `merchant_feed.py --upload` feed (scheduled after this job) regenerates the whole feed from the DB, so the day's price changes reach Google Merchant via that one daily feed (over SFTP — no Content API).
+- **Google**: **not pushed from here.** The nightly Google feed (bcweb's `scripts/merchant-feed.js --upload` since 2026-11-08, scheduled after this job) regenerates the whole feed from the DB, so the day's price changes reach Google Merchant via that one daily feed (over SFTP — no Content API).
 
 ## Enabling a style
 
@@ -57,7 +59,7 @@ Logs: `../logs/amz_match_sync.log` (shared logging, same as every other script).
 ## Schedule
 
 Runs on a cron schedule ahead of the nightly Google Merchant feed, so the day's price changes are carried to
-Merchant Center by that feed (no separate Google push). See **`crontab.txt`** for the actual timing — it's the
+Merchant Center by that feed (no separate Google push). See bcweb's **`docs/crontab.txt`** for the actual timing — it's the
 single source of truth; don't restate times here.
 
 ## Shared dependencies (reused from `C:\scripts`, not duplicated)

@@ -8,10 +8,10 @@ month-shaped gap when someone forgets.
 
 WHY THIS IS A SEPARATE SCRIPT (asked and answered, Aug 2026)
 
-  * `orders/update_orders.py` books the sale rows, but it sits under the
-    "this logic exists in two places, change both or neither" banner — its live
-    twin is bcweb-server/utils/orderSync.js. Putting returns in there would
-    create exactly the divergence that banner exists to prevent. It also has
+  * The sale rows are booked by bcweb's order sync (bcweb-server/utils/
+    shopifyOrderSync.js; until 2026-11-01 also by a Python twin, orders/
+    update_orders.py, since retired). Returns were kept out of it while two
+    copies existed, to avoid a divergence between them. It also has
     known whole-run crash modes (`batch::int`) that returns should not share.
   * `db-maint/clean_sales.py` already handles returns, but only *repairs* them,
     on the weekly purge cadence. Ingestion needs to be daily.
@@ -34,7 +34,7 @@ WHAT IT WILL NOT DO
 
   A reversal is only written when a matching positive sale row exists and still
   has unreversed units. Shopify refunds also cover cancellations, and
-  `update_orders.py` skips cancelled orders at insert time — so without that
+  the order sync skips cancelled orders at insert time — so without that
   guard a cancelled-before-shipping order would book a negative row against a
   sale that was never recorded, inventing a loss. See `reversible_units()`.
 
@@ -131,7 +131,7 @@ def fetch_orders_with_refunds(since):
         log(f"  page {page}: {len(batch)} orders (total {len(orders)})")
 
         # Paginate via the Link header. Absent this the fetch silently truncates
-        # at 250 — the bug update_orders.py still carries. Don't drop it.
+        # at 250 (the retired update_orders.py had that bug). Don't drop it.
         url = None
         params = None  # cursor URLs already carry the query
         for part in response.headers.get("Link", "").split(","):
@@ -250,7 +250,7 @@ def reversible_units(cursor, ordernum, code):
     a second refund against an already-fully-returned line cannot double-reverse
     it. Guards against a phantom negative when the sale was never booked at all
     — which is the normal case for an order cancelled before fulfilment, since
-    update_orders.py skips those.
+    the order sync skips those.
     """
     cursor.execute(
         """

@@ -1,7 +1,7 @@
 # DB Maintenance
 
 Database housekeeping: the weekly purge and the nightly backup. Both run
-unattended on the VPS — see `crontab.txt` for schedules.
+unattended on the VPS — see bcweb's `docs/crontab.txt` for schedules.
 
 ## Sales-table maintenance
 

@@ -7,7 +7,7 @@ writes happen the same way every time: in one transaction, with the affected row
 count reported, and with a dry run available when you want to see the damage first.
 
     python db/write.py "UPDATE skusummary SET segment='IVES' WHERE groupid='X'"
-    python db/write.py --dry-run "DELETE FROM price_track WHERE created < '2024-01-01'"
+    python db/write.py --dry-run "DELETE FROM bclog WHERE date < '2024-01-01'"
     python db/write.py --file migration.sql
 
 Everything in one invocation runs in a single transaction and commits together, or

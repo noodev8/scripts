@@ -8,8 +8,8 @@ follows.
 
 ## Shopify — LOCKED (source of truth)
 
-Defined in code: `orders/update_orders.py` → `shopify_profit(sold, cost)`, mirrored by
-`bcweb-server` `shopifyProfit`. Written to `sales.profit` per unit at order-sync
+Defined in code: `bcweb-server/utils/shopifyProfit.js` → `shopifyProfit` (the only copy since
+2026-11-01; it was ported from the retired `orders/update_orders.py` → `shopify_profit()`). Written to `sales.profit` per unit at order-sync
 (commit a7cf657). Do not re-invent — change the code, not this doc.
 
 ```
